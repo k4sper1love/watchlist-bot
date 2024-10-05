@@ -2,30 +2,41 @@ package config
 
 import (
 	"fmt"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/joho/godotenv"
 	"os"
 )
 
-type Config struct {
+type App struct {
+	Vars *Vars
+	Bot  *tgbotapi.BotAPI
+	Upd  *tgbotapi.Update
+}
+
+type Vars struct {
 	BotToken    string
 	Environment string
 	DSN         string
 	BaseURL     string
 }
 
-func LoadConfig() (*Config, error) {
+func LoadApp() (*App, error) {
 	if err := godotenv.Load(); err != nil {
 		return nil, err
 	}
 
-	cfg := &Config{
+	vars := &Vars{
 		BotToken:    os.Getenv("BOT_TOKEN"),
 		Environment: os.Getenv("ENVIRONMENT"),
 		DSN:         configureDSN(),
 		BaseURL:     os.Getenv("BASE_URL"),
 	}
 
-	return cfg, nil
+	app := &App{
+		Vars: vars,
+	}
+
+	return app, nil
 }
 
 func configureDSN() string {

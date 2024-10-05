@@ -5,7 +5,9 @@ go 1.23rc2
 require (
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/joho/godotenv v1.5.1
-	github.com/k4sper1love/watchlist-api v0.0.0-20240929085313-e3a937a0f630
+	github.com/k4sper1love/watchlist-api v0.0.0-20241005100658-a70ddb0196c8
+	gorm.io/driver/postgres v1.5.9
+	gorm.io/gorm v1.25.12
 )
 
 require (
@@ -19,6 +21,4 @@ require (
 	golang.org/x/crypto v0.26.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
-	gorm.io/driver/postgres v1.5.9 // indirect
-	gorm.io/gorm v1.25.12 // indirect
 )

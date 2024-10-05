@@ -8,12 +8,14 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/handlers"
 )
 
-func Run(cfg *config.Config) error {
-	bot, err := tgbotapi.NewBotAPI(cfg.BotToken)
+func Run(app *config.App) error {
+	bot, err := tgbotapi.NewBotAPI(app.Vars.BotToken)
 	if err != nil {
 		return err
 	}
-	bot.Debug = true
+	bot.Debug = false
+
+	app.Bot = bot
 
 	sl.Log.Info(fmt.Sprintf("Authorized on account %s", bot.Self.UserName))
 
@@ -26,18 +28,8 @@ func Run(cfg *config.Config) error {
 	}
 
 	for update := range updates {
-		switch update.Message.Command() {
-		case "start":
-			go handlers.StartHandler(bot, &update)
-		case "help":
-			go handlers.HelpHandler(bot, &update)
-		case "profile":
-			go handlers.ProfileHandler(bot, &update)
-		default:
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "The bot is currently under development")
-			msg.ReplyToMessageID = update.Message.MessageID
-			bot.Send(msg)
-		}
+		app.Upd = &update
+		go handlers.HandleUserInput(app)
 	}
 
 	return nil

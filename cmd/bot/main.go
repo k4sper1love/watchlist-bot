@@ -9,18 +9,18 @@ import (
 )
 
 func main() {
-	cfg, err := config.LoadConfig()
+	app, err := config.LoadApp()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	sl.SetupLogger(cfg.Environment)
+	sl.SetupLogger(app.Vars.Environment)
 
-	if err = postgres.OpenDB(cfg); err != nil {
+	if err = postgres.OpenDB(app.Vars); err != nil {
 		log.Fatal(err)
 	}
 
-	if err = bot.Run(cfg); err != nil {
+	if err = bot.Run(app); err != nil {
 		log.Fatal(err)
 	}
 }

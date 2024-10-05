@@ -9,15 +9,15 @@ import (
 
 var db *gorm.DB
 
-func OpenDB(cfg *config.Config) error {
+func OpenDB(vars *config.Vars) error {
 	var err error
 
-	db, err = gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
+	db, err = gorm.Open(postgres.Open(vars.DSN), &gorm.Config{})
 	if err != nil {
 		return err
 	}
 
-	err = db.Debug().AutoMigrate(&models.User{})
+	err = db.Debug().AutoMigrate(&models.Session{})
 	if err != nil {
 		return err
 	}
@@ -27,4 +27,8 @@ func OpenDB(cfg *config.Config) error {
 
 func GetDB() *gorm.DB {
 	return db
+}
+
+func Save(value interface{}) {
+	db.Save(value)
 }
