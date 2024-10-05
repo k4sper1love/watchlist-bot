@@ -7,19 +7,27 @@ import (
 	"strings"
 )
 
-func HandleUserInput(app *config.App) {
+func HandleUserInput(app config.App) {
 	session, err := postgres.GetSessionByTelegramID(app.Upd.Message.From.ID)
 	if err != nil {
-		utils.SendMessage(app.Bot, app.Upd, "Произошла ошибка при получении пользователя")
+		utils.SendMessage(app.Bot, app.Upd, "Произошла ошибка при получении сессии")
 		return
 	}
 
 	if session.State == "" {
 		switch app.Upd.Message.Command() {
+		case "start":
+			handleStartCommand(app, session)
+		case "help":
+			handleHelpCommand(app, session)
 		case "profile":
-			handleUserGet(app, session)
+			requireAuth(app, session, handleProfileCommand)
 		case "register":
-			startRegistrationProcess(app, session)
+			requireNoAuth(app, session, startRegistrationProcess)
+		case "login":
+			requireNoAuth(app, session, startLoginProcess)
+		case "logout":
+			requireAuth(app, session, startLogoutProcess)
 		default:
 			utils.SendMessage(app.Bot, app.Upd, "Введите /register")
 		}
@@ -27,6 +35,10 @@ func HandleUserInput(app *config.App) {
 		switch {
 		case strings.HasPrefix(session.State, "registration_"):
 			handleRegistrationProcess(app, session)
+		case strings.HasPrefix(session.State, "login_"):
+			handleLoginProcess(app, session)
+		case strings.HasPrefix(session.State, "logout_"):
+			requireAuth(app, session, handleLogoutProcess)
 		default:
 			utils.SendMessage(app.Bot, app.Upd, "Неизвестное состояние")
 		}

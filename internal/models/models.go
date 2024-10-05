@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"github.com/k4sper1love/watchlist-api/pkg/filters"
+	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
+	"gorm.io/gorm"
+)
 
 type Session struct {
 	gorm.Model
@@ -13,7 +17,12 @@ type Session struct {
 }
 
 type AuthState struct {
-	Username string `json:"username"`
+	Username string `json:"username,omitempty"`
 	Email    string `json:"email"`
 	Password string `json:"password,omitempty"`
+}
+
+type CollectionsResponse struct {
+	Collections []apiModels.Collection `json:"collections"`
+	Metadata    filters.Metadata       `json:"metadata"`
 }

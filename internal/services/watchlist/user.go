@@ -3,7 +3,6 @@ package watchlist
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/config"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
@@ -11,7 +10,7 @@ import (
 	"time"
 )
 
-func GetUser(app *config.App, session *models.Session) (*apiModels.User, error) {
+func GetUser(app config.App, session *models.Session) (*apiModels.User, error) {
 	resp, err := SendRequest(app.Vars.BaseURL, "/user", http.MethodGet, session.AccessToken, nil)
 	if err != nil {
 		return nil, err
@@ -21,7 +20,6 @@ func GetUser(app *config.App, session *models.Session) (*apiModels.User, error) 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("не удалось, код: %s", resp.Status)
 	}
-	sl.Log.Debug("resp", resp)
 
 	var responseData map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&responseData); err != nil {
