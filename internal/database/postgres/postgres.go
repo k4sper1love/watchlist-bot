@@ -17,7 +17,7 @@ func OpenDB(vars *config.Vars) error {
 		return err
 	}
 
-	err = db.Debug().AutoMigrate(&models.Session{})
+	err = db.Debug().AutoMigrate(&models.Session{}, &models.CollectionState{}, &models.FilmState{}, &models.CollectionFilmState{})
 	if err != nil {
 		return err
 	}
@@ -29,6 +29,8 @@ func GetDB() *gorm.DB {
 	return db
 }
 
-func Save(value interface{}) {
-	db.Save(value)
+func Save(values ...interface{}) {
+	for _, value := range values {
+		db.Save(value)
+	}
 }

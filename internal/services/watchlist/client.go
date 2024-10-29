@@ -3,21 +3,16 @@ package watchlist
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
-func SendRequest(baseURL, requestURL, method, token string, data any) (*http.Response, error) {
-	req, err := prepareRequest(baseURL, requestURL, method, data)
+func SendRequest(baseURL, requestURL, method string, body any, headers map[string]string) (*http.Response, error) {
+	req, err := prepareRequest(baseURL, requestURL, method, body)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-
-	if token != "" {
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	}
+	addRequestHeaders(req, headers)
 
 	return doRequest(req)
 }
@@ -36,6 +31,14 @@ func prepareRequest(baseURL, requestURL, method string, data any) (*http.Request
 	}
 
 	return http.NewRequest(method, baseURL+requestURL, requestBody)
+}
+
+func addRequestHeaders(req *http.Request, headers map[string]string) {
+	req.Header.Set("Content-Type", "application/json")
+
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
 }
 
 func doRequest(request *http.Request) (*http.Response, error) {

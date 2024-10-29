@@ -18,6 +18,7 @@ type Vars struct {
 	Environment string
 	DSN         string
 	BaseURL     string
+	Secret      string
 }
 
 func LoadApp() (*App, error) {
@@ -30,6 +31,7 @@ func LoadApp() (*App, error) {
 		Environment: os.Getenv("ENVIRONMENT"),
 		DSN:         configureDSN(),
 		BaseURL:     os.Getenv("BASE_URL"),
+		Secret:      os.Getenv("SECRET"),
 	}
 
 	app := &App{

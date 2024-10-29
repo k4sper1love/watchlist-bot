@@ -1,12 +1,27 @@
 package handlers
 
+import "github.com/k4sper1love/watchlist-bot/internal/models"
+
 const (
-	RegistrationStateAwatingUsername = "registration_state_awaiting_username"
-	RegistrationStateAwatingEmail    = "registration_state_awaiting_email"
-	RegistrationStateAwatingPassword = "registration_state_awaiting_password"
+	ProcessLogoutStateAwaitingConfirm = "logout_state_awaiting_confirm"
 
-	LoginStateAwaitingEmail    = "login_state_awaiting_email"
-	LoginStateAwaitingPassword = "login_state_awaiting_password"
+	CallbackSettingsCollectionsPageSize        = "settings_collections_page_size"
+	ProcessSettingsCollectionsAwaitingPageSize = "settings_collections_awaiting_page_size"
 
-	LogoutStateAwaitingConfirm = "logout_state_awaiting_confirm"
+	CallbackCollectionsNextPage = "collections_next_page"
+	CallbackCollectionsPrevPage = "collections_prev_page"
+
+	ProcessNewCollectionAwaitingName        = "new_collection_awaiting_name"
+	ProcessNewCollectionAwaitingDescription = "new_collection_awaiting_description"
+
+	CallbackCollectionFilmsNextPage = "collection_films_next_page"
+	CallbackCollectionFilmsPrevPage = "collection_films_prev_page"
 )
+
+func resetState(session *models.Session) {
+	session.State = ""
+}
+
+func setState(session *models.Session, state string) {
+	session.State = state
+}

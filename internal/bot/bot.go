@@ -29,7 +29,7 @@ func Run(app *config.App) error {
 
 	for update := range updates {
 		app.Upd = &update
-		go handlers.HandleUserInput(*app)
+		go handlers.HandleUpdates(*app)
 	}
 
 	return nil

@@ -4,33 +4,28 @@ import (
 	"github.com/k4sper1love/watchlist-bot/config"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
-	"github.com/k4sper1love/watchlist-bot/pkg/utils"
 )
 
 func requireAuth(app config.App, session *models.Session, next func(config.App, *models.Session)) {
-	if !session.IsLogged {
-		utils.SendMessage(app.Bot, app.Upd, "Для выполнения этой команды нужно быть авторизованным. Используйте /register или /login")
+	if session.UserID == -1 {
+		sendMessage(app, "Для выполнения этой команды нужно быть авторизованным. Используйте /start")
+		resetState(session)
 		return
 	}
 
 	if !watchlist.IsTokenValid(app, session.AccessToken) {
 		if err := watchlist.RefreshAccessToken(app, session); err != nil {
-			utils.SendMessage(app.Bot, app.Upd, "Ваши токены истекли. Авторизуйтесь заново с помощью /login")
-			session.IsLogged = false
-			return
+			sendMessage(app, "Ваши токены истекли. Производим вход в систему")
+			if err := handleAuthProcess(app, session); err != nil {
+				sendMessage(app, "Не удалось войти в систему. Используйте /start.")
+				resetState(session)
+				return
+			} else {
+				sendMessage(app, "Вход выполнен успешно!")
+			}
 		} else {
-			utils.SendMessage(app.Bot, app.Upd, "Ваш токен был успешно обновлен")
+			sendMessage(app, "Ваш токен был успешно обновлен")
 		}
 	}
-
-	next(app, session)
-}
-
-func requireNoAuth(app config.App, session *models.Session, next func(config.App, *models.Session)) {
-	if session.IsLogged {
-		utils.SendMessage(app.Bot, app.Upd, "Вы уже авторизованы")
-		return
-	}
-
 	next(app, session)
 }
