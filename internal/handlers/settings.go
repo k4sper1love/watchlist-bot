@@ -15,7 +15,7 @@ var settingsButtons = []builders.Button{
 func handleSettingCommand(app config.App, session *models.Session) {
 	msg := "Выберите, что хотите настроить\n"
 	keyboard := builders.BuildButtonKeyboard(settingsButtons, 1)
-	sendMessageWithKeyboard(app, keyboard, msg)
+	sendMessageWithKeyboard(app, msg, keyboard)
 }
 
 func handleSettingButton(app config.App, session *models.Session) {

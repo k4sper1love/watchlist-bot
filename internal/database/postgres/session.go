@@ -8,6 +8,7 @@ func GetSessionByTelegramID(telegramID int) (*models.Session, error) {
 	if err := GetDB().
 		Preload("CollectionState").
 		Preload("FilmState").
+		Preload("CollectionFilmState").
 		FirstOrInit(&session, models.Session{TelegramID: telegramID}).Error; err != nil {
 		return nil, err
 	}
@@ -16,5 +17,5 @@ func GetSessionByTelegramID(telegramID int) (*models.Session, error) {
 }
 
 func SaveSessionWihDependencies(session *models.Session) {
-	Save(session, session.CollectionState, session.FilmState)
+	Save(session, session.CollectionState, session.FilmState, session.CollectionFilmState)
 }

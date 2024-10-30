@@ -13,9 +13,9 @@ func GetFilms(app config.App, session *models.Session) (*models.FilmsResponse, e
 		"Authorization": session.AccessToken,
 	}
 
-	requestUrl := fmt.Sprintf("/collections/%d/films", session.CollectionState.ObjectID)
+	requestURL := fmt.Sprintf("/collections/%d/films", session.CollectionState.ObjectID)
 
-	resp, err := SendRequest(app.Vars.BaseURL, requestUrl, http.MethodGet, nil, headers)
+	resp, err := SendRequest(app.Vars.BaseURL, requestURL, http.MethodGet, nil, headers)
 	if err != nil {
 		return nil, err
 	}

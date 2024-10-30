@@ -22,8 +22,8 @@ func BuildCollectionFilmsMessage(collectionFilmsResponse *models.CollectionFilms
 func BuildCollectionFilmsSelectButtons(collectionFilmsResponse *models.CollectionFilmsResponse) []Button {
 	var buttons []Button
 
-	for _, film := range collectionFilmsResponse.CollectionFilms.Films {
-		buttons = append(buttons, Button{film.Title, fmt.Sprintf("select_collection_film_%d", film.ID)})
+	for i, film := range collectionFilmsResponse.CollectionFilms.Films {
+		buttons = append(buttons, Button{film.Title, fmt.Sprintf("select_cf_%d", i)})
 	}
 
 	return buttons

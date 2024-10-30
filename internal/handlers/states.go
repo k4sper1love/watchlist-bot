@@ -16,6 +16,9 @@ const (
 
 	CallbackCollectionFilmsNextPage = "collection_films_next_page"
 	CallbackCollectionFilmsPrevPage = "collection_films_prev_page"
+
+	CallbackCollectionFilmsDetailNextPage = "collection_films_detail_next_page"
+	CallbackCollectionFilmsDetailPrevPage = "collection_films_detail_prev_page"
 )
 
 func resetState(session *models.Session) {

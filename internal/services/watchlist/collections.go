@@ -20,9 +20,9 @@ func GetCollections(app config.App, session *models.Session) (*models.Collection
 		"Authorization": session.AccessToken,
 	}
 
-	requestUrl := fmt.Sprintf("/collections?page=%d&page_size=%d", session.CollectionState.CurrentPage, session.CollectionState.PageSize)
+	requestURL := fmt.Sprintf("/collections?page=%d&page_size=%d", session.CollectionState.CurrentPage, session.CollectionState.PageSize)
 
-	resp, err := SendRequest(app.Vars.BaseURL, requestUrl, http.MethodGet, nil, headers)
+	resp, err := SendRequest(app.Vars.BaseURL, requestURL, http.MethodGet, nil, headers)
 	if err != nil {
 		return nil, err
 	}

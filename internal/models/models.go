@@ -20,25 +20,26 @@ type Session struct {
 
 type CollectionState struct {
 	gorm.Model
-	SessionID   uint
-	ObjectID    int    `json:"-" gorm:"default:-1"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	CurrentPage int    `json:"-"`
-	LastPage    int    `json:"-"`
-	PageSize    int    `json:"-" gorm:"default:1"`
+	SessionID       uint
+	ObjectID        int                       `json:"-" gorm:"default:-1"`
+	CollectionFilms apiModels.CollectionFilms `json:"collection_films" gorm:"serializer:json"`
+	Name            string                    `json:"name"`
+	Description     string                    `json:"description"`
+	CurrentPage     int                       `json:"-"`
+	LastPage        int                       `json:"-"`
+	PageSize        int                       `json:"-" gorm:"default:1"`
 }
 
-type FilmState struct {
+type CollectionFilmState struct {
 	gorm.Model
 	SessionID   uint
-	ObjectID    int `json:"-" gorm:"default:-1"`
+	Index       int `json:"-" gorm:"default:-1"`
 	CurrentPage int
 	LastPage    int
 	PageSize    int `json:"-" gorm:"default:1"`
 }
 
-type CollectionFilmState struct {
+type FilmState struct {
 	gorm.Model
 	SessionID   uint
 	ObjectID    int `json:"-" gorm:"default:-1"`
@@ -60,4 +61,9 @@ type FilmsResponse struct {
 type CollectionFilmsResponse struct {
 	CollectionFilms apiModels.CollectionFilms `json:"collection_films"`
 	Metadata        filters.Metadata          `json:"metadata"`
+}
+
+type CollectionFilmResponse struct {
+	Collection apiModels.Collection `json:"collection"`
+	Film       apiModels.Film       `json:"film"`
 }

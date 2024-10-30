@@ -87,11 +87,15 @@ func handleCallbackQuery(app config.App, session *models.Session) {
 
 	case callbackData == CallbackCollectionsNextPage || callbackData == CallbackCollectionsPrevPage || strings.HasPrefix(callbackData, "select_collection_"):
 		setState(session, callbackData)
-		requireAuth(app, session, handleCollectionsButton)
+		requireAuth(app, session, handleCollectionsButtons)
 
-	case callbackData == CallbackCollectionFilmsNextPage || callbackData == CallbackCollectionFilmsPrevPage:
+	case callbackData == CallbackCollectionFilmsNextPage || callbackData == CallbackCollectionFilmsPrevPage || strings.HasPrefix(callbackData, "select_cf_"):
 		setState(session, callbackData)
-		requireAuth(app, session, handleCollectionFilmsButton)
+		requireAuth(app, session, handleCollectionFilmsButtons)
+
+	case callbackData == CallbackCollectionFilmsDetailNextPage || callbackData == CallbackCollectionFilmsDetailPrevPage:
+		setState(session, callbackData)
+		requireAuth(app, session, handleCollectionFilmsDetailButtons)
 
 	default:
 		sendMessage(app, "Неизвестная команда")

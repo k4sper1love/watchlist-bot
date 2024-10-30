@@ -11,11 +11,6 @@ import (
 	"strings"
 )
 
-var (
-	callbackPrevPage = "collections_prev_page"
-	callbackNextPage = "collections_next_page"
-)
-
 func handleCollectionsCommand(app config.App, session *models.Session) {
 	collectionsResponse, err := watchlist.GetCollections(app, session)
 	if err != nil {
@@ -41,10 +36,10 @@ func handleCollectionsCommand(app config.App, session *models.Session) {
 
 	keyboard := builders.BuildButtonKeyboard(buttons, 1)
 
-	sendMessageWithKeyboard(app, keyboard, msg)
+	sendMessageWithKeyboard(app, msg, keyboard)
 }
 
-func handleCollectionsButton(app config.App, session *models.Session) {
+func handleCollectionsButtons(app config.App, session *models.Session) {
 	switch {
 	case session.State == CallbackCollectionsNextPage:
 		if session.CollectionState.CurrentPage < session.CollectionState.LastPage {

@@ -27,6 +27,8 @@ func handleCollectionFilmsCommand(app config.App, session *models.Session) {
 		return
 	}
 
+	session.CollectionState.CollectionFilms = collectionFilmsResponse.CollectionFilms
+
 	currentPage := collectionFilmsResponse.Metadata.CurrentPage
 	lastPage := collectionFilmsResponse.Metadata.LastPage
 
@@ -35,18 +37,19 @@ func handleCollectionFilmsCommand(app config.App, session *models.Session) {
 
 	msg := builders.BuildCollectionFilmsMessage(collectionFilmsResponse)
 
-	buttons := builders.BuildNavigationButtons(currentPage, lastPage, CallbackCollectionFilmsPrevPage, CallbackCollectionFilmsNextPage)
+	buttons := builders.BuildCollectionFilmsSelectButtons(collectionFilmsResponse)
+	buttons = append(buttons, builders.BuildNavigationButtons(currentPage, lastPage, CallbackCollectionFilmsPrevPage, CallbackCollectionFilmsNextPage)...)
 
-	keyboard := builders.BuildButtonKeyboard(buttons, 2)
+	keyboard := builders.BuildButtonKeyboard(buttons, 1)
 
 	if lastPage != 1 {
-		sendMessageWithKeyboard(app, keyboard, msg)
+		sendMessageWithKeyboard(app, msg, keyboard)
 	} else {
 		sendMessage(app, msg)
 	}
 }
 
-func handleCollectionFilmsButton(app config.App, session *models.Session) {
+func handleCollectionFilmsButtons(app config.App, session *models.Session) {
 	switch {
 	case session.State == CallbackCollectionFilmsNextPage:
 		if session.CollectionFilmState.CurrentPage < session.CollectionFilmState.LastPage {
@@ -65,23 +68,22 @@ func handleCollectionFilmsButton(app config.App, session *models.Session) {
 			sendMessage(app, "Вы уже на первой странице")
 		}
 		resetState(session)
-	case strings.HasPrefix(session.State, "select_collection_film"):
+	case strings.HasPrefix(session.State, "select_cf_"):
 		handleCollectionFilmSelect(app, session)
 		resetState(session)
 	}
 }
 
 func handleCollectionFilmSelect(app config.App, session *models.Session) {
-	collectionFilmIDStr := strings.TrimPrefix(session.State, "select_collection_film_")
-	collectionFilmID, err := strconv.Atoi(collectionFilmIDStr)
+	listIndexStr := strings.TrimPrefix(session.State, "select_cf_")
+	listIndex, err := strconv.Atoi(listIndexStr)
 
 	if err != nil {
 		sendMessage(app, "Ошибка при получении ID коллекции.")
-		log.Printf("error parsing collection ID: %v", err)
+		log.Printf("error parsing collection film index: %v", err)
 		return
 	}
 
-	session.CollectionFilmState.ObjectID = collectionFilmID
-	//session.CollectionFilmState.CurrentPage = 1
-	////handleCollectionFilmsCommand(app, session)
+	session.CollectionFilmState.Index = listIndex
+	handleCollectionFilmsDetailCommand(app, session)
 }
