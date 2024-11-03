@@ -4,11 +4,11 @@ import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
-	"github.com/k4sper1love/watchlist-bot/config"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers"
+	"github.com/k4sper1love/watchlist-bot/internal/models"
 )
 
-func Run(app *config.App) error {
+func Run(app *models.App) error {
 	bot, err := tgbotapi.NewBotAPI(app.Vars.BotToken)
 	if err != nil {
 		return err

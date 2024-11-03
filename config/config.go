@@ -2,31 +2,16 @@ package config
 
 import (
 	"fmt"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/joho/godotenv"
+	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"os"
 )
 
-type App struct {
-	Vars *Vars
-	Bot  *tgbotapi.BotAPI
-	Upd  *tgbotapi.Update
-}
-
-type Vars struct {
-	BotToken    string
-	Environment string
-	DSN         string
-	BaseURL     string
-	Secret      string
-}
-
-func LoadApp() (*App, error) {
+func LoadApp() (*models.App, error) {
 	if err := godotenv.Load(); err != nil {
 		return nil, err
 	}
-
-	vars := &Vars{
+	vars := &models.Vars{
 		BotToken:    os.Getenv("BOT_TOKEN"),
 		Environment: os.Getenv("ENVIRONMENT"),
 		DSN:         configureDSN(),
@@ -34,7 +19,7 @@ func LoadApp() (*App, error) {
 		Secret:      os.Getenv("SECRET"),
 	}
 
-	app := &App{
+	app := &models.App{
 		Vars: vars,
 	}
 

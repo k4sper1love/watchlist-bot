@@ -3,19 +3,18 @@ package watchlist
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/k4sper1love/watchlist-bot/config"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"net/http"
 )
 
-func GetFilms(app config.App, session *models.Session) (*models.FilmsResponse, error) {
+func GetFilms(app models.App, session *models.Session) (*models.FilmsResponse, error) {
 	headers := map[string]string{
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("/collections/%d/films", session.CollectionState.ObjectID)
+	requestURL := fmt.Sprintf("%s/collections/%d/films", app.Vars.BaseURL, session.CollectionDetailState.ObjectID)
 
-	resp, err := SendRequest(app.Vars.BaseURL, requestURL, http.MethodGet, nil, headers)
+	resp, err := SendRequest(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
 		return nil, err
 	}

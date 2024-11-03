@@ -4,25 +4,19 @@ import (
 	"encoding/json"
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
-	"github.com/k4sper1love/watchlist-bot/config"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"io"
 	"net/http"
 )
 
-type collectionRequest struct {
-	Name        string `json:"name"`
-	Description string `json:"description,omitempty"`
-}
-
-func GetCollections(app config.App, session *models.Session) (*models.CollectionsResponse, error) {
+func GetCollections(app models.App, session *models.Session) (*models.CollectionsResponse, error) {
 	headers := map[string]string{
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("/collections?page=%d&page_size=%d", session.CollectionState.CurrentPage, session.CollectionState.PageSize)
+	requestURL := fmt.Sprintf("%s/collections?page=%d&page_size=%d", app.Vars.BaseURL, session.CollectionsState.CurrentPage, session.CollectionsState.PageSize)
 
-	resp, err := SendRequest(app.Vars.BaseURL, requestURL, http.MethodGet, nil, headers)
+	resp, err := SendRequest(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -40,17 +34,12 @@ func GetCollections(app config.App, session *models.Session) (*models.Collection
 	return &collectionsResponse, nil
 }
 
-func CreateCollection(app config.App, session *models.Session) (*apiModels.Collection, error) {
+func CreateCollection(app models.App, session *models.Session) (*apiModels.Collection, error) {
 	headers := map[string]string{
 		"Authorization": session.AccessToken,
 	}
 
-	data := collectionRequest{
-		Name:        session.CollectionState.Name,
-		Description: session.CollectionState.Description,
-	}
-
-	resp, err := SendRequest(app.Vars.BaseURL, "/collections", http.MethodPost, data, headers)
+	resp, err := SendRequest(app.Vars.BaseURL+"/collections", http.MethodPost, session.CollectionDetailState, headers)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
@@ -66,6 +55,26 @@ func CreateCollection(app config.App, session *models.Session) (*apiModels.Colle
 	}
 
 	return collection, nil
+}
+
+func DeleteCollection(app models.App, session *models.Session) error {
+	headers := map[string]string{
+		"Authorization": session.AccessToken,
+	}
+
+	requestURL := fmt.Sprintf("%s/collections/%d", app.Vars.BaseURL, session.CollectionDetailState.ObjectID)
+
+	resp, err := SendRequest(requestURL, http.MethodDelete, nil, headers)
+	if err != nil {
+		return fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("delete_collection failed: %s", resp.Status)
+	}
+
+	return nil
 }
 
 func parseCollection(dest *apiModels.Collection, data io.Reader) error {

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-api/pkg/tokens"
-	"github.com/k4sper1love/watchlist-bot/config"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"io"
 	"log/slog"
@@ -17,7 +16,7 @@ const (
 	verificationTokenExpiration = 10 * time.Second
 )
 
-func Register(app config.App, session *models.Session) error {
+func Register(app models.App, session *models.Session) error {
 	token, err := tokens.GenerateToken(app.Vars.Secret, session.TelegramID, verificationTokenExpiration)
 	if err != nil {
 		return err
@@ -27,7 +26,7 @@ func Register(app config.App, session *models.Session) error {
 		"Verification": token,
 	}
 
-	resp, err := SendRequest(app.Vars.BaseURL, "/auth/register/telegram", http.MethodPost, "", headers)
+	resp, err := SendRequest(app.Vars.BaseURL+"/auth/register/telegram", http.MethodPost, "", headers)
 	if err != nil {
 		return err
 	}
@@ -40,7 +39,7 @@ func Register(app config.App, session *models.Session) error {
 	return parseAuth(session, resp.Body)
 }
 
-func Login(app config.App, session *models.Session) error {
+func Login(app models.App, session *models.Session) error {
 	token, err := tokens.GenerateToken(app.Vars.Secret, session.TelegramID, verificationTokenExpiration)
 	if err != nil {
 		return err
@@ -50,7 +49,7 @@ func Login(app config.App, session *models.Session) error {
 		"Verification": token,
 	}
 
-	resp, err := SendRequest(app.Vars.BaseURL, "/auth/login/telegram", http.MethodPost, "", headers)
+	resp, err := SendRequest(app.Vars.BaseURL+"/auth/login/telegram", http.MethodPost, "", headers)
 	if err != nil {
 		return err
 	}
@@ -69,12 +68,12 @@ func Login(app config.App, session *models.Session) error {
 	return parseAuth(session, resp.Body)
 }
 
-func IsTokenValid(app config.App, token string) bool {
+func IsTokenValid(app models.App, token string) bool {
 	headers := map[string]string{
 		"Authorization": token,
 	}
 
-	resp, err := SendRequest(app.Vars.BaseURL, "/auth/check-token", http.MethodGet, nil, headers)
+	resp, err := SendRequest(app.Vars.BaseURL+"/auth/check-token", http.MethodGet, nil, headers)
 	if err != nil {
 		return false
 	}
@@ -83,12 +82,12 @@ func IsTokenValid(app config.App, token string) bool {
 	return resp.StatusCode == http.StatusOK
 }
 
-func RefreshAccessToken(app config.App, session *models.Session) error {
+func RefreshAccessToken(app models.App, session *models.Session) error {
 	headers := map[string]string{
 		"Authorization": session.RefreshToken,
 	}
 
-	resp, err := SendRequest(app.Vars.BaseURL, "/auth/refresh", http.MethodPost, nil, headers)
+	resp, err := SendRequest(app.Vars.BaseURL+"/auth/refresh", http.MethodPost, nil, headers)
 	if err != nil {
 		return err
 	}
@@ -108,12 +107,12 @@ func RefreshAccessToken(app config.App, session *models.Session) error {
 	return nil
 }
 
-func Logout(app config.App, session *models.Session) error {
+func Logout(app models.App, session *models.Session) error {
 	headers := map[string]string{
 		"Authorization": session.RefreshToken,
 	}
 
-	resp, err := SendRequest(app.Vars.BaseURL, "/auth/logout", http.MethodPost, nil, headers)
+	resp, err := SendRequest(app.Vars.BaseURL+"/auth/logout", http.MethodPost, nil, headers)
 	if err != nil {
 		return err
 	}

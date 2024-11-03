@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"github.com/k4sper1love/watchlist-bot/config"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -9,7 +8,7 @@ import (
 
 var db *gorm.DB
 
-func OpenDB(vars *config.Vars) error {
+func OpenDB(vars *models.Vars) error {
 	var err error
 
 	db, err = gorm.Open(postgres.Open(vars.DSN), &gorm.Config{})
@@ -17,12 +16,13 @@ func OpenDB(vars *config.Vars) error {
 		return err
 	}
 
-	err = db.Debug().AutoMigrate(&models.Session{}, &models.CollectionState{}, &models.FilmState{}, &models.CollectionFilmState{})
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return db.Debug().AutoMigrate(
+		&models.Session{},
+		&models.CollectionsState{},
+		&models.FilmState{},
+		&models.CollectionDetailState{},
+		&models.CollectionFilmState{},
+	)
 }
 
 func GetDB() *gorm.DB {

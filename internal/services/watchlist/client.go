@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-func SendRequest(baseURL, requestURL, method string, body any, headers map[string]string) (*http.Response, error) {
-	req, err := prepareRequest(baseURL, requestURL, method, body)
+func SendRequest(requestURL, method string, body any, headers map[string]string) (*http.Response, error) {
+	req, err := prepareRequest(requestURL, method, body)
 	if err != nil {
 		return nil, err
 	}
@@ -17,7 +17,7 @@ func SendRequest(baseURL, requestURL, method string, body any, headers map[strin
 	return doRequest(req)
 }
 
-func prepareRequest(baseURL, requestURL, method string, data any) (*http.Request, error) {
+func prepareRequest(requestURL, method string, data any) (*http.Request, error) {
 	var requestBody *bytes.Buffer
 
 	if data != nil {
@@ -30,7 +30,7 @@ func prepareRequest(baseURL, requestURL, method string, data any) (*http.Request
 		requestBody = bytes.NewBuffer([]byte{})
 	}
 
-	return http.NewRequest(method, baseURL+requestURL, requestBody)
+	return http.NewRequest(method, requestURL, requestBody)
 }
 
 func addRequestHeaders(req *http.Request, headers map[string]string) {

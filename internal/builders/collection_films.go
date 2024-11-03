@@ -2,6 +2,7 @@ package builders
 
 import (
 	"fmt"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 )
 
@@ -19,12 +20,21 @@ func BuildCollectionFilmsMessage(collectionFilmsResponse *models.CollectionFilms
 	return msg
 }
 
-func BuildCollectionFilmsSelectButtons(collectionFilmsResponse *models.CollectionFilmsResponse) []Button {
-	var buttons []Button
-
+func (k *Keyboard) AddCollectionFilmsSelect(collectionFilmsResponse *models.CollectionFilmsResponse) *Keyboard {
 	for i, film := range collectionFilmsResponse.CollectionFilms.Films {
-		buttons = append(buttons, Button{film.Title, fmt.Sprintf("select_cf_%d", i)})
+		k.Buttons = append(k.Buttons, Button{film.Title, fmt.Sprintf("select_cf_%d", i)})
 	}
+	return k
+}
 
-	return buttons
+func (k *Keyboard) AddCollectionFilmsNew() *Keyboard {
+	k.Buttons = append(k.Buttons, Button{"Добавить новый фильм", states.CallbackCollectionFilmsNew})
+
+	return k
+}
+
+func (k *Keyboard) AddCollectionFilmsDelete() *Keyboard {
+	k.Buttons = append(k.Buttons, Button{"Удалить фильм", states.CallbackCollectionFilmsDelete})
+
+	return k
 }

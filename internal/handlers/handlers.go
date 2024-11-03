@@ -3,24 +3,33 @@ package handlers
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
-	"github.com/k4sper1love/watchlist-bot/config"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/collections"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/general"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/users"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"log"
 	"log/slog"
 	"strings"
 )
 
-func HandleUpdates(app config.App) {
-	telegramID := parseTelegramID(app.Upd)
+func HandleUpdates(app models.App) {
+	telegramID := utils.ParseTelegramID(app.Upd)
 	session, err := postgres.GetSessionByTelegramID(telegramID)
 	if err != nil {
-		sendMessage(app, "Произошла ошибка при получении сессии")
+		app.SendMessage("Произошла ошибка при получении сессии", nil)
+		log.Println(err)
 		return
 	}
 
 	switch {
 	case app.Upd.CallbackQuery != nil:
 		handleCallbackQuery(app, session)
+
+	case app.Upd.Message.Command() == "reset":
+		session.ResetState()
 
 	case session.State == "":
 		handleCommands(app, session)
@@ -32,80 +41,93 @@ func HandleUpdates(app config.App) {
 	postgres.SaveSessionWihDependencies(session)
 }
 
-func handleCommands(app config.App, session *models.Session) {
-	switch app.Upd.Message.Command() {
-	case "start":
-		handleStartCommand(app, session)
+func handleCommands(app models.App, session *models.Session) {
+	command := utils.ParseMessageCommand(app.Upd)
+	callbackData := utils.ParseCallback(app.Upd)
 
-	case "help":
-		handleHelpCommand(app, session)
+	switch {
+	case command == "start":
+		general.HandleStartCommand(app, session)
 
-	case "profile":
-		requireAuth(app, session, handleProfileCommand)
+	case command == "help":
+		general.HandleHelpCommand(app, session)
 
-	case "logout":
-		requireAuth(app, session, handleLogoutCommand)
+	case command == "menu":
+		general.HandleMenuCommand(app, session)
 
-	case "collections":
-		session.CollectionState.CurrentPage = 1
-		requireAuth(app, session, handleCollectionsCommand)
+	case command == "profile" || callbackData == states.CallbackMenuSelectProfile:
+		general.RequireAuth(app, session, users.HandleProfileCommand)
 
-	case "new_collection":
-		requireAuth(app, session, handleNewCollectionCommand)
+	case command == "logout" || callbackData == states.CallbackMenuSelectLogout:
+		general.RequireAuth(app, session, general.HandleLogoutCommand)
 
-	case "settings":
-		handleSettingCommand(app, session)
+	case command == "collections" || callbackData == states.CallbackMenuSelectCollections:
+		session.CollectionsState.CurrentPage = 1
+		general.RequireAuth(app, session, collections.HandleCollectionsCommand)
+
+	case command == "settings" || callbackData == states.CallbackMenuSelectSettings:
+		general.HandleSettingCommand(app, session)
 
 	default:
-		sendMessage(app, "Неизвестная команда. Введите /help")
+		app.SendMessage("Неизвестная команда. Введите /help", nil)
 	}
 }
 
-func handleUserInput(app config.App, session *models.Session) {
+func handleUserInput(app models.App, session *models.Session) {
 	switch {
-	case strings.HasPrefix(session.State, "logout_"):
-		handleLogoutProcess(app, session)
+	case strings.HasPrefix(session.State, "logout_awaiting"):
+		general.HandleLogoutProcess(app, session)
 
-	case strings.HasPrefix(session.State, "new_collection_"):
-		handleNewCollectionProcess(app, session)
+	case strings.HasPrefix(session.State, "new_collection_awaiting"):
+		collections.HandleNewCollectionProcess(app, session)
+
+	case strings.HasPrefix(session.State, "delete_collection_awaiting"):
+		collections.HandleDeleteCollectionProcess(app, session)
+
+	case strings.HasPrefix(session.State, "new_collection_film_awaiting"):
+		collections.HandleNewCollectionFilmProcess(app, session)
+
+	case strings.HasPrefix(session.State, "delete_collection_film_awaiting"):
+		collections.HandleDeleteCollectionFilmProcess(app, session)
 
 	case strings.HasPrefix(session.State, "settings_"):
-		handleSettingProcess(app, session)
+		general.HandleSettingProcess(app, session)
 
 	default:
-		sendMessage(app, "Неизвестное состояние")
+		app.SendMessage("Неизвестное состояние. Введите /reset для сброса.", nil)
 	}
 }
 
-func handleCallbackQuery(app config.App, session *models.Session) {
-	callbackData := parseCallbackData(app.Upd)
+func handleCallbackQuery(app models.App, session *models.Session) {
+	callbackData := utils.ParseCallback(app.Upd)
 
 	switch {
-	case callbackData == CallbackSettingsCollectionsPageSize:
-		setState(session, callbackData)
-		handleSettingButton(app, session)
+	case strings.HasPrefix(callbackData, "menu_select_"):
+		handleCommands(app, session)
 
-	case callbackData == CallbackCollectionsNextPage || callbackData == CallbackCollectionsPrevPage || strings.HasPrefix(callbackData, "select_collection_"):
-		setState(session, callbackData)
-		requireAuth(app, session, handleCollectionsButtons)
+	case strings.HasPrefix(callbackData, "settings_"):
+		general.HandleSettingButton(app, session)
 
-	case callbackData == CallbackCollectionFilmsNextPage || callbackData == CallbackCollectionFilmsPrevPage || strings.HasPrefix(callbackData, "select_cf_"):
-		setState(session, callbackData)
-		requireAuth(app, session, handleCollectionFilmsButtons)
+	case strings.HasPrefix(callbackData, "profile_"):
+		general.RequireAuth(app, session, users.HandleProfileButtons)
 
-	case callbackData == CallbackCollectionFilmsDetailNextPage || callbackData == CallbackCollectionFilmsDetailPrevPage:
-		setState(session, callbackData)
-		requireAuth(app, session, handleCollectionFilmsDetailButtons)
+	case strings.HasPrefix(callbackData, "collections_") || strings.HasPrefix(callbackData, "select_collection_"):
+		general.RequireAuth(app, session, collections.HandleCollectionsButtons)
+
+	case strings.HasPrefix(callbackData, "collection_films_") || strings.HasPrefix(callbackData, "select_cf_"):
+		general.RequireAuth(app, session, collections.HandleCollectionFilmsButtons)
+
+	case strings.HasPrefix(callbackData, "collection_film_detail"):
+		general.RequireAuth(app, session, collections.HandleCollectionFilmsDetailButtons)
 
 	default:
-		sendMessage(app, "Неизвестная команда")
-		return
+		handleUserInput(app, session)
 	}
 
 	answerCallbackQuery(app)
 }
 
-func answerCallbackQuery(app config.App) {
+func answerCallbackQuery(app models.App) {
 	_, err := app.Bot.AnswerCallbackQuery(tgbotapi.CallbackConfig{
 		CallbackQueryID: app.Upd.CallbackQuery.ID,
 		//Text:            "Обработка завершена",

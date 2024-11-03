@@ -4,18 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
-	"github.com/k4sper1love/watchlist-bot/config"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"io"
 	"net/http"
 )
 
-func GetUser(app config.App, session *models.Session) (*apiModels.User, error) {
+func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 	headers := map[string]string{
 		"Authorization": session.AccessToken,
 	}
 
-	resp, err := SendRequest(app.Vars.BaseURL, "/user", http.MethodGet, nil, headers)
+	resp, err := SendRequest(app.Vars.BaseURL+"/user", http.MethodGet, nil, headers)
 	if err != nil {
 		return nil, err
 	}
