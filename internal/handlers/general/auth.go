@@ -61,6 +61,6 @@ func parseLogoutConfirm(app models.App, session *models.Session) {
 		app.SendMessage("Отмена выхода из системы", nil)
 	}
 
-	session.ResetState()
+	session.ClearState()
 	HandleMenuCommand(app, session)
 }

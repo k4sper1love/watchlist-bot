@@ -88,5 +88,5 @@ func ClearSession(session *models.Session) {
 	session.CollectionDetailState.Description = ""
 	session.CollectionDetailState.CurrentPage = 0
 	session.CollectionDetailState.LastPage = 0
-	session.ResetState()
+	session.ClearState()
 }

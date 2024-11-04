@@ -27,7 +27,7 @@ func HandleDeleteCollectionProcess(app models.App, session *models.Session) {
 }
 
 func parseDeleteCollectionConfirm(app models.App, session *models.Session) {
-	session.ResetState()
+	session.ClearState()
 
 	switch utils.IsAgree(app.Upd) {
 	case true:

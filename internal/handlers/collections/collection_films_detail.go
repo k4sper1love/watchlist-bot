@@ -30,6 +30,7 @@ func HandleCollectionFilmsDetailCommand(app models.App, session *models.Session)
 	msg += builders.BuildCollectionFilmDetailMessage(&films[index])
 
 	keyboard := builders.NewKeyboard(2).
+		AddCollectionFilmsUpdate().
 		AddCollectionFilmsDelete().
 		AddNavigation(itemID, session.CollectionDetailState.TotalRecords, states.CallbackCollectionFilmDetailPrevPage, states.CallbackCollectionFilmDetailNextPage).
 		AddBack(states.CallbackCollectionFilmDetailBack).

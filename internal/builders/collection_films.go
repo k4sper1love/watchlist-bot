@@ -38,3 +38,9 @@ func (k *Keyboard) AddCollectionFilmsDelete() *Keyboard {
 
 	return k
 }
+
+func (k *Keyboard) AddCollectionFilmsUpdate() *Keyboard {
+	k.Buttons = append(k.Buttons, Button{"Обновить фильм", states.CallbackCollectionFilmsUpdate})
+
+	return k
+}

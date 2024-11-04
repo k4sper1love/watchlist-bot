@@ -5,8 +5,6 @@ import (
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
-	"io"
-	"log"
 	"net/http"
 )
 
@@ -54,9 +52,9 @@ func CreateCollectionFilm(app models.App, session *models.Session) (*apiModels.C
 
 	collectionFilm := &apiModels.CollectionFilm{}
 	if err := parseCollectionFilm(collectionFilm, resp.Body); err != nil {
-		return nil, fmt.Errorf("failed to parse collection: %w", err)
+		return nil, fmt.Errorf("failed to parse collection film: %w", err)
 	}
-	log.Println(collectionFilm)
+
 	return collectionFilm, nil
 }
 
@@ -78,12 +76,4 @@ func DeleteCollectionFilm(app models.App, session *models.Session) error {
 	}
 
 	return nil
-}
-
-func parseCollectionFilm(dest *apiModels.CollectionFilm, data io.Reader) error {
-	return json.NewDecoder(data).Decode(&struct {
-		CollectionFilm *apiModels.CollectionFilm `json:"collection_film"`
-	}{
-		CollectionFilm: dest,
-	})
 }

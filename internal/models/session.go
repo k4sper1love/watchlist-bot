@@ -19,6 +19,6 @@ func (s *Session) SetState(state string) {
 	s.State = state
 }
 
-func (s *Session) ResetState() {
+func (s *Session) ClearState() {
 	s.State = ""
 }

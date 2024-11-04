@@ -1,11 +1,9 @@
 package watchlist
 
 import (
-	"encoding/json"
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
-	"io"
 	"net/http"
 )
 
@@ -30,12 +28,4 @@ func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 	}
 
 	return user, nil
-}
-
-func parseUser(dest *apiModels.User, data io.Reader) error {
-	return json.NewDecoder(data).Decode(&struct {
-		User *apiModels.User `json:"user"`
-	}{
-		User: dest,
-	})
 }

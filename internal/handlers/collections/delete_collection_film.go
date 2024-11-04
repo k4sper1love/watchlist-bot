@@ -27,7 +27,7 @@ func HandleDeleteCollectionFilmProcess(app models.App, session *models.Session) 
 }
 
 func parseDeleteCollectionFilmConfirm(app models.App, session *models.Session) {
-	session.ResetState()
+	session.ClearState()
 
 	switch utils.IsAgree(app.Upd) {
 	case true:

@@ -31,6 +31,7 @@ const (
 	CallbackCollectionsPrevPage = "collections_prev_page"
 	CallbackCollectionsBack     = "collections_back"
 	CallbackCollectionsDelete   = "collections_delete"
+	CallbackCollectionsUpdate   = "collections_update"
 
 	// new collection states
 	ProcessNewCollectionAwaitingName        = "new_collection_awaiting_name"
@@ -39,12 +40,20 @@ const (
 	// delete collection states
 	ProcessDeleteCollectionAwaitingConfirm = "delete_collection_awaiting_confirm"
 
+	// update colllection states
+	CallbackUpdateCollectionSelectBack         = "update_collection_select_back"
+	CallbackUpdateCollectionSelectName         = "update_collection_select_name"
+	ProcessUpdateCollectionAwaitingName        = "update_collection_awaiting_name"
+	CallbackUpdateCollectionSelectDescription  = "update_collection_select_description"
+	ProcessUpdateCollectionAwaitingDescription = "update_collection_awaiting_description"
+
 	// collection films states
 	CallbackCollectionFilmsNew      = "collection_films_new"
 	CallbackCollectionFilmsNextPage = "collection_films_next_page"
 	CallbackCollectionFilmsPrevPage = "collection_films_prev_page"
 	CallbackCollectionFilmsBack     = "collection_films_back"
 	CallbackCollectionFilmsDelete   = "collection_films_delete"
+	CallbackCollectionFilmsUpdate   = "collection_films_update"
 
 	// new collection film states
 	ProcessNewCollectionFilmAwaitingTitle       = "new_collection_film_awaiting_title"
@@ -60,6 +69,29 @@ const (
 
 	// delete collection film states
 	ProcessDeleteCollectionFilmAwaitingConfirm = "delete_collection_film_awaiting_confirm"
+
+	// update collection film states
+	CallbackUpdateCollectionFilmSelectBack         = "update_collection_film_select_back"
+	CallbackUpdateCollectionFilmSelectTitle        = "update_collection_film_select_title"
+	ProcessUpdateCollectionFilmAwaitingTitle       = "update_collection_film_awaiting_title"
+	CallbackUpdateCollectionFilmSelectYear         = "update_collection_film_select_year"
+	ProcessUpdateCollectionFilmAwaitingYear        = "update_collection_film_awaiting_year"
+	CallbackUpdateCollectionFilmSelectGenre        = "update_collection_film_select_genre"
+	ProcessUpdateCollectionFilmAwaitingGenre       = "update_collection_film_awaiting_genre"
+	CallbackUpdateCollectionFilmSelectDescription  = "update_collection_film_select_description"
+	ProcessUpdateCollectionFilmAwaitingDescription = "update_collection_film_awaiting_description"
+	CallbackUpdateCollectionFilmSelectRating       = "update_collection_film_select_rating"
+	ProcessUpdateCollectionFilmAwaitingRating      = "update_collection_film_awaiting_rating"
+	CallbackUpdateCollectionFilmSelectImage        = "update_collection_film_select_image"
+	ProcessUpdateCollectionFilmAwaitingImage       = "update_collection_film_awaiting_image"
+	CallbackUpdateCollectionFilmSelectComment      = "update_collection_film_select_comment"
+	ProcessUpdateCollectionFilmAwaitingComment     = "update_collection_film_awaiting_comment"
+	CallbackUpdateCollectionFilmSelectViewed       = "update_collection_film_select_viewed"
+	ProcessUpdateCollectionFilmAwaitingViewed      = "update_collection_film_awaiting_viewed"
+	CallbackUpdateCollectionFilmSelectUserRating   = "update_collection_film_select_user_rating"
+	ProcessUpdateCollectionFilmAwaitingUserRating  = "update_collection_film_awaiting_user_rating"
+	CallbackUpdateCollectionFilmSelectReview       = "update_collection_film_select_review"
+	ProcessUpdateCollectionFilmAwaitingReview      = "update_collection_film_awaiting_review"
 
 	// collection film detail states
 	CallbackCollectionFilmDetailNextPage = "collection_film_detail_next_page"

@@ -17,8 +17,9 @@ func HandleNewCollectionCommand(app models.App, session *models.Session) {
 
 func HandleNewCollectionProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Upd) {
-		session.ResetState()
+		session.ClearState()
 		HandleCollectionsCommand(app, session)
+		return
 	}
 
 	switch session.State {
@@ -48,7 +49,8 @@ func parseNewCollectionDescription(app models.App, session *models.Session) {
 	}
 
 	createCollection(app, session)
-	session.ResetState()
+	session.CollectionDetailState.Clear()
+	session.ClearState()
 }
 
 func createCollection(app models.App, session *models.Session) {

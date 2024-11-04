@@ -52,3 +52,21 @@ type FilmState struct {
 	LastPage    int
 	PageSize    int `json:"-" gorm:"default:1"`
 }
+
+func (c *CollectionDetailState) Clear() {
+	c.Name = ""
+	c.Description = ""
+}
+
+func (c *CollectionFilmState) Clear() {
+	c.Title = ""
+	c.Year = 0
+	c.Genre = ""
+	c.Description = ""
+	c.Rating = 0
+	c.ImageURL = ""
+	c.Comment = ""
+	c.IsViewed = false
+	c.UserRating = 0
+	c.Review = ""
+}

@@ -18,7 +18,7 @@ func HandleNewCollectionFilmCommand(app models.App, session *models.Session) {
 
 func HandleNewCollectionFilmProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Upd) {
-		session.ResetState()
+		session.ClearState()
 		HandleCollectionFilmsCommand(app, session)
 		return
 	}
@@ -170,7 +170,7 @@ func parseNewCollectionFilmViewed(app models.App, session *models.Session) {
 		session.CollectionFilmState.UserRating = 0
 		session.CollectionFilmState.Review = ""
 		createNewCollectionFilm(app, session)
-		session.ResetState()
+		session.ClearState()
 	}
 }
 
@@ -197,7 +197,8 @@ func parseNewCollectionFilmReview(app models.App, session *models.Session) {
 	}
 
 	createNewCollectionFilm(app, session)
-	session.ResetState()
+	session.CollectionFilmState.Clear()
+	session.ClearState()
 }
 
 func createNewCollectionFilm(app models.App, session *models.Session) {

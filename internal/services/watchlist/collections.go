@@ -5,7 +5,6 @@ import (
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
-	"io"
 	"net/http"
 )
 
@@ -57,6 +56,31 @@ func CreateCollection(app models.App, session *models.Session) (*apiModels.Colle
 	return collection, nil
 }
 
+func UpdateCollection(app models.App, session *models.Session) (*apiModels.Collection, error) {
+	headers := map[string]string{
+		"Authorization": session.AccessToken,
+	}
+
+	requestURL := fmt.Sprintf("%s/collections/%d", app.Vars.BaseURL, session.CollectionDetailState.ObjectID)
+
+	resp, err := SendRequest(requestURL, http.MethodPut, session.CollectionDetailState, headers)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("update_collection failed: %s", resp.Status)
+	}
+
+	collection := &apiModels.Collection{}
+	if err := parseCollection(collection, resp.Body); err != nil {
+		return nil, fmt.Errorf("failed to parse collection: %w", err)
+	}
+
+	return collection, nil
+}
+
 func DeleteCollection(app models.App, session *models.Session) error {
 	headers := map[string]string{
 		"Authorization": session.AccessToken,
@@ -75,12 +99,4 @@ func DeleteCollection(app models.App, session *models.Session) error {
 	}
 
 	return nil
-}
-
-func parseCollection(dest *apiModels.Collection, data io.Reader) error {
-	return json.NewDecoder(data).Decode(&struct {
-		Collection *apiModels.Collection `json:"collection"`
-	}{
-		Collection: dest,
-	})
 }

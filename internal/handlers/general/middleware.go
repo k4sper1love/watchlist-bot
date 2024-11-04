@@ -8,7 +8,7 @@ import (
 func RequireAuth(app models.App, session *models.Session, next func(models.App, *models.Session)) {
 	if !isAuth(session) {
 		app.SendMessage("Для выполнения этой команды нужно быть авторизованным. Используйте /start", nil)
-		session.ResetState()
+		session.ClearState()
 		return
 	}
 
@@ -17,7 +17,7 @@ func RequireAuth(app models.App, session *models.Session, next func(models.App, 
 			app.SendMessage("Ваши токены истекли. Производим вход в систему", nil)
 			if err := HandleAuthProcess(app, session); err != nil {
 				app.SendMessage("Не удалось войти в систему. Используйте /start.", nil)
-				session.ResetState()
+				session.ClearState()
 				return
 			} else {
 				app.SendMessage("Вход выполнен успешно!", nil)

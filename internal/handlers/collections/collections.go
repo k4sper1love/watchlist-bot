@@ -69,6 +69,9 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 	case callback == states.CallbackCollectionsDelete:
 		HandleDeleteCollectionCommand(app, session)
 
+	case callback == states.CallbackCollectionsUpdate:
+		HandleUpdateCollectionCommand(app, session)
+
 	case callback == states.CallbackCollectionsBack:
 		general.HandleMenuCommand(app, session)
 

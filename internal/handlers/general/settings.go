@@ -13,13 +13,13 @@ var settingsButtons = []builders.Button{
 	{"Изменить количество коллекций на странице", states.CallbackSettingsCollectionsPageSize},
 }
 
-func HandleSettingCommand(app models.App, session *models.Session) {
+func HandleSettingsCommand(app models.App, session *models.Session) {
 	msg := "Выберите, что хотите настроить\n"
 	keyboard := builders.NewKeyboard(1).AddSeveral(settingsButtons).AddBack(states.CallbackSettingsBack).Build()
 	app.SendMessage(msg, keyboard)
 }
 
-func HandleSettingButton(app models.App, session *models.Session) {
+func HandleSettingsButton(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Upd) {
 	case states.CallbackSettingsBack:
 		HandleMenuCommand(app, session)
@@ -29,10 +29,10 @@ func HandleSettingButton(app models.App, session *models.Session) {
 	}
 }
 
-func HandleSettingProcess(app models.App, session *models.Session) {
+func HandleSettingsProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Upd) {
-		session.ResetState()
-		HandleSettingCommand(app, session)
+		session.ClearState()
+		HandleSettingsCommand(app, session)
 	}
 
 	switch session.State {
@@ -64,7 +64,7 @@ func parseCollectionsPageSize(app models.App, session *models.Session) {
 
 	app.SendMessage(msg, nil)
 
-	session.ResetState()
+	session.ClearState()
 
-	HandleSettingCommand(app, session)
+	HandleSettingsCommand(app, session)
 }

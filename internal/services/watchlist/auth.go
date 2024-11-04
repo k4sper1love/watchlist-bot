@@ -127,22 +127,3 @@ func Logout(app models.App, session *models.Session) error {
 
 	return nil
 }
-
-func parseAuth(dest *models.Session, data io.Reader) error {
-	var responseMap map[string]interface{}
-	if err := json.NewDecoder(data).Decode(&responseMap); err != nil {
-		return err
-	}
-
-	userData := responseMap["user"].(map[string]interface{})
-
-	if id, ok := userData["id"].(float64); ok {
-		dest.UserID = int(id)
-	} else {
-		return fmt.Errorf("invalid id format")
-	}
-	dest.AccessToken = userData["access_token"].(string)
-	dest.RefreshToken = userData["refresh_token"].(string)
-
-	return nil
-}

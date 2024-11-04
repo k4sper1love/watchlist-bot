@@ -26,6 +26,7 @@ func HandleCollectionFilmsCommand(app models.App, session *models.Session) {
 	keyboard := builders.NewKeyboard(1).
 		AddCollectionFilmsSelect(collectionFilmsResponse).
 		AddCollectionFilmsNew().
+		AddCollectionsUpdate().
 		AddCollectionsDelete().
 		AddNavigation(metadata.CurrentPage, metadata.LastPage, states.CallbackCollectionFilmsPrevPage, states.CallbackCollectionFilmsNextPage).
 		AddBack(states.CallbackCollectionFilmsBack).
@@ -62,6 +63,9 @@ func HandleCollectionFilmsButtons(app models.App, session *models.Session) {
 
 	case callback == states.CallbackCollectionFilmsDelete:
 		HandleDeleteCollectionFilmCommand(app, session)
+
+	case callback == states.CallbackCollectionFilmsUpdate:
+		HandleUpdateCollectionFilmCommand(app, session)
 
 	case strings.HasPrefix(callback, "select_cf_"):
 		handleCollectionFilmSelect(app, session)

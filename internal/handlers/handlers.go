@@ -29,7 +29,7 @@ func HandleUpdates(app models.App) {
 		handleCallbackQuery(app, session)
 
 	case app.Upd.Message.Command() == "reset":
-		session.ResetState()
+		session.ClearState()
 
 	case session.State == "":
 		handleCommands(app, session)
@@ -66,7 +66,7 @@ func handleCommands(app models.App, session *models.Session) {
 		general.RequireAuth(app, session, collections.HandleCollectionsCommand)
 
 	case command == "settings" || callbackData == states.CallbackMenuSelectSettings:
-		general.HandleSettingCommand(app, session)
+		general.HandleSettingsCommand(app, session)
 
 	default:
 		app.SendMessage("Неизвестная команда. Введите /help", nil)
@@ -81,17 +81,23 @@ func handleUserInput(app models.App, session *models.Session) {
 	case strings.HasPrefix(session.State, "new_collection_awaiting"):
 		collections.HandleNewCollectionProcess(app, session)
 
+	case strings.HasPrefix(session.State, "update_collection_awaiting"):
+		collections.HandleUpdateCollectionProcess(app, session)
+
 	case strings.HasPrefix(session.State, "delete_collection_awaiting"):
 		collections.HandleDeleteCollectionProcess(app, session)
 
 	case strings.HasPrefix(session.State, "new_collection_film_awaiting"):
 		collections.HandleNewCollectionFilmProcess(app, session)
 
+	case strings.HasPrefix(session.State, "update_collection_film_awaiting"):
+		collections.HandleUpdateCollectionFilmProcess(app, session)
+
 	case strings.HasPrefix(session.State, "delete_collection_film_awaiting"):
 		collections.HandleDeleteCollectionFilmProcess(app, session)
 
 	case strings.HasPrefix(session.State, "settings_"):
-		general.HandleSettingProcess(app, session)
+		general.HandleSettingsProcess(app, session)
 
 	default:
 		app.SendMessage("Неизвестное состояние. Введите /reset для сброса.", nil)
@@ -106,7 +112,7 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 		handleCommands(app, session)
 
 	case strings.HasPrefix(callbackData, "settings_"):
-		general.HandleSettingButton(app, session)
+		general.HandleSettingsButton(app, session)
 
 	case strings.HasPrefix(callbackData, "profile_"):
 		general.RequireAuth(app, session, users.HandleProfileButtons)
@@ -114,8 +120,14 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, "collections_") || strings.HasPrefix(callbackData, "select_collection_"):
 		general.RequireAuth(app, session, collections.HandleCollectionsButtons)
 
+	case strings.HasPrefix(callbackData, "update_collection_select"):
+		general.RequireAuth(app, session, collections.HandleUpdateCollectionButtons)
+
 	case strings.HasPrefix(callbackData, "collection_films_") || strings.HasPrefix(callbackData, "select_cf_"):
 		general.RequireAuth(app, session, collections.HandleCollectionFilmsButtons)
+
+	case strings.HasPrefix(callbackData, "update_collection_film_select"):
+		general.RequireAuth(app, session, collections.HandleUpdateCollectionFilmButtons)
 
 	case strings.HasPrefix(callbackData, "collection_film_detail"):
 		general.RequireAuth(app, session, collections.HandleCollectionFilmsDetailButtons)
