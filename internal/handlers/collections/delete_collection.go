@@ -33,7 +33,7 @@ func parseDeleteCollectionConfirm(app models.App, session *models.Session) {
 	case true:
 		if err := watchlist.DeleteCollection(app, session); err != nil {
 			app.SendMessage("Произошла ошибка при удалении", nil)
-			HandleCollectionFilmsCommand(app, session)
+			HandleManageCollectionCommand(app, session)
 			break
 		}
 		app.SendMessage("Успешно удалено", nil)
@@ -41,6 +41,6 @@ func parseDeleteCollectionConfirm(app models.App, session *models.Session) {
 
 	case false:
 		app.SendMessage("Действие отменено", nil)
-		HandleCollectionFilmsCommand(app, session)
+		HandleManageCollectionCommand(app, session)
 	}
 }

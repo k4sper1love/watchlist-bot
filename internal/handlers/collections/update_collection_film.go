@@ -6,7 +6,6 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"log"
 )
 
 var updateCollectionFilmButtons = []builders.Button{
@@ -48,7 +47,7 @@ func HandleUpdateCollectionFilmCommand(app models.App, session *models.Session) 
 func HandleUpdateCollectionFilmButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Upd) {
 	case states.CallbackUpdateCollectionFilmSelectBack:
-		HandleCollectionFilmsCommand(app, session)
+		HandleManageCollectionFilmCommand(app, session)
 
 	case states.CallbackUpdateCollectionFilmSelectImage:
 		handleUpdateCollectionFilmImage(app, session)
@@ -288,7 +287,7 @@ func updateCollectionFilm(app models.App, session *models.Session) {
 		app.SendMessage("Не удалось обновить фильм в коллекции", nil)
 		return
 	}
-	log.Println(film.IsViewed)
+
 	session.CollectionFilmState.Object = *film
 	app.SendMessage("Фильм в коллекции успешно обновлен", nil)
 }
@@ -332,8 +331,6 @@ func finishUpdateCollectionFilmProcess(app models.App, session *models.Session) 
 	if state.Review == "" {
 		state.Review = collectionFilm.Review
 	}
-
-	log.Println(state.IsViewed)
 
 	updateCollectionFilm(app, session)
 	session.CollectionFilmState.Clear()

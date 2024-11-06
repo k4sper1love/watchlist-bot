@@ -27,11 +27,15 @@ const (
 
 	// collections states
 	CallbackCollectionsNew      = "collections_new"
+	CallbackCollectionsManage   = "collections_manage"
 	CallbackCollectionsNextPage = "collections_next_page"
 	CallbackCollectionsPrevPage = "collections_prev_page"
 	CallbackCollectionsBack     = "collections_back"
-	CallbackCollectionsDelete   = "collections_delete"
-	CallbackCollectionsUpdate   = "collections_update"
+
+	// manage collection states
+	CallbackManageCollectionSelectBack   = "manage_collection_select_back"
+	CallbackManageCollectionSelectUpdate = "manage_collection_select_update"
+	CallbackManageCollectionSelectDelete = "manage_collection_select_delete"
 
 	// new collection states
 	ProcessNewCollectionAwaitingName        = "new_collection_awaiting_name"
@@ -49,11 +53,15 @@ const (
 
 	// collection films states
 	CallbackCollectionFilmsNew      = "collection_films_new"
+	CallbackCollectionFilmsManage   = "collection_films_manage"
 	CallbackCollectionFilmsNextPage = "collection_films_next_page"
 	CallbackCollectionFilmsPrevPage = "collection_films_prev_page"
 	CallbackCollectionFilmsBack     = "collection_films_back"
-	CallbackCollectionFilmsDelete   = "collection_films_delete"
-	CallbackCollectionFilmsUpdate   = "collection_films_update"
+
+	// manage collection film states
+	CallbackManageCollectionFilmSelectBack   = "manage_collection_film_select_back"
+	CallbackManageCollectionFilmSelectUpdate = "manage_collection_film_select_update"
+	CallbackManageCollectionFilmSelectDelete = "manage_collection_film_select_delete"
 
 	// new collection film states
 	ProcessNewCollectionFilmAwaitingTitle       = "new_collection_film_awaiting_title"

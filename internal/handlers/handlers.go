@@ -120,11 +120,17 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, "collections_") || strings.HasPrefix(callbackData, "select_collection_"):
 		general.RequireAuth(app, session, collections.HandleCollectionsButtons)
 
+	case strings.HasPrefix(callbackData, "manage_collection_select"):
+		general.RequireAuth(app, session, collections.HandleManageCollectionButtons)
+
 	case strings.HasPrefix(callbackData, "update_collection_select"):
 		general.RequireAuth(app, session, collections.HandleUpdateCollectionButtons)
 
 	case strings.HasPrefix(callbackData, "collection_films_") || strings.HasPrefix(callbackData, "select_cf_"):
 		general.RequireAuth(app, session, collections.HandleCollectionFilmsButtons)
+
+	case strings.HasPrefix(callbackData, "manage_collection_film_select"):
+		general.RequireAuth(app, session, collections.HandleManageCollectionFilmButtons)
 
 	case strings.HasPrefix(callbackData, "update_collection_film_select"):
 		general.RequireAuth(app, session, collections.HandleUpdateCollectionFilmButtons)

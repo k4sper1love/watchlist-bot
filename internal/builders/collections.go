@@ -37,11 +37,17 @@ func (k *Keyboard) AddCollectionsNew() *Keyboard {
 }
 
 func (k *Keyboard) AddCollectionsDelete() *Keyboard {
-	k.Buttons = append(k.Buttons, Button{"Удалить коллекцию", states.CallbackCollectionsDelete})
+	k.Buttons = append(k.Buttons, Button{"Удалить коллекцию", states.CallbackManageCollectionSelectDelete})
 	return k
 }
 
 func (k *Keyboard) AddCollectionsUpdate() *Keyboard {
-	k.Buttons = append(k.Buttons, Button{"Обновить коллекцию", states.CallbackCollectionsUpdate})
+	k.Buttons = append(k.Buttons, Button{"Обновить коллекцию", states.CallbackManageCollectionSelectUpdate})
+	return k
+}
+
+func (k *Keyboard) AddCollectionsManage() *Keyboard {
+	k.Buttons = append(k.Buttons, Button{"Управление коллекцией", states.CallbackCollectionsManage})
+
 	return k
 }

@@ -34,13 +34,19 @@ func (k *Keyboard) AddCollectionFilmsNew() *Keyboard {
 }
 
 func (k *Keyboard) AddCollectionFilmsDelete() *Keyboard {
-	k.Buttons = append(k.Buttons, Button{"Удалить фильм", states.CallbackCollectionFilmsDelete})
+	k.Buttons = append(k.Buttons, Button{"Удалить фильм", states.CallbackManageCollectionFilmSelectDelete})
 
 	return k
 }
 
 func (k *Keyboard) AddCollectionFilmsUpdate() *Keyboard {
-	k.Buttons = append(k.Buttons, Button{"Обновить фильм", states.CallbackCollectionFilmsUpdate})
+	k.Buttons = append(k.Buttons, Button{"Обновить фильм", states.CallbackManageCollectionFilmSelectUpdate})
+
+	return k
+}
+
+func (k *Keyboard) AddCollectionFilmsManage() *Keyboard {
+	k.Buttons = append(k.Buttons, Button{"Управление фильмом", states.CallbackCollectionFilmsManage})
 
 	return k
 }

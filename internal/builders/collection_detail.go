@@ -15,5 +15,7 @@ func BuildCollectionDetailMessage(collection *apiModels.Collection) string {
 		msg += fmt.Sprintf("📝 <b>Описание</b>: %s\n", collection.Description)
 	}
 
+	msg += fmt.Sprintf("📈 <b>Всего фильмов</b>: %d\n", collection.TotalFilms)
+
 	return msg
 }

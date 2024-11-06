@@ -28,7 +28,7 @@ func HandleUpdateCollectionCommand(app models.App, session *models.Session) {
 func HandleUpdateCollectionButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Upd) {
 	case states.CallbackUpdateCollectionSelectBack:
-		HandleCollectionFilmsCommand(app, session)
+		HandleManageCollectionCommand(app, session)
 
 	case states.CallbackUpdateCollectionSelectName:
 		handleUpdateCollectionName(app, session)

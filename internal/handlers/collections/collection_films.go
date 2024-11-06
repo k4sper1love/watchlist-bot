@@ -26,8 +26,7 @@ func HandleCollectionFilmsCommand(app models.App, session *models.Session) {
 	keyboard := builders.NewKeyboard(1).
 		AddCollectionFilmsSelect(collectionFilmsResponse).
 		AddCollectionFilmsNew().
-		AddCollectionsUpdate().
-		AddCollectionsDelete().
+		AddCollectionsManage().
 		AddNavigation(metadata.CurrentPage, metadata.LastPage, states.CallbackCollectionFilmsPrevPage, states.CallbackCollectionFilmsNextPage).
 		AddBack(states.CallbackCollectionFilmsBack).
 		Build()
@@ -39,6 +38,9 @@ func HandleCollectionFilmsButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Upd)
 
 	switch {
+	case callback == states.CallbackCollectionFilmsBack:
+		HandleCollectionsCommand(app, session)
+
 	case callback == states.CallbackCollectionFilmsNextPage:
 		if session.CollectionDetailState.CurrentPage < session.CollectionDetailState.LastPage {
 			session.CollectionDetailState.CurrentPage++
@@ -58,14 +60,8 @@ func HandleCollectionFilmsButtons(app models.App, session *models.Session) {
 	case callback == states.CallbackCollectionFilmsNew:
 		HandleNewCollectionFilmCommand(app, session)
 
-	case callback == states.CallbackCollectionFilmsBack:
-		HandleCollectionsCommand(app, session)
-
-	case callback == states.CallbackCollectionFilmsDelete:
-		HandleDeleteCollectionFilmCommand(app, session)
-
-	case callback == states.CallbackCollectionFilmsUpdate:
-		HandleUpdateCollectionFilmCommand(app, session)
+	case callback == states.CallbackCollectionFilmsManage:
+		HandleManageCollectionFilmCommand(app, session)
 
 	case strings.HasPrefix(callback, "select_cf_"):
 		handleCollectionFilmSelect(app, session)

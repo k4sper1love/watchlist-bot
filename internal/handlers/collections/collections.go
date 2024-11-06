@@ -47,6 +47,9 @@ func HandleCollectionsCommand(app models.App, session *models.Session) {
 func HandleCollectionsButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Upd)
 	switch {
+	case callback == states.CallbackCollectionsBack:
+		general.HandleMenuCommand(app, session)
+
 	case callback == states.CallbackCollectionsNextPage:
 		if session.CollectionsState.CurrentPage < session.CollectionsState.LastPage {
 			session.CollectionsState.CurrentPage++
@@ -66,14 +69,8 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 	case callback == states.CallbackCollectionsNew:
 		HandleNewCollectionCommand(app, session)
 
-	case callback == states.CallbackCollectionsDelete:
-		HandleDeleteCollectionCommand(app, session)
-
-	case callback == states.CallbackCollectionsUpdate:
-		HandleUpdateCollectionCommand(app, session)
-
-	case callback == states.CallbackCollectionsBack:
-		general.HandleMenuCommand(app, session)
+	case callback == states.CallbackCollectionsManage:
+		HandleManageCollectionCommand(app, session)
 
 	case strings.HasPrefix(callback, "select_collection_"):
 		HandleCollectionSelect(app, session)

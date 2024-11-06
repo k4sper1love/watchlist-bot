@@ -33,7 +33,7 @@ func parseDeleteCollectionFilmConfirm(app models.App, session *models.Session) {
 	case true:
 		if err := watchlist.DeleteCollectionFilm(app, session); err != nil {
 			app.SendMessage("Не удалось удалить фильм из коллекции", nil)
-			HandleCollectionFilmsDetailCommand(app, session)
+			HandleManageCollectionFilmCommand(app, session)
 			break
 		}
 		app.SendMessage("Фильм удален из коллекции успешно", nil)
@@ -41,6 +41,6 @@ func parseDeleteCollectionFilmConfirm(app models.App, session *models.Session) {
 
 	case false:
 		app.SendMessage("Действие отменено", nil)
-		HandleCollectionFilmsDetailCommand(app, session)
+		HandleManageCollectionFilmCommand(app, session)
 	}
 }
