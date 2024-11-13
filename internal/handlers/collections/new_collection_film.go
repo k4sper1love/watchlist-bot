@@ -19,6 +19,7 @@ func HandleNewCollectionFilmCommand(app models.App, session *models.Session) {
 func HandleNewCollectionFilmProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Upd) {
 		session.ClearState()
+		session.CollectionFilmState.Clear()
 		HandleCollectionFilmsCommand(app, session)
 		return
 	}
@@ -120,7 +121,7 @@ func parseNewCollectionFilmRating(app models.App, session *models.Session) {
 	}
 
 	keyboard := builders.NewKeyboard(1).AddSkip().AddCancel().Build()
-	msg := "Укажите ссылку на изображение"
+	msg := "Отправьте изображение или ссылку на него"
 
 	app.SendMessage(msg, keyboard)
 
@@ -129,12 +130,29 @@ func parseNewCollectionFilmRating(app models.App, session *models.Session) {
 
 func parseNewCollectionFilmImage(app models.App, session *models.Session) {
 	if utils.IsSkip(app.Upd) {
-		session.CollectionFilmState.ImageURL = ""
-		log.Println("skip")
-	} else {
-		session.CollectionFilmState.ImageURL = utils.ParseMessageString(app.Upd)
+		requestNewCollectionFilmComment(app, session)
+		return
 	}
 
+	image, err := utils.ParseServerImage(app.Bot, app.Upd, app.Vars.Host)
+	if err != nil {
+		app.SendMessage("Ошибка при получении изображения", nil)
+		requestNewCollectionFilmComment(app, session)
+		return
+	}
+
+	imageURL, err := watchlist.UploadImage(app, image)
+	if err != nil {
+		app.SendMessage("Ошибка при получении изображения", nil)
+		requestNewCollectionFilmComment(app, session)
+		return
+	}
+
+	session.CollectionFilmState.ImageURL = imageURL
+	requestNewCollectionFilmComment(app, session)
+}
+
+func requestNewCollectionFilmComment(app models.App, session *models.Session) {
 	keyboard := builders.NewKeyboard(1).AddSkip().AddCancel().Build()
 	msg := "Укажите ваш комментарий к фильму"
 
@@ -161,12 +179,14 @@ func parseNewCollectionFilmComment(app models.App, session *models.Session) {
 func parseNewCollectionFilmViewed(app models.App, session *models.Session) {
 	switch utils.IsAgree(app.Upd) {
 	case true:
+		session.CollectionFilmState.IsViewed = true
 		keyboard := builders.NewKeyboard(1).AddSkip().AddCancel().Build()
 		msg := "Укажите вашу оценку фильму"
 		app.SendMessage(msg, keyboard)
 		session.SetState(states.ProcessNewCollectionFilmAwaitingUserRating)
 
 	case false:
+		session.CollectionFilmState.IsViewed = false
 		session.CollectionFilmState.UserRating = 0
 		session.CollectionFilmState.Review = ""
 		createNewCollectionFilm(app, session)

@@ -3,7 +3,6 @@ package utils
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
-	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"strconv"
 )
 
@@ -77,16 +76,4 @@ func IsCancel(update *tgbotapi.Update) bool {
 
 func IsAgree(update *tgbotapi.Update) bool {
 	return ParseCallback(update) == states.CallbackYes
-}
-
-func ClearSession(session *models.Session) {
-	session.UserID = -1
-	session.AccessToken = ""
-	session.RefreshToken = ""
-
-	session.CollectionDetailState.Name = ""
-	session.CollectionDetailState.Description = ""
-	session.CollectionDetailState.CurrentPage = 0
-	session.CollectionDetailState.LastPage = 0
-	session.ClearState()
 }

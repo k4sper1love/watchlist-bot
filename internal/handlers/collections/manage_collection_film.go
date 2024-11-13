@@ -4,6 +4,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
 func HandleManageCollectionFilmCommand(app models.App, session *models.Session) {
@@ -13,7 +14,8 @@ func HandleManageCollectionFilmCommand(app models.App, session *models.Session) 
 	msg += "Выберите действие"
 
 	keyboard := builders.NewKeyboard(1).
-		AddCollectionFilmsManage().
+		AddCollectionFilmsUpdate().
+		AddCollectionFilmsDelete().
 		AddBack(states.CallbackManageCollectionFilmSelectBack).
 		Build()
 
@@ -21,7 +23,7 @@ func HandleManageCollectionFilmCommand(app models.App, session *models.Session) 
 }
 
 func HandleManageCollectionFilmButtons(app models.App, session *models.Session) {
-	switch session.State {
+	switch utils.ParseCallback(app.Upd) {
 	case states.CallbackManageCollectionFilmSelectBack:
 		HandleCollectionFilmsDetailCommand(app, session)
 

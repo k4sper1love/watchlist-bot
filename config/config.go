@@ -15,7 +15,7 @@ func LoadApp() (*models.App, error) {
 		BotToken:    os.Getenv("BOT_TOKEN"),
 		Environment: os.Getenv("ENVIRONMENT"),
 		DSN:         configureDSN(),
-		BaseURL:     os.Getenv("BASE_URL"),
+		Host:        os.Getenv("API_HOST"),
 		Secret:      os.Getenv("SECRET"),
 	}
 

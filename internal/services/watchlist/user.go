@@ -12,7 +12,7 @@ func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 		"Authorization": session.AccessToken,
 	}
 
-	resp, err := SendRequest(app.Vars.BaseURL+"/user", http.MethodGet, nil, headers)
+	resp, err := SendRequest(app.Vars.Host+"/api/v1/user", http.MethodGet, nil, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -28,4 +28,45 @@ func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 	}
 
 	return user, nil
+}
+
+func UpdateUser(app models.App, session *models.Session) (*apiModels.User, error) {
+	headers := map[string]string{
+		"Authorization": session.AccessToken,
+	}
+
+	resp, err := SendRequest(app.Vars.Host+"/api/v1/user", http.MethodPut, session.ProfileState, headers)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("update_user failed: %s", resp.Status)
+	}
+
+	user := &apiModels.User{}
+	if err := parseUser(user, resp.Body); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func DeleteUser(app models.App, session *models.Session) error {
+	headers := map[string]string{
+		"Authorization": session.AccessToken,
+	}
+
+	resp, err := SendRequest(app.Vars.Host+"/api/v1/user", http.MethodDelete, nil, headers)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("delete_user failed: %s", resp.Status)
+	}
+
+	return nil
 }

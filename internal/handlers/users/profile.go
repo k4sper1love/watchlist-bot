@@ -1,7 +1,6 @@
 package users
 
 import (
-	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/general"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
@@ -17,19 +16,28 @@ func HandleProfileCommand(app models.App, session *models.Session) {
 		return
 	}
 
-	msg := fmt.Sprintf("Вот ваш профиль, %s:\n", user.Username) +
-		fmt.Sprintf("Ваш ID в системе API: %d\n", user.ID) +
-		fmt.Sprintf("Ваш email: %s\n", user.Email) +
-		fmt.Sprintf("Аккаунт был создан %v", user.CreatedAt)
+	msg := builders.BuildProfileMessage(user)
 
-	keyboard := builders.NewKeyboard(1).AddBack(states.CallbackProfileBack).Build()
+	keyboard := builders.NewKeyboard(1).
+		AddProfileUpdate().
+		AddProfileDelete().
+		AddBack(states.CallbackProfileSelectBack).
+		Build()
 
 	app.SendMessage(msg, keyboard)
 }
 
 func HandleProfileButtons(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Upd) {
-	case states.CallbackProfileBack:
+	callback := utils.ParseCallback(app.Upd)
+
+	switch {
+	case callback == states.CallbackProfileSelectBack:
 		general.HandleMenuCommand(app, session)
+
+	case callback == states.CallbackProfileSelectUpdate:
+		HandleUpdateProfileCommand(app, session)
+
+	case callback == states.CallbackProfileSelectDelete:
+		HandleDeleteProfileCommand(app, session)
 	}
 }

@@ -5,7 +5,7 @@ import (
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 )
 
-func BuildCollectionFilmDetailMessage(film *apiModels.Film) string {
+func BuildFilmDetailMessage(film *apiModels.Film) string {
 	msg := fmt.Sprintf("🆔 <b>ID</b>: %d\n", film.ID)
 
 	if film.Title != "" {
@@ -46,7 +46,7 @@ func BuildCollectionFilmDetailMessage(film *apiModels.Film) string {
 	return msg
 }
 
-func BuildCollectionFilmGeneralMessage(itemID int, film *apiModels.Film) string {
+func BuildFilmGeneralMessage(itemID int, film *apiModels.Film) string {
 	msg := fmt.Sprintf("<b>🎬 Фильм №%d</b>. ", itemID)
 	msg += fmt.Sprintf("<b>ID:</b> %d\n\n", film.ID)
 
@@ -83,4 +83,11 @@ func BuildCollectionFilmGeneralMessage(itemID int, film *apiModels.Film) string 
 	msg += fmt.Sprintf("📅 <b>Создан:</b> %s\n\n", film.CreatedAt.Format("02.01.06 15:04"))
 
 	return msg
+}
+
+func boolToString(viewed bool) string {
+	if viewed {
+		return "✅"
+	}
+	return "❌"
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"log"
 )
 
 var updateCollectionFilmButtons = []builders.Button{
@@ -84,6 +85,7 @@ func HandleUpdateCollectionFilmButtons(app models.App, session *models.Session) 
 func HandleUpdateCollectionFilmProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Upd) {
 		session.ClearState()
+		session.CollectionFilmState.Clear()
 		HandleUpdateCollectionFilmCommand(app, session)
 		return
 	}
@@ -122,7 +124,7 @@ func HandleUpdateCollectionFilmProcess(app models.App, session *models.Session) 
 }
 
 func handleUpdateCollectionFilmImage(app models.App, session *models.Session) {
-	msg := "Введите новую ссылку на изображение фильма"
+	msg := "Отправьте новое изображение или ссылку на него"
 
 	keyboard := builders.NewKeyboard(1).AddCancel().Build()
 
@@ -132,9 +134,26 @@ func handleUpdateCollectionFilmImage(app models.App, session *models.Session) {
 }
 
 func parseUpdateCollectionFilmImage(app models.App, session *models.Session) {
-	session.CollectionFilmState.ImageURL = utils.ParseMessageString(app.Upd)
+	image, err := utils.ParseServerImage(app.Bot, app.Upd, app.Vars.Host)
+	if err != nil {
+		app.SendMessage("Ошибка при получении изображения", nil)
+		finishUpdateCollectionFilmProcess(app, session)
+		HandleUpdateCollectionFilmCommand(app, session)
+		return
+	}
+
+	imageURL, err := watchlist.UploadImage(app, image)
+	if err != nil {
+		app.SendMessage("Ошибка при получении изображения", nil)
+		finishUpdateCollectionFilmProcess(app, session)
+		HandleUpdateCollectionFilmCommand(app, session)
+		return
+	}
+
+	session.CollectionFilmState.ImageURL = imageURL
 
 	finishUpdateCollectionFilmProcess(app, session)
+	HandleUpdateCollectionFilmCommand(app, session)
 }
 
 func handleUpdateCollectionFilmTitle(app models.App, session *models.Session) {
@@ -151,6 +170,7 @@ func parseUpdateCollectionFilmTitle(app models.App, session *models.Session) {
 	session.CollectionFilmState.Title = utils.ParseMessageString(app.Upd)
 
 	finishUpdateCollectionFilmProcess(app, session)
+	HandleUpdateCollectionFilmCommand(app, session)
 }
 
 func handleUpdateCollectionFilmDescription(app models.App, session *models.Session) {
@@ -167,6 +187,7 @@ func parseUpdateCollectionFilmDescription(app models.App, session *models.Sessio
 	session.CollectionFilmState.Description = utils.ParseMessageString(app.Upd)
 
 	finishUpdateCollectionFilmProcess(app, session)
+	HandleUpdateCollectionFilmCommand(app, session)
 }
 
 func handleUpdateCollectionFilmGenre(app models.App, session *models.Session) {
@@ -183,6 +204,7 @@ func parseUpdateCollectionFilmGenre(app models.App, session *models.Session) {
 	session.CollectionFilmState.Genre = utils.ParseMessageString(app.Upd)
 
 	finishUpdateCollectionFilmProcess(app, session)
+	HandleUpdateCollectionFilmCommand(app, session)
 }
 
 func handleUpdateCollectionFilmRating(app models.App, session *models.Session) {
@@ -199,6 +221,7 @@ func parseUpdateCollectionFilmRating(app models.App, session *models.Session) {
 	session.CollectionFilmState.Rating = utils.ParseMessageFloat(app.Upd)
 
 	finishUpdateCollectionFilmProcess(app, session)
+	HandleUpdateCollectionFilmCommand(app, session)
 }
 
 func handleUpdateCollectionFilmYear(app models.App, session *models.Session) {
@@ -215,6 +238,7 @@ func parseUpdateCollectionFilmYear(app models.App, session *models.Session) {
 	session.CollectionFilmState.Year = utils.ParseMessageInt(app.Upd)
 
 	finishUpdateCollectionFilmProcess(app, session)
+	HandleUpdateCollectionFilmCommand(app, session)
 }
 
 func handleUpdateCollectionFilmComment(app models.App, session *models.Session) {
@@ -231,6 +255,7 @@ func parseUpdateCollectionFilmComment(app models.App, session *models.Session) {
 	session.CollectionFilmState.Comment = utils.ParseMessageString(app.Upd)
 
 	finishUpdateCollectionFilmProcess(app, session)
+	HandleUpdateCollectionFilmCommand(app, session)
 }
 
 func handleUpdateCollectionFilmViewed(app models.App, session *models.Session) {
@@ -245,8 +270,10 @@ func handleUpdateCollectionFilmViewed(app models.App, session *models.Session) {
 
 func parseUpdateCollectionFilmViewed(app models.App, session *models.Session) {
 	session.CollectionFilmState.IsViewed = utils.IsAgree(app.Upd)
+	session.CollectionFilmState.IsEditViewed = true
 
 	finishUpdateCollectionFilmProcess(app, session)
+	HandleUpdateCollectionFilmCommand(app, session)
 }
 
 func handleUpdateCollectionFilmUserRating(app models.App, session *models.Session) {
@@ -263,6 +290,7 @@ func parseUpdateCollectionFilmUserRating(app models.App, session *models.Session
 	session.CollectionFilmState.UserRating = utils.ParseMessageFloat(app.Upd)
 
 	finishUpdateCollectionFilmProcess(app, session)
+	HandleUpdateCollectionFilmCommand(app, session)
 }
 
 func handleUpdateCollectionFilmReview(app models.App, session *models.Session) {
@@ -279,17 +307,18 @@ func parseUpdateCollectionFilmReview(app models.App, session *models.Session) {
 	session.CollectionFilmState.Review = utils.ParseMessageString(app.Upd)
 
 	finishUpdateCollectionFilmProcess(app, session)
+	HandleUpdateCollectionFilmCommand(app, session)
 }
 
 func updateCollectionFilm(app models.App, session *models.Session) {
 	film, err := watchlist.UpdateFilm(app, session)
 	if err != nil {
+		log.Println(err)
 		app.SendMessage("Не удалось обновить фильм в коллекции", nil)
 		return
 	}
 
 	session.CollectionFilmState.Object = *film
-	app.SendMessage("Фильм в коллекции успешно обновлен", nil)
 }
 
 func finishUpdateCollectionFilmProcess(app models.App, session *models.Session) {
@@ -324,6 +353,10 @@ func finishUpdateCollectionFilmProcess(app models.App, session *models.Session) 
 		state.Comment = collectionFilm.Comment
 	}
 
+	if !state.IsViewed && !state.IsEditViewed {
+		state.IsViewed = collectionFilm.IsViewed
+	}
+
 	if state.UserRating == 0 {
 		state.UserRating = collectionFilm.UserRating
 	}
@@ -333,7 +366,11 @@ func finishUpdateCollectionFilmProcess(app models.App, session *models.Session) 
 	}
 
 	updateCollectionFilm(app, session)
+
+	if _, err := getCollectionFilms(app, session); err != nil {
+		app.SendMessage("Ошибка при обновлении списка фильмов", nil)
+	}
+
 	session.CollectionFilmState.Clear()
 	session.ClearState()
-	HandleUpdateCollectionFilmCommand(app, session)
 }

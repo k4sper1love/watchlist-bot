@@ -18,8 +18,10 @@ func OpenDB(vars *models.Vars) error {
 
 	return db.Debug().AutoMigrate(
 		&models.Session{},
+		&models.ProfileState{},
 		&models.CollectionsState{},
-		&models.FilmState{},
+		&models.FilmsState{},
+		&models.FilmDetailState{},
 		&models.CollectionDetailState{},
 		&models.CollectionFilmState{},
 	)

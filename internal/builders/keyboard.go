@@ -47,6 +47,10 @@ func (k *Keyboard) Add(button Button) *Keyboard {
 }
 
 func (k *Keyboard) AddSeveral(buttons []Button) *Keyboard {
+	if buttons == nil {
+		return k
+	}
+
 	k.Buttons = append(k.Buttons, buttons...)
 	return k
 }

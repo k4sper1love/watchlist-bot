@@ -13,17 +13,98 @@ const (
 
 	// menu states
 	CallbackMenuSelectProfile     = "menu_select_profile"
+	CallbackMenuSelectFilms       = "menu_select_films"
 	CallbackMenuSelectCollections = "menu_select_collections"
 	CallbackMenuSelectSettings    = "menu_select_settings"
 	CallbackMenuSelectLogout      = "menu_select_logout"
+	CallbackMenuSelectAdmin       = "menu_select_admin"
 
 	// settings states
 	CallbackSettingsBack                       = "settings_back"
 	CallbackSettingsCollectionsPageSize        = "settings_collections_page_size"
 	ProcessSettingsCollectionsAwaitingPageSize = "settings_collections_awaiting_page_size"
 
+	// admin states
+	CallbackAdminSelectBack                  = "admin_select_back"
+	CallbackAdminSelectUserCount             = "admin_select_user_count"
+	CallbackAdminSelectBroadcastMessage      = "admin_select_broadcast_message"
+	ProcessAdminAwaitingBroadcastMessageText = "admin_awaiting_broadcast_message_text"
+
 	// profile states
-	CallbackProfileBack = "profile_back"
+	CallbackProfileSelectUpdate = "profile_select_update"
+	CallbackProfileSelectDelete = "profile_select_delete"
+	CallbackProfileSelectBack   = "profile_select_back"
+
+	// update profile states
+	CallbackUpdateProfileSelectBack      = "update_profile_select_back"
+	CallbackUpdateProfileSelectUsername  = "update_profile_select_username"
+	ProcessUpdateProfileAwaitingUsername = "update_profile_awaiting_username"
+	CallbackUpdateProfileSelectEmail     = "update_profile_select_email"
+	ProcessUpdateProfileAwaitingEmail    = "update_profile_awaiting_email"
+
+	// delete profile states
+	ProcessDeleteProfileAwaitingConfirm = "delete_profile_awaiting_confirm"
+
+	// films states
+	CallbackFilmsNew      = "films_new"
+	CallbackFilmsManage   = "films_manage"
+	CallbackFilmsNextPage = "films_next_page"
+	CallbackFilmsPrevPage = "films_prev_page"
+	CallbackFilmsBack     = "films_back"
+
+	// manage film states
+	CallbackManageFilmSelectBack   = "manage_film_select_back"
+	CallbackManageFilmSelectUpdate = "manage_film_select_update"
+	CallbackManageFilmSelectDelete = "manage_film_select_delete"
+
+	// new film states
+	ProcessNewFilmAwaitingTitle       = "new_film_awaiting_title"
+	ProcessNewFilmAwaitingYear        = "new_film_awaiting_year"
+	ProcessNewFilmAwaitingGenre       = "new_film_awaiting_genre"
+	ProcessNewFilmAwaitingDescription = "new_film_awaiting_description"
+	ProcessNewFilmAwaitingRating      = "new_film_awaiting_rating"
+	ProcessNewFilmAwaitingImage       = "new_film_awaiting_image"
+	ProcessNewFilmAwaitingComment     = "new_film_awaiting_comment"
+	ProcessNewFilmAwaitingViewed      = "new_film_awaiting_viewed"
+	ProcessNewFilmAwaitingUserRating  = "new_film_awaiting_user_rating"
+	ProcessNewFilmAwaitingReview      = "new_film_awaiting_review"
+
+	// delete film states
+	ProcessDeleteFilmAwaitingConfirm = "delete_film_awaiting_confirm"
+
+	// update film states
+	CallbackUpdateFilmSelectBack         = "update_film_select_back"
+	CallbackUpdateFilmSelectTitle        = "update_film_select_title"
+	ProcessUpdateFilmAwaitingTitle       = "update_film_awaiting_title"
+	CallbackUpdateFilmSelectYear         = "update_film_select_year"
+	ProcessUpdateFilmAwaitingYear        = "update_film_awaiting_year"
+	CallbackUpdateFilmSelectGenre        = "update_film_select_genre"
+	ProcessUpdateFilmAwaitingGenre       = "update_film_awaiting_genre"
+	CallbackUpdateFilmSelectDescription  = "update_film_select_description"
+	ProcessUpdateFilmAwaitingDescription = "update_film_awaiting_description"
+	CallbackUpdateFilmSelectRating       = "update_film_select_rating"
+	ProcessUpdateFilmAwaitingRating      = "update_film_awaiting_rating"
+	CallbackUpdateFilmSelectImage        = "update_film_select_image"
+	ProcessUpdateFilmAwaitingImage       = "update_film_awaiting_image"
+	CallbackUpdateFilmSelectComment      = "update_film_select_comment"
+	ProcessUpdateFilmAwaitingComment     = "update_film_awaiting_comment"
+	CallbackUpdateFilmSelectViewed       = "update_film_select_viewed"
+	ProcessUpdateFilmAwaitingViewed      = "update_film_awaiting_viewed"
+	CallbackUpdateFilmSelectUserRating   = "update_film_select_user_rating"
+	ProcessUpdateFilmAwaitingUserRating  = "update_film_awaiting_user_rating"
+	CallbackUpdateFilmSelectReview       = "update_film_select_review"
+	ProcessUpdateFilmAwaitingReview      = "update_film_awaiting_review"
+
+	// film detail states
+	CallbackFilmDetailNextPage = "film_detail_next_page"
+	CallbackFilmDetailPrevPage = "film_detail_prev_page"
+	CallbackFilmDetailBack     = "film_detail_back"
+	CallbackFilmDetailViewed   = "film_detail_viewed"
+
+	// viewed film states
+	CallbackViewedFilmBack          = "viewed_film_back"
+	ProcessViewedFilmAwaitingRating = "viewed_film_awaiting_rating"
+	ProcessViewedFilmAwaitingReview = "viewed_film_awaiting_review"
 
 	// collections states
 	CallbackCollectionsNew      = "collections_new"
@@ -105,4 +186,10 @@ const (
 	CallbackCollectionFilmDetailNextPage = "collection_film_detail_next_page"
 	CallbackCollectionFilmDetailPrevPage = "collection_film_detail_prev_page"
 	CallbackCollectionFilmDetailBack     = "collection_film_detail_back"
+	CallbackCollectionFilmDetailViewed   = "collection_film_detail_viewed"
+
+	// viewed collection film states
+	CallbackViewedCollectionFilmBack          = "viewed_collection_film_back"
+	ProcessViewedCollectionFilmAwaitingRating = "viewed_collection_film_awaiting_rating"
+	ProcessViewedCollectionFilmAwaitingReview = "viewed_collection_film_awaiting_review"
 )

@@ -19,11 +19,6 @@ func HandleCollectionsCommand(app models.App, session *models.Session) {
 		return
 	}
 
-	if collectionsResponse.Metadata.TotalRecords == 0 {
-		app.SendMessage("Не найдено коллекций. Создайте новую коллекцию с помощью /new_collection", nil)
-		return
-	}
-
 	session.CollectionsState.Object = collectionsResponse.Collections
 
 	currentPage := collectionsResponse.Metadata.CurrentPage
@@ -33,6 +28,10 @@ func HandleCollectionsCommand(app models.App, session *models.Session) {
 	session.CollectionsState.LastPage = lastPage
 
 	msg := builders.BuildCollectionsMessage(collectionsResponse)
+
+	if collectionsResponse.Metadata.TotalRecords == 0 {
+		msg = "Не найдено коллекций"
+	}
 
 	keyboard := builders.NewKeyboard(1).
 		AddCollectionsSelect(collectionsResponse).

@@ -8,13 +8,22 @@ import (
 
 var menuButtons = []builders.Button{
 	{"Профиль", states.CallbackMenuSelectProfile},
+	{"Фильмы", states.CallbackMenuSelectFilms},
 	{"Коллекции", states.CallbackMenuSelectCollections},
 	{"Настройки", states.CallbackMenuSelectSettings},
 	{"Выйти из системы", states.CallbackMenuSelectLogout},
 }
 
 func HandleMenuCommand(app models.App, session *models.Session) {
-	keyboard := builders.NewKeyboard(1).AddSeveral(menuButtons).Build()
+	keyboard := builders.NewKeyboard(1)
 
-	app.SendMessage("Выберите одно из действий", keyboard)
+	if session.IsAdmin {
+		adminButton := builders.Button{"Админ-панель", states.CallbackMenuSelectAdmin}
+
+		keyboard.Add(adminButton)
+	}
+
+	keyboard.AddSeveral(menuButtons)
+
+	app.SendMessage("Выберите одно из действий", keyboard.Build())
 }

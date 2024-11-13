@@ -8,7 +8,7 @@ import (
 )
 
 func HandleManageCollectionCommand(app models.App, session *models.Session) {
-	msg := builders.BuildCollectionDetailMessage(&session.CollectionDetailState.Object.Collection)
+	msg := builders.BuildCollectionDetailMessage(-1, &session.CollectionDetailState.Object.Collection)
 	msg += "\nВыберите действие"
 
 	keyboard := builders.NewKeyboard(1).

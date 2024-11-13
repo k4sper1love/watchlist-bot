@@ -6,21 +6,32 @@ func GetSessionByTelegramID(telegramID int) (*models.Session, error) {
 	var session models.Session
 
 	if err := GetDB().
+		Preload("ProfileState").
 		Preload("CollectionsState").
-		Preload("FilmState").
+		Preload("FilmsState").
+		Preload("FilmDetailState").
 		Preload("CollectionDetailState").
 		Preload("CollectionFilmState").
 		FirstOrInit(&session, models.Session{TelegramID: telegramID}).Error; err != nil {
 		return nil, err
 	}
 
+	if session.ProfileState == nil {
+		session.ProfileState = &models.ProfileState{}
+	}
+
 	if session.CollectionsState == nil {
 		session.CollectionsState = &models.CollectionsState{}
 	}
-	if session.FilmState == nil {
-		session.FilmState = &models.FilmState{}
-		session.FilmState.ObjectID = -1
+	if session.FilmsState == nil {
+		session.FilmsState = &models.FilmsState{}
 	}
+
+	if session.FilmDetailState == nil {
+		session.FilmDetailState = &models.FilmDetailState{}
+		session.FilmDetailState.Index = -1
+	}
+
 	if session.CollectionDetailState == nil {
 		session.CollectionDetailState = &models.CollectionDetailState{}
 		session.CollectionDetailState.ObjectID = -1
@@ -34,5 +45,5 @@ func GetSessionByTelegramID(telegramID int) (*models.Session, error) {
 }
 
 func SaveSessionWihDependencies(session *models.Session) {
-	Save(session, session.CollectionsState, session.FilmState, session.CollectionDetailState, session.CollectionFilmState)
+	Save(session, session.ProfileState, session.CollectionsState, session.FilmsState, session.FilmDetailState, session.CollectionDetailState, session.CollectionFilmState)
 }

@@ -13,7 +13,7 @@ func GetCollectionFilms(app models.App, session *models.Session) (*models.Collec
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/collections/%d/films?page=%d&page_size=%d", app.Vars.BaseURL, session.CollectionDetailState.ObjectID, session.CollectionDetailState.CurrentPage, session.CollectionDetailState.PageSize)
+	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films?page=%d&page_size=%d", app.Vars.Host, session.CollectionDetailState.ObjectID, session.CollectionDetailState.CurrentPage, session.CollectionDetailState.PageSize)
 
 	resp, err := SendRequest(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
@@ -38,7 +38,7 @@ func CreateCollectionFilm(app models.App, session *models.Session) (*apiModels.C
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/collections/%d/films", app.Vars.BaseURL, session.CollectionDetailState.ObjectID)
+	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films", app.Vars.Host, session.CollectionDetailState.ObjectID)
 
 	resp, err := SendRequest(requestURL, http.MethodPost, session.CollectionFilmState, headers)
 	if err != nil {
@@ -63,7 +63,7 @@ func DeleteCollectionFilm(app models.App, session *models.Session) error {
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/collections/%d/films/%d", app.Vars.BaseURL, session.CollectionDetailState.ObjectID, session.CollectionFilmState.Object.ID)
+	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Vars.Host, session.CollectionDetailState.ObjectID, session.CollectionFilmState.Object.ID)
 
 	resp, err := SendRequest(requestURL, http.MethodDelete, nil, headers)
 	if err != nil {

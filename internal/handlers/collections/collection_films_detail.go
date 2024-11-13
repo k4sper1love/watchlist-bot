@@ -9,8 +9,9 @@ import (
 )
 
 func HandleCollectionFilmsDetailCommand(app models.App, session *models.Session) {
-	films := session.CollectionDetailState.Object.Films
 	index := session.CollectionFilmState.Index
+	films := session.CollectionDetailState.Object.Films
+	film := films[index]
 
 	if len(films) == 0 {
 		app.SendMessage("Фильмы не найдены. Начните с начала", nil)
@@ -29,7 +30,14 @@ func HandleCollectionFilmsDetailCommand(app models.App, session *models.Session)
 	msg := fmt.Sprintf("🎞️ <b>№</b>: %d\n", itemID)
 	msg += builders.BuildCollectionFilmDetailMessage(&films[index])
 
+	var buttons []builders.Button
+
+	if !film.IsViewed {
+		buttons = append(buttons, builders.Button{"Просмотрено✅", states.CallbackCollectionFilmDetailViewed})
+	}
+
 	keyboard := builders.NewKeyboard(2).
+		AddSeveral(buttons).
 		AddCollectionFilmsManage().
 		AddNavigation(itemID, session.CollectionDetailState.TotalRecords, states.CallbackCollectionFilmDetailPrevPage, states.CallbackCollectionFilmDetailNextPage).
 		AddBack(states.CallbackCollectionFilmDetailBack).
@@ -44,10 +52,8 @@ func HandleCollectionFilmsDetailButtons(app models.App, session *models.Session)
 	currentIndex := session.CollectionFilmState.Index
 	lastIndex := getCollectionFilmsLastIndex(session)
 
-	callback := utils.ParseCallback(app.Upd)
-
-	switch {
-	case callback == states.CallbackCollectionFilmDetailNextPage:
+	switch utils.ParseCallback(app.Upd) {
+	case states.CallbackCollectionFilmDetailNextPage:
 		if currentIndex < lastIndex {
 			session.CollectionFilmState.Index++
 			HandleCollectionFilmsDetailCommand(app, session)
@@ -60,7 +66,7 @@ func HandleCollectionFilmsDetailButtons(app models.App, session *models.Session)
 			HandleCollectionFilmsDetailCommand(app, session)
 		}
 
-	case callback == states.CallbackCollectionFilmDetailPrevPage:
+	case states.CallbackCollectionFilmDetailPrevPage:
 		if currentIndex > 0 {
 			session.CollectionFilmState.Index--
 			HandleCollectionFilmsDetailCommand(app, session)
@@ -74,8 +80,11 @@ func HandleCollectionFilmsDetailButtons(app models.App, session *models.Session)
 			HandleCollectionFilmsDetailCommand(app, session)
 		}
 
-	case callback == states.CallbackCollectionFilmDetailBack:
+	case states.CallbackCollectionFilmDetailBack:
 		HandleCollectionFilmsCommand(app, session)
+
+	case states.CallbackCollectionFilmDetailViewed:
+		HandleViewedCollectionFilmCommand(app, session)
 	}
 }
 

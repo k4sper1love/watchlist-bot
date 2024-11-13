@@ -21,10 +21,13 @@ func HandleAuthProcess(app models.App, session *models.Session) error {
 
 	err := watchlist.Login(app, session)
 	if err == nil {
+		app.SendMessage("Успешный вход!", nil)
 		return nil
 	}
+
 	err = watchlist.Register(app, session)
 	if err == nil {
+		app.SendMessage("Успешная регистрация", nil)
 		return nil
 	}
 
@@ -55,7 +58,7 @@ func parseLogoutConfirm(app models.App, session *models.Session) {
 			break
 		}
 		app.SendMessage("Успешно вышли из системы", nil)
-		utils.ClearSession(session)
+		session.ClearFull()
 
 	case false:
 		app.SendMessage("Отмена выхода из системы", nil)

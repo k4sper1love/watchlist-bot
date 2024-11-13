@@ -13,7 +13,7 @@ func GetFilms(app models.App, session *models.Session) (*models.FilmsResponse, e
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/collections/%d/films", app.Vars.BaseURL, session.CollectionDetailState.ObjectID)
+	requestURL := fmt.Sprintf("%s/api/v1/films?page=%d&page_size=%d", app.Vars.Host, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
 
 	resp, err := SendRequest(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
@@ -38,9 +38,9 @@ func UpdateFilm(app models.App, session *models.Session) (*apiModels.Film, error
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/films/%d", app.Vars.BaseURL, session.CollectionFilmState.Object.ID)
+	requestURL := fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Object.ID)
 
-	resp, err := SendRequest(requestURL, http.MethodPut, session.CollectionFilmState, headers)
+	resp, err := SendRequest(requestURL, http.MethodPut, session.FilmDetailState, headers)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
@@ -56,4 +56,49 @@ func UpdateFilm(app models.App, session *models.Session) (*apiModels.Film, error
 	}
 
 	return film, nil
+}
+
+func CreateFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
+	headers := map[string]string{
+		"Authorization": session.AccessToken,
+	}
+
+	requestURL := fmt.Sprintf("%s/api/v1/films", app.Vars.Host)
+
+	resp, err := SendRequest(requestURL, http.MethodPost, session.FilmDetailState, headers)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusCreated {
+		return nil, fmt.Errorf("create_film failed: %d", resp.StatusCode)
+	}
+
+	film := &apiModels.Film{}
+	if err := parseFilm(film, resp.Body); err != nil {
+		return nil, fmt.Errorf("failed to parse film: %w", err)
+	}
+
+	return film, nil
+}
+
+func DeleteFilm(app models.App, session *models.Session) error {
+	headers := map[string]string{
+		"Authorization": session.AccessToken,
+	}
+
+	requestURL := fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Object.ID)
+
+	resp, err := SendRequest(requestURL, http.MethodDelete, nil, headers)
+	if err != nil {
+		return fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("delete_film failed: %s", resp.Status)
+	}
+
+	return nil
 }

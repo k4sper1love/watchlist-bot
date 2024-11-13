@@ -2,27 +2,28 @@ package watchlist
 
 import (
 	"encoding/json"
-	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"io"
+	"log"
 )
 
 func parseAuth(dest *models.Session, data io.Reader) error {
-	var responseMap map[string]interface{}
-	if err := json.NewDecoder(data).Decode(&responseMap); err != nil {
+	auth := &apiModels.AuthResponse{}
+
+	err := json.NewDecoder(data).Decode(&struct {
+		Auth *apiModels.AuthResponse `json:"user"`
+	}{
+		Auth: auth,
+	})
+
+	if err != nil {
 		return err
 	}
 
-	userData := responseMap["user"].(map[string]interface{})
-
-	if id, ok := userData["id"].(float64); ok {
-		dest.UserID = int(id)
-	} else {
-		return fmt.Errorf("invalid id format")
-	}
-	dest.AccessToken = userData["access_token"].(string)
-	dest.RefreshToken = userData["refresh_token"].(string)
+	dest.User = *auth.User
+	dest.AccessToken = auth.AccessToken
+	dest.RefreshToken = auth.RefreshToken
 
 	return nil
 }
@@ -57,4 +58,18 @@ func parseCollectionFilm(dest *apiModels.CollectionFilm, data io.Reader) error {
 	}{
 		CollectionFilm: dest,
 	})
+}
+
+func parseImageURL(data io.Reader) (string, error) {
+	var result struct {
+		ImageURL string `json:"image_url"`
+	}
+
+	err := json.NewDecoder(data).Decode(&result)
+	if err != nil {
+		return "", err
+	}
+	log.Println("вот резы", result)
+	log.Println("вот имадже юрл", result)
+	return result.ImageURL, nil
 }

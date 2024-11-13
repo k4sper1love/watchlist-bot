@@ -21,7 +21,6 @@ func HandleStartCommand(app models.App, session *models.Session) {
 		sl.Log.Error("error auth process", slog.Any("err", err))
 		return
 	}
-	app.SendMessage("Успешный вход в систему.", nil)
 	HandleMenuCommand(app, session)
 }
 

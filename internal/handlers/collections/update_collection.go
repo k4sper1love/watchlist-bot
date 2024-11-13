@@ -14,7 +14,7 @@ var updateCollectionButtons = []builders.Button{
 }
 
 func HandleUpdateCollectionCommand(app models.App, session *models.Session) {
-	msg := builders.BuildCollectionDetailMessage(&session.CollectionDetailState.Object.Collection)
+	msg := builders.BuildCollectionDetailMessage(-1, &session.CollectionDetailState.Object.Collection)
 	msg += "\nВыберите, какое поле вы хотите изменить?"
 
 	keyboard := builders.NewKeyboard(1).
@@ -41,6 +41,7 @@ func HandleUpdateCollectionButtons(app models.App, session *models.Session) {
 func HandleUpdateCollectionProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Upd) {
 		session.ClearState()
+		session.CollectionDetailState.Clear()
 		HandleUpdateCollectionCommand(app, session)
 		return
 	}

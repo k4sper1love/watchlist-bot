@@ -13,7 +13,7 @@ func GetCollections(app models.App, session *models.Session) (*models.Collection
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/collections?page=%d&page_size=%d", app.Vars.BaseURL, session.CollectionsState.CurrentPage, session.CollectionsState.PageSize)
+	requestURL := fmt.Sprintf("%s/api/v1/collections?page=%d&page_size=%d", app.Vars.Host, session.CollectionsState.CurrentPage, session.CollectionsState.PageSize)
 
 	resp, err := SendRequest(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
@@ -38,7 +38,7 @@ func CreateCollection(app models.App, session *models.Session) (*apiModels.Colle
 		"Authorization": session.AccessToken,
 	}
 
-	resp, err := SendRequest(app.Vars.BaseURL+"/collections", http.MethodPost, session.CollectionDetailState, headers)
+	resp, err := SendRequest(app.Vars.Host+"/api/v1/collections", http.MethodPost, session.CollectionDetailState, headers)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
@@ -61,7 +61,7 @@ func UpdateCollection(app models.App, session *models.Session) (*apiModels.Colle
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/collections/%d", app.Vars.BaseURL, session.CollectionDetailState.ObjectID)
+	requestURL := fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.ObjectID)
 
 	resp, err := SendRequest(requestURL, http.MethodPut, session.CollectionDetailState, headers)
 	if err != nil {
@@ -86,7 +86,7 @@ func DeleteCollection(app models.App, session *models.Session) error {
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/collections/%d", app.Vars.BaseURL, session.CollectionDetailState.ObjectID)
+	requestURL := fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.ObjectID)
 
 	resp, err := SendRequest(requestURL, http.MethodDelete, nil, headers)
 	if err != nil {

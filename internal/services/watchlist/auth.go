@@ -26,7 +26,7 @@ func Register(app models.App, session *models.Session) error {
 		"Verification": token,
 	}
 
-	resp, err := SendRequest(app.Vars.BaseURL+"/auth/register/telegram", http.MethodPost, "", headers)
+	resp, err := SendRequest(app.Vars.Host+"/api/v1/auth/register/telegram", http.MethodPost, "", headers)
 	if err != nil {
 		return err
 	}
@@ -36,7 +36,11 @@ func Register(app models.App, session *models.Session) error {
 		return fmt.Errorf("registration failed: %s", resp.Status)
 	}
 
-	return parseAuth(session, resp.Body)
+	if err := parseAuth(session, resp.Body); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func Login(app models.App, session *models.Session) error {
@@ -49,7 +53,7 @@ func Login(app models.App, session *models.Session) error {
 		"Verification": token,
 	}
 
-	resp, err := SendRequest(app.Vars.BaseURL+"/auth/login/telegram", http.MethodPost, "", headers)
+	resp, err := SendRequest(app.Vars.Host+"/api/v1/auth/login/telegram", http.MethodPost, "", headers)
 	if err != nil {
 		return err
 	}
@@ -65,7 +69,11 @@ func Login(app models.App, session *models.Session) error {
 		return fmt.Errorf("login failed: %s", resp.Status)
 	}
 
-	return parseAuth(session, resp.Body)
+	if err := parseAuth(session, resp.Body); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func IsTokenValid(app models.App, token string) bool {
@@ -73,7 +81,7 @@ func IsTokenValid(app models.App, token string) bool {
 		"Authorization": token,
 	}
 
-	resp, err := SendRequest(app.Vars.BaseURL+"/auth/check-token", http.MethodGet, nil, headers)
+	resp, err := SendRequest(app.Vars.Host+"/api/v1/auth/check-token", http.MethodGet, nil, headers)
 	if err != nil {
 		return false
 	}
@@ -87,7 +95,7 @@ func RefreshAccessToken(app models.App, session *models.Session) error {
 		"Authorization": session.RefreshToken,
 	}
 
-	resp, err := SendRequest(app.Vars.BaseURL+"/auth/refresh", http.MethodPost, nil, headers)
+	resp, err := SendRequest(app.Vars.Host+"/api/v1/auth/refresh", http.MethodPost, nil, headers)
 	if err != nil {
 		return err
 	}
@@ -112,7 +120,7 @@ func Logout(app models.App, session *models.Session) error {
 		"Authorization": session.RefreshToken,
 	}
 
-	resp, err := SendRequest(app.Vars.BaseURL+"/auth/logout", http.MethodPost, nil, headers)
+	resp, err := SendRequest(app.Vars.Host+"/api/v1/auth/logout", http.MethodPost, nil, headers)
 	if err != nil {
 		return err
 	}
@@ -122,8 +130,7 @@ func Logout(app models.App, session *models.Session) error {
 		return fmt.Errorf("logout failed: %s", resp.Status)
 	}
 
-	session.AccessToken = ""
-	session.RefreshToken = ""
+	session.ClearUser()
 
 	return nil
 }

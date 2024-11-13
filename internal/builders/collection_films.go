@@ -7,15 +7,18 @@ import (
 )
 
 func BuildCollectionFilmsMessage(collectionFilmsResponse *models.CollectionFilmsResponse) string {
-	msg := "Вот ваши фильмы:\n"
+	collection := collectionFilmsResponse.CollectionFilms.Collection
+	films := collectionFilmsResponse.CollectionFilms.Films
+	metadata := collectionFilmsResponse.Metadata
 
-	for i, film := range collectionFilmsResponse.CollectionFilms.Films {
-		itemID := i + 1 + ((collectionFilmsResponse.Metadata.CurrentPage - 1) * collectionFilmsResponse.Metadata.PageSize)
+	msg := fmt.Sprintf("<b>🎬 Коллекция фильмов:</b> \"%s\"\n\n", collection.Name)
 
-		msg += fmt.Sprintf("%d. ID: %d\nTitle: %s\nGenre: %s\nDescription: %s\nRating: %.2f\nLast updated: %s\nCreated: %s\n",
-			itemID, film.ID, film.Title, film.Genre, film.Description, film.Rating, film.UpdatedAt, film.CreatedAt)
+	if collection.TotalFilms == 0 {
+		msg += "Не найдено фильмов в этой коллекции."
+		return msg
 	}
-	msg += fmt.Sprintf("%d из %d страниц\n", collectionFilmsResponse.Metadata.CurrentPage, collectionFilmsResponse.Metadata.LastPage)
+
+	msg += filmsToString(films, metadata)
 
 	return msg
 }

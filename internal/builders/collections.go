@@ -8,20 +8,30 @@ import (
 )
 
 func BuildCollectionsMessage(collectionsResponse *models.CollectionsResponse) string {
+	collections := collectionsResponse.Collections
 	metadata := collectionsResponse.Metadata
 
-	msg := "Вот ваши коллекции:\n"
+	msg := ""
 
-	for i, collection := range collectionsResponse.Collections {
-		itemID := utils.GetItemID(i, metadata.CurrentPage, metadata.PageSize)
-
-		msg += fmt.Sprintf("%d. ID: %d\nName: %s\nDescription: %s\nLast updated: %s\nCreated: %s\n",
-			itemID, collection.ID, collection.Name, collection.Description, collection.UpdatedAt, collection.CreatedAt)
+	if metadata.TotalRecords == 0 {
+		msg += "Не найдено коллекций."
+		return msg
 	}
 
-	msg += fmt.Sprintf("%d из %d страниц\n", collectionsResponse.Metadata.CurrentPage, collectionsResponse.Metadata.LastPage)
+	msg += fmt.Sprintf("<b>📊 Всего коллекций:</b> %d\n\n", metadata.TotalRecords)
 
-	return msg + "Выберите колллекцию из списка"
+	for i, collection := range collections {
+		itemID := utils.GetItemID(i, metadata.CurrentPage, metadata.PageSize)
+
+		msg += "<b>──────────────────────────</b>\n\n"
+		msg += BuildCollectionDetailMessage(itemID, &collection)
+	}
+
+	msg += "<b>──────────────────────────</b>\n\n"
+	msg += fmt.Sprintf("<b>📄 Страница %d из %d</b>\n\n", metadata.CurrentPage, metadata.LastPage)
+	msg += "Выберите коллекцию из списка, чтобы узнать больше."
+
+	return msg
 }
 
 func (k *Keyboard) AddCollectionsSelect(collectionsResponse *models.CollectionsResponse) *Keyboard {

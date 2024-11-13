@@ -4,12 +4,9 @@ import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
-	"io"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"log/slog"
-	"net/http"
 	"os"
-	"path/filepath"
-	"strings"
 )
 
 type App struct {
@@ -22,7 +19,7 @@ type Vars struct {
 	BotToken    string
 	Environment string
 	DSN         string
-	BaseURL     string
+	Host        string
 	Secret      string
 }
 
@@ -59,7 +56,11 @@ func (app App) SendMessage(text string, keyboard *tgbotapi.InlineKeyboardMarkup)
 }
 
 func (app App) SendImage(imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
-	imagePath, _ := downloadImage(imageURL)
+	imagePath, err := utils.DownloadImage(imageURL)
+	if err != nil {
+		app.SendMessage("Ошибка при отправке изображения", nil)
+		return
+	}
 
 	msg := tgbotapi.NewPhotoUpload(app.GetChatID(), imagePath)
 	msg.ParseMode = "HTML"
@@ -73,36 +74,18 @@ func (app App) SendImage(imageURL, text string, keyboard *tgbotapi.InlineKeyboar
 	}
 
 	app.send(msg)
+
+	os.Remove(imagePath)
 }
 
-func downloadImage(imageURL string) (string, error) {
-	resp, err := http.Get(imageURL)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
+func (app App) SendBroadcastMessage(telegramIDs []int, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
+	for _, telegramID := range telegramIDs {
+		msg := tgbotapi.NewMessage(int64(telegramID), text)
 
-	splitURL := strings.Split(imageURL, "/")
-	filename := splitURL[len(splitURL)-1]
-	path := filepath.Join("static", filename)
-
-	if _, err := os.Stat("static"); os.IsNotExist(err) {
-		err = os.Mkdir("static", os.ModePerm)
-		if err != nil {
-			return "", err
+		if keyboard != nil {
+			msg.ReplyMarkup = keyboard
 		}
-	}
 
-	file, err := os.Create(path)
-	if err != nil {
-		return "", err
+		app.send(msg)
 	}
-	defer file.Close()
-
-	_, err = io.Copy(file, resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	return path, nil
 }

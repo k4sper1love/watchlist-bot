@@ -19,13 +19,22 @@ func RequireAuth(app models.App, session *models.Session, next func(models.App, 
 				app.SendMessage("Не удалось войти в систему. Используйте /start.", nil)
 				session.ClearState()
 				return
-			} else {
-				app.SendMessage("Вход выполнен успешно!", nil)
 			}
 		} else {
 			app.SendMessage("Ваш токен был успешно обновлен", nil)
 		}
 	}
+	next(app, session)
+}
+
+func RequireAdmin(app models.App, session *models.Session, next func(models.App, *models.Session)) {
+	if !session.IsAdmin {
+		app.SendMessage("Недостаточный уровень прав", nil)
+		session.ClearState()
+		HandleMenuCommand(app, session)
+		return
+	}
+
 	next(app, session)
 }
 

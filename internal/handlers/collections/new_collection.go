@@ -18,6 +18,7 @@ func HandleNewCollectionCommand(app models.App, session *models.Session) {
 func HandleNewCollectionProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Upd) {
 		session.ClearState()
+		session.CollectionDetailState.Clear()
 		HandleCollectionsCommand(app, session)
 		return
 	}
@@ -61,10 +62,14 @@ func createCollection(app models.App, session *models.Session) {
 	}
 
 	app.SendMessage("Новая коллекция успешно создана!", nil)
+
 	msg := fmt.Sprintf("ID: %d\n", collection.ID) +
 		fmt.Sprintf("Name: %s\n", collection.Name) +
 		fmt.Sprintf("Description: %s\n", collection.Description) +
 		fmt.Sprintf("Last updated: %s", collection.UpdatedAt.String()) +
 		fmt.Sprintf("Created: %s\n", collection.CreatedAt.String())
+
 	app.SendMessage(msg, nil)
+
+	HandleCollectionsCommand(app, session)
 }

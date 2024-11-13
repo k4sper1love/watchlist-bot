@@ -73,7 +73,7 @@ func handleCollectionFilmSelect(app models.App, session *models.Session) {
 	indexStr := strings.TrimPrefix(callback, "select_cf_")
 	index, err := strconv.Atoi(indexStr)
 	if err != nil {
-		app.SendMessage("Ошибка при получении ID коллекции.", nil)
+		app.SendMessage("Ошибка при получении ID фильма.", nil)
 		log.Printf("error parsing collection film index: %v", err)
 		return
 	}
