@@ -1,7 +1,11 @@
 package collections
 
 import (
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
+	"github.com/k4sper1love/watchlist-api/pkg/filters"
+	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/films"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/general"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
@@ -13,32 +17,15 @@ import (
 )
 
 func HandleCollectionsCommand(app models.App, session *models.Session) {
-	collectionsResponse, err := watchlist.GetCollections(app, session)
+	metadata, err := GetCollections(app, session)
 	if err != nil {
 		app.SendMessage(err.Error(), nil)
 		return
 	}
 
-	session.CollectionsState.Object = collectionsResponse.Collections
+	msg := messages.BuildCollectionsMessage(session, metadata)
 
-	currentPage := collectionsResponse.Metadata.CurrentPage
-	lastPage := collectionsResponse.Metadata.LastPage
-
-	session.CollectionsState.CurrentPage = currentPage
-	session.CollectionsState.LastPage = lastPage
-
-	msg := builders.BuildCollectionsMessage(collectionsResponse)
-
-	if collectionsResponse.Metadata.TotalRecords == 0 {
-		msg = "Не найдено коллекций"
-	}
-
-	keyboard := builders.NewKeyboard(1).
-		AddCollectionsSelect(collectionsResponse).
-		AddCollectionsNew().
-		AddNavigation(currentPage, lastPage, states.CallbackCollectionsPrevPage, states.CallbackCollectionsNextPage).
-		AddBack(states.CallbackCollectionsBack).
-		Build()
+	keyboard := keyboards.BuildCollectionsKeyboard(session, metadata.CurrentPage, metadata.LastPage)
 
 	app.SendMessage(msg, keyboard)
 }
@@ -78,8 +65,8 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 
 func HandleCollectionSelect(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Upd)
-	collectionIDStr := strings.TrimPrefix(callback, "select_collection_")
-	collectionID, err := strconv.Atoi(collectionIDStr)
+	idStr := strings.TrimPrefix(callback, "select_collection_")
+	id, err := strconv.Atoi(idStr)
 
 	if err != nil {
 		app.SendMessage("Ошибка при получении ID коллекции.", nil)
@@ -87,7 +74,26 @@ func HandleCollectionSelect(app models.App, session *models.Session) {
 		return
 	}
 
-	session.CollectionDetailState.ObjectID = collectionID
-	session.CollectionDetailState.CurrentPage = 1
-	HandleCollectionFilmsCommand(app, session)
+	session.CollectionDetailState.ObjectID = id
+	session.FilmsState.CurrentPage = 1
+
+	session.SetContext(states.ContextCollection)
+	films.HandleFilmsCommand(app, session)
+}
+
+func GetCollections(app models.App, session *models.Session) (*filters.Metadata, error) {
+	collectionsResponse, err := watchlist.GetCollections(app, session)
+	if err != nil {
+		return nil, err
+	}
+
+	UpdateSessionWithCollections(session, collectionsResponse.Collections, &collectionsResponse.Metadata)
+
+	return &collectionsResponse.Metadata, nil
+}
+
+func UpdateSessionWithCollections(session *models.Session, collections []apiModels.Collection, metadata *filters.Metadata) {
+	session.CollectionsState.Collections = collections
+	session.CollectionsState.LastPage = metadata.LastPage
+	//session.CollectionsState.LastPage = metadata.LastPage
 }

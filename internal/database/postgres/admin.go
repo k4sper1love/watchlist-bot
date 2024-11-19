@@ -25,3 +25,28 @@ func GetAllTelegramID() ([]int, error) {
 
 	return telegramIDs, nil
 }
+
+func FetchAllUsers() ([]models.Session, error) {
+	var sessions []models.Session
+	err := GetDB().Order("created_at DESC").Find(&sessions).Error
+	return sessions, err
+}
+
+func BanUser(telegramID int) error {
+	return GetDB().Model(&models.Session{}).Where("telegram_id = ?", telegramID).Update("is_banned", true).Error
+}
+
+func UnbanUser(telegramID int) error {
+	return GetDB().Model(&models.Session{}).Where("telegram_id = ?", telegramID).Update("is_banned", false).Error
+}
+
+func IsUserBanned(telegramID int) (bool, error) {
+	var session models.Session
+
+	err := GetDB().Model(&models.Session{}).Where("telegram_id = ?", telegramID).First(&session).Error
+	if err != nil {
+		return false, err
+	}
+
+	return session.IsBanned, nil
+}

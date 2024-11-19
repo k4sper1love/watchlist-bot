@@ -5,6 +5,7 @@ import (
 	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/admin"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/collectionFilms"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/collections"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/films"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/general"
@@ -28,16 +29,16 @@ func HandleUpdates(app models.App) {
 
 	switch {
 	case app.Upd.CallbackQuery != nil:
-		handleCallbackQuery(app, session)
+		general.CheckBanned(app, session, handleCallbackQuery)
 
 	case app.Upd.Message.Command() == "reset":
 		session.ClearState()
 
 	case session.State == "":
-		handleCommands(app, session)
+		general.CheckBanned(app, session, handleCommands)
 
 	default:
-		handleUserInput(app, session)
+		general.CheckBanned(app, session, handleUserInput)
 	}
 
 	postgres.SaveSessionWihDependencies(session)
@@ -60,11 +61,17 @@ func handleCommands(app models.App, session *models.Session) {
 	case command == "profile" || callbackData == states.CallbackMenuSelectProfile:
 		general.RequireAuth(app, session, users.HandleProfileCommand)
 
+	case strings.HasPrefix(command, "delete_feedback_") ||
+		strings.HasPrefix(command, "ban_") ||
+		strings.HasPrefix(command, "unban_"):
+		general.RequireAdmin(app, session, admin.HandleAdminButtons)
+
 	case command == "logout" || callbackData == states.CallbackMenuSelectLogout:
 		general.RequireAuth(app, session, general.HandleLogoutCommand)
 
 	case command == "films" || callbackData == states.CallbackMenuSelectFilms:
 		session.FilmsState.CurrentPage = 1
+		session.SetContext(states.ContextFilm)
 		general.RequireAuth(app, session, films.HandleFilmsCommand)
 
 	case command == "collections" || callbackData == states.CallbackMenuSelectCollections:
@@ -73,6 +80,9 @@ func handleCommands(app models.App, session *models.Session) {
 
 	case command == "settings" || callbackData == states.CallbackMenuSelectSettings:
 		general.HandleSettingsCommand(app, session)
+
+	case command == "feedback" || callbackData == states.CallbackMenuSelectFeedback:
+		general.HandleFeedbackCommand(app, session)
 
 	case command == "admin" || callbackData == states.CallbackMenuSelectAdmin:
 		general.RequireAdmin(app, session, admin.HandleAdminCommand)
@@ -89,6 +99,9 @@ func handleUserInput(app models.App, session *models.Session) {
 
 	case strings.HasPrefix(session.State, "admin_awaiting"):
 		admin.HandleAdminProcess(app, session)
+
+	case strings.HasPrefix(session.State, "feedback_awaiting"):
+		general.HandleFeedbackProcess(app, session)
 
 	case strings.HasPrefix(session.State, "update_profile_awaiting"):
 		users.HandleUpdateProfileProcess(app, session)
@@ -117,18 +130,6 @@ func handleUserInput(app models.App, session *models.Session) {
 	case strings.HasPrefix(session.State, "delete_collection_awaiting"):
 		collections.HandleDeleteCollectionProcess(app, session)
 
-	case strings.HasPrefix(session.State, "new_collection_film_awaiting"):
-		collections.HandleNewCollectionFilmProcess(app, session)
-
-	case strings.HasPrefix(session.State, "update_collection_film_awaiting"):
-		collections.HandleUpdateCollectionFilmProcess(app, session)
-
-	case strings.HasPrefix(session.State, "viewed_collection_film_awaiting"):
-		collections.HandleViewedCollectionFilmProcess(app, session)
-
-	case strings.HasPrefix(session.State, "delete_collection_film_awaiting"):
-		collections.HandleDeleteCollectionFilmProcess(app, session)
-
 	case strings.HasPrefix(session.State, "settings_"):
 		general.HandleSettingsProcess(app, session)
 
@@ -139,8 +140,10 @@ func handleUserInput(app models.App, session *models.Session) {
 
 func handleCallbackQuery(app models.App, session *models.Session) {
 	callbackData := utils.ParseCallback(app.Upd)
-
 	switch {
+	case callbackData == states.CallbackMainMenu:
+		general.HandleMenuCommand(app, session)
+
 	case strings.HasPrefix(callbackData, "menu_select_"):
 		handleCommands(app, session)
 
@@ -150,6 +153,9 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, "admin_select"):
 		general.RequireAdmin(app, session, admin.HandleAdminButtons)
 
+	case strings.HasPrefix(callbackData, "feedback_category"):
+		general.RequireAuth(app, session, general.HandleFeedbackButtons)
+
 	case strings.HasPrefix(callbackData, "profile_"):
 		general.RequireAuth(app, session, users.HandleProfileButtons)
 
@@ -157,16 +163,20 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 		general.RequireAuth(app, session, users.HandleUpdateProfileButtons)
 
 	case strings.HasPrefix(callbackData, "films_") || strings.HasPrefix(callbackData, "select_film_"):
-		general.RequireAuth(app, session, films.HandleFilmsButtons)
+		if session.Context == states.ContextFilm {
+			films.HandleFilmsButtons(app, session, general.HandleMenuCommand)
+		} else if session.Context == states.ContextCollection {
+			films.HandleFilmsButtons(app, session, collections.HandleCollectionsCommand)
+		}
 
 	case strings.HasPrefix(callbackData, "manage_film_select"):
-		general.RequireAuth(app, session, films.HandleManageFilmButtons)
+		films.HandleManageFilmButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "update_film_select"):
-		general.RequireAuth(app, session, films.HandleUpdateFilmButtons)
+		films.HandleUpdateFilmButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "film_detail"):
-		general.RequireAuth(app, session, films.HandleFilmsDetailButtons)
+		films.HandleFilmsDetailButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "collections_") || strings.HasPrefix(callbackData, "select_collection_"):
 		general.RequireAuth(app, session, collections.HandleCollectionsButtons)
@@ -177,17 +187,19 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, "update_collection_select"):
 		general.RequireAuth(app, session, collections.HandleUpdateCollectionButtons)
 
-	case strings.HasPrefix(callbackData, "collection_films_") || strings.HasPrefix(callbackData, "select_cf_"):
-		general.RequireAuth(app, session, collections.HandleCollectionFilmsButtons)
+	case strings.HasPrefix(callbackData, "collection_films_"):
+		session.CollectionFilmsState.CurrentPage = 1
+		collectionFilms.HandleCollectionFilmsButtons(app, session)
 
-	case strings.HasPrefix(callbackData, "manage_collection_film_select"):
-		general.RequireAuth(app, session, collections.HandleManageCollectionFilmButtons)
+	case strings.HasPrefix(callbackData, "options_film_to_collection_"):
+		session.CollectionFilmsState.CurrentPage = 1
+		collectionFilms.HandleOptionsFilmToCollectionButtons(app, session)
 
-	case strings.HasPrefix(callbackData, "update_collection_film_select"):
-		general.RequireAuth(app, session, collections.HandleUpdateCollectionFilmButtons)
+	case strings.HasPrefix(callbackData, "add_collection_to_film_") || strings.HasPrefix(callbackData, "select_cf_collection_"):
+		collectionFilms.HandleAddCollectionToFilmButtons(app, session)
 
-	case strings.HasPrefix(callbackData, "collection_film_detail"):
-		general.RequireAuth(app, session, collections.HandleCollectionFilmsDetailButtons)
+	case strings.HasPrefix(callbackData, "add_film_to_collection_") || strings.HasPrefix(callbackData, "select_cf_film_"):
+		collectionFilms.HandleAddFilmToCollectionButtons(app, session)
 
 	default:
 		handleUserInput(app, session)

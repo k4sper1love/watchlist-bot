@@ -1,7 +1,9 @@
 package films
 
 import (
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
+	"fmt"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
@@ -9,15 +11,14 @@ import (
 )
 
 func HandleNewFilmCommand(app models.App, session *models.Session) {
-	keyboard := builders.NewKeyboard(1).AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
 	app.SendMessage("Введите название фильма", keyboard)
 	session.SetState(states.ProcessNewFilmAwaitingTitle)
 }
 
 func HandleNewFilmProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Upd) {
-		session.ClearState()
-		session.FilmDetailState.Clear()
+		session.ClearAllStates()
 		HandleFilmsCommand(app, session)
 		return
 	}
@@ -58,7 +59,7 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 func parseNewFilmTitle(app models.App, session *models.Session) {
 	session.FilmDetailState.Title = utils.ParseMessageString(app.Upd)
 
-	keyboard := builders.NewKeyboard(1).AddSkip().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build()
 	msg := "Укажите год выпуска фильма"
 
 	app.SendMessage(msg, keyboard)
@@ -73,7 +74,7 @@ func parseNewFilmYear(app models.App, session *models.Session) {
 		session.FilmDetailState.Year = utils.ParseMessageInt(app.Upd)
 	}
 
-	keyboard := builders.NewKeyboard(1).AddSkip().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build()
 	msg := "Укажите жанр фильма"
 
 	app.SendMessage(msg, keyboard)
@@ -88,7 +89,7 @@ func parseNewFilmGenre(app models.App, session *models.Session) {
 		session.FilmDetailState.Genre = utils.ParseMessageString(app.Upd)
 	}
 
-	keyboard := builders.NewKeyboard(1).AddSkip().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build()
 	msg := "Укажите описание"
 
 	app.SendMessage(msg, keyboard)
@@ -103,7 +104,7 @@ func parseNewFilmDescription(app models.App, session *models.Session) {
 		session.FilmDetailState.Description = utils.ParseMessageString(app.Upd)
 	}
 
-	keyboard := builders.NewKeyboard(1).AddSkip().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build()
 	msg := "Укажите рейтинг фильма"
 
 	app.SendMessage(msg, keyboard)
@@ -118,7 +119,7 @@ func parseNewFilmRating(app models.App, session *models.Session) {
 		session.FilmDetailState.Rating = utils.ParseMessageFloat(app.Upd)
 	}
 
-	keyboard := builders.NewKeyboard(1).AddSkip().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build()
 	msg := "Отправьте изображение или ссылку на него"
 
 	app.SendMessage(msg, keyboard)
@@ -151,7 +152,7 @@ func parseNewFilmImage(app models.App, session *models.Session) {
 }
 
 func requestNewFilmComment(app models.App, session *models.Session) {
-	keyboard := builders.NewKeyboard(1).AddSkip().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build()
 	msg := "Укажите ваш комментарий к фильму"
 
 	app.SendMessage(msg, keyboard)
@@ -166,7 +167,7 @@ func parseNewFilmComment(app models.App, session *models.Session) {
 		session.FilmDetailState.Comment = utils.ParseMessageString(app.Upd)
 	}
 
-	keyboard := builders.NewKeyboard(2).AddSurvey().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddSurvey().AddCancel().Build()
 	msg := "Вы уже смотрели этот фильм?"
 
 	app.SendMessage(msg, keyboard)
@@ -178,7 +179,7 @@ func parseNewFilmViewed(app models.App, session *models.Session) {
 	switch utils.IsAgree(app.Upd) {
 	case true:
 		session.FilmDetailState.IsViewed = true
-		keyboard := builders.NewKeyboard(1).AddSkip().AddCancel().Build()
+		keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build()
 		msg := "Укажите вашу оценку фильму"
 		app.SendMessage(msg, keyboard)
 		session.SetState(states.ProcessNewFilmAwaitingUserRating)
@@ -187,8 +188,15 @@ func parseNewFilmViewed(app models.App, session *models.Session) {
 		session.FilmDetailState.IsViewed = false
 		session.FilmDetailState.UserRating = 0
 		session.FilmDetailState.Review = ""
-		createNewFilm(app, session)
-		session.ClearState()
+
+		if err := CreateNewFilm(app, session); err != nil {
+			app.SendMessage("Не удалось создать фильм", nil)
+			HandleFilmsCommand(app, session)
+			return
+		}
+
+		session.ClearAllStates()
+		HandleFilmsCommand(app, session)
 	}
 }
 
@@ -199,7 +207,7 @@ func parseNewFilmUserRating(app models.App, session *models.Session) {
 		session.FilmDetailState.UserRating = utils.ParseMessageFloat(app.Upd)
 	}
 
-	keyboard := builders.NewKeyboard(1).AddSkip().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build()
 	msg := "Укажите ваш отзыв к фильму"
 
 	app.SendMessage(msg, keyboard)
@@ -214,22 +222,57 @@ func parseNewFilmReview(app models.App, session *models.Session) {
 		session.FilmDetailState.Review = utils.ParseMessageString(app.Upd)
 	}
 
-	createNewFilm(app, session)
-	session.FilmDetailState.Clear()
-	session.ClearState()
+	if err := CreateNewFilm(app, session); err != nil {
+		app.SendMessage("Не удалось создать фильм", nil)
+		HandleFilmsCommand(app, session)
+		return
+	}
+
+	session.ClearAllStates()
+	HandleFilmsCommand(app, session)
 }
 
-func createNewFilm(app models.App, session *models.Session) {
+func CreateNewFilm(app models.App, session *models.Session) error {
+	switch session.Context {
+	case states.ContextFilm:
+		return createNewUserFilm(app, session)
+
+	case states.ContextCollection:
+		return createNewCollectionFilm(app, session)
+
+	default:
+		return fmt.Errorf("unsupported session context: %v", session.Context)
+	}
+}
+
+func createNewUserFilm(app models.App, session *models.Session) error {
 	film, err := watchlist.CreateFilm(app, session)
 	if err != nil {
-		app.SendMessage("Не удалось создать фильм", nil)
-		return
+		return err
 	}
 
 	msg := "Новый фильм успешно создан\n"
 
-	msg += builders.BuildFilmDetailMessage(film)
+	msg += messages.BuildFilmDetailMessage(film)
 
 	imageURL := film.ImageURL
 	app.SendImage(imageURL, msg, nil)
+
+	return nil
+}
+
+func createNewCollectionFilm(app models.App, session *models.Session) error {
+	collectionFilm, err := watchlist.CreateCollectionFilm(app, session)
+	if err != nil {
+		return err
+	}
+
+	msg := fmt.Sprintf("Новый фильм в коллекции %q успешно создан\n", collectionFilm.Collection.Name)
+
+	msg += messages.BuildFilmDetailMessage(&collectionFilm.Film)
+
+	imageURL := collectionFilm.Film.ImageURL
+	app.SendImage(imageURL, msg, nil)
+
+	return nil
 }

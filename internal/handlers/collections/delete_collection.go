@@ -2,7 +2,7 @@ package collections
 
 import (
 	"fmt"
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
@@ -10,9 +10,9 @@ import (
 )
 
 func HandleDeleteCollectionCommand(app models.App, session *models.Session) {
-	msg := fmt.Sprintf("Вы уверены, что хотите удалить коллекцию %q", session.CollectionDetailState.Object.Collection.Name)
+	msg := fmt.Sprintf("Вы уверены, что хотите удалить коллекцию %q", session.CollectionDetailState.Collection.Name)
 
-	keyboard := builders.NewKeyboard(1).AddSurvey().Build()
+	keyboard := keyboards.NewKeyboard().AddSurvey().Build()
 
 	app.SendMessage(msg, keyboard)
 

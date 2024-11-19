@@ -2,7 +2,7 @@ package users
 
 import (
 	"fmt"
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/general"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
@@ -13,7 +13,7 @@ import (
 func HandleDeleteProfileCommand(app models.App, session *models.Session) {
 	msg := fmt.Sprintf("Вы уверены, что хотите удалить свой аккаунт %q?", session.User.Username)
 
-	keyboard := builders.NewKeyboard(1).
+	keyboard := keyboards.NewKeyboard().
 		AddSurvey().
 		Build()
 
@@ -40,7 +40,7 @@ func parseDeleteProfileConfirm(app models.App, session *models.Session) {
 			return
 		}
 		app.SendMessage("Профиль успешно удален!", nil)
-		session.ClearFull()
+		session.Logout()
 		general.HandleMenuCommand(app, session)
 
 	case false:

@@ -1,7 +1,7 @@
 package general
 
 import (
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
@@ -37,7 +37,7 @@ func HandleAuthProcess(app models.App, session *models.Session) error {
 func HandleLogoutCommand(app models.App, session *models.Session) {
 	msg := "Вы точно хотите выйти из аккаунта?"
 
-	keyboard := builders.NewKeyboard(1).AddSurvey().Build()
+	keyboard := keyboards.NewKeyboard().AddSurvey().Build()
 
 	app.SendMessage(msg, keyboard)
 	session.SetState(states.ProcessLogoutAwaitingConfirm)
@@ -58,7 +58,7 @@ func parseLogoutConfirm(app models.App, session *models.Session) {
 			break
 		}
 		app.SendMessage("Успешно вышли из системы", nil)
-		session.ClearFull()
+		session.Logout()
 
 	case false:
 		app.SendMessage("Отмена выхода из системы", nil)

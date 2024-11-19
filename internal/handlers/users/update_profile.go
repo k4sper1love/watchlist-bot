@@ -1,24 +1,25 @@
 package users
 
 import (
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
-var updateProfileButtons = []builders.Button{
-	{"Username", states.CallbackUpdateProfileSelectUsername},
+var updateProfileButtons = []keyboards.Button{
+	{"Имя", states.CallbackUpdateProfileSelectUsername},
 	{"Email", states.CallbackUpdateProfileSelectEmail},
 }
 
 func HandleUpdateProfileCommand(app models.App, session *models.Session) {
-	msg := builders.BuildProfileMessage(&session.User)
-	msg += "\nВыберите, какое поле вы хотите изменить?"
+	msg := messages.BuildProfileMessage(&session.User)
+	msg += "Выберите, какое поле вы хотите изменить?"
 
-	keyboard := builders.NewKeyboard(1).
-		AddSeveral(updateProfileButtons).
+	keyboard := keyboards.NewKeyboard().
+		AddButtons(updateProfileButtons...).
 		AddBack(states.CallbackUpdateProfileSelectBack).
 		Build()
 
@@ -55,7 +56,7 @@ func HandleUpdateProfileProcess(app models.App, session *models.Session) {
 func handleUpdateProfileUsername(app models.App, session *models.Session) {
 	msg := "Введите новый username"
 
-	keyboard := builders.NewKeyboard(1).
+	keyboard := keyboards.NewKeyboard().
 		AddCancel().
 		Build()
 
@@ -73,7 +74,7 @@ func parseUpdateProfileUsername(app models.App, session *models.Session) {
 func handleUpdateProfileEmail(app models.App, session *models.Session) {
 	msg := "Введите адрес электронной почты"
 
-	keyboard := builders.NewKeyboard(1).
+	keyboard := keyboards.NewKeyboard().
 		AddCancel().
 		Build()
 

@@ -9,11 +9,23 @@ import (
 )
 
 func GetCollections(app models.App, session *models.Session) (*models.CollectionsResponse, error) {
+	return getCollectionsRequest(app, session, -1, -1, session.CollectionsState.CurrentPage, session.CollectionsState.PageSize)
+}
+
+func GetCollectionsByFilm(app models.App, session *models.Session) (*models.CollectionsResponse, error) {
+	return getCollectionsRequest(app, session, session.FilmDetailState.Film.ID, -1, session.CollectionsState.CurrentPage, session.CollectionsState.PageSize)
+}
+
+func GetCollectionsExcludeFilm(app models.App, session *models.Session) (*models.CollectionsResponse, error) {
+	return getCollectionsRequest(app, session, -1, session.FilmDetailState.Film.ID, session.CollectionFilmsState.CurrentPage, session.CollectionFilmsState.PageSize)
+}
+
+func getCollectionsRequest(app models.App, session *models.Session, filmID, excludeFilmID, currentPage, pageSize int) (*models.CollectionsResponse, error) {
 	headers := map[string]string{
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/collections?page=%d&page_size=%d", app.Vars.Host, session.CollectionsState.CurrentPage, session.CollectionsState.PageSize)
+	requestURL := fmt.Sprintf("%s/api/v1/collections?film=%d&exclude_film=%d&page=%d&page_size=%d", app.Vars.Host, filmID, excludeFilmID, currentPage, pageSize)
 
 	resp, err := SendRequest(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
@@ -22,7 +34,7 @@ func GetCollections(app models.App, session *models.Session) (*models.Collection
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("get_collection failed: %s", resp.Status)
+		return nil, fmt.Errorf("get_collections failed: %s", resp.Status)
 	}
 
 	var collectionsResponse models.CollectionsResponse
@@ -61,7 +73,7 @@ func UpdateCollection(app models.App, session *models.Session) (*apiModels.Colle
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.ObjectID)
+	requestURL := fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID)
 
 	resp, err := SendRequest(requestURL, http.MethodPut, session.CollectionDetailState, headers)
 	if err != nil {
@@ -86,7 +98,7 @@ func DeleteCollection(app models.App, session *models.Session) error {
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.ObjectID)
+	requestURL := fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID)
 
 	resp, err := SendRequest(requestURL, http.MethodDelete, nil, headers)
 	if err != nil {

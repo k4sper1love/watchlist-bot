@@ -1,8 +1,8 @@
 package users
 
 import (
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
-	"github.com/k4sper1love/watchlist-bot/internal/handlers/general"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
@@ -16,12 +16,12 @@ func HandleProfileCommand(app models.App, session *models.Session) {
 		return
 	}
 
-	msg := builders.BuildProfileMessage(user)
+	msg := messages.BuildProfileMessage(user)
 
-	keyboard := builders.NewKeyboard(1).
+	keyboard := keyboards.NewKeyboard().
 		AddProfileUpdate().
 		AddProfileDelete().
-		AddBack(states.CallbackProfileSelectBack).
+		AddBack("").
 		Build()
 
 	app.SendMessage(msg, keyboard)
@@ -31,9 +31,6 @@ func HandleProfileButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Upd)
 
 	switch {
-	case callback == states.CallbackProfileSelectBack:
-		general.HandleMenuCommand(app, session)
-
 	case callback == states.CallbackProfileSelectUpdate:
 		HandleUpdateProfileCommand(app, session)
 

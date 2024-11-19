@@ -1,15 +1,15 @@
 package films
 
 import (
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"log"
 )
 
-var updateFilmButtons = []builders.Button{
+var updateFilmButtons = []keyboards.Button{
 	{"Изображение", states.CallbackUpdateFilmSelectImage},
 	{"Название", states.CallbackUpdateFilmSelectTitle},
 	{"Описание", states.CallbackUpdateFilmSelectDescription},
@@ -20,27 +20,18 @@ var updateFilmButtons = []builders.Button{
 	{"Просмотрено", states.CallbackUpdateFilmSelectViewed},
 }
 
-var updateFilmsAfterViewedButtons = []builders.Button{
+var updateFilmsAfterViewedButtons = []keyboards.Button{
 	{"Оценка пользователя", states.CallbackUpdateFilmSelectUserRating},
 	{"Рецензия", states.CallbackUpdateFilmSelectReview},
 }
 
 func HandleUpdateFilmCommand(app models.App, session *models.Session) {
-	film := session.FilmDetailState.Object
+	film := session.FilmDetailState.Film
 
-	buttons := updateFilmButtons
-
-	if film.IsViewed {
-		buttons = append(buttons, updateFilmsAfterViewedButtons...)
-	}
-
-	msg := builders.BuildFilmDetailMessage(&film)
+	msg := messages.BuildFilmDetailMessage(&film)
 	msg += "Выберите, какое поле вы хотите изменить?"
 
-	keyboard := builders.NewKeyboard(2).
-		AddSeveral(buttons).
-		AddBack(states.CallbackUpdateFilmSelectBack).
-		Build()
+	keyboard := keyboards.BuildFilmUpdateKeyboard(session)
 
 	app.SendImage(film.ImageURL, msg, keyboard)
 }
@@ -48,7 +39,7 @@ func HandleUpdateFilmCommand(app models.App, session *models.Session) {
 func HandleUpdateFilmButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Upd) {
 	case states.CallbackUpdateFilmSelectBack:
-		HandleManageFilmCommand(app, session)
+		HandleFilmsDetailCommand(app, session)
 
 	case states.CallbackUpdateFilmSelectImage:
 		handleUpdateFilmImage(app, session)
@@ -84,8 +75,7 @@ func HandleUpdateFilmButtons(app models.App, session *models.Session) {
 
 func HandleUpdateFilmProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Upd) {
-		session.ClearState()
-		session.FilmDetailState.Clear()
+		session.ClearAllStates()
 		HandleUpdateFilmCommand(app, session)
 		return
 	}
@@ -102,7 +92,6 @@ func HandleUpdateFilmProcess(app models.App, session *models.Session) {
 
 	case states.ProcessUpdateFilmAwaitingGenre:
 		parseUpdateFilmGenre(app, session)
-
 	case states.ProcessUpdateFilmAwaitingRating:
 		parseUpdateFilmRating(app, session)
 
@@ -126,7 +115,7 @@ func HandleUpdateFilmProcess(app models.App, session *models.Session) {
 func handleUpdateFilmImage(app models.App, session *models.Session) {
 	msg := "Отправьте новое изображение или ссылку на него"
 
-	keyboard := builders.NewKeyboard(1).AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
 
 	app.SendMessage(msg, keyboard)
 
@@ -137,7 +126,7 @@ func parseUpdateFilmImage(app models.App, session *models.Session) {
 	image, err := utils.ParseServerImage(app.Bot, app.Upd, app.Vars.Host)
 	if err != nil {
 		app.SendMessage("Ошибка при получении изображения", nil)
-		finishUpdateFilmProcess(app, session)
+		session.ClearAllStates()
 		HandleUpdateFilmCommand(app, session)
 		return
 	}
@@ -145,7 +134,7 @@ func parseUpdateFilmImage(app models.App, session *models.Session) {
 	imageURL, err := watchlist.UploadImage(app, image)
 	if err != nil {
 		app.SendMessage("Ошибка при получении изображения", nil)
-		finishUpdateFilmProcess(app, session)
+		session.ClearAllStates()
 		HandleUpdateFilmCommand(app, session)
 		return
 	}
@@ -153,13 +142,12 @@ func parseUpdateFilmImage(app models.App, session *models.Session) {
 	session.FilmDetailState.ImageURL = imageURL
 
 	finishUpdateFilmProcess(app, session)
-	HandleUpdateFilmCommand(app, session)
 }
 
 func handleUpdateFilmTitle(app models.App, session *models.Session) {
 	msg := "Введите новое название фильма"
 
-	keyboard := builders.NewKeyboard(1).AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
 
 	app.SendMessage(msg, keyboard)
 
@@ -170,13 +158,12 @@ func parseUpdateFilmTitle(app models.App, session *models.Session) {
 	session.FilmDetailState.Title = utils.ParseMessageString(app.Upd)
 
 	finishUpdateFilmProcess(app, session)
-	HandleUpdateFilmCommand(app, session)
 }
 
 func handleUpdateFilmDescription(app models.App, session *models.Session) {
 	msg := "Введите новое описание фильма"
 
-	keyboard := builders.NewKeyboard(1).AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
 
 	app.SendMessage(msg, keyboard)
 
@@ -187,13 +174,12 @@ func parseUpdateFilmDescription(app models.App, session *models.Session) {
 	session.FilmDetailState.Description = utils.ParseMessageString(app.Upd)
 
 	finishUpdateFilmProcess(app, session)
-	HandleUpdateFilmCommand(app, session)
 }
 
 func handleUpdateFilmGenre(app models.App, session *models.Session) {
 	msg := "Введите новый жанр фильма"
 
-	keyboard := builders.NewKeyboard(1).AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
 
 	app.SendMessage(msg, keyboard)
 
@@ -204,13 +190,12 @@ func parseUpdateFilmGenre(app models.App, session *models.Session) {
 	session.FilmDetailState.Genre = utils.ParseMessageString(app.Upd)
 
 	finishUpdateFilmProcess(app, session)
-	HandleUpdateFilmCommand(app, session)
 }
 
 func handleUpdateFilmRating(app models.App, session *models.Session) {
 	msg := "Введите новый рейтинг фильма"
 
-	keyboard := builders.NewKeyboard(1).AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
 
 	app.SendMessage(msg, keyboard)
 
@@ -221,13 +206,12 @@ func parseUpdateFilmRating(app models.App, session *models.Session) {
 	session.FilmDetailState.Rating = utils.ParseMessageFloat(app.Upd)
 
 	finishUpdateFilmProcess(app, session)
-	HandleUpdateFilmCommand(app, session)
 }
 
 func handleUpdateFilmYear(app models.App, session *models.Session) {
 	msg := "Введите новый год выпуска"
 
-	keyboard := builders.NewKeyboard(1).AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
 
 	app.SendMessage(msg, keyboard)
 
@@ -238,13 +222,12 @@ func parseUpdateFilmYear(app models.App, session *models.Session) {
 	session.FilmDetailState.Year = utils.ParseMessageInt(app.Upd)
 
 	finishUpdateFilmProcess(app, session)
-	HandleUpdateFilmCommand(app, session)
 }
 
 func handleUpdateFilmComment(app models.App, session *models.Session) {
 	msg := "Введите новый комментарий к фильму"
 
-	keyboard := builders.NewKeyboard(1).AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
 
 	app.SendMessage(msg, keyboard)
 
@@ -255,13 +238,12 @@ func parseUpdateFilmComment(app models.App, session *models.Session) {
 	session.FilmDetailState.Comment = utils.ParseMessageString(app.Upd)
 
 	finishUpdateFilmProcess(app, session)
-	HandleUpdateFilmCommand(app, session)
 }
 
 func handleUpdateFilmViewed(app models.App, session *models.Session) {
 	msg := "Вы посмотрели этот фильм?"
 
-	keyboard := builders.NewKeyboard(2).AddSurvey().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddSurvey().AddCancel().Build()
 
 	app.SendMessage(msg, keyboard)
 
@@ -273,13 +255,12 @@ func parseUpdateFilmViewed(app models.App, session *models.Session) {
 	session.FilmDetailState.IsEditViewed = true
 
 	finishUpdateFilmProcess(app, session)
-	HandleUpdateFilmCommand(app, session)
 }
 
 func handleUpdateFilmUserRating(app models.App, session *models.Session) {
 	msg := "Введите новый пользовательский рейтинг"
 
-	keyboard := builders.NewKeyboard(1).AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
 
 	app.SendMessage(msg, keyboard)
 
@@ -290,13 +271,12 @@ func parseUpdateFilmUserRating(app models.App, session *models.Session) {
 	session.FilmDetailState.UserRating = utils.ParseMessageFloat(app.Upd)
 
 	finishUpdateFilmProcess(app, session)
-	HandleUpdateFilmCommand(app, session)
 }
 
 func handleUpdateFilmReview(app models.App, session *models.Session) {
 	msg := "Введите новую рецензию на фильм"
 
-	keyboard := builders.NewKeyboard(1).AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
 
 	app.SendMessage(msg, keyboard)
 
@@ -307,70 +287,42 @@ func parseUpdateFilmReview(app models.App, session *models.Session) {
 	session.FilmDetailState.Review = utils.ParseMessageString(app.Upd)
 
 	finishUpdateFilmProcess(app, session)
-	HandleUpdateFilmCommand(app, session)
 }
-
 func updateFilm(app models.App, session *models.Session) {
 	film, err := watchlist.UpdateFilm(app, session)
 	if err != nil {
-		log.Println(err)
 		app.SendMessage("Не удалось обновить фильм", nil)
 		return
 	}
 
-	session.FilmDetailState.Object = *film
+	session.FilmDetailState.Film = *film
 }
 
 func finishUpdateFilmProcess(app models.App, session *models.Session) {
+
 	state := session.FilmDetailState
-	film := state.Object
+	film := state.Film
 
-	if state.ImageURL == "" {
-		state.ImageURL = film.ImageURL
-	}
+	if !state.IsEditViewed {
+		if state.UserRating == 0 {
+			state.UserRating = film.UserRating
+		}
 
-	if state.Title == "" {
-		state.Title = film.Title
-	}
+		if state.Review == "" {
+			state.Review = film.Review
+		}
 
-	if state.Description == "" {
-		state.Description = film.Description
-	}
-
-	if state.Genre == "" {
-		state.Genre = film.Genre
-	}
-
-	if state.Rating == 0 {
-		state.Rating = film.Rating
-	}
-
-	if state.Year == 0 {
-		state.Year = film.Year
-	}
-
-	if state.Comment == "" {
-		state.Comment = film.Comment
-	}
-
-	if !state.IsViewed && !state.IsEditViewed {
-		state.IsViewed = film.IsViewed
-	}
-
-	if state.UserRating == 0 {
-		state.UserRating = film.UserRating
-	}
-
-	if state.Review == "" {
-		state.Review = film.Review
+		if !state.IsViewed {
+			state.IsViewed = film.IsViewed
+		}
 	}
 
 	updateFilm(app, session)
 
-	if _, err := getFilms(app, session); err != nil {
+	if _, err := GetFilms(app, session); err != nil {
 		app.SendMessage("Ошибка при обновлении списка фильмов", nil)
 	}
 
-	session.FilmDetailState.Clear()
-	session.ClearState()
+	session.ClearAllStates()
+	HandleUpdateFilmCommand(app, session)
 }

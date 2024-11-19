@@ -6,58 +6,35 @@ import (
 )
 
 type ProfileState struct {
-	gorm.Model
-	SessionID uint `json:"-"`
-	Username  string
-	Email     string
+	gorm.Model `json:"-"`
+	SessionID  uint `json:"-"`
+	Username   string
+	Email      string
 }
 
-type CollectionsState struct {
-	gorm.Model
-	SessionID   uint                   `json:"-"`
-	Object      []apiModels.Collection `json:"collections" gorm:"serializer:json"`
-	LastPage    int                    `json:"-"`
-	PageSize    int                    `json:"-" gorm:"default:5"`
-	CurrentPage int                    `json:"-"`
+type FeedbackState struct {
+	gorm.Model `json:"-"`
+	SessionID  uint `json:"-"`
+	Category   string
+	Message    string
 }
 
-type CollectionDetailState struct {
-	gorm.Model
-	SessionID    uint
-	ObjectID     int                       `json:"-"`
-	Object       apiModels.CollectionFilms `json:"collection_films" gorm:"serializer:json"`
-	CurrentPage  int
-	LastPage     int
-	PageSize     int `json:"-" gorm:"default:5"`
-	TotalRecords int
-	Name         string `json:"name"`
-	Description  string `json:"description,omitempty"`
-}
-
-type CollectionFilmState struct {
+type FilmsState struct {
 	gorm.Model   `json:"-"`
-	SessionID    uint           `json:"-"`
-	Index        int            `json:"-"`
-	Object       apiModels.Film `json:"film" gorm:"serializer:json"`
-	Title        string         `json:"title"`
-	Year         int            `json:"year,omitempty"`
-	Genre        string         `json:"genre,omitempty"`
-	Description  string         `json:"description,omitempty"`
-	Rating       float64        `json:"rating,omitempty"`
-	ImageURL     string         `json:"image_url,omitempty"`
-	Comment      string         `json:"comment,omitempty"`
-	IsViewed     bool           `json:"is_viewed"`
-	IsEditViewed bool           `json:"-"`
-	UserRating   float64        `json:"user_rating,omitempty"`
-	Review       string         `json:"review,omitempty"`
+	SessionID    uint             `json:"-"`
+	Films        []apiModels.Film `json:"films" gorm:"serializer:json"`
+	LastPage     int              `json:"-"`
+	PageSize     int              `json:"-" gorm:"default:4"`
+	CurrentPage  int              `json:"-"`
+	TotalRecords int
 }
 
 type FilmDetailState struct {
 	gorm.Model   `json:"-"`
 	SessionID    uint           `json:"-"`
 	Index        int            `json:"-"`
-	Object       apiModels.Film `json:"film" gorm:"serializer:json"`
-	Title        string         `json:"title"`
+	Film         apiModels.Film `json:"film" gorm:"serializer:json"`
+	Title        string         `json:"title,omitempty"`
 	Year         int            `json:"year,omitempty"`
 	Genre        string         `json:"genre,omitempty"`
 	Description  string         `json:"description,omitempty"`
@@ -66,18 +43,35 @@ type FilmDetailState struct {
 	Comment      string         `json:"comment,omitempty"`
 	IsViewed     bool           `json:"is_viewed"`
 	IsEditViewed bool           `json:"-"`
-	UserRating   float64        `json:"user_rating,omitempty"`
-	Review       string         `json:"review,omitempty"`
+	UserRating   float64        `json:"user_rating"`
+	Review       string         `json:"review"`
 }
 
-type FilmsState struct {
-	gorm.Model
-	SessionID    uint             `json:"-"`
-	Object       []apiModels.Film `json:"films" gorm:"serializer:json"`
-	LastPage     int              `json:"-"`
-	PageSize     int              `json:"-" gorm:"default:5"`
-	CurrentPage  int              `json:"-"`
-	TotalRecords int
+type CollectionsState struct {
+	gorm.Model  `json:"-"`
+	ID          uint                   `json:"-"`
+	SessionID   uint                   `json:"-"`
+	Collections []apiModels.Collection `json:"collections" gorm:"serializer:json"`
+	LastPage    int                    `json:"-"`
+	PageSize    int                    `json:"-" gorm:"default:4"`
+	CurrentPage int                    `json:"-"`
+}
+
+type CollectionDetailState struct {
+	gorm.Model  `json:"-"`
+	SessionID   uint                 `json:"-"`
+	ObjectID    int                  `json:"-"`
+	Collection  apiModels.Collection `json:"collection" gorm:"serializer:json"`
+	Name        string               `json:"name,omitempty"`
+	Description string               `json:"description,omitempty"`
+}
+
+type CollectionFilmsState struct {
+	gorm.Model  `json:"-"`
+	SessionID   uint `json:"-"`
+	LastPage    int  `json:"-"`
+	PageSize    int  `json:"-" gorm:"default:4"`
+	CurrentPage int  `json:"-"`
 }
 
 func (s *ProfileState) Clear() {
@@ -85,23 +79,9 @@ func (s *ProfileState) Clear() {
 	s.Email = ""
 }
 
-func (s *CollectionDetailState) Clear() {
-	s.Name = ""
-	s.Description = ""
-}
-
-func (s *CollectionFilmState) Clear() {
-	s.Title = ""
-	s.Year = 0
-	s.Genre = ""
-	s.Description = ""
-	s.Rating = 0
-	s.ImageURL = ""
-	s.Comment = ""
-	s.IsViewed = false
-	s.IsEditViewed = false
-	s.UserRating = 0
-	s.Review = ""
+func (s *FeedbackState) Clear() {
+	s.Category = ""
+	s.Message = ""
 }
 
 func (s *FilmDetailState) Clear() {
@@ -116,4 +96,9 @@ func (s *FilmDetailState) Clear() {
 	s.IsEditViewed = false
 	s.UserRating = 0
 	s.Review = ""
+}
+
+func (s *CollectionDetailState) Clear() {
+	s.Name = ""
+	s.Description = ""
 }

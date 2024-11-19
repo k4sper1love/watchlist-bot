@@ -2,7 +2,7 @@ package films
 
 import (
 	"fmt"
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
@@ -10,9 +10,9 @@ import (
 )
 
 func HandleDeleteFilmCommand(app models.App, session *models.Session) {
-	msg := fmt.Sprintf("Вы уверены, что хотите удалить фильм %q", session.FilmDetailState.Object.Title)
+	msg := fmt.Sprintf("Вы уверены, что хотите удалить фильм %q", session.FilmDetailState.Film.Title)
 
-	keyboard := builders.NewKeyboard(1).AddSurvey().Build()
+	keyboard := keyboards.NewKeyboard().AddSurvey().Build()
 
 	app.SendMessage(msg, keyboard)
 
@@ -27,20 +27,33 @@ func HandleDeleteFilmProcess(app models.App, session *models.Session) {
 }
 
 func parseDeleteFilmConfirm(app models.App, session *models.Session) {
-	session.ClearState()
+	session.ClearAllStates()
 
 	switch utils.IsAgree(app.Upd) {
 	case true:
-		if err := watchlist.DeleteFilm(app, session); err != nil {
+		if err := DeleteFilm(app, session); err != nil {
 			app.SendMessage("Не удалось удалить фильм", nil)
 			HandleManageFilmCommand(app, session)
 			break
 		}
 		app.SendMessage("Фильм удален успешно", nil)
-		HandleFilmsCommand(app, session)
+		HandleFilmsDetailCommand(app, session)
 
 	case false:
 		app.SendMessage("Действие отменено", nil)
-		HandleManageFilmCommand(app, session)
+		HandleFilmsDetailCommand(app, session)
+	}
+}
+
+func DeleteFilm(app models.App, session *models.Session) error {
+	switch session.Context {
+	case states.ContextFilm:
+		return watchlist.DeleteFilm(app, session)
+
+	case states.ContextCollection:
+		return watchlist.DeleteCollectionFilm(app, session)
+
+	default:
+		return fmt.Errorf("unsupported session context: %v", session.Context)
 	}
 }

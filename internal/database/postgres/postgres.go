@@ -17,13 +17,15 @@ func OpenDB(vars *models.Vars) error {
 	}
 
 	return db.Debug().AutoMigrate(
+		&models.Feedback{},
 		&models.Session{},
 		&models.ProfileState{},
+		&models.FeedbackState{},
 		&models.CollectionsState{},
+		&models.CollectionDetailState{},
 		&models.FilmsState{},
 		&models.FilmDetailState{},
-		&models.CollectionDetailState{},
-		&models.CollectionFilmState{},
+		&models.CollectionFilmsState{},
 	)
 }
 

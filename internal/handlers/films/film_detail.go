@@ -1,8 +1,8 @@
 package films
 
 import (
-	"fmt"
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
@@ -10,7 +10,7 @@ import (
 
 func HandleFilmsDetailCommand(app models.App, session *models.Session) {
 	index := session.FilmDetailState.Index
-	films := session.FilmsState.Object
+	films := session.FilmsState.Films
 	film := films[index]
 
 	if len(films) == 0 {
@@ -23,27 +23,15 @@ func HandleFilmsDetailCommand(app models.App, session *models.Session) {
 		return
 	}
 
-	session.FilmDetailState.Object = films[index]
+	session.FilmDetailState.Film = film
 
 	itemID := utils.GetItemID(index, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
 
-	msg := fmt.Sprintf("🎞️ <b>№</b>: %d\n", itemID)
-	msg += builders.BuildCollectionFilmDetailMessage(&films[index])
+	msg := messages.BuildFilmDetailWithNumberMessage(itemID, &film)
 
-	var buttons []builders.Button
+	keyboard := keyboards.BuildFilmDetailKeyboard(session)
 
-	if !film.IsViewed {
-		buttons = append(buttons, builders.Button{"Просмотрено✅", states.CallbackFilmDetailViewed})
-	}
-
-	keyboard := builders.NewKeyboard(2).
-		AddSeveral(buttons).
-		AddFilmsManage().
-		AddNavigation(itemID, session.FilmsState.TotalRecords, states.CallbackFilmDetailPrevPage, states.CallbackFilmDetailNextPage).
-		AddBack(states.CallbackFilmDetailBack).
-		Build()
-
-	imageURL := films[index].ImageURL
+	imageURL := film.ImageURL
 
 	app.SendImage(imageURL, msg, keyboard)
 }
@@ -58,7 +46,7 @@ func HandleFilmsDetailButtons(app models.App, session *models.Session) {
 			session.FilmDetailState.Index++
 			HandleFilmsDetailCommand(app, session)
 		} else {
-			if err := updateFilmsList(app, session, true); err != nil {
+			if err := UpdateFilmsList(app, session, true); err != nil {
 				app.SendMessage(err.Error(), nil)
 				return
 			}
@@ -71,7 +59,7 @@ func HandleFilmsDetailButtons(app models.App, session *models.Session) {
 			session.FilmDetailState.Index--
 			HandleFilmsDetailCommand(app, session)
 		} else {
-			if err := updateFilmsList(app, session, false); err != nil {
+			if err := UpdateFilmsList(app, session, false); err != nil {
 				app.SendMessage(err.Error(), nil)
 				return
 			}
@@ -89,5 +77,5 @@ func HandleFilmsDetailButtons(app models.App, session *models.Session) {
 }
 
 func getFilmsLastIndex(session *models.Session) int {
-	return len(session.FilmsState.Object) - 1
+	return len(session.FilmsState.Films) - 1
 }

@@ -9,11 +9,19 @@ import (
 )
 
 func GetFilms(app models.App, session *models.Session) (*models.FilmsResponse, error) {
+	return getFilmsRequest(app, session, -1, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
+}
+
+func GetFilmsExcludeCollection(app models.App, session *models.Session) (*models.FilmsResponse, error) {
+	return getFilmsRequest(app, session, session.CollectionDetailState.Collection.ID, session.CollectionFilmsState.CurrentPage, session.CollectionFilmsState.PageSize)
+}
+
+func getFilmsRequest(app models.App, session *models.Session, collectionID, currentPage, pageSize int) (*models.FilmsResponse, error) {
 	headers := map[string]string{
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/films?page=%d&page_size=%d", app.Vars.Host, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
+	requestURL := fmt.Sprintf("%s/api/v1/films?exclude_collection=%d&page=%d&page_size=%d", app.Vars.Host, collectionID, currentPage, pageSize)
 
 	resp, err := SendRequest(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
@@ -38,7 +46,7 @@ func UpdateFilm(app models.App, session *models.Session) (*apiModels.Film, error
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Object.ID)
+	requestURL := fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID)
 
 	resp, err := SendRequest(requestURL, http.MethodPut, session.FilmDetailState, headers)
 	if err != nil {
@@ -88,7 +96,7 @@ func DeleteFilm(app models.App, session *models.Session) error {
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Object.ID)
+	requestURL := fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID)
 
 	resp, err := SendRequest(requestURL, http.MethodDelete, nil, headers)
 	if err != nil {

@@ -1,6 +1,7 @@
 package general
 
 import (
+	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 )
@@ -32,6 +33,17 @@ func RequireAdmin(app models.App, session *models.Session, next func(models.App,
 		app.SendMessage("Недостаточный уровень прав", nil)
 		session.ClearState()
 		HandleMenuCommand(app, session)
+		return
+	}
+
+	next(app, session)
+}
+
+func CheckBanned(app models.App, session *models.Session, next func(models.App, *models.Session)) {
+	isBanned, _ := postgres.IsUserBanned(session.TelegramID)
+
+	if isBanned {
+		app.SendMessage("❌ Вы заблокированы.\n Обратитесь к администратору для разблокировки.", nil)
 		return
 	}
 

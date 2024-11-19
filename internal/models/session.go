@@ -9,16 +9,23 @@ type Session struct {
 	gorm.Model
 	TelegramID            int            `gorm:"unique"`
 	IsAdmin               bool           `gorm:"default:false"`
+	IsBanned              bool           `gorm:"default:false"`
 	User                  apiModels.User `json:"user" gorm:"serializer:json"`
 	AccessToken           string         `json:"access_token"`
 	RefreshToken          string         `json:"refresh_token"`
 	State                 string
+	Context               string
 	ProfileState          *ProfileState          `gorm:"foreignKey:SessionID"`
+	FeedbackState         *FeedbackState         `gorm:"foreignKey:SessionID"`
 	CollectionsState      *CollectionsState      `gorm:"foreignKey:SessionID"`
 	CollectionDetailState *CollectionDetailState `gorm:"foreignKey:SessionID"`
-	CollectionFilmState   *CollectionFilmState   `gorm:"foreignKey:SessionID"`
 	FilmsState            *FilmsState            `gorm:"foreignKey:SessionID"`
 	FilmDetailState       *FilmDetailState       `gorm:"foreignKey:SessionID"`
+	CollectionFilmsState  *CollectionFilmsState  `gorm:"foreignKey:SessionID"`
+}
+
+func (s *Session) SetContext(context string) {
+	s.Context = context
 }
 
 func (s *Session) SetState(state string) {
@@ -29,17 +36,26 @@ func (s *Session) ClearState() {
 	s.State = ""
 }
 
+func (s *Session) ClearContext() {
+	s.Context = ""
+}
+
 func (s *Session) ClearUser() {
 	s.User = apiModels.User{}
 }
 
-func (s *Session) ClearFull() {
-	s.AccessToken = ""
-	s.RefreshToken = ""
+func (s *Session) ClearAllStates() {
 	s.ClearState()
-	s.ClearUser()
 	s.ProfileState.Clear()
+	s.FeedbackState.Clear()
 	s.FilmDetailState.Clear()
 	s.CollectionDetailState.Clear()
-	s.CollectionFilmState.Clear()
+}
+
+func (s *Session) Logout() {
+	s.AccessToken = ""
+	s.RefreshToken = ""
+	s.ClearUser()
+	s.ClearContext()
+	s.ClearAllStates()
 }

@@ -1,7 +1,7 @@
 package films
 
 import (
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
@@ -14,10 +14,7 @@ func HandleViewedFilmCommand(app models.App, session *models.Session) {
 	msg += "Поставьте оценку фильму\n\n"
 	msg += "<i>Вы можете отменить \"просмотр\" фильма, нажав на кнопку отмены</i>"
 
-	keyboard := builders.NewKeyboard(1).
-		AddSkip().
-		AddCancel().
-		Build()
+	keyboard := keyboards.BuildFilmViewedKeyboard()
 
 	app.SendMessage(msg, keyboard)
 	session.SetState(states.ProcessViewedFilmAwaitingRating)
@@ -25,8 +22,7 @@ func HandleViewedFilmCommand(app models.App, session *models.Session) {
 
 func HandleViewedFilmProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Upd) {
-		session.ClearState()
-		session.FilmDetailState.Clear()
+		session.ClearAllStates()
 		HandleFilmsDetailCommand(app, session)
 		return
 	}
@@ -49,10 +45,7 @@ func parseViewedFilmRating(app models.App, session *models.Session) {
 
 	msg := "Оставьте отзыв к фильму"
 
-	keyboard := builders.NewKeyboard(1).
-		AddSkip().
-		AddCancel().
-		Build()
+	keyboard := keyboards.BuildFilmViewedKeyboard()
 
 	app.SendMessage(msg, keyboard)
 
@@ -67,7 +60,4 @@ func parseViewedFilmReview(app models.App, session *models.Session) {
 	}
 
 	finishUpdateFilmProcess(app, session)
-
-	app.SendMessage("Успешно изменено!", nil)
-	HandleFilmsDetailCommand(app, session)
 }

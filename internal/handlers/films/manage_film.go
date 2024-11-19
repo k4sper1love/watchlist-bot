@@ -1,23 +1,20 @@
 package films
 
 import (
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
 func HandleManageFilmCommand(app models.App, session *models.Session) {
-	film := session.FilmDetailState.Object
+	film := session.FilmDetailState.Film
 
-	msg := builders.BuildFilmDetailMessage(&film)
+	msg := messages.BuildFilmDetailMessage(&film)
 	msg += "Выберите действие"
 
-	keyboard := builders.NewKeyboard(1).
-		AddFilmsUpdate().
-		AddFilmsDelete().
-		AddBack(states.CallbackManageFilmSelectBack).
-		Build()
+	keyboard := keyboards.BuildFilmManageKeyboard()
 
 	app.SendImage(film.ImageURL, msg, keyboard)
 }

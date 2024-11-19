@@ -2,8 +2,10 @@ package films
 
 import (
 	"fmt"
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
-	"github.com/k4sper1love/watchlist-bot/internal/handlers/general"
+	"github.com/k4sper1love/watchlist-api/pkg/filters"
+	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
@@ -14,32 +16,30 @@ import (
 )
 
 func HandleFilmsCommand(app models.App, session *models.Session) {
-	filmsResponse, err := getFilms(app, session)
+	metadata, err := GetFilms(app, session)
 	if err != nil {
 		app.SendMessage(err.Error(), nil)
 		return
 	}
 
-	metadata := filmsResponse.Metadata
+	msg := messages.BuildFilmsMessage(session, metadata)
 
-	msg := builders.BuildFilmsMessage(filmsResponse)
+	keyboard := keyboards.BuildFilmsKeyboard(session, metadata.CurrentPage, metadata.LastPage)
 
-	keyboard := builders.NewKeyboard(1).
-		AddFilmsSelect(filmsResponse).
-		AddFilmsNew().
-		AddNavigation(metadata.CurrentPage, metadata.LastPage, states.CallbackFilmsPrevPage, states.CallbackFilmsNextPage).
-		AddBack(states.CallbackFilmsBack).
-		Build()
+	fmt.Println(keyboard)
 
 	app.SendMessage(msg, keyboard)
 }
 
-func HandleFilmsButtons(app models.App, session *models.Session) {
+func HandleFilmsButtons(app models.App,
+	session *models.Session,
+	backFunc func(models.App, *models.Session),
+) {
 	callback := utils.ParseCallback(app.Upd)
 
 	switch {
 	case callback == states.CallbackFilmsBack:
-		general.HandleMenuCommand(app, session)
+		backFunc(app, session)
 
 	case callback == states.CallbackFilmsNextPage:
 		if session.FilmsState.CurrentPage < session.FilmsState.LastPage {
@@ -73,29 +73,17 @@ func handleFilmSelect(app models.App, session *models.Session) {
 	indexStr := strings.TrimPrefix(callback, "select_film_")
 	index, err := strconv.Atoi(indexStr)
 	if err != nil {
-		app.SendMessage("Ошибка при получении ID фильма.", nil)
+		app.SendMessage("Ошибка при получении индекса фильма.", nil)
 		log.Printf("error parsing film index: %v", err)
 		return
 	}
 
 	session.FilmDetailState.Index = index
+
 	HandleFilmsDetailCommand(app, session)
 }
 
-func getFilms(app models.App, session *models.Session) (*models.FilmsResponse, error) {
-	filmsResponse, err := watchlist.GetFilms(app, session)
-	if err != nil {
-		return nil, err
-	}
-
-	session.FilmsState.Object = filmsResponse.Films
-	session.FilmsState.LastPage = filmsResponse.Metadata.LastPage
-	session.FilmsState.TotalRecords = filmsResponse.Metadata.TotalRecords
-
-	return filmsResponse, nil
-}
-
-func updateFilmsList(app models.App, session *models.Session, next bool) error {
+func UpdateFilmsList(app models.App, session *models.Session, next bool) error {
 	currentPage := session.FilmsState.CurrentPage
 	lastPage := session.FilmsState.LastPage
 
@@ -114,10 +102,62 @@ func updateFilmsList(app models.App, session *models.Session, next bool) error {
 		}
 	}
 
-	_, err := getFilms(app, session)
+	_, err := GetFilms(app, session)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func GetFilms(app models.App, session *models.Session) (*filters.Metadata, error) {
+	var films []apiModels.Film
+	var metadata *filters.Metadata
+	var err error
+
+	switch session.Context {
+	case states.ContextFilm:
+		films, metadata, err = fetchFilmsFromUser(app, session)
+		if err != nil {
+			return nil, err
+		}
+
+	case states.ContextCollection:
+		films, metadata, err = fetchFilmsFromCollection(app, session)
+		if err != nil {
+			return nil, err
+		}
+
+	default:
+		return nil, fmt.Errorf("unsupported session context: %v", session.Context)
+	}
+
+	UpdateSessionWithFilms(session, films, metadata)
+
+	return metadata, nil
+}
+
+func fetchFilmsFromUser(app models.App, session *models.Session) ([]apiModels.Film, *filters.Metadata, error) {
+	filmsResponse, err := watchlist.GetFilms(app, session)
+	if err != nil {
+		return nil, nil, err
+	}
+	return filmsResponse.Films, &filmsResponse.Metadata, nil
+}
+
+func fetchFilmsFromCollection(app models.App, session *models.Session) ([]apiModels.Film, *filters.Metadata, error) {
+	collectionResponse, err := watchlist.GetCollectionFilms(app, session)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	session.CollectionDetailState.Collection = collectionResponse.CollectionFilms.Collection
+
+	return collectionResponse.CollectionFilms.Films, &collectionResponse.Metadata, nil
+}
+
+func UpdateSessionWithFilms(session *models.Session, films []apiModels.Film, metadata *filters.Metadata) {
+	session.FilmsState.Films = films
+	session.FilmsState.LastPage = metadata.LastPage
+	session.FilmsState.TotalRecords = metadata.TotalRecords
 }

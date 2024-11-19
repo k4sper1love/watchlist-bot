@@ -1,8 +1,8 @@
 package collections
 
 import (
-	"fmt"
-	"github.com/k4sper1love/watchlist-bot/internal/builders"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/films"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
@@ -10,7 +10,7 @@ import (
 )
 
 func HandleNewCollectionCommand(app models.App, session *models.Session) {
-	keyboard := builders.NewKeyboard(1).AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
 	app.SendMessage("Введите название коллекции", keyboard)
 	session.SetState(states.ProcessNewCollectionAwaitingName)
 }
@@ -35,7 +35,7 @@ func HandleNewCollectionProcess(app models.App, session *models.Session) {
 func parseNewCollectionName(app models.App, session *models.Session) {
 	session.CollectionDetailState.Name = utils.ParseMessageString(app.Upd)
 
-	keyboard := builders.NewKeyboard(1).AddSkip().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build()
 
 	app.SendMessage("Введите описание коллекции", keyboard)
 
@@ -50,8 +50,7 @@ func parseNewCollectionDescription(app models.App, session *models.Session) {
 	}
 
 	createCollection(app, session)
-	session.CollectionDetailState.Clear()
-	session.ClearState()
+	session.ClearAllStates()
 }
 
 func createCollection(app models.App, session *models.Session) {
@@ -63,13 +62,8 @@ func createCollection(app models.App, session *models.Session) {
 
 	app.SendMessage("Новая коллекция успешно создана!", nil)
 
-	msg := fmt.Sprintf("ID: %d\n", collection.ID) +
-		fmt.Sprintf("Name: %s\n", collection.Name) +
-		fmt.Sprintf("Description: %s\n", collection.Description) +
-		fmt.Sprintf("Last updated: %s", collection.UpdatedAt.String()) +
-		fmt.Sprintf("Created: %s\n", collection.CreatedAt.String())
+	session.CollectionDetailState.ObjectID = collection.ID
 
-	app.SendMessage(msg, nil)
-
-	HandleCollectionsCommand(app, session)
+	session.SetContext(states.ContextCollection)
+	films.HandleFilmsCommand(app, session)
 }

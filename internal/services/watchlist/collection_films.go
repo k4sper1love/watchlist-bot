@@ -13,7 +13,7 @@ func GetCollectionFilms(app models.App, session *models.Session) (*models.Collec
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films?page=%d&page_size=%d", app.Vars.Host, session.CollectionDetailState.ObjectID, session.CollectionDetailState.CurrentPage, session.CollectionDetailState.PageSize)
+	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films?page=%d&page_size=%d", app.Vars.Host, session.CollectionDetailState.ObjectID, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
 
 	resp, err := SendRequest(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
@@ -38,9 +38,9 @@ func CreateCollectionFilm(app models.App, session *models.Session) (*apiModels.C
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films", app.Vars.Host, session.CollectionDetailState.ObjectID)
+	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films", app.Vars.Host, session.CollectionDetailState.Collection.ID)
 
-	resp, err := SendRequest(requestURL, http.MethodPost, session.CollectionFilmState, headers)
+	resp, err := SendRequest(requestURL, http.MethodPost, session.FilmDetailState, headers)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
@@ -58,12 +58,37 @@ func CreateCollectionFilm(app models.App, session *models.Session) (*apiModels.C
 	return collectionFilm, nil
 }
 
+func AddCollectionFilm(app models.App, session *models.Session) (*apiModels.CollectionFilm, error) {
+	headers := map[string]string{
+		"Authorization": session.AccessToken,
+	}
+
+	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID)
+
+	resp, err := SendRequest(requestURL, http.MethodPost, nil, headers)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusCreated {
+		return nil, fmt.Errorf("add_collection_film failed: %d", resp.StatusCode)
+	}
+
+	collectionFilm := &apiModels.CollectionFilm{}
+	if err := parseCollectionFilm(collectionFilm, resp.Body); err != nil {
+		return nil, fmt.Errorf("failed to parse collection film: %w", err)
+	}
+
+	return collectionFilm, nil
+}
+
 func DeleteCollectionFilm(app models.App, session *models.Session) error {
 	headers := map[string]string{
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Vars.Host, session.CollectionDetailState.ObjectID, session.CollectionFilmState.Object.ID)
+	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID)
 
 	resp, err := SendRequest(requestURL, http.MethodDelete, nil, headers)
 	if err != nil {
