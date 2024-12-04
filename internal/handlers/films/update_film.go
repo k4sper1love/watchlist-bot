@@ -123,7 +123,7 @@ func handleUpdateFilmImage(app models.App, session *models.Session) {
 }
 
 func parseUpdateFilmImage(app models.App, session *models.Session) {
-	image, err := utils.ParseServerImage(app.Bot, app.Upd, app.Vars.Host)
+	image, err := utils.ParseImageFromMessage(app.Bot, app.Upd)
 	if err != nil {
 		app.SendMessage("Ошибка при получении изображения", nil)
 		session.ClearAllStates()

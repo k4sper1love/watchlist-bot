@@ -16,11 +16,12 @@ type App struct {
 }
 
 type Vars struct {
-	BotToken    string
-	Environment string
-	DSN         string
-	Host        string
-	Secret      string
+	BotToken          string
+	Environment       string
+	DSN               string
+	Host              string
+	Secret            string
+	KinopoiskAPIToken string
 }
 
 func (app App) send(msg tgbotapi.Chattable) {

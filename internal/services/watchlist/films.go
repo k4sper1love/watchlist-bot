@@ -5,6 +5,7 @@ import (
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"net/http"
 )
 
@@ -23,7 +24,7 @@ func getFilmsRequest(app models.App, session *models.Session, collectionID, curr
 
 	requestURL := fmt.Sprintf("%s/api/v1/films?exclude_collection=%d&page=%d&page_size=%d", app.Vars.Host, collectionID, currentPage, pageSize)
 
-	resp, err := SendRequest(requestURL, http.MethodGet, nil, headers)
+	resp, err := client.SendRequest(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +49,7 @@ func UpdateFilm(app models.App, session *models.Session) (*apiModels.Film, error
 
 	requestURL := fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID)
 
-	resp, err := SendRequest(requestURL, http.MethodPut, session.FilmDetailState, headers)
+	resp, err := client.SendRequest(requestURL, http.MethodPut, session.FilmDetailState, headers)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
@@ -73,7 +74,7 @@ func CreateFilm(app models.App, session *models.Session) (*apiModels.Film, error
 
 	requestURL := fmt.Sprintf("%s/api/v1/films", app.Vars.Host)
 
-	resp, err := SendRequest(requestURL, http.MethodPost, session.FilmDetailState, headers)
+	resp, err := client.SendRequest(requestURL, http.MethodPost, session.FilmDetailState, headers)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
@@ -98,7 +99,7 @@ func DeleteFilm(app models.App, session *models.Session) error {
 
 	requestURL := fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID)
 
-	resp, err := SendRequest(requestURL, http.MethodDelete, nil, headers)
+	resp, err := client.SendRequest(requestURL, http.MethodDelete, nil, headers)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"log"
 )
 
 func HandleAuthProcess(app models.App, session *models.Session) error {
@@ -31,6 +32,7 @@ func HandleAuthProcess(app models.App, session *models.Session) error {
 		return nil
 	}
 
+	log.Println("я тут")
 	return err
 }
 

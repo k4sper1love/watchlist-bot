@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"io"
 	"log"
 	"mime/multipart"
@@ -17,7 +18,7 @@ func UploadImage(app models.App, data []byte) (string, error) {
 		return "", err
 	}
 
-	resp, err := doRequest(request)
+	resp, err := client.DoRequest(request)
 	if err != nil {
 		log.Printf("Error at 21: sending request: %v\n", err)
 		return "", err

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"net/http"
 )
 
@@ -12,7 +13,7 @@ func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 		"Authorization": session.AccessToken,
 	}
 
-	resp, err := SendRequest(app.Vars.Host+"/api/v1/user", http.MethodGet, nil, headers)
+	resp, err := client.SendRequest(app.Vars.Host+"/api/v1/user", http.MethodGet, nil, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +36,7 @@ func UpdateUser(app models.App, session *models.Session) (*apiModels.User, error
 		"Authorization": session.AccessToken,
 	}
 
-	resp, err := SendRequest(app.Vars.Host+"/api/v1/user", http.MethodPut, session.ProfileState, headers)
+	resp, err := client.SendRequest(app.Vars.Host+"/api/v1/user", http.MethodPut, session.ProfileState, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +59,7 @@ func DeleteUser(app models.App, session *models.Session) error {
 		"Authorization": session.AccessToken,
 	}
 
-	resp, err := SendRequest(app.Vars.Host+"/api/v1/user", http.MethodDelete, nil, headers)
+	resp, err := client.SendRequest(app.Vars.Host+"/api/v1/user", http.MethodDelete, nil, headers)
 	if err != nil {
 		return err
 	}

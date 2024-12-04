@@ -49,6 +49,8 @@ func handleCommands(app models.App, session *models.Session) {
 	callbackData := utils.ParseCallback(app.Upd)
 
 	switch {
+	//case command == "api":
+	//	kinopoisk.GetFilmByID(4626783)
 	case command == "start":
 		general.HandleStartCommand(app, session)
 

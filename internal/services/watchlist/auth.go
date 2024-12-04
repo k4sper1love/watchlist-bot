@@ -6,6 +6,7 @@ import (
 	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-api/pkg/tokens"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"io"
 	"log/slog"
 	"net/http"
@@ -26,7 +27,7 @@ func Register(app models.App, session *models.Session) error {
 		"Verification": token,
 	}
 
-	resp, err := SendRequest(app.Vars.Host+"/api/v1/auth/register/telegram", http.MethodPost, "", headers)
+	resp, err := client.SendRequest(app.Vars.Host+"/api/v1/auth/register/telegram", http.MethodPost, "", headers)
 	if err != nil {
 		return err
 	}
@@ -53,7 +54,7 @@ func Login(app models.App, session *models.Session) error {
 		"Verification": token,
 	}
 
-	resp, err := SendRequest(app.Vars.Host+"/api/v1/auth/login/telegram", http.MethodPost, "", headers)
+	resp, err := client.SendRequest(app.Vars.Host+"/api/v1/auth/login/telegram", http.MethodPost, "", headers)
 	if err != nil {
 		return err
 	}
@@ -81,7 +82,7 @@ func IsTokenValid(app models.App, token string) bool {
 		"Authorization": token,
 	}
 
-	resp, err := SendRequest(app.Vars.Host+"/api/v1/auth/check-token", http.MethodGet, nil, headers)
+	resp, err := client.SendRequest(app.Vars.Host+"/api/v1/auth/check-token", http.MethodGet, nil, headers)
 	if err != nil {
 		return false
 	}
@@ -95,7 +96,7 @@ func RefreshAccessToken(app models.App, session *models.Session) error {
 		"Authorization": session.RefreshToken,
 	}
 
-	resp, err := SendRequest(app.Vars.Host+"/api/v1/auth/refresh", http.MethodPost, nil, headers)
+	resp, err := client.SendRequest(app.Vars.Host+"/api/v1/auth/refresh", http.MethodPost, nil, headers)
 	if err != nil {
 		return err
 	}
@@ -120,7 +121,7 @@ func Logout(app models.App, session *models.Session) error {
 		"Authorization": session.RefreshToken,
 	}
 
-	resp, err := SendRequest(app.Vars.Host+"/api/v1/auth/logout", http.MethodPost, nil, headers)
+	resp, err := client.SendRequest(app.Vars.Host+"/api/v1/auth/logout", http.MethodPost, nil, headers)
 	if err != nil {
 		return err
 	}

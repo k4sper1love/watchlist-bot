@@ -6,8 +6,12 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/services/kinopoisk"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"log"
+	"strconv"
+	"strings"
 )
 
 func HandleNewFilmCommand(app models.App, session *models.Session) {
@@ -25,7 +29,7 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.ProcessNewFilmAwaitingTitle:
-		parseNewFilmTitle(app, session)
+		parseNewFilmFromURL(app, session)
 
 	case states.ProcessNewFilmAwaitingYear:
 		parseNewFilmYear(app, session)
@@ -54,6 +58,46 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 	case states.ProcessNewFilmAwaitingReview:
 		parseNewFilmReview(app, session)
 	}
+}
+
+func parseNewFilmFromURL(app models.App, session *models.Session) {
+	url := utils.ParseMessageString(app.Upd)
+	log.Println(url)
+	trimmed := strings.TrimPrefix(url, "https://www.kinopoisk.ru/film/")
+
+	idStr := strings.Split(trimmed, "/")[0]
+
+	id, _ := strconv.Atoi(idStr)
+
+	log.Println(id)
+
+	film, err := kinopoisk.GetFilmByID(app, id)
+	if err != nil {
+		log.Println("error here")
+		return
+	}
+
+	session.FilmDetailState.Title = film.Title
+	session.FilmDetailState.Description = film.Description
+	session.FilmDetailState.Genre = film.Genre
+	session.FilmDetailState.Year = film.Year
+	session.FilmDetailState.Rating = film.Rating
+
+	image, err := utils.ParseImageFromURL(film.ImageURL)
+	if err != nil {
+		app.SendMessage("Ошибка при получении изображения", nil)
+		return
+	}
+
+	imageURL, err := watchlist.UploadImage(app, image)
+	if err != nil {
+		app.SendMessage("Ошибка при получении изображения", nil)
+		return
+	}
+
+	session.FilmDetailState.ImageURL = imageURL
+
+	requestNewFilmComment(app, session)
 }
 
 func parseNewFilmTitle(app models.App, session *models.Session) {
@@ -133,7 +177,7 @@ func parseNewFilmImage(app models.App, session *models.Session) {
 		return
 	}
 
-	image, err := utils.ParseServerImage(app.Bot, app.Upd, app.Vars.Host)
+	image, err := utils.ParseImageFromMessage(app.Bot, app.Upd)
 	if err != nil {
 		app.SendMessage("Ошибка при получении изображения", nil)
 		requestNewFilmComment(app, session)
