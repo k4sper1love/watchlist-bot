@@ -36,7 +36,6 @@ func GetFilmByID(app models.App, filmID int) (*apiModels.Film, error) {
 		return nil, err
 	}
 
-	log.Println(film)
 	return &film, nil
 }
 

@@ -171,6 +171,9 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 			films.HandleFilmsButtons(app, session, collections.HandleCollectionsCommand)
 		}
 
+	case strings.HasPrefix(callbackData, "new_film_select"):
+		films.HandleNewFilmButtons(app, session)
+
 	case strings.HasPrefix(callbackData, "manage_film_select"):
 		films.HandleManageFilmButtons(app, session)
 

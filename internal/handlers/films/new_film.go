@@ -15,21 +15,23 @@ import (
 )
 
 func HandleNewFilmCommand(app models.App, session *models.Session) {
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
-	app.SendMessage("Введите название фильма", keyboard)
-	session.SetState(states.ProcessNewFilmAwaitingTitle)
+	keyboard := keyboards.BuildFilmNewKeyboard()
+	app.SendMessage("Выберите один из предложенных методов", keyboard)
 }
 
 func HandleNewFilmProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Upd) {
 		session.ClearAllStates()
-		HandleFilmsCommand(app, session)
+		HandleNewFilmCommand(app, session)
 		return
 	}
 
 	switch session.State {
-	case states.ProcessNewFilmAwaitingTitle:
+	case states.ProcessNewFilmAwaitingURL:
 		parseNewFilmFromURL(app, session)
+
+	case states.ProcessNewFilmAwaitingTitle:
+		parseNewFilmTitle(app, session)
 
 	case states.ProcessNewFilmAwaitingYear:
 		parseNewFilmYear(app, session)
@@ -58,6 +60,31 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 	case states.ProcessNewFilmAwaitingReview:
 		parseNewFilmReview(app, session)
 	}
+}
+
+func HandleNewFilmButtons(app models.App, session *models.Session) {
+	switch utils.ParseCallback(app.Upd) {
+	case states.CallbackNewFilmSelectBack:
+		HandleFilmsCommand(app, session)
+
+	case states.CallbackNewFilmSelectManually:
+		handleNewFilmManually(app, session)
+
+	case states.CallbackNewFilmSelectFromURL:
+		handleNewFilmFromURL(app, session)
+	}
+}
+
+func handleNewFilmManually(app models.App, session *models.Session) {
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	app.SendMessage("Введите название фильма", keyboard)
+	session.SetState(states.ProcessNewFilmAwaitingTitle)
+}
+
+func handleNewFilmFromURL(app models.App, session *models.Session) {
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	app.SendMessage("Пришлите ссылку на фильм (kinopoisk)", keyboard)
+	session.SetState(states.ProcessNewFilmAwaitingURL)
 }
 
 func parseNewFilmFromURL(app models.App, session *models.Session) {
