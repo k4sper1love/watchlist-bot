@@ -102,3 +102,15 @@ func (s *CollectionDetailState) Clear() {
 	s.Name = ""
 	s.Description = ""
 }
+
+func (s *FilmDetailState) SetImageURL(url string) {
+	s.ImageURL = url
+}
+
+func (s *FilmDetailState) SetFromFilm(film *apiModels.Film) {
+	s.Title = film.Title
+	s.Description = film.Description
+	s.Genre = film.Genre
+	s.Year = film.Year
+	s.Rating = film.Rating
+}

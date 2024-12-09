@@ -49,8 +49,6 @@ func handleCommands(app models.App, session *models.Session) {
 	callbackData := utils.ParseCallback(app.Upd)
 
 	switch {
-	//case command == "api":
-	//	kinopoisk.GetFilmByID(4626783)
 	case command == "start":
 		general.HandleStartCommand(app, session)
 
@@ -210,10 +208,10 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 		handleUserInput(app, session)
 	}
 
-	answerCallbackQuery(app)
+	answerCallbackQuery(app, session)
 }
 
-func answerCallbackQuery(app models.App) {
+func answerCallbackQuery(app models.App, session *models.Session) {
 	_, err := app.Bot.AnswerCallbackQuery(tgbotapi.CallbackConfig{
 		CallbackQueryID: app.Upd.CallbackQuery.ID,
 		//Text:            "Обработка завершена",
@@ -221,7 +219,8 @@ func answerCallbackQuery(app models.App) {
 	})
 
 	if err != nil {
-		sl.Log.Error("answer callback", slog.Any("error", err))
-		panic(err)
+		sl.Log.Error("Failed to answer callback", slog.Any("error", err))
+		general.HandleStartCommand(app, session)
+		return
 	}
 }

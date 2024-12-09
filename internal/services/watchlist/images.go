@@ -18,7 +18,7 @@ func UploadImage(app models.App, data []byte) (string, error) {
 		return "", err
 	}
 
-	resp, err := client.DoRequest(request)
+	resp, err := client.SendRequest(request)
 	if err != nil {
 		log.Printf("Error at 21: sending request: %v\n", err)
 		return "", err

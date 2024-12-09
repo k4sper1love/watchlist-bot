@@ -29,7 +29,7 @@ func HandleUpdateFilmCommand(app models.App, session *models.Session) {
 	film := session.FilmDetailState.Film
 
 	msg := messages.BuildFilmDetailMessage(&film)
-	msg += "Выберите, какое поле вы хотите изменить?"
+	msg += "\nВыберите, какое поле вы хотите изменить?"
 
 	keyboard := keyboards.BuildFilmUpdateKeyboard(session)
 
@@ -299,7 +299,6 @@ func updateFilm(app models.App, session *models.Session) {
 }
 
 func finishUpdateFilmProcess(app models.App, session *models.Session) {
-
 	state := session.FilmDetailState
 	film := state.Film
 

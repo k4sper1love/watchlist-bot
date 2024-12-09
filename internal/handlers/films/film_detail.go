@@ -13,16 +13,6 @@ func HandleFilmsDetailCommand(app models.App, session *models.Session) {
 	films := session.FilmsState.Films
 	film := films[index]
 
-	if len(films) == 0 {
-		app.SendMessage("Фильмы не найдены. Начните с начала", nil)
-		return
-	}
-
-	if index == -1 || index >= len(films) {
-		app.SendMessage("Неизвестный фильм. Начните с начала", nil)
-		return
-	}
-
 	session.FilmDetailState.Film = film
 
 	itemID := utils.GetItemID(index, session.FilmsState.CurrentPage, session.FilmsState.PageSize)

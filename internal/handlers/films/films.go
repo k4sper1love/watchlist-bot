@@ -160,4 +160,5 @@ func UpdateSessionWithFilms(session *models.Session, films []apiModels.Film, met
 	session.FilmsState.Films = films
 	session.FilmsState.LastPage = metadata.LastPage
 	session.FilmsState.TotalRecords = metadata.TotalRecords
+	session.FilmsState.PageSize = metadata.PageSize
 }

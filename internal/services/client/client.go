@@ -6,7 +6,12 @@ import (
 	"net/http"
 )
 
-func SendRequest(requestURL, method string, body any, headers map[string]string) (*http.Response, error) {
+func SendRequest(request *http.Request) (*http.Response, error) {
+	client := &http.Client{}
+	return client.Do(request)
+}
+
+func SendRequestWithOptions(requestURL, method string, body any, headers map[string]string) (*http.Response, error) {
 	req, err := prepareRequest(requestURL, method, body)
 	if err != nil {
 		return nil, err
@@ -14,7 +19,15 @@ func SendRequest(requestURL, method string, body any, headers map[string]string)
 
 	AddRequestHeaders(req, headers)
 
-	return DoRequest(req)
+	return SendRequest(req)
+}
+
+func AddRequestHeaders(req *http.Request, headers map[string]string) {
+	req.Header.Set("Content-Type", "application/json")
+
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
 }
 
 func prepareRequest(requestURL, method string, data any) (*http.Request, error) {
@@ -31,17 +44,4 @@ func prepareRequest(requestURL, method string, data any) (*http.Request, error) 
 	}
 
 	return http.NewRequest(method, requestURL, requestBody)
-}
-
-func AddRequestHeaders(req *http.Request, headers map[string]string) {
-	req.Header.Set("Content-Type", "application/json")
-
-	for key, value := range headers {
-		req.Header.Set(key, value)
-	}
-}
-
-func DoRequest(request *http.Request) (*http.Response, error) {
-	client := &http.Client{}
-	return client.Do(request)
 }
