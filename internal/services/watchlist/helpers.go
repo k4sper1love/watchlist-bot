@@ -5,7 +5,6 @@ import (
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"io"
-	"log"
 )
 
 func parseAuth(dest *models.Session, data io.Reader) error {
@@ -69,7 +68,6 @@ func parseImageURL(data io.Reader) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	log.Println("вот резы", result)
-	log.Println("вот имадже юрл", result)
+
 	return result.ImageURL, nil
 }

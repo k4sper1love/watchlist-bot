@@ -5,6 +5,7 @@ import (
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"net/http"
 )
 
@@ -27,7 +28,7 @@ func getCollectionsRequest(app models.App, session *models.Session, filmID, excl
 
 	requestURL := fmt.Sprintf("%s/api/v1/collections?film=%d&exclude_film=%d&page=%d&page_size=%d", app.Vars.Host, filmID, excludeFilmID, currentPage, pageSize)
 
-	resp, err := SendRequest(requestURL, http.MethodGet, nil, headers)
+	resp, err := client.SendRequestWithOptions(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +51,7 @@ func CreateCollection(app models.App, session *models.Session) (*apiModels.Colle
 		"Authorization": session.AccessToken,
 	}
 
-	resp, err := SendRequest(app.Vars.Host+"/api/v1/collections", http.MethodPost, session.CollectionDetailState, headers)
+	resp, err := client.SendRequestWithOptions(app.Vars.Host+"/api/v1/collections", http.MethodPost, session.CollectionDetailState, headers)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
@@ -75,7 +76,7 @@ func UpdateCollection(app models.App, session *models.Session) (*apiModels.Colle
 
 	requestURL := fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID)
 
-	resp, err := SendRequest(requestURL, http.MethodPut, session.CollectionDetailState, headers)
+	resp, err := client.SendRequestWithOptions(requestURL, http.MethodPut, session.CollectionDetailState, headers)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
@@ -100,7 +101,7 @@ func DeleteCollection(app models.App, session *models.Session) error {
 
 	requestURL := fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID)
 
-	resp, err := SendRequest(requestURL, http.MethodDelete, nil, headers)
+	resp, err := client.SendRequestWithOptions(requestURL, http.MethodDelete, nil, headers)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}

@@ -12,11 +12,12 @@ func LoadApp() (*models.App, error) {
 		return nil, err
 	}
 	vars := &models.Vars{
-		BotToken:    os.Getenv("BOT_TOKEN"),
-		Environment: os.Getenv("ENVIRONMENT"),
-		DSN:         configureDSN(),
-		Host:        os.Getenv("API_HOST"),
-		Secret:      os.Getenv("SECRET"),
+		BotToken:          os.Getenv("BOT_TOKEN"),
+		Environment:       os.Getenv("ENVIRONMENT"),
+		DSN:               configureDSN(),
+		Host:              os.Getenv("API_HOST"),
+		Secret:            os.Getenv("SECRET"),
+		KinopoiskAPIToken: os.Getenv("KINOPOISK_API_TOKEN"),
 	}
 
 	app := &models.App{

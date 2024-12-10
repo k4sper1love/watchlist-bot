@@ -169,6 +169,9 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 			films.HandleFilmsButtons(app, session, collections.HandleCollectionsCommand)
 		}
 
+	case strings.HasPrefix(callbackData, "new_film_select"):
+		films.HandleNewFilmButtons(app, session)
+
 	case strings.HasPrefix(callbackData, "manage_film_select"):
 		films.HandleManageFilmButtons(app, session)
 
@@ -205,10 +208,10 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 		handleUserInput(app, session)
 	}
 
-	answerCallbackQuery(app)
+	answerCallbackQuery(app, session)
 }
 
-func answerCallbackQuery(app models.App) {
+func answerCallbackQuery(app models.App, session *models.Session) {
 	_, err := app.Bot.AnswerCallbackQuery(tgbotapi.CallbackConfig{
 		CallbackQueryID: app.Upd.CallbackQuery.ID,
 		//Text:            "Обработка завершена",
@@ -216,7 +219,8 @@ func answerCallbackQuery(app models.App) {
 	})
 
 	if err != nil {
-		sl.Log.Error("answer callback", slog.Any("error", err))
-		panic(err)
+		sl.Log.Error("Failed to answer callback", slog.Any("error", err))
+		general.HandleStartCommand(app, session)
+		return
 	}
 }

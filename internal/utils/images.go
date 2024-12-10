@@ -61,7 +61,7 @@ func DownloadImage(imageURL string) (string, error) {
 	return file.Name(), nil
 }
 
-func ParseServerImage(bot *tgbotapi.BotAPI, update *tgbotapi.Update, host string) ([]byte, error) {
+func ParseImageFromMessage(bot *tgbotapi.BotAPI, update *tgbotapi.Update) ([]byte, error) {
 	var data []byte
 	var err error
 
@@ -80,4 +80,8 @@ func ParseServerImage(bot *tgbotapi.BotAPI, update *tgbotapi.Update, host string
 	}
 
 	return data, nil
+}
+
+func ParseImageFromURL(imageURL string) ([]byte, error) {
+	return processImageFromURL(imageURL)
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"net/http"
 )
 
@@ -15,7 +16,7 @@ func GetCollectionFilms(app models.App, session *models.Session) (*models.Collec
 
 	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films?page=%d&page_size=%d", app.Vars.Host, session.CollectionDetailState.ObjectID, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
 
-	resp, err := SendRequest(requestURL, http.MethodGet, nil, headers)
+	resp, err := client.SendRequestWithOptions(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +41,7 @@ func CreateCollectionFilm(app models.App, session *models.Session) (*apiModels.C
 
 	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films", app.Vars.Host, session.CollectionDetailState.Collection.ID)
 
-	resp, err := SendRequest(requestURL, http.MethodPost, session.FilmDetailState, headers)
+	resp, err := client.SendRequestWithOptions(requestURL, http.MethodPost, session.FilmDetailState, headers)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
@@ -65,7 +66,7 @@ func AddCollectionFilm(app models.App, session *models.Session) (*apiModels.Coll
 
 	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID)
 
-	resp, err := SendRequest(requestURL, http.MethodPost, nil, headers)
+	resp, err := client.SendRequestWithOptions(requestURL, http.MethodPost, nil, headers)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
@@ -90,7 +91,7 @@ func DeleteCollectionFilm(app models.App, session *models.Session) error {
 
 	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID)
 
-	resp, err := SendRequest(requestURL, http.MethodDelete, nil, headers)
+	resp, err := client.SendRequestWithOptions(requestURL, http.MethodDelete, nil, headers)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}

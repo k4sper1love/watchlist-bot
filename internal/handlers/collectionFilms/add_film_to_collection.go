@@ -1,6 +1,7 @@
 package collectionFilms
 
 import (
+	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
@@ -12,15 +13,21 @@ import (
 )
 
 func HandleAddFilmToCollectionCommand(app models.App, session *models.Session) {
-	if err := GetFilmsExcludeCollection(app, session); err != nil {
+	films, err := GetFilmsExcludeCollection(app, session)
+	if err != nil {
 		app.SendMessage(err.Error(), nil)
 		return
 	}
 
+	if len(films) == 0 {
+		msg := "Фильмы не найдены."
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAddFilmToCollectionBack).Build()
+		app.SendMessage(msg, keyboard)
+		return
+	}
+
 	msg := "Выберите, какой фильм добавить в коллекцию?"
-
 	keyboard := keyboards.BuildAddFilmToCollectionKeyboard(session)
-
 	app.SendMessage(msg, keyboard)
 }
 
@@ -66,15 +73,15 @@ func HandleAddFilmToCollectionSelect(app models.App, session *models.Session) {
 	addFilmToCollection(app, session)
 }
 
-func GetFilmsExcludeCollection(app models.App, session *models.Session) error {
+func GetFilmsExcludeCollection(app models.App, session *models.Session) ([]apiModels.Film, error) {
 	filmsResponse, err := watchlist.GetFilmsExcludeCollection(app, session)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	session.FilmsState.Films = filmsResponse.Films
 	session.CollectionFilmsState.CurrentPage = filmsResponse.Metadata.CurrentPage
 	session.CollectionFilmsState.LastPage = filmsResponse.Metadata.LastPage
 
-	return nil
+	return filmsResponse.Films, nil
 }

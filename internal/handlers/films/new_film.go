@@ -6,24 +6,27 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/services/parsing"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
 func HandleNewFilmCommand(app models.App, session *models.Session) {
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
-	app.SendMessage("Введите название фильма", keyboard)
-	session.SetState(states.ProcessNewFilmAwaitingTitle)
+	keyboard := keyboards.BuildFilmNewKeyboard()
+	app.SendMessage("Выберите один из предложенных методов", keyboard)
 }
 
 func HandleNewFilmProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Upd) {
 		session.ClearAllStates()
-		HandleFilmsCommand(app, session)
+		HandleNewFilmCommand(app, session)
 		return
 	}
 
 	switch session.State {
+	case states.ProcessNewFilmAwaitingURL:
+		parseNewFilmFromURL(app, session)
+
 	case states.ProcessNewFilmAwaitingTitle:
 		parseNewFilmTitle(app, session)
 
@@ -54,6 +57,56 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 	case states.ProcessNewFilmAwaitingReview:
 		parseNewFilmReview(app, session)
 	}
+}
+
+func HandleNewFilmButtons(app models.App, session *models.Session) {
+	switch utils.ParseCallback(app.Upd) {
+	case states.CallbackNewFilmSelectBack:
+		HandleFilmsCommand(app, session)
+
+	case states.CallbackNewFilmSelectManually:
+		handleNewFilmManually(app, session)
+
+	case states.CallbackNewFilmSelectFromURL:
+		handleNewFilmFromURL(app, session)
+	}
+}
+
+func handleNewFilmFromURL(app models.App, session *models.Session) {
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	app.SendMessage("Пришлите ссылку на фильм (kinopoisk, kinopoisk HD, rezka)", keyboard)
+	session.SetState(states.ProcessNewFilmAwaitingURL)
+}
+
+func parseNewFilmFromURL(app models.App, session *models.Session) {
+	url := utils.ParseMessageString(app.Upd)
+
+	film, err := parsing.GetFilmByURL(app, url)
+	if err != nil {
+		app.SendMessage("Ошибка при получении фильма", nil)
+		session.ClearAllStates()
+		HandleNewFilmCommand(app, session)
+		return
+	}
+
+	session.FilmDetailState.SetFromFilm(film)
+
+	imageURL, err := parseAndUploadImageFromURL(app, film.ImageURL)
+	if err != nil {
+		app.SendMessage("Ошибка при получении изображения", nil)
+		session.FilmDetailState.SetImageURL("")
+		requestNewFilmComment(app, session)
+		return
+	}
+	session.FilmDetailState.SetImageURL(imageURL)
+
+	requestNewFilmComment(app, session)
+}
+
+func handleNewFilmManually(app models.App, session *models.Session) {
+	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	app.SendMessage("Введите название фильма", keyboard)
+	session.SetState(states.ProcessNewFilmAwaitingTitle)
 }
 
 func parseNewFilmTitle(app models.App, session *models.Session) {
@@ -133,21 +186,15 @@ func parseNewFilmImage(app models.App, session *models.Session) {
 		return
 	}
 
-	image, err := utils.ParseServerImage(app.Bot, app.Upd, app.Vars.Host)
+	imageURL, err := parseAndUploadImageFromMessage(app)
 	if err != nil {
 		app.SendMessage("Ошибка при получении изображения", nil)
 		requestNewFilmComment(app, session)
 		return
 	}
 
-	imageURL, err := watchlist.UploadImage(app, image)
-	if err != nil {
-		app.SendMessage("Ошибка при получении изображения", nil)
-		requestNewFilmComment(app, session)
-		return
-	}
+	session.FilmDetailState.SetImageURL(imageURL)
 
-	session.FilmDetailState.ImageURL = imageURL
 	requestNewFilmComment(app, session)
 }
 
@@ -189,14 +236,7 @@ func parseNewFilmViewed(app models.App, session *models.Session) {
 		session.FilmDetailState.UserRating = 0
 		session.FilmDetailState.Review = ""
 
-		if err := CreateNewFilm(app, session); err != nil {
-			app.SendMessage("Не удалось создать фильм", nil)
-			HandleFilmsCommand(app, session)
-			return
-		}
-
-		session.ClearAllStates()
-		HandleFilmsCommand(app, session)
+		finishNewFilmProcess(app, session)
 	}
 }
 
@@ -222,14 +262,33 @@ func parseNewFilmReview(app models.App, session *models.Session) {
 		session.FilmDetailState.Review = utils.ParseMessageString(app.Upd)
 	}
 
+	finishNewFilmProcess(app, session)
+}
+
+func finishNewFilmProcess(app models.App, session *models.Session) {
 	if err := CreateNewFilm(app, session); err != nil {
 		app.SendMessage("Не удалось создать фильм", nil)
+		session.ClearAllStates()
 		HandleFilmsCommand(app, session)
 		return
 	}
+	app.SendMessage("Новый фильм успешно создан", nil)
 
 	session.ClearAllStates()
-	HandleFilmsCommand(app, session)
+
+	totalRecords := session.FilmsState.TotalRecords
+	pageSize := session.FilmsState.PageSize
+
+	newPage, newIndex := utils.CalculateNewElementPageAndIndex(totalRecords, pageSize)
+
+	session.FilmsState.CurrentPage = newPage
+	session.FilmDetailState.Index = newIndex
+
+	if _, err := GetFilms(app, session); err != nil {
+		app.SendMessage("Ошибка при обновлении списка фильмов", nil)
+	}
+
+	HandleFilmsDetailCommand(app, session)
 }
 
 func CreateNewFilm(app models.App, session *models.Session) error {
@@ -246,17 +305,10 @@ func CreateNewFilm(app models.App, session *models.Session) error {
 }
 
 func createNewUserFilm(app models.App, session *models.Session) error {
-	film, err := watchlist.CreateFilm(app, session)
+	_, err := watchlist.CreateFilm(app, session)
 	if err != nil {
 		return err
 	}
-
-	msg := "Новый фильм успешно создан\n"
-
-	msg += messages.BuildFilmDetailMessage(film)
-
-	imageURL := film.ImageURL
-	app.SendImage(imageURL, msg, nil)
 
 	return nil
 }
@@ -275,4 +327,22 @@ func createNewCollectionFilm(app models.App, session *models.Session) error {
 	app.SendImage(imageURL, msg, nil)
 
 	return nil
+}
+
+func parseAndUploadImageFromMessage(app models.App) (string, error) {
+	image, err := utils.ParseImageFromMessage(app.Bot, app.Upd)
+	if err != nil {
+		return "", err
+	}
+
+	return watchlist.UploadImage(app, image)
+}
+
+func parseAndUploadImageFromURL(app models.App, url string) (string, error) {
+	image, err := utils.ParseImageFromURL(url)
+	if err != nil {
+		return "", err
+	}
+
+	return watchlist.UploadImage(app, image)
 }

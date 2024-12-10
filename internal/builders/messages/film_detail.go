@@ -3,6 +3,7 @@ package messages
 import (
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
 func BuildFilmDetailMessage(film *apiModels.Film) string {
@@ -77,6 +78,11 @@ func BuildFilmGeneralMessage(film *apiModels.Film) string {
 	}
 
 	if film.Description != "" {
+		if len(film.Description) > 400 {
+			film.Description, _ = utils.SplitTextByLength(film.Description, 300)
+			fmt.Println(film.Description)
+		}
+
 		msg += fmt.Sprintf("<b>Описание:</b> %s\n", film.Description)
 	}
 

@@ -90,6 +90,18 @@ func BuildFilmManageKeyboard() *tgbotapi.InlineKeyboardMarkup {
 	return keyboard.Build()
 }
 
+func BuildFilmNewKeyboard() *tgbotapi.InlineKeyboardMarkup {
+	keyboard := NewKeyboard()
+
+	keyboard.AddNewFilmManually()
+
+	keyboard.AddNewFilmFromURL()
+
+	keyboard.AddBack(states.CallbackNewFilmSelectBack)
+
+	return keyboard.Build()
+}
+
 func BuildFilmUpdateKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	film := session.FilmDetailState.Film
 	keyboard := NewKeyboard()
@@ -143,4 +155,12 @@ func (k *Keyboard) AddFilmUpdate() *Keyboard {
 
 func (k *Keyboard) AddFilmManage() *Keyboard {
 	return k.AddButton("⚙️ Управление фильмом", states.CallbackFilmsManage)
+}
+
+func (k *Keyboard) AddNewFilmManually() *Keyboard {
+	return k.AddButton("Вручную", states.CallbackNewFilmSelectManually)
+}
+
+func (k *Keyboard) AddNewFilmFromURL() *Keyboard {
+	return k.AddButton("Из внешнего URL", states.CallbackNewFilmSelectFromURL)
 }

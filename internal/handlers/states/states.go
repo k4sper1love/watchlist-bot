@@ -77,6 +77,10 @@ const (
 	CallbackManageFilmSelectDelete = "manage_film_select_delete"
 
 	// new film states
+	CallbackNewFilmSelectBack         = "new_film_select_back"
+	CallbackNewFilmSelectManually     = "new_film_select_manually"
+	CallbackNewFilmSelectFromURL      = "new_film_select_from_url"
+	ProcessNewFilmAwaitingURL         = "new_film_awaiting_url"
 	ProcessNewFilmAwaitingTitle       = "new_film_awaiting_title"
 	ProcessNewFilmAwaitingYear        = "new_film_awaiting_year"
 	ProcessNewFilmAwaitingGenre       = "new_film_awaiting_genre"
