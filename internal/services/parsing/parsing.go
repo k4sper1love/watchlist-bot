@@ -15,6 +15,12 @@ func GetFilmByURL(app models.App, url string) (*apiModels.Film, error) {
 	case strings.Contains(url, "rezka"):
 		return GetFilmFromRezka(url)
 
+	case strings.Contains(url, "kinoafisha") && strings.Contains(url, "movies"):
+		return GetFilmFromKinoafisha(url)
+
+	case strings.Contains(url, "kinoafisha") && strings.Contains(url, "series"):
+		return GetSeriesFromKinoafisha(url)
+
 	default:
 		return nil, fmt.Errorf("unsupported URL")
 	}

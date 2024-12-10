@@ -84,6 +84,8 @@ func parseNewFilmFromURL(app models.App, session *models.Session) {
 	film, err := parsing.GetFilmByURL(app, url)
 	if err != nil {
 		app.SendMessage("Ошибка при получении фильма", nil)
+		session.ClearAllStates()
+		HandleNewFilmCommand(app, session)
 		return
 	}
 

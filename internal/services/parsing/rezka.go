@@ -1,6 +1,7 @@
 package parsing
 
 import (
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
@@ -20,13 +21,11 @@ func GetFilmFromRezka(url string) (*apiModels.Film, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		log.Println(resp.Status)
-		return nil, err
+		return nil, fmt.Errorf("failed response. Status is %s", resp.Status)
 	}
 
 	var film apiModels.Film
 	if err := parseFilmFromRezka(&film, resp.Body); err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
@@ -43,7 +42,10 @@ func parseFilmFromRezka(dest *apiModels.Film, data io.Reader) error {
 
 	year := strings.TrimSpace(doc.Find("a[href*='/year/']").Text())
 	year = strings.Replace(year, " года", "", 1)
-	dest.Year, _ = strconv.Atoi(year)
+	dest.Year, err = strconv.Atoi(year)
+	if err != nil {
+		return nil
+	}
 
 	doc.Find(".b-post__info tr").Each(func(i int, s *goquery.Selection) {
 		label := strings.TrimSpace(s.Find("td.l").Text())
@@ -57,7 +59,10 @@ func parseFilmFromRezka(dest *apiModels.Film, data io.Reader) error {
 
 	rating := strings.TrimSpace(doc.Find(".imbd .bold").Text())
 
-	dest.Rating, _ = strconv.ParseFloat(rating, 64)
+	dest.Rating, err = strconv.ParseFloat(rating, 64)
+	if err != nil {
+		return err
+	}
 
 	dest.ImageURL = strings.TrimSpace(doc.Find(".b-sidecover a").AttrOr("href", ""))
 

@@ -30,7 +30,7 @@ func GetFilmFromKinopoisk(app models.App, url string) (*apiModels.Film, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return nil, err
+		return nil, fmt.Errorf("failed response. Status is %s", resp.Status)
 	}
 
 	var film apiModels.Film
