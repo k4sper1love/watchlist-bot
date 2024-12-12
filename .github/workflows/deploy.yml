@@ -34,15 +34,15 @@ jobs:
 
       - name: Upload Project to Server
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}${{ secrets.SSH_HOST }} << 'EOF'
             mkdir -p /home/${{ secrets.SSH_USER }}/watchlist-bot
           EOF
           
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r ./* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/watchlist-bot
+          scp -o StrictHostKeyChecking=no -r ./* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/watchlist-bot
           
       - name: Deploy Application with Docker Compose
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ServerAliveInterval=60 -o ServerAliveCountMax=5 ${{ secrets.SSH_USER }}${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ServerAliveInterval=60 -o ServerAliveCountMax=5 ${{ secrets.SSH_USER }}${{ secrets.SSH_HOST }} << 'EOF'
             cd /home/${{ secrets.SSH_USER }}/watchlist-bot
             
             # Setting a unique project name
