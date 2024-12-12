@@ -46,7 +46,7 @@ jobs:
             cd /home/${{ secrets.SSH_USER }}/watchlist-bot
             
             # Setting a unique project name
-            export COMPOSE_PROJECT_NAME=watchlist-api
+            export COMPOSE_PROJECT_NAME=watchlist-bot
           
             export VERSION=${{ env.VERSION }}
             export ENVIRONMENT=${{ secrets.ENVIRONMENT }}
