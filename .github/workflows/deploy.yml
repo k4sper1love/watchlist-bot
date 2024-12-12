@@ -47,8 +47,8 @@ jobs:
           
             export VERSION=${{ env.VERSION }}
             export ENVIRONMENT=${{ secrets.ENVIRONMENT }}
-            export API_HOST=${{ secrets.APP_ENV }}  
-            export API_SECRET=${{  }}
+            export API_HOST=${{ secrets.API_HOST }}  
+            export API_SECRET=${{ secrets.API_SECRET }}
             export BOT_TOKEN=${{ secrets.BOT_TOKEN }}
             export POSTGRES_USER=${{ secrets.POSTGRES_USER }}  
             export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}  
