@@ -4,19 +4,21 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"log"
 	"os"
 )
 
 func LoadApp() (*models.App, error) {
 	if err := godotenv.Load(); err != nil {
-		return nil, err
+		log.Println("no .env file found")
 	}
+
 	vars := &models.Vars{
 		BotToken:          os.Getenv("BOT_TOKEN"),
 		Environment:       os.Getenv("ENVIRONMENT"),
 		DSN:               configureDSN(),
 		Host:              os.Getenv("API_HOST"),
-		Secret:            os.Getenv("SECRET"),
+		Secret:            os.Getenv("API_SECRET"),
 		KinopoiskAPIToken: os.Getenv("KINOPOISK_API_TOKEN"),
 	}
 
