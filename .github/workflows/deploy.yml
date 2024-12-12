@@ -34,7 +34,7 @@ jobs:
 
       - name: Upload Project to Server
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             mkdir -p /home/${{ secrets.SSH_USER }}/watchlist-bot
           EOF
           
