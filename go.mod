@@ -6,7 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.10.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/joho/godotenv v1.5.1
-	github.com/k4sper1love/watchlist-api v0.0.0-20241021194538-6a0b19df6e19
+	github.com/k4sper1love/watchlist-api v0.0.0-20241212131753-a2c0ba75551d
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.12
 )
