@@ -4,15 +4,17 @@ import (
 	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 	"log/slog"
 )
 
 func HandleStartCommand(app models.App, session *models.Session) {
-	msg := messages.BuildStartMessage()
+	msg := messages.BuildStartMessage(app, session)
 	app.SendMessage(msg, nil)
 
 	if err := HandleAuthProcess(app, session); err != nil {
-		app.SendMessage("Не удалось войти в систему. Отправьте /start заново.", nil)
+		msg = translator.Translate(session.Lang, "authFailure", nil, nil)
+		app.SendMessage(msg, nil)
 		sl.Log.Error("error auth process", slog.Any("err", err))
 		return
 	}
@@ -21,7 +23,7 @@ func HandleStartCommand(app models.App, session *models.Session) {
 }
 
 func HandleHelpCommand(app models.App, session *models.Session) {
-	msg := messages.BuildHelpMessage()
+	msg := messages.BuildHelpMessage(session)
 
 	app.SendMessage(msg, nil)
 }

@@ -1,20 +1,24 @@
 package films
 
 import (
+	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleViewedFilmCommand(app models.App, session *models.Session) {
 	session.FilmDetailState.IsViewed = true
 
-	msg := "Фильм просмотрен✅\n"
-	msg += "Поставьте оценку фильму\n\n"
-	msg += "<i>Вы можете отменить \"просмотр\" фильма, нажав на кнопку отмены</i>"
+	part1 := translator.Translate(session.Lang, "viewedFilmViewed", nil, nil)
+	part2 := translator.Translate(session.Lang, "viewedFilmRequestRating", nil, nil)
+	part3 := translator.Translate(session.Lang, "viewedFilmCanCancel", nil, nil)
 
-	keyboard := keyboards.BuildFilmViewedKeyboard()
+	msg := fmt.Sprintf("✅ %s\n%s\n\n<i>%s</i>", part1, part2, part3)
+
+	keyboard := keyboards.BuildFilmViewedKeyboard(session)
 
 	app.SendMessage(msg, keyboard)
 	session.SetState(states.ProcessViewedFilmAwaitingRating)
@@ -43,9 +47,12 @@ func parseViewedFilmRating(app models.App, session *models.Session) {
 		session.FilmDetailState.UserRating = utils.ParseMessageFloat(app.Upd)
 	}
 
-	msg := "Оставьте отзыв к фильму"
+	part1 := translator.Translate(session.Lang, "viewedFilmRequestReview", nil, nil)
+	part2 := translator.Translate(session.Lang, "viewedFilmCanCancel", nil, nil)
 
-	keyboard := keyboards.BuildFilmViewedKeyboard()
+	msg := fmt.Sprintf("✅ %s\n\n<i>%s</i>", part1, part2)
+
+	keyboard := keyboards.BuildFilmViewedKeyboard(session)
 
 	app.SendMessage(msg, keyboard)
 

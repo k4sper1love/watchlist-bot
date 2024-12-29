@@ -7,21 +7,22 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 var updateProfileButtons = []keyboards.Button{
-	{"Имя", states.CallbackUpdateProfileSelectUsername},
-	{"Email", states.CallbackUpdateProfileSelectEmail},
+	{"", "Имя", states.CallbackUpdateProfileSelectUsername},
+	{"", "Email", states.CallbackUpdateProfileSelectEmail},
 }
 
 func HandleUpdateProfileCommand(app models.App, session *models.Session) {
-	msg := messages.BuildProfileMessage(&session.User)
-	msg += "Выберите, какое поле вы хотите изменить?"
+	msg := messages.BuildProfileMessage(session)
+	msg += translator.Translate(session.Lang, "updateChoiceField", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().
 		AddButtons(updateProfileButtons...).
 		AddBack(states.CallbackUpdateProfileSelectBack).
-		Build()
+		Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 }
@@ -54,11 +55,11 @@ func HandleUpdateProfileProcess(app models.App, session *models.Session) {
 }
 
 func handleUpdateProfileUsername(app models.App, session *models.Session) {
-	msg := "Введите новый username"
+	msg := translator.Translate(session.Lang, "updateProfileUsername", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().
 		AddCancel().
-		Build()
+		Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -72,11 +73,11 @@ func parseUpdateProfileUsername(app models.App, session *models.Session) {
 }
 
 func handleUpdateProfileEmail(app models.App, session *models.Session) {
-	msg := "Введите адрес электронной почты"
+	msg := translator.Translate(session.Lang, "updateProfileEmail", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().
 		AddCancel().
-		Build()
+		Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -92,12 +93,20 @@ func parseUpdateProfileEmail(app models.App, session *models.Session) {
 func updateProfile(app models.App, session *models.Session) {
 	user, err := watchlist.UpdateUser(app, session)
 	if err != nil {
-		app.SendMessage("Не удалось обновить профиль", nil)
+		msg := translator.Translate(session.Lang, "updateProfileFailure", map[string]interface{}{
+			"Username": session.User.Username,
+		}, nil)
+
+		app.SendMessage(msg, nil)
 		return
 	}
-
 	session.User = *user
-	app.SendMessage("Профиль успешно обновлен", nil)
+
+	msg := translator.Translate(session.Lang, "updateProfileSuccess", map[string]interface{}{
+		"Username": session.User.Username,
+	}, nil)
+
+	app.SendMessage(msg, nil)
 }
 
 func finishUpdateProfileProcess(app models.App, session *models.Session) {

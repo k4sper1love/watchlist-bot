@@ -14,12 +14,14 @@ func LoadApp() (*models.App, error) {
 	}
 
 	vars := &models.Vars{
+		Version:           os.Getenv("VERSION"),
 		BotToken:          os.Getenv("BOT_TOKEN"),
 		Environment:       os.Getenv("ENVIRONMENT"),
 		DSN:               configureDSN(),
 		Host:              os.Getenv("API_HOST"),
 		Secret:            os.Getenv("API_SECRET"),
 		KinopoiskAPIToken: os.Getenv("KINOPOISK_API_TOKEN"),
+		YoutubeAPIToken:   os.Getenv("YOUTUBE_API_TOKEN"),
 	}
 
 	app := &models.App{

@@ -1,0 +1,572 @@
+{
+  "welcomeMessageGreeting": {
+    "other": "Welcome to the Watchlist Bot, {{.Name}}!"
+  },
+  "welcomeMessageBody": {
+    "other": "At the moment, the bot is under development (version {{.Version}}), but the main functions are already available."
+  },
+  "welcomeMessageCallToAction": {
+    "other": "Type /help to see the list of available commands."
+  },
+  "listOfCommands": {
+    "other": "List of available commands"
+  },
+  "sessionError": {
+    "other": "An error occurred while receiving the session."
+  },
+  "bannedHeader": {
+    "other": "You are banned.."
+  },
+  "bannedBody": {
+    "other": "Contact your administrator to unban."
+  },
+  "authRequest": {
+    "other": "You need to be authorized to run this command. Use /start"
+  },
+  "authExpired": {
+    "other": "Your tokens have expired. We log in to the system"
+  },
+  "authFailure": {
+    "other": "Couldn't log in. Use /start"
+  },
+  "authUpdated": {
+    "other": "Your token has been successfully updated"
+  },
+  "permissionsNotEnough": {
+    "other": "Insufficient level of rights"
+  },
+  "mainMenu": {
+    "other": "Main Menu"
+  },
+  "choiceAction": {
+    "other": "Choose one of the actions"
+  },
+  "adminPanel": {
+    "other": "Admin-panel"
+  },
+  "profile": {
+    "other": "Profile"
+  },
+  "films": {
+    "other": "Films"
+  },
+  "collections": {
+    "other": "Collections"
+  },
+  "settings": {
+    "other": "Settings"
+  },
+  "feedback": {
+    "other": "Feedback"
+  },
+  "logout": {
+    "other": "Logout"
+  },
+  "name": {
+    "other": "Name"
+  },
+  "id": {
+    "other": "ID"
+  },
+  "email": {
+    "other": "Email"
+  },
+  "joinDate": {
+    "other": "Date of registration"
+  },
+  "deleteProfileConfirm": {
+    "other": "Are you sure you want to delete \"{{.Username}}\" account"
+  },
+  "deleteProfileFailure": {
+    "other": "Account \"{{.Username}}\" could not be deleted"
+  },
+  "deleteProfileSuccess": {
+    "other": "Account \"{{.Username}}\" successfully deleted!"
+  },
+  "cancelAction": {
+    "other": "Action cancelled"
+  },
+  "updateChoiceField": {
+    "other": "Choose which field you want to change?"
+  },
+  "updateProfileUsername": {
+    "other": "Enter a new username"
+  },
+  "updateProfileEmail": {
+    "other": "Enter a new email address"
+  },
+  "updateProfileFailure": {
+    "other": "Account \"{{.Username}}\" update failed"
+  },
+  "updateProfileSuccess": {
+    "other": "Account \"{{.Username}}\" successfully updated!"
+  },
+  "settingsChoice": {
+    "other": "Select which parameter you want to change"
+  },
+  "settingsLanguage": {
+    "other": "Change the language"
+  },
+  "settingsCollectionsPageSize": {
+    "other": "Change the number of collections on a page"
+  },
+  "settingsFilmsPageSize": {
+    "other": "Change the number of films on a page"
+  },
+  "settingsObjectsPageSize": {
+    "other": "Change the number of objects on the page"
+  },
+  "parseLanguagesFailure": {
+    "other": "Error when getting the list of available languages"
+  },
+  "currentLanguage": {
+    "other": "Current language"
+  },
+  "settingsLanguageChoice": {
+    "other": "Select the desired language"
+  },
+  "settingsLanguageSuccess": {
+    "other": "Language successfully changed to \"{{.Language}}\""
+  },
+  "currentCollectionsPageSize": {
+    "other": "Page size for collections"
+  },
+  "settingsPageSizeChoice": {
+    "other": "Choose the desired size (from 1 and above)"
+  },
+  "settingsCollectionsPageSizeSuccess": {
+    "other": "New page size for the list of collections"
+  },
+  "currentFilmsPageSize": {
+    "other": "Page size for films"
+  },
+  "settingsFilmsPageSizeSuccess": {
+    "other": "New page size for the film list"
+  },
+  "currentObjectsPageSize": {
+    "other": "Page size for objects"
+  },
+  "settingsObjectsPageSizeSuccess": {
+    "other": "New page size for the object list"
+  },
+  "feedbackMessageHeader": {
+    "other": "Leave your feedback"
+  },
+  "feedbackMessageBody": {
+    "other": "Write your opinions, suggestions, or ideas, and we will definitely consider them!"
+  },
+  "feedbackCategoryChoice": {
+    "other": "Choose a category"
+  },
+  "feedbackCurrentCategory": {
+    "other": "You have selected the category"
+  },
+  "feedbackTextRequest": {
+    "other": "Please write your feedback"
+  },
+  "feedbackFailure": {
+    "other": "Failed to save feedback"
+  },
+  "feedbackSuccess": {
+    "other": "Thank you for your feedback! We appreciate your opinion"
+  },
+  "tryLater": {
+    "other": "Try again later"
+  },
+  "loginSuccess": {
+    "other": "Successfully logged into the account \"{{.Username}}\"!"
+  },
+  "registrationSuccess": {
+    "other": "Account registration successful for \"{{.Username}}\"!"
+  },
+  "logoutConfirm": {
+    "other": "Are you sure you want to log out of the account \"{{.Username}}\"?"
+  },
+  "logoutFailure": {
+    "other": "Failed to log out of the account \"{{.Username}}\""
+  },
+  "logoutSuccess": {
+    "other": "Successfully logged out of the account \"{{.Username}}\""
+  },
+  "logoutCancel": {
+    "other": "Logout canceled for the account \"{{.Username}}\""
+  },
+  "unknownState": {
+    "other": "Unknown state. Enter /reset to reset."
+  },
+  "viewedFilmViewed": {
+    "other": "The film is viewed"
+  },
+  "viewedFilmRequestRating": {
+    "other": "Rate the film"
+  },
+  "viewedFilmCanCancel": {
+    "other": "You can cancel the film as \"viewed\" by clicking the cancel button"
+  },
+  "viewedFilmRequestReview": {
+    "other": "Leave a review for the film"
+  },
+  "image": {
+    "other": "Image"
+  },
+  "title": {
+    "other": "Title"
+  },
+  "description": {
+    "other": "Description"
+  },
+  "genre": {
+    "other": "Genre"
+  },
+  "rating": {
+    "other": "Rating"
+  },
+  "yearOfRelease": {
+    "other": "Year of release"
+  },
+  "comment": {
+    "other": "Comment"
+  },
+  "viewed": {
+    "other": "Viewed"
+  },
+  "userRating": {
+    "other": "User rating"
+  },
+  "Review": {
+    "other": "Review"
+  },
+  "filmRequestImage": {
+    "other": "Send an image or a link to it"
+  },
+  "getImageFailure": {
+    "other": "Failed to retrieve the image"
+  },
+  "filmRequestTitle": {
+    "other": "Enter the film title"
+  },
+  "filmRequestDescription": {
+    "other": "Enter the film description"
+  },
+  "filmRequestYear": {
+    "other": "Enter the film's release year"
+  },
+  "filmRequestGenre": {
+    "other": "Enter the film genre"
+  },
+  "filmRequestRating": {
+    "other": "Enter the film rating"
+  },
+  "filmRequestComment": {
+    "other": "Enter your comment for the film"
+  },
+  "filmRequestViewed": {
+    "other": "Have you already watched this film?"
+  },
+  "filmRequestUserRating": {
+    "other": "Enter your rating for the film"
+  },
+  "filmRequestReview": {
+    "other": "Enter your review for the film"
+  },
+  "updateFilmFailure": {
+    "other": "Failed to update the film"
+  },
+  "updateFilmListFailure": {
+    "other": "Error updating the film list"
+  },
+  "choiceWay": {
+    "other": "Choose one of the ways"
+  },
+  "filmRequestLink": {
+    "other": "Send a link to the film"
+  },
+  "supportedServices": {
+    "other": "Supported services"
+  },
+  "getFilmFailure": {
+    "other": "Failed to retrieve the film"
+  },
+  "createFilmFailure": {
+    "other": "Failed to create the film"
+  },
+  "createFilmSuccess": {
+    "other": "New film successfully created"
+  },
+  "createCollectionFilmSuccess": {
+    "other": "New film successfully added to the collection \"{{.Collection}}\""
+  },
+  "lastPageAlert": {
+    "other": "You are already on the last page"
+  },
+  "firstPageAlert": {
+    "other": "You are already on the first page"
+  },
+  "deleteFilmConfirm": {
+    "other": "Are you sure you want to delete the film \"{{.Film}}\"?"
+  },
+  "deleteFilmFailure": {
+    "other": "Failed to delete the film \"{{.Film}}\""
+  },
+  "deleteFilmSuccess": {
+    "other": "The film \"{{.Film}}\" has been successfully deleted"
+  },
+  "collectionRequestName": {
+    "other": "Enter the collection name"
+  },
+  "collectionRequestDescription": {
+    "other": "Enter the collection description"
+  },
+  "updateCollectionFailure": {
+    "other": "Failed to update the collection"
+  },
+  "updateCollectionSuccess": {
+    "other": "The collection has been successfully updated"
+  },
+  "createCollectionFailure": {
+    "other": "Failed to create the collection"
+  },
+  "createCollectionSuccess": {
+    "other": "The new collection has been successfully created!"
+  },
+  "deleteCollectionConfirm": {
+    "other": "Are you sure you want to delete the collection \"{{.Collection}}\"?"
+  },
+  "deleteCollectionFailure": {
+    "other": "Failed to delete the collection \"{{.Collection}}\""
+  },
+  "deleteCollectionSuccess": {
+    "other": "The collection \"{{.Collection}}\" has been successfully deleted"
+  },
+  "getCollectionFailure": {
+    "other": "Error retrieving the collection"
+  },
+  "filmToCollectionSuccess": {
+    "other": "The film \"{{.Film}}\" has been successfully added to the collection \"{{.Collection}}\""
+  },
+  "filmsNotFound": {
+    "other": "Films not found"
+  },
+  "choiceFilmToCollection": {
+    "other": "Choose which film to add to the collection?"
+  },
+  "collectionsNotFound": {
+    "other": "Collections not found"
+  },
+  "choiceCollectionToFilm": {
+    "other": "Choose which collection to add the film to?"
+  },
+  "adminOptionUserCount": {
+    "other": "Check the number of users"
+  },
+  "adminOptionBroadcast": {
+    "other": "Send a broadcast"
+  },
+  "adminOptionFeedback": {
+    "other": "View feedbacks"
+  },
+  "adminOptionUserList": {
+    "other": "User list"
+  },
+  "requestFailure": {
+    "other": "Request failed"
+  },
+  "uniqueUsersCount": {
+    "other": "Unique bot users"
+  },
+  "recipientCount": {
+    "other": "Number of recipients"
+  },
+  "requestBroadcastMessage": {
+    "other": "Enter the message for the broadcast"
+  },
+  "emptyFeedbackList": {
+    "other": "No new feedback to view"
+  },
+  "feedbackList": {
+    "other": "Feedback list"
+  },
+  "category": {
+    "other": "Category"
+  },
+  "user": {
+    "other": "User"
+  },
+  "deleteFeedbackFailure": {
+    "other": "Failed to delete feedback"
+  },
+  "deleteFeedbackSuccess": {
+    "other": "Feedback successfully deleted"
+  },
+  "emptyUserList": {
+    "other": "The user list is empty"
+  },
+  "userList": {
+    "other": "User list"
+  },
+  "telegramID": {
+    "other": "Telegram ID"
+  },
+  "admin": {
+    "other": "Admin"
+  },
+  "banned": {
+    "other": "Banned"
+  },
+  "created": {
+    "other": "Created"
+  },
+  "badFormatID": {
+    "other": "Invalid ID format"
+  },
+  "banFailure": {
+    "other": "Error banning the user"
+  },
+  "banSuccess": {
+    "other": "The user \"{{.User}}\" has been successfully banned"
+  },
+  "unbanFailure": {
+    "other": "Error unbanning the user"
+  },
+  "unbanSuccess": {
+    "other": "The user \"{{.User}}\" has been successfully unbanned"
+  },
+  "helpMessage": {
+    "other": "Use /menu to interact with the bot"
+  },
+  "unknownContext": {
+    "other": "Unknown context"
+  },
+  "totalFilms": {
+    "other": "Total films"
+  },
+  "pageCounter": {
+    "other": "Page {{.CurrentPage}} of {{.LastPage}}"
+  },
+  "choiceFilmForDetails": {
+    "other": "Choose a film to learn more"
+  },
+  "collection": {
+    "other": "Collection"
+  },
+  "notFoundFilmsInCollection": {
+    "other": "No films found in this collection"
+  },
+  "yourRating": {
+    "other": "Your rating"
+  },
+  "film": {
+    "other": "Film"
+  },
+  "notViewed": {
+    "other": "Not viewed"
+  },
+  "totalCollections": {
+    "other": "Total collections"
+  },
+  "choiceCollectionForDetails": {
+    "other": "Choose a collection to learn more"
+  },
+  "backward": {
+    "other": "Back"
+  },
+  "forward": {
+    "other": "Next"
+  },
+  "cancel": {
+    "other": "Cancel"
+  },
+  "skip": {
+    "other": "Skip"
+  },
+  "yes": {
+    "other": "Yes"
+  },
+  "no": {
+    "other": "No"
+  },
+  "back": {
+    "other": "Back"
+  },
+  "offers": {
+    "other": "Suggestions"
+  },
+  "mistakes": {
+    "other": "Bugs"
+  },
+  "otherIssues": {
+    "other": "Other questions"
+  },
+  "edit": {
+    "other": "Edit"
+  },
+  "delete": {
+    "other": "Delete"
+  },
+  "createFilm": {
+    "other": "Create a film"
+  },
+  "updateFilm": {
+    "other": "Update the film"
+  },
+  "deleteFilm": {
+    "other": "Delete the film"
+  },
+  "manageFilm": {
+    "other": "Manage the film"
+  },
+  "manually": {
+    "other": "Manually"
+  },
+  "fromURL": {
+    "other": "From an external URL"
+  },
+  "createCollection": {
+    "other": "Create a collection"
+  },
+  "updateCollection": {
+    "other": "Update the collection"
+  },
+  "deleteCollection": {
+    "other": "Delete the collection"
+  },
+  "manageCollection": {
+    "other": "Manage the collection"
+  },
+  "addFilmToCollection": {
+    "other": "Add a film"
+  },
+  "addCollectionToFilm": {
+    "other": "Add a film to the collection"
+  },
+  "choiceFromFilms": {
+    "other": "Choose from my films"
+  },
+  "unknownCommand": {
+    "other": "Unknown command. Enter /menu"
+  },
+  "sendImageFailure": {
+    "other": "Failed to send the image"
+  },
+  "author": {
+    "other": "Author"
+  },
+  "duration": {
+    "other": "Duration"
+  },
+  "views": {
+    "other": "Views"
+  },
+  "grades": {
+    "other": "Grades"
+  },
+  "comments": {
+    "other": "Comments"
+  },
+  "dateOfRelease": {
+    "other": "Release date"
+  },
+  "year": {
+    "other": "Year"
+  }
+}

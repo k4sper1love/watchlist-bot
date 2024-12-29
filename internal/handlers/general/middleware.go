@@ -1,28 +1,36 @@
 package general
 
 import (
+	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func RequireAuth(app models.App, session *models.Session, next func(models.App, *models.Session)) {
 	if !isAuth(session) {
-		app.SendMessage("Для выполнения этой команды нужно быть авторизованным. Используйте /start", nil)
+		msg := translator.Translate(session.Lang, "authRequest", nil, nil)
+		app.SendMessage(msg, nil)
 		session.ClearState()
 		return
 	}
 
 	if !watchlist.IsTokenValid(app, session.AccessToken) {
 		if err := watchlist.RefreshAccessToken(app, session); err != nil {
-			app.SendMessage("Ваши токены истекли. Производим вход в систему", nil)
+			msg := translator.Translate(session.Lang, "authExpired", nil, nil)
+			app.SendMessage(msg, nil)
+
 			if err := HandleAuthProcess(app, session); err != nil {
-				app.SendMessage("Не удалось войти в систему. Используйте /start.", nil)
+				msg = translator.Translate(session.Lang, "authFailure", nil, nil)
+				app.SendMessage(msg, nil)
 				session.ClearState()
 				return
 			}
+
 		} else {
-			app.SendMessage("Ваш токен был успешно обновлен", nil)
+			msg := translator.Translate(session.Lang, "authUpdated", nil, nil)
+			app.SendMessage(msg, nil)
 		}
 	}
 	next(app, session)
@@ -30,7 +38,8 @@ func RequireAuth(app models.App, session *models.Session, next func(models.App, 
 
 func RequireAdmin(app models.App, session *models.Session, next func(models.App, *models.Session)) {
 	if !session.IsAdmin {
-		app.SendMessage("Недостаточный уровень прав", nil)
+		msg := translator.Translate(session.Lang, "permissionsNotEnough", nil, nil)
+		app.SendMessage(msg, nil)
 		session.ClearState()
 		HandleMenuCommand(app, session)
 		return
@@ -43,7 +52,12 @@ func CheckBanned(app models.App, session *models.Session, next func(models.App, 
 	isBanned, _ := postgres.IsUserBanned(session.TelegramID)
 
 	if isBanned {
-		app.SendMessage("❌ Вы заблокированы.\n Обратитесь к администратору для разблокировки.", nil)
+		part1 := translator.Translate(session.Lang, "bannedHeader", nil, nil)
+		part2 := translator.Translate(session.Lang, "bannedBody", nil, nil)
+
+		msg := fmt.Sprintf("❌ %s\n%s", part1, part2)
+
+		app.SendMessage(msg, nil)
 		return
 	}
 

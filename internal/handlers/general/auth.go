@@ -6,7 +6,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"log"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleAuthProcess(app models.App, session *models.Session) error {
@@ -22,24 +22,33 @@ func HandleAuthProcess(app models.App, session *models.Session) error {
 
 	err := watchlist.Login(app, session)
 	if err == nil {
-		app.SendMessage("Успешный вход!", nil)
+		msg := translator.Translate(session.Lang, "loginSuccess", map[string]interface{}{
+			"Username": session.User.Username,
+		}, nil)
+
+		app.SendMessage(msg, nil)
 		return nil
 	}
 
 	err = watchlist.Register(app, session)
 	if err == nil {
-		app.SendMessage("Успешная регистрация", nil)
+		msg := translator.Translate(session.Lang, "registrationSuccess", map[string]interface{}{
+			"Username": session.User.Username,
+		}, nil)
+
+		app.SendMessage(msg, nil)
 		return nil
 	}
 
-	log.Println("я тут")
 	return err
 }
 
 func HandleLogoutCommand(app models.App, session *models.Session) {
-	msg := "Вы точно хотите выйти из аккаунта?"
+	msg := translator.Translate(session.Lang, "logoutConfirm", map[string]interface{}{
+		"Username": session.User.Username,
+	}, nil)
 
-	keyboard := keyboards.NewKeyboard().AddSurvey().Build()
+	keyboard := keyboards.NewKeyboard().AddSurvey().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 	session.SetState(states.ProcessLogoutAwaitingConfirm)
@@ -56,14 +65,26 @@ func parseLogoutConfirm(app models.App, session *models.Session) {
 	switch utils.IsAgree(app.Upd) {
 	case true:
 		if err := watchlist.Logout(app, session); err != nil {
-			app.SendMessage("Неудачный выход из системы", nil)
+			msg := translator.Translate(session.Lang, "logoutFailure", map[string]interface{}{
+				"Username": session.User.Username,
+			}, nil)
+
+			app.SendMessage(msg, nil)
 			break
 		}
-		app.SendMessage("Успешно вышли из системы", nil)
+
+		msg := translator.Translate(session.Lang, "logoutSuccess", map[string]interface{}{
+			"Username": session.User.Username,
+		}, nil)
+
+		app.SendMessage(msg, nil)
 		session.Logout()
 
 	case false:
-		app.SendMessage("Отмена выхода из системы", nil)
+		msg := translator.Translate(session.Lang, "logoutCancel", map[string]interface{}{
+			"Username": session.User.Username,
+		}, nil)
+		app.SendMessage(msg, nil)
 	}
 
 	session.ClearState()

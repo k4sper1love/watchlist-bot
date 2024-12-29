@@ -7,6 +7,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 	"log"
 	"strconv"
 	"strings"
@@ -20,13 +21,13 @@ func HandleAddFilmToCollectionCommand(app models.App, session *models.Session) {
 	}
 
 	if len(films) == 0 {
-		msg := "Фильмы не найдены."
-		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAddFilmToCollectionBack).Build()
+		msg := translator.Translate(session.Lang, "filmsNotFound", nil, nil)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAddFilmToCollectionBack).Build(session.Lang)
 		app.SendMessage(msg, keyboard)
 		return
 	}
 
-	msg := "Выберите, какой фильм добавить в коллекцию?"
+	msg := translator.Translate(session.Lang, "choiceFilmToCollection", nil, nil)
 	keyboard := keyboards.BuildAddFilmToCollectionKeyboard(session)
 	app.SendMessage(msg, keyboard)
 }
@@ -44,7 +45,8 @@ func HandleAddFilmToCollectionButtons(app models.App, session *models.Session) {
 			session.CollectionFilmsState.CurrentPage++
 			HandleAddFilmToCollectionCommand(app, session)
 		} else {
-			app.SendMessage("Вы уже на последней странице", nil)
+			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
 		}
 
 	case callback == states.CallbackAddFilmToCollectionPrevPage:
@@ -52,7 +54,8 @@ func HandleAddFilmToCollectionButtons(app models.App, session *models.Session) {
 			session.CollectionFilmsState.CurrentPage--
 			HandleAddFilmToCollectionCommand(app, session)
 		} else {
-			app.SendMessage("Вы уже на первой странице", nil)
+			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
 		}
 	}
 }
@@ -63,7 +66,8 @@ func HandleAddFilmToCollectionSelect(app models.App, session *models.Session) {
 	id, err := strconv.Atoi(idStr)
 
 	if err != nil {
-		app.SendMessage("Ошибка при получении ID фильма.", nil)
+		msg := translator.Translate(session.Lang, "getFilmFailure", nil, nil)
+		app.SendMessage(msg, nil)
 		log.Printf("error parsing film ID: %v", err)
 		return
 	}

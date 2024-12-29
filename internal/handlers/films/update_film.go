@@ -7,29 +7,15 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
-
-var updateFilmButtons = []keyboards.Button{
-	{"Изображение", states.CallbackUpdateFilmSelectImage},
-	{"Название", states.CallbackUpdateFilmSelectTitle},
-	{"Описание", states.CallbackUpdateFilmSelectDescription},
-	{"Жанр", states.CallbackUpdateFilmSelectGenre},
-	{"Рейтинг", states.CallbackUpdateFilmSelectRating},
-	{"Год выпуска", states.CallbackUpdateFilmSelectYear},
-	{"Комментарий", states.CallbackUpdateFilmSelectComment},
-	{"Просмотрено", states.CallbackUpdateFilmSelectViewed},
-}
-
-var updateFilmsAfterViewedButtons = []keyboards.Button{
-	{"Оценка пользователя", states.CallbackUpdateFilmSelectUserRating},
-	{"Рецензия", states.CallbackUpdateFilmSelectReview},
-}
 
 func HandleUpdateFilmCommand(app models.App, session *models.Session) {
 	film := session.FilmDetailState.Film
 
-	msg := messages.BuildFilmDetailMessage(&film)
-	msg += "\nВыберите, какое поле вы хотите изменить?"
+	msg := messages.BuildFilmDetailMessage(session, &film) + "\n"
+
+	msg += translator.Translate(session.Lang, "updateChoice", nil, nil)
 
 	keyboard := keyboards.BuildFilmUpdateKeyboard(session)
 
@@ -113,9 +99,9 @@ func HandleUpdateFilmProcess(app models.App, session *models.Session) {
 }
 
 func handleUpdateFilmImage(app models.App, session *models.Session) {
-	msg := "Отправьте новое изображение или ссылку на него"
+	msg := translator.Translate(session.Lang, "filmRequestImage", nil, nil)
 
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -125,7 +111,8 @@ func handleUpdateFilmImage(app models.App, session *models.Session) {
 func parseUpdateFilmImage(app models.App, session *models.Session) {
 	image, err := utils.ParseImageFromMessage(app.Bot, app.Upd)
 	if err != nil {
-		app.SendMessage("Ошибка при получении изображения", nil)
+		msg := translator.Translate(session.Lang, "getImageFailure", nil, nil)
+		app.SendMessage(msg, nil)
 		session.ClearAllStates()
 		HandleUpdateFilmCommand(app, session)
 		return
@@ -133,7 +120,8 @@ func parseUpdateFilmImage(app models.App, session *models.Session) {
 
 	imageURL, err := watchlist.UploadImage(app, image)
 	if err != nil {
-		app.SendMessage("Ошибка при получении изображения", nil)
+		msg := translator.Translate(session.Lang, "getImageFailure", nil, nil)
+		app.SendMessage(msg, nil)
 		session.ClearAllStates()
 		HandleUpdateFilmCommand(app, session)
 		return
@@ -145,9 +133,9 @@ func parseUpdateFilmImage(app models.App, session *models.Session) {
 }
 
 func handleUpdateFilmTitle(app models.App, session *models.Session) {
-	msg := "Введите новое название фильма"
+	msg := translator.Translate(session.Lang, "filmRequestTitle", nil, nil)
 
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -161,9 +149,9 @@ func parseUpdateFilmTitle(app models.App, session *models.Session) {
 }
 
 func handleUpdateFilmDescription(app models.App, session *models.Session) {
-	msg := "Введите новое описание фильма"
+	msg := translator.Translate(session.Lang, "filmRequestDescription", nil, nil)
 
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -177,9 +165,9 @@ func parseUpdateFilmDescription(app models.App, session *models.Session) {
 }
 
 func handleUpdateFilmGenre(app models.App, session *models.Session) {
-	msg := "Введите новый жанр фильма"
+	msg := translator.Translate(session.Lang, "filmRequestGenre", nil, nil)
 
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -193,9 +181,9 @@ func parseUpdateFilmGenre(app models.App, session *models.Session) {
 }
 
 func handleUpdateFilmRating(app models.App, session *models.Session) {
-	msg := "Введите новый рейтинг фильма"
+	msg := translator.Translate(session.Lang, "filmRequestRating", nil, nil)
 
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -209,9 +197,9 @@ func parseUpdateFilmRating(app models.App, session *models.Session) {
 }
 
 func handleUpdateFilmYear(app models.App, session *models.Session) {
-	msg := "Введите новый год выпуска"
+	msg := translator.Translate(session.Lang, "filmRequestYear", nil, nil)
 
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -225,9 +213,9 @@ func parseUpdateFilmYear(app models.App, session *models.Session) {
 }
 
 func handleUpdateFilmComment(app models.App, session *models.Session) {
-	msg := "Введите новый комментарий к фильму"
+	msg := translator.Translate(session.Lang, "filmRequestComment", nil, nil)
 
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -241,9 +229,9 @@ func parseUpdateFilmComment(app models.App, session *models.Session) {
 }
 
 func handleUpdateFilmViewed(app models.App, session *models.Session) {
-	msg := "Вы посмотрели этот фильм?"
+	msg := translator.Translate(session.Lang, "filmRequestTitle", nil, nil)
 
-	keyboard := keyboards.NewKeyboard().AddSurvey().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddSurvey().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -258,9 +246,9 @@ func parseUpdateFilmViewed(app models.App, session *models.Session) {
 }
 
 func handleUpdateFilmUserRating(app models.App, session *models.Session) {
-	msg := "Введите новый пользовательский рейтинг"
+	msg := translator.Translate(session.Lang, "filmRequestUserRating", nil, nil)
 
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -274,9 +262,9 @@ func parseUpdateFilmUserRating(app models.App, session *models.Session) {
 }
 
 func handleUpdateFilmReview(app models.App, session *models.Session) {
-	msg := "Введите новую рецензию на фильм"
+	msg := translator.Translate(session.Lang, "filmRequestReview", nil, nil)
 
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -291,7 +279,8 @@ func parseUpdateFilmReview(app models.App, session *models.Session) {
 func updateFilm(app models.App, session *models.Session) {
 	film, err := watchlist.UpdateFilm(app, session)
 	if err != nil {
-		app.SendMessage("Не удалось обновить фильм", nil)
+		msg := translator.Translate(session.Lang, "updateFilmFailure", nil, nil)
+		app.SendMessage(msg, nil)
 		return
 	}
 
@@ -319,7 +308,8 @@ func finishUpdateFilmProcess(app models.App, session *models.Session) {
 	updateFilm(app, session)
 
 	if _, err := GetFilms(app, session); err != nil {
-		app.SendMessage("Ошибка при обновлении списка фильмов", nil)
+		msg := translator.Translate(session.Lang, "updateFilmListFailure", nil, nil)
+		app.SendMessage(msg, nil)
 	}
 
 	session.ClearAllStates()

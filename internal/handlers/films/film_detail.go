@@ -17,7 +17,7 @@ func HandleFilmsDetailCommand(app models.App, session *models.Session) {
 
 	itemID := utils.GetItemID(index, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
 
-	msg := messages.BuildFilmDetailWithNumberMessage(itemID, &film)
+	msg := messages.BuildFilmDetailWithNumberMessage(session, itemID, &film)
 
 	keyboard := keyboards.BuildFilmDetailKeyboard(session)
 

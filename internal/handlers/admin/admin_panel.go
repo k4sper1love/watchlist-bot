@@ -8,25 +8,26 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 	"log"
 	"strconv"
 	"strings"
 )
 
 var adminButtons = []keyboards.Button{
-	{"Узнать количество пользателей", states.CallbackAdminSelectUserCount},
-	{"Отправить рассылку", states.CallbackAdminSelectBroadcastMessage},
-	{"Просмотр фидбеков", states.CallbackAdminSelectFeedback},
-	{"Список пользователей", states.CallbackAdminSelectUsers},
+	{"", "adminOptionUserCount", states.CallbackAdminSelectUserCount},
+	{"", "adminOptionBroadcast", states.CallbackAdminSelectBroadcastMessage},
+	{"", "adminOptionFeedback", states.CallbackAdminSelectFeedback},
+	{"", "adminOptionUserList", states.CallbackAdminSelectUsers},
 }
 
 func HandleAdminCommand(app models.App, session *models.Session) {
-	msg := "Выберите действие"
+	msg := translator.Translate(session.Lang, "choiceAction", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().
 		AddButtons(adminButtons...).
 		AddBack(states.CallbackAdminSelectBack).
-		Build()
+		Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 }
@@ -80,25 +81,31 @@ func HandleAdminProcess(app models.App, session *models.Session) {
 func handleAdminUserCount(app models.App, session *models.Session) {
 	count, err := postgres.GetUserCounts()
 	if err != nil {
-		app.SendMessage("Не удалось получить инфу", nil)
+		msg := translator.Translate(session.Lang, "requestFailure", nil, nil)
+		app.SendMessage(msg, nil)
 		return
 	}
 
-	app.SendMessage(fmt.Sprintf("Уникальных юзеров бота: %d", count), nil)
+	uniqueUsersMsg := translator.Translate(session.Lang, "uniqueUsersCount", nil, nil)
+	msg := fmt.Sprintf("%s: %d", uniqueUsersMsg, count)
+
+	app.SendMessage(msg, nil)
 	HandleAdminCommand(app, session)
 }
 
 func handleAdminBroadcastMessage(app models.App, session *models.Session) {
 	count, err := postgres.GetUserCounts()
 	if err != nil {
-		app.SendMessage("Произошла ошибка при подсчете получателей", nil)
+		msg := translator.Translate(session.Lang, "requestFailure", nil, nil)
+		app.SendMessage(msg, nil)
 		return
 	}
 
-	msg := fmt.Sprintf("Количество получателей: %d\n", count)
-	msg += "Введите сообщение, которое будет использвано для рассылки"
+	part1 := translator.Translate(session.Lang, "recipientCount", nil, nil)
+	part2 := translator.Translate(session.Lang, "requestBroadcastMessage", nil, nil)
+	msg := fmt.Sprintf("%s: %d\n\n%s", part1, count, part2)
 
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -110,7 +117,8 @@ func parseAdminBroadcastMessageText(app models.App, session *models.Session) {
 
 	telegramIDs, err := postgres.GetAllTelegramID()
 	if err != nil {
-		app.SendMessage("Ошибка при получении IDs пользователей", nil)
+		msg = translator.Translate(session.Lang, "requestFailure", nil, nil)
+		app.SendMessage(msg, nil)
 		return
 	}
 
@@ -122,28 +130,35 @@ func parseAdminBroadcastMessageText(app models.App, session *models.Session) {
 }
 
 func handleAdminFeedback(app models.App, session *models.Session) {
-	keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectBackPanel).Build()
+	keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectBackPanel).Build(session.Lang)
 
 	feedbacks, err := postgres.FetchAllFeedbacks()
 	if err != nil || len(feedbacks) == 0 {
-		app.SendMessage("📭 Нет новых фидбеков для просмотра.", keyboard)
+		emptyListMsg := translator.Translate(session.Lang, "emptyFeedbackList", nil, nil)
+		msg := fmt.Sprintf("📭 %s", emptyListMsg)
+		app.SendMessage(msg, keyboard)
 		return
 	}
 
 	const maxMessageLength = 4000
 
-	msg := "📄 <b>Список фидбеков:</b>\n\n"
+	feedbackListMsg := translator.Translate(session.Lang, "feedbackList", nil, nil)
+	msg := fmt.Sprintf("📄 <b>%s:</b>\n\n", feedbackListMsg)
 
 	for _, feedback := range feedbacks {
+		idMsg := translator.Translate(session.Lang, "id", nil, nil)
+		userMsg := translator.Translate(session.Lang, "user", nil, nil)
+		categoryMsg := translator.Translate(session.Lang, "category", nil, nil)
+
 		entry := fmt.Sprintf(
-			"🆔 ID: %d\n"+
-				"👤 Пользователь: tg://user?id=%d\n"+
-				"📂 Категория: %s\n"+
+			"🆔 %s: %d\n"+
+				"👤 %s: tg://user?id=%d\n"+
+				"📂 %s: %s\n"+
 				"💬 %s\n"+
 				"📅 %s\n\n"+
 				"🗑️ /delete_feedback_%d\n"+
 				"━━━━━━━━━━━━━\n",
-			feedback.ID, feedback.TelegramID, feedback.Category, feedback.Message,
+			idMsg, feedback.ID, userMsg, feedback.TelegramID, categoryMsg, feedback.Category, feedback.Message,
 			feedback.CreatedAt.Format("02.01.2006 15:04"), feedback.ID,
 		)
 
@@ -163,44 +178,56 @@ func handleAdminFeedback(app models.App, session *models.Session) {
 func handleDeleteFeedback(app models.App, session *models.Session) {
 	feedbackID, err := parseFeedbackID(app)
 	if err != nil {
-		app.SendMessage("Ошибка при получении ID фидбека.", nil)
+		msg := translator.Translate(session.Lang, "requestFailure", nil, nil)
+		app.SendMessage(msg, nil)
 		return
 	}
 
 	err = postgres.DeleteFeedbackByID(feedbackID)
 	if err != nil {
-		app.SendMessage("❌ Не удалось удалить фидбек.", nil)
+		failureMsg := translator.Translate(session.Lang, "deleteFeedbackFailure", nil, nil)
+		msg := fmt.Sprintf("❌ %s", failureMsg)
+		app.SendMessage(msg, nil)
 		return
 	}
 
-	app.SendMessage("✅ Фидбек успешно удален.", nil)
+	successMsg := translator.Translate(session.Lang, "deleteFeedbackSuccess", nil, nil)
+	msg := fmt.Sprintf("✅ %s", successMsg)
+	app.SendMessage(msg, nil)
 
 	handleAdminFeedback(app, session)
 }
 
 func handleAdminUsers(app models.App, session *models.Session) {
-	keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectBackPanel).Build()
+	keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectBackPanel).Build(session.Lang)
 
 	users, err := postgres.FetchAllUsers()
 	if err != nil || len(users) == 0 {
-		app.SendMessage("📭 Нет пользователей для отображения.", keyboard)
+		msg := translator.Translate(session.Lang, "emptyUserList", nil, nil)
+		app.SendMessage(msg, keyboard)
 		return
 	}
 
 	const maxMessageLength = 4000
 
-	msg := "📄 <b>Список пользователей:</b>\n\n"
+	userListMsg := translator.Translate(session.Lang, "userList", nil, nil)
+	msg := fmt.Sprintf("📄 <b>%s:</b>\n\n", userListMsg)
 
 	for _, user := range users {
+		telegramIDMsg := translator.Translate(session.Lang, "telegramID", nil, nil)
+		adminMsg := translator.Translate(session.Lang, "admin", nil, nil)
+		bannedMsg := translator.Translate(session.Lang, "banned", nil, nil)
+		createdMsg := translator.Translate(session.Lang, "created", nil, nil)
+
 		entry := fmt.Sprintf(
-			"🆔 Telegram ID: tg://user?id=%d\n"+
-				"👤 <b>Админ:</b> %s\n"+
-				"🔐 <b>Заблокирован:</b> %s\n"+
-				"📅 <b>Создан:</b> %s\n",
-			user.TelegramID,
-			boolToString(user.IsAdmin),
-			boolToString(user.IsBanned),
-			user.CreatedAt.Format("02.01.2006 15:04"),
+			"🆔 %s tg://user?id=%d\n"+
+				"👤 <b>%s:</b> %s\n"+
+				"🔐 <b>%s:</b> %s\n"+
+				"📅 <b>%s:</b> %s\n",
+			telegramIDMsg, user.TelegramID,
+			adminMsg, boolToString(user.IsAdmin),
+			bannedMsg, boolToString(user.IsBanned),
+			createdMsg, user.CreatedAt.Format("02.01.2006 15:04"),
 		)
 
 		if !user.IsAdmin && !user.IsBanned {
@@ -229,17 +256,27 @@ func handleAdminUsers(app models.App, session *models.Session) {
 func handleBanUser(app models.App, session *models.Session) {
 	telegramID, err := parseBanTelegramID(app)
 	if err != nil {
-		app.SendMessage("❌ Неверный формат ID.", nil)
+		badMsg := translator.Translate(session.Lang, "badFormatID", nil, nil)
+		msg := fmt.Sprintf("❌ %s", badMsg)
+		app.SendMessage(msg, nil)
 		return
 	}
 
 	err = postgres.BanUser(telegramID)
 	if err != nil {
-		app.SendMessage("❌ Ошибка при блокировке пользователя.", nil)
+		failureMsg := translator.Translate(session.Lang, "banFailure", nil, nil)
+		msg := fmt.Sprintf("❌ %s", failureMsg)
+		app.SendMessage(msg, nil)
 		return
 	}
 
-	app.SendMessage(fmt.Sprintf("✅ Пользователь %d успешно заблокирован.", telegramID), nil)
+	successMsg := translator.Translate(session.Lang, "banSuccess", map[string]interface{}{
+		"User": telegramID,
+	}, nil)
+
+	msg := fmt.Sprintf("✅ %s", successMsg)
+
+	app.SendMessage(msg, nil)
 
 	handleAdminUsers(app, session)
 }
@@ -247,17 +284,27 @@ func handleBanUser(app models.App, session *models.Session) {
 func handleUnbanUser(app models.App, session *models.Session) {
 	telegramID, err := parseUnbanTelegramID(app)
 	if err != nil {
-		app.SendMessage("❌ Неверный формат ID.", nil)
+		badMsg := translator.Translate(session.Lang, "badFormatID", nil, nil)
+		msg := fmt.Sprintf("❌ %s", badMsg)
+		app.SendMessage(msg, nil)
 		return
 	}
 
 	err = postgres.UnbanUser(telegramID)
 	if err != nil {
-		app.SendMessage("❌ Ошибка при разблокировке пользователя.", nil)
+		failureMsg := translator.Translate(session.Lang, "unbanFailure", nil, nil)
+		msg := fmt.Sprintf("❌ %s", failureMsg)
+		app.SendMessage(msg, nil)
 		return
 	}
 
-	app.SendMessage(fmt.Sprintf("✅ Пользователь %d успешно разблокирован.", telegramID), nil)
+	successMsg := translator.Translate(session.Lang, "unbanSuccess", map[string]interface{}{
+		"User": telegramID,
+	}, nil)
+
+	msg := fmt.Sprintf("✅ %s", successMsg)
+
+	app.SendMessage(msg, nil)
 
 	handleAdminUsers(app, session)
 }

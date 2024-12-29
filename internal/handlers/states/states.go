@@ -34,6 +34,8 @@ const (
 	ProcessLogoutAwaitingConfirm = "logout_awaiting_confirm"
 
 	// settings states
+	CallbackSettingsBack                       = "settings_back"
+	CallbackSettingsLanguage                   = "settings_language"
 	CallbackSettingsCollectionsPageSize        = "settings_collections_page_size"
 	ProcessSettingsCollectionsAwaitingPageSize = "settings_collections_awaiting_page_size"
 	CallbackSettingsFilmsPageSize              = "settings_films_page_size"
