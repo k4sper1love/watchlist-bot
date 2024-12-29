@@ -1,6 +1,12 @@
 {
-  "welcomeMessageGreeting": {
-    "other": "Watchlist Bot-қа қош келдіңіз, {{.Name}}!"
+  "choiceLanguage": {
+    "other": "Ботпен сөйлесу үшін Тілді таңдаңыз. Сіз оны параметрлерде өзгерте аласыз"
+  },
+  "someError": {
+    "other": "Қандай да бір қателік болды"
+  },
+  "setDefaultLanguage": {
+    "other": "Әдепкі тіл орнатылған"
   },
   "welcomeMessageBody": {
     "other": "Қазіргі уақытта бот әзірлену кезеңінде (нұсқа {{.Version}}), бірақ негізгі функциялары қолжетімді."

@@ -152,6 +152,9 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, "menu_select_"):
 		handleCommands(app, session)
 
+	case strings.HasPrefix(callbackData, "select_start_lang_"):
+		general.HandleLanguageButton(app, session)
+
 	case strings.HasPrefix(callbackData, "settings_") || strings.HasPrefix(callbackData, "select_lang_"):
 		general.HandleSettingsButton(app, session)
 

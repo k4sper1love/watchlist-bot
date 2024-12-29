@@ -7,13 +7,14 @@ import (
 
 type Session struct {
 	gorm.Model
-	TelegramID            int            `gorm:"unique"`
-	User                  apiModels.User `json:"user" gorm:"serializer:json"`
+	TelegramID            int `gorm:"unique"`
+	TelegramUsername      string
+	Role                  string `gorm:"default:user"`
 	Lang                  string
-	AccessToken           string `json:"access_token"`
-	RefreshToken          string `json:"refresh_token"`
-	IsAdmin               bool   `gorm:"default:false"`
-	IsBanned              bool   `gorm:"default:false"`
+	IsBanned              bool           `gorm:"default:false"`
+	User                  apiModels.User `json:"user" gorm:"serializer:json"`
+	AccessToken           string         `json:"access_token"`
+	RefreshToken          string         `json:"refresh_token"`
 	State                 string
 	Context               string
 	ProfileState          *ProfileState          `gorm:"foreignKey:SessionID"`

@@ -70,11 +70,11 @@ func (k *Keyboard) AddProfileDelete() *Keyboard {
 	return k.AddButton("⚠️", "delete", states.CallbackProfileSelectDelete)
 }
 
-func (k *Keyboard) AddLanguageSelect(languages []string) *Keyboard {
+func (k *Keyboard) AddLanguageSelect(languages []string, callback string) *Keyboard {
 	var buttons []Button
 
 	for _, lang := range languages {
-		buttons = append(buttons, Button{"", fmt.Sprintf(strings.ToUpper(lang)), fmt.Sprintf("select_lang_%s", lang)})
+		buttons = append(buttons, Button{"", fmt.Sprintf(strings.ToUpper(lang)), fmt.Sprintf("%s_%s", callback, lang)})
 	}
 
 	k.AddButtonsWithRowSize(2, buttons...)

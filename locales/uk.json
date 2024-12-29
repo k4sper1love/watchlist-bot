@@ -1,4 +1,13 @@
 {
+  "choiceLanguage": {
+    "other": "Будь ласка, виберіть мову для спілкування з ботом. Ви зможете поміняти його в Налаштуваннях"
+  },
+  "someError": {
+    "other": "Сталася якась помилка"
+  },
+  "setDefaultLanguage": {
+    "other": "Встановлено мову за замовчуванням."
+  },
   "welcomeMessageGreeting": {
     "other": "Ласкаво просимо до Watchlist Bot, {{.Name}}!"
   },

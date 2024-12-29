@@ -28,6 +28,7 @@ type Vars struct {
 	DSN               string
 	Host              string
 	Secret            string
+	AdminID           int
 	KinopoiskAPIToken string
 	YoutubeAPIToken   string
 }

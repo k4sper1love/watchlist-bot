@@ -80,7 +80,7 @@ func handleLanguage(app models.App, session *models.Session) {
 
 	msg := fmt.Sprintf("%s: %s\n%s", part1, session.Lang, part2)
 
-	keyboard := keyboards.NewKeyboard().AddLanguageSelect(languages).AddBack(states.CallbackSettingsBack).Build("")
+	keyboard := keyboards.NewKeyboard().AddLanguageSelect(languages, "select_lang").AddBack(states.CallbackSettingsBack).Build("")
 
 	app.SendMessage(msg, keyboard)
 }

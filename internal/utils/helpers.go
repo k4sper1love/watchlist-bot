@@ -34,6 +34,16 @@ func ParseTelegramName(update *tgbotapi.Update) string {
 	return "Guest"
 }
 
+func ParseTelegramTag(update *tgbotapi.Update) string {
+	if update.Message != nil {
+		return update.Message.From.UserName
+	} else if update.CallbackQuery.Message != nil {
+		return update.Message.From.UserName
+	}
+
+	return ""
+}
+
 func ParseLanguageCode(update *tgbotapi.Update) string {
 	if update.Message != nil {
 		return update.Message.From.LanguageCode

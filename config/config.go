@@ -6,11 +6,17 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"log"
 	"os"
+	"strconv"
 )
 
 func LoadApp() (*models.App, error) {
 	if err := godotenv.Load(); err != nil {
 		log.Println("no .env file found")
+	}
+
+	adminID, err := strconv.Atoi(os.Getenv("ADMIN_TELEGRAM_ID"))
+	if err != nil {
+		return nil, err
 	}
 
 	vars := &models.Vars{
@@ -20,6 +26,7 @@ func LoadApp() (*models.App, error) {
 		DSN:               configureDSN(),
 		Host:              os.Getenv("API_HOST"),
 		Secret:            os.Getenv("API_SECRET"),
+		AdminID:           adminID,
 		KinopoiskAPIToken: os.Getenv("KINOPOISK_API_TOKEN"),
 		YoutubeAPIToken:   os.Getenv("YOUTUBE_API_TOKEN"),
 	}
