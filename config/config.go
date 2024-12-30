@@ -14,7 +14,7 @@ func LoadApp() (*models.App, error) {
 		log.Println("no .env file found")
 	}
 
-	adminID, err := strconv.Atoi(os.Getenv("ADMIN_TELEGRAM_ID"))
+	rootID, err := strconv.Atoi(os.Getenv("ROOT_TELEGRAM_ID"))
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func LoadApp() (*models.App, error) {
 		DSN:               configureDSN(),
 		Host:              os.Getenv("API_HOST"),
 		Secret:            os.Getenv("API_SECRET"),
-		AdminID:           adminID,
+		RootID:            rootID,
 		KinopoiskAPIToken: os.Getenv("KINOPOISK_API_TOKEN"),
 		YoutubeAPIToken:   os.Getenv("YOUTUBE_API_TOKEN"),
 	}

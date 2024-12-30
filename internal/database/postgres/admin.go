@@ -2,12 +2,24 @@ package postgres
 
 import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 )
 
 func GetUserCounts() (int64, error) {
 	var count int64
 
 	err := GetDB().Model(&models.Session{}).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func GetAdminCounts() (int64, error) {
+	var count int64
+
+	err := GetDB().Model(&models.Session{}).Where("role > 0").Count(&count).Error
 	if err != nil {
 		return 0, err
 	}
@@ -26,9 +38,38 @@ func GetAllTelegramID() ([]int, error) {
 	return telegramIDs, nil
 }
 
-func FetchAllUsers() ([]models.Session, error) {
+func GetAllUsers() ([]models.Session, error) {
 	var sessions []models.Session
 	err := GetDB().Order("created_at DESC").Find(&sessions).Error
+	return sessions, err
+}
+
+func GetAllUsersWithPagination(page, pageSize int) ([]models.Session, error) {
+	var sessions []models.Session
+
+	offset := (page - 1) * pageSize
+
+	err := GetDB().Order("created_at DESC").
+		Limit(pageSize).
+		Offset(offset).
+		Find(&sessions).Error
+
+	return sessions, err
+}
+
+func GetAllAdminsWithPagination(page, pageSize int) ([]models.Session, error) {
+	var sessions []models.Session
+
+	offset := (page - 1) * pageSize
+
+	err := GetDB().
+		Model(&models.Session{}).
+		Where("role > 0").
+		Order("created_at DESC").
+		Limit(pageSize).
+		Offset(offset).
+		Find(&sessions).Error
+
 	return sessions, err
 }
 
@@ -49,4 +90,61 @@ func IsUserBanned(telegramID int) (bool, error) {
 	}
 
 	return session.IsBanned, nil
+}
+
+func SetUserRole(telegramID int, role roles.Role) (bool, error) {
+	err := GetDB().
+		Model(&models.Session{}).
+		Where("telegram_id = ?", telegramID).
+		Update("role", role).Error
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func GetUserByTelegramID(telegramID int) (*models.Session, error) {
+	var session models.Session
+
+	err := GetDB().Model(&models.Session{}).Where("telegram_id = ?", telegramID).First(&session).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &session, nil
+}
+
+func GetUserByTelegramUsername(username string) (*models.Session, error) {
+	var session models.Session
+
+	err := GetDB().Model(&models.Session{}).Where("telegram_username = ?", username).First(&session).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &session, nil
+}
+
+func GetAdminByTelegramID(telegramID int) (*models.Session, error) {
+	var session models.Session
+
+	err := GetDB().Model(&models.Session{}).Where("telegram_id = ? AND role > 0", telegramID).First(&session).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &session, nil
+}
+
+func GetAdminByTelegramUsername(username string) (*models.Session, error) {
+	var session models.Session
+
+	err := GetDB().Model(&models.Session{}).Where("telegram_username = ? AND role > 0", username).First(&session).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &session, nil
 }

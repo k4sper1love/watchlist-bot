@@ -8,6 +8,135 @@
   "setDefaultLanguage": {
     "other": "The default language is set"
   },
+  "admins": {
+    "other": "Administrators"
+  },
+  "users": {
+    "other": "Users"
+  },
+  "message": {
+    "other": "Message"
+  },
+  "broadcast": {
+    "other": "Broadcast"
+  },
+  "findUser": {
+    "other": "Find User"
+  },
+  "requestIDOrUsername": {
+    "other": "Enter ID or @username"
+  },
+  "superAdmin": {
+    "other": "Super Administrator"
+  },
+  "helper": {
+    "other": "Helper"
+  },
+  "root": {
+    "other": "Root"
+  },
+  "manageUserRole": {
+    "other": "Change Role"
+  },
+  "unban": {
+    "other": "Unban"
+  },
+  "ban": {
+    "other": "Ban"
+  },
+  "alreadyMaxRole": {
+    "other": "The user already has the maximum role"
+  },
+  "alreadyMinRole": {
+    "other": "The user already has the minimum role"
+  },
+  "findAdmin": {
+    "other": "Find Administrator"
+  },
+  "foundFeedbacks": {
+    "other": "Feedbacks Found"
+  },
+  "noAccess": {
+    "other": "No Access"
+  },
+  "viewFeedback": {
+    "other": "View Feedback"
+  },
+  "foundUsers": {
+    "other": "Users Found"
+  },
+  "role": {
+    "other": "Role"
+  },
+  "unknown": {
+    "other": "Unknown"
+  },
+  "requestBroadcastImage": {
+    "other": "Send a link or an image for the broadcast"
+  },
+  "send": {
+    "other": "Send"
+  },
+  "broadcastEmpty": {
+    "other": "Cannot send an empty broadcast"
+  },
+  "feedbackDetails": {
+    "other": "Feedback Details"
+  },
+  "currentRole": {
+    "other": "Current Role"
+  },
+  "choiceUserForDetails": {
+    "other": "Select a user"
+  },
+  "language": {
+    "other": "Language"
+  },
+  "state": {
+    "other": "State"
+  },
+  "empty": {
+    "other": "Empty"
+  },
+  "sessionDetails": {
+    "other": "Session Details"
+  },
+  "apiDetails": {
+    "other": "API Details"
+  },
+  "updated": {
+    "other": "Updated"
+  },
+  "choiceForDetails": {
+    "other": "Select to view details"
+  },
+  "needRemoveRole": {
+    "other": "You must first set the role to user"
+  },
+  "unbanned": {
+    "other": "Unblocked"
+  },
+  "currenRole": {
+    "other": "Current Role"
+  },
+  "choiceRole": {
+    "other": "Choose Role"
+  },
+  "success": {
+    "other": "Success"
+  },
+  "notFound": {
+    "other": "Not Found"
+  },
+  "raiseRole": {
+    "other": "Raise Role"
+  },
+  "lowerRole": {
+    "other": "Lower Role"
+  },
+  "removeAdminRole": {
+    "other": "Remove Administrator Role"
+},
   "welcomeMessageGreeting": {
     "other": "Welcome to the Watchlist Bot, {{.Name}}!"
   },
@@ -417,7 +546,7 @@
     "other": "Telegram ID"
   },
   "admin": {
-    "other": "Admin"
+    "other": "Administrator"
   },
   "banned": {
     "other": "Banned"

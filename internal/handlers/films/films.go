@@ -27,8 +27,6 @@ func HandleFilmsCommand(app models.App, session *models.Session) {
 
 	keyboard := keyboards.BuildFilmsKeyboard(session, metadata.CurrentPage, metadata.LastPage)
 
-	fmt.Println(keyboard)
-
 	app.SendMessage(msg, keyboard)
 }
 

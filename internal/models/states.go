@@ -74,6 +74,24 @@ type CollectionFilmsState struct {
 	CurrentPage int  `json:"-"`
 }
 
+type AdminState struct {
+	gorm.Model       `json:"-"`
+	SessionID        uint   `json:"-"`
+	UserID           int    `json:"-"`
+	FeedbackID       int    `json:"-"`
+	LastPage         int    `json:"-"`
+	PageSize         int    `json:"-" gorm:"default:4"`
+	CurrentPage      int    `json:"-"`
+	TotalRecords     int    `json:"-"`
+	FeedbackMessage  string `json:"-"`
+	FeedbackImageURL string `json:"-"`
+}
+
+func (s *AdminState) Clear() {
+	s.FeedbackMessage = ""
+	s.FeedbackImageURL = ""
+}
+
 func (s *ProfileState) Clear() {
 	s.Username = ""
 	s.Email = ""

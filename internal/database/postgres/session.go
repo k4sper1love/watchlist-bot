@@ -1,9 +1,9 @@
 package postgres
 
 import (
-	"github.com/k4sper1love/watchlist-bot/config"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 )
 
 func GetSessionByTelegramID(app models.App) (*models.Session, error) {
@@ -11,6 +11,7 @@ func GetSessionByTelegramID(app models.App) (*models.Session, error) {
 
 	telegramID := utils.ParseTelegramID(app.Upd)
 	lang := utils.ParseLanguageCode(app.Upd)
+	username := utils.ParseTelegramUsername(app.Upd)
 
 	if err := GetDB().
 		Preload("ProfileState").
@@ -20,16 +21,25 @@ func GetSessionByTelegramID(app models.App) (*models.Session, error) {
 		Preload("FilmsState").
 		Preload("FilmDetailState").
 		Preload("CollectionFilmsState").
+		Preload("AdminState").
 		FirstOrInit(&session, models.Session{TelegramID: telegramID}).Error; err != nil {
 		return nil, err
 	}
 
-	if session.TelegramID == app.Vars.AdminID {
-		session.Role = config.SuperAdminRole
+	if session.TelegramID == app.Vars.RootID {
+		session.Role = roles.Root
+	}
+
+	if session.TelegramUsername == "" && username != "" {
+		session.TelegramUsername = username
 	}
 
 	if session.Lang == "" {
 		session.Lang = lang
+	}
+
+	if session.AdminState == nil {
+		session.AdminState = &models.AdminState{}
 	}
 
 	if session.ProfileState == nil {
@@ -66,5 +76,5 @@ func GetSessionByTelegramID(app models.App) (*models.Session, error) {
 }
 
 func SaveSessionWihDependencies(session *models.Session) {
-	Save(session, session.ProfileState, session.FeedbackState, session.CollectionsState, session.CollectionDetailState, session.FilmsState, session.FilmDetailState, session.CollectionFilmsState)
+	Save(session, session.ProfileState, session.FeedbackState, session.CollectionsState, session.CollectionDetailState, session.FilmsState, session.FilmDetailState, session.CollectionFilmsState, session.AdminState)
 }

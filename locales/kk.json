@@ -8,6 +8,135 @@
   "setDefaultLanguage": {
     "other": "Әдепкі тіл орнатылған"
   },
+  "admins": {
+    "other": "Әкімшілер"
+  },
+  "users": {
+    "other": "Пайдаланушылар"
+  },
+  "message": {
+    "other": "Хабарлама"
+  },
+  "broadcast": {
+    "other": "Хабар тарату"
+  },
+  "findUser": {
+    "other": "Пайдаланушыны табу"
+  },
+  "requestIDOrUsername": {
+    "other": "ID немесе @пайдаланушы атын енгізіңіз"
+  },
+  "superAdmin": {
+    "other": "Аға әкімші"
+  },
+  "helper": {
+    "other": "Көмекші"
+  },
+  "root": {
+    "other": "Суперпайдаланушы"
+  },
+  "manageUserRole": {
+    "other": "Рөлді өзгерту"
+  },
+  "unban": {
+    "other": "Бұғаттан шығару"
+  },
+  "ban": {
+    "other": "Бұғаттау"
+  },
+  "alreadyMaxRole": {
+    "other": "Пайдаланушыда ең жоғары рөл бар"
+  },
+  "alreadyMinRole": {
+    "other": "Пайдаланушыда ең төменгі рөл бар"
+  },
+  "findAdmin": {
+    "other": "Әкімшіні табу"
+  },
+  "foundFeedbacks": {
+    "other": "Кері байланыстар табылды"
+  },
+  "noAccess": {
+    "other": "Қолжетімділік жоқ"
+  },
+  "viewFeedback": {
+    "other": "Кері байланысты көру"
+  },
+  "foundUsers": {
+    "other": "Пайдаланушылар табылды"
+  },
+  "role": {
+    "other": "Рөл"
+  },
+  "unknown": {
+    "other": "Белгісіз"
+  },
+  "requestBroadcastImage": {
+    "other": "Хабар тарату үшін сілтеме немесе сурет жіберіңіз"
+  },
+  "send": {
+    "other": "Жіберу"
+  },
+  "broadcastEmpty": {
+    "other": "Бос хабар таратуды жіберу мүмкін емес"
+  },
+  "feedbackDetails": {
+    "other": "Кері байланыстың егжей-тегжейлері"
+  },
+  "currentRole": {
+    "other": "Ағымдағы рөл"
+  },
+  "choiceUserForDetails": {
+    "other": "Пайдаланушыны таңдаңыз"
+  },
+  "language": {
+    "other": "Тіл"
+  },
+  "state": {
+    "other": "Мәртебе"
+  },
+  "empty": {
+    "other": "Бос"
+  },
+  "sessionDetails": {
+    "other": "Сессия мәліметтері"
+  },
+  "apiDetails": {
+    "other": "API мәліметтері"
+  },
+  "updated": {
+    "other": "Жаңартылған"
+  },
+  "choiceForDetails": {
+    "other": "Мәліметтерді көру үшін таңдаңыз"
+  },
+  "needRemoveRole": {
+    "other": "Алдымен рөлді пайдаланушыға өзгерту керек"
+  },
+  "unbanned": {
+    "other": "Бұғаттан шығарылды"
+  },
+  "currenRole": {
+    "other": "Ағымдағы рөл"
+  },
+  "choiceRole": {
+    "other": "Рөлді таңдаңыз"
+  },
+  "success": {
+    "other": "Сәтті"
+  },
+  "notFound": {
+    "other": "Табылмады"
+  },
+  "raiseRole": {
+    "other": "Рөлді жоғарылату"
+  },
+  "lowerRole": {
+    "other": "Рөлді төмендету"
+  },
+  "removeAdminRole": {
+    "other": "Әкімші рөлін жою"
+  },
   "welcomeMessageBody": {
     "other": "Қазіргі уақытта бот әзірлену кезеңінде (нұсқа {{.Version}}), бірақ негізгі функциялары қолжетімді."
   },

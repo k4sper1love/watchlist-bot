@@ -17,9 +17,9 @@ func BuildProfileMessage(session *models.Session) string {
 
 	msg := fmt.Sprintf(
 		"👤 <b>%s:</b>\n\n"+
-			"🔹 <b>%s:</b> %s\n"+
-			"🔹 <b>%s:</b> %d\n"+
-			"🔹 <b>%s:</b> %s\n"+
+			"🔹 <b>%s:</b> <code>%s</code>\n"+
+			"🔹 <b>%s:</b> <code>%d</code>\n"+
+			"🔹 <b>%s:</b> <code>%s</code>\n"+
 			"🔹 <b>%s:</b> %s\n\n",
 		part1,
 		part2, user.Username,

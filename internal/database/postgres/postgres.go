@@ -26,6 +26,7 @@ func OpenDB(vars *models.Vars) error {
 		&models.FilmsState{},
 		&models.FilmDetailState{},
 		&models.CollectionFilmsState{},
+		&models.AdminState{},
 	)
 }
 

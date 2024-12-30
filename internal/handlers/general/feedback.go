@@ -25,19 +25,20 @@ func HandleFeedbackButtons(app models.App, session *models.Session) {
 	var category string
 	switch callback {
 	case states.CallbackFeedbackCategorySuggestions:
-		category = "Offers"
+		category = "offers"
 	case states.CallbackFeedbackCategoryBugs:
-		category = "Mistakes"
+		category = "mistakes"
 	case states.CallbackFeedbackCategoryOther:
-		category = "Other issues"
+		category = "otherIssues"
 	}
 
 	session.FeedbackState.Category = category
 
 	part1 := translator.Translate(session.Lang, "feedbackCurrentCategory", nil, nil)
-	part2 := translator.Translate(session.Lang, "feedbackTextRequest", nil, nil)
+	part2 := translator.Translate(session.Lang, category, nil, nil)
+	part3 := translator.Translate(session.Lang, "feedbackTextRequest", nil, nil)
 
-	msg := fmt.Sprintf("📄 <b>%s:</b> %s\n\n%s", part1, category, part2)
+	msg := fmt.Sprintf("📄 <b>%s:</b> %s\n\n%s", part1, part2, part3)
 
 	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 

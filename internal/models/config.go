@@ -28,7 +28,7 @@ type Vars struct {
 	DSN               string
 	Host              string
 	Secret            string
-	AdminID           int
+	RootID            int
 	KinopoiskAPIToken string
 	YoutubeAPIToken   string
 }
@@ -54,25 +54,42 @@ func (app App) GetChatID() int64 {
 	return -1
 }
 
-func (app App) SendMessage(text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
+func (app App) chunkTextAndSend(text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	for len(text) > maxMessageLength {
 		firstPart, secondPart := utils.SplitTextByLength(text, maxMessageLength)
-
-		msg := tgbotapi.NewMessage(app.GetChatID(), firstPart)
-		msg.ParseMode = "HTML"
-		app.send(msg)
-
+		app.createAndSendMessage(firstPart, keyboard)
 		text = secondPart
 	}
+	app.createAndSendMessage(text, keyboard)
+}
 
+func (app App) createAndSendMessage(text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	msg := tgbotapi.NewMessage(app.GetChatID(), text)
 	msg.ParseMode = "HTML"
-
 	if keyboard != nil {
 		msg.ReplyMarkup = keyboard
 	}
-
 	app.send(msg)
+}
+
+func (app App) SendMessage(text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
+	app.chunkTextAndSend(text, keyboard)
+}
+
+func (app App) sendImageInternal(imagePath, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
+	msg := tgbotapi.NewPhotoUpload(app.GetChatID(), imagePath)
+	msg.ParseMode = "HTML"
+	if text != "" && len(text) < maxCaptionLength {
+		msg.Caption = text
+	}
+	if keyboard != nil && len(text) < maxCaptionLength {
+		msg.ReplyMarkup = keyboard
+	}
+	app.send(msg)
+
+	if len(text) > maxCaptionLength {
+		app.chunkTextAndSend(text, keyboard)
+	}
 }
 
 func (app App) SendImage(imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
@@ -81,39 +98,39 @@ func (app App) SendImage(imageURL, text string, keyboard *tgbotapi.InlineKeyboar
 		app.SendMessage("Error when sending the image", nil)
 		return
 	}
-
 	defer func() {
 		if err := os.Remove(imagePath); err != nil {
 			log.Println("Failed to remove temp file", slog.Any("error", err))
 		}
 	}()
 
-	msg := tgbotapi.NewPhotoUpload(app.GetChatID(), imagePath)
-	msg.ParseMode = "HTML"
-
-	if text != "" && len(text) < maxCaptionLength {
-		msg.Caption = text
-	}
-
-	if keyboard != nil && len(text) < maxCaptionLength {
-		msg.ReplyMarkup = keyboard
-	}
-
-	app.send(msg)
-
-	if len(text) > maxCaptionLength {
-		app.SendMessage(text, keyboard)
-	}
+	app.sendImageInternal(imagePath, text, keyboard)
 }
 
 func (app App) SendBroadcastMessage(telegramIDs []int, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	for _, telegramID := range telegramIDs {
 		msg := tgbotapi.NewMessage(int64(telegramID), text)
-
 		if keyboard != nil {
 			msg.ReplyMarkup = keyboard
 		}
-
 		app.send(msg)
+	}
+}
+
+func (app App) SendBroadcastImage(telegramIDs []int, imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
+	imagePath, err := utils.DownloadImage(imageURL)
+	if err != nil {
+		app.SendBroadcastMessage(telegramIDs, "Error when sending the image", nil)
+		return
+	}
+	defer func() {
+		if err := os.Remove(imagePath); err != nil {
+			log.Println("Failed to remove temp file", slog.Any("error", err))
+		}
+	}()
+
+	for _, telegramID := range telegramIDs {
+		app.Upd = &tgbotapi.Update{Message: &tgbotapi.Message{Chat: &tgbotapi.Chat{ID: int64(telegramID)}}}
+		app.sendImageInternal(imagePath, text, keyboard)
 	}
 }
