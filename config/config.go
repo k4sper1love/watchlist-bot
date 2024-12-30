@@ -14,6 +14,7 @@ func LoadApp() (*models.App, error) {
 		log.Println("no .env file found")
 	}
 
+
 	rootID, err := strconv.Atoi(os.Getenv("ROOT_TELEGRAM_ID"))
 	if err != nil {
 		return nil, err

@@ -26,6 +26,7 @@ func GetSessionByTelegramID(app models.App) (*models.Session, error) {
 		return nil, err
 	}
 
+
 	if session.TelegramID == app.Vars.RootID {
 		session.Role = roles.Root
 	}
@@ -41,7 +42,7 @@ func GetSessionByTelegramID(app models.App) (*models.Session, error) {
 	if session.AdminState == nil {
 		session.AdminState = &models.AdminState{}
 	}
-
+  
 	if session.ProfileState == nil {
 		session.ProfileState = &models.ProfileState{}
 	}
