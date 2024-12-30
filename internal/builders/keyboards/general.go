@@ -1,67 +1,83 @@
 package keyboards
 
 import (
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
+	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"strings"
 )
 
 var menuButtons = []Button{
-	{"👤 Профиль", states.CallbackMenuSelectProfile},
-	{"🎥 Фильмы", states.CallbackMenuSelectFilms},
-	{"📚 Коллекции", states.CallbackMenuSelectCollections},
-	{"⚙️ Настройки", states.CallbackMenuSelectSettings},
-	{"💬 Обратная связь", states.CallbackMenuSelectFeedback},
-	{"🚪 Выйти из системы", states.CallbackMenuSelectLogout},
+	{"👤", "profile", states.CallbackMenuSelectProfile},
+	{"🎥", "films", states.CallbackMenuSelectFilms},
+	{"📚", "collections", states.CallbackMenuSelectCollections},
+	{"⚙️", "settings", states.CallbackMenuSelectSettings},
+	{"💬", "feedback", states.CallbackMenuSelectFeedback},
+	{"🚪", "logout", states.CallbackMenuSelectLogout},
 }
 
 var settingsButtons = []Button{
-	{"🔢 Изменить количество коллекций на странице", states.CallbackSettingsCollectionsPageSize},
-	{"🔢 Изменить количество фильмов на странице", states.CallbackSettingsFilmsPageSize},
-	{"🔢 Изменить количество объектов на странице", states.CallbackSettingsObjectsPageSize},
+	{"🔢", "settingsLanguage", states.CallbackSettingsLanguage},
+	{"🔢", "settingsCollectionsPageSize", states.CallbackSettingsCollectionsPageSize},
+	{"🔢", "settingsFilmsPageSize", states.CallbackSettingsFilmsPageSize},
+	{"🔢", "settingsObjectsPageSize", states.CallbackSettingsObjectsPageSize},
 }
 
 var feedbackCategoryButtons = []Button{
-	{"💡 Предложения", states.CallbackFeedbackCategorySuggestions},
-	{"🐞 Ошибки", states.CallbackFeedbackCategoryBugs},
-	{"❓ Другие вопросы", states.CallbackFeedbackCategoryOther},
+	{"💡", "offers", states.CallbackFeedbackCategorySuggestions},
+	{"🐞", "mistakes", states.CallbackFeedbackCategoryBugs},
+	{"❓", "otherIssues", states.CallbackFeedbackCategoryOther},
 }
 
-func BuildMenuKeyboard(isAdmin bool) *tgbotapi.InlineKeyboardMarkup {
+func BuildMenuKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
-	if isAdmin {
-		keyboard.AddButton("🛠️ Админ-панель", states.CallbackMenuSelectAdmin)
+	if session.IsAdmin {
+		keyboard.AddButton("🛠️", "adminPanel", states.CallbackMenuSelectAdmin)
 	}
 
 	keyboard.AddButtons(menuButtons...)
 
-	return keyboard.Build()
+	return keyboard.Build(session.Lang)
 }
 
-func BuildSettingsKeyboard() *tgbotapi.InlineKeyboardMarkup {
+func BuildSettingsKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
 	keyboard.AddButtons(settingsButtons...)
 
 	keyboard.AddBack("")
 
-	return keyboard.Build()
+	return keyboard.Build(session.Lang)
 }
 
-func BuildFeedbackKeyboard() *tgbotapi.InlineKeyboardMarkup {
+func BuildFeedbackKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
 	keyboard.AddButtons(feedbackCategoryButtons...)
 
 	keyboard.AddBack("")
 
-	return keyboard.Build()
+	return keyboard.Build(session.Lang)
 }
 
 func (k *Keyboard) AddProfileUpdate() *Keyboard {
-	return k.AddButton("✏️ Редактировать", states.CallbackProfileSelectUpdate)
+	return k.AddButton("✏️", "edit", states.CallbackProfileSelectUpdate)
 }
 
 func (k *Keyboard) AddProfileDelete() *Keyboard {
-	return k.AddButton("⚠️ Удалить", states.CallbackProfileSelectDelete)
+	return k.AddButton("⚠️", "delete", states.CallbackProfileSelectDelete)
+}
+
+func (k *Keyboard) AddLanguageSelect(languages []string, callback string) *Keyboard {
+	var buttons []Button
+
+	for _, lang := range languages {
+		buttons = append(buttons, Button{"", fmt.Sprintf(strings.ToUpper(lang)), fmt.Sprintf("%s_%s", callback, lang)})
+	}
+
+	k.AddButtonsWithRowSize(2, buttons...)
+
+	return k
 }

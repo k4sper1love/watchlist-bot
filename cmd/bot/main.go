@@ -5,6 +5,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/config"
 	"github.com/k4sper1love/watchlist-bot/internal/bot"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 	"log"
 )
 
@@ -17,6 +18,11 @@ func main() {
 	sl.SetupLogger(app.Vars.Environment)
 
 	if err = postgres.OpenDB(app.Vars); err != nil {
+		log.Fatal(err)
+	}
+
+	err = translator.InitTranslator("./locales")
+	if err != nil {
 		log.Fatal(err)
 	}
 

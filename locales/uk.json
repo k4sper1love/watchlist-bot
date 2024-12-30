@@ -1,0 +1,581 @@
+{
+  "choiceLanguage": {
+    "other": "Будь ласка, виберіть мову для спілкування з ботом. Ви зможете поміняти його в Налаштуваннях"
+  },
+  "someError": {
+    "other": "Сталася якась помилка"
+  },
+  "setDefaultLanguage": {
+    "other": "Встановлено мову за замовчуванням."
+  },
+  "welcomeMessageGreeting": {
+    "other": "Ласкаво просимо до Watchlist Bot, {{.Name}}!"
+  },
+  "welcomeMessageBody": {
+    "other": "Наразі бот знаходиться в розробці (версія {{.Version}}), але основні функції вже доступні."
+  },
+  "welcomeMessageCallToAction": {
+    "other": "Введіть /help, щоб побачити список доступних команд."
+  },
+  "listOfCommands": {
+    "other": "Список доступних команд:"
+  },
+  "sessionError": {
+    "other": "Сталася помилка під час отримання сесії"
+  },
+  "bannedHeader": {
+    "other": "Вас заблоковано."
+  },
+  "bannedBody": {
+    "other": "Зверніться до адміністратора для розблокування."
+  },
+  "authRequest": {
+    "other": "Для виконання цієї команди потрібно бути авторизованим. Використовуйте /start"
+  },
+  "authExpired": {
+    "other": "Ваші токени закінчилися. Виконуємо вхід до системи"
+  },
+  "authFailure": {
+    "other": "Не вдалося увійти до системи. Використовуйте /start."
+  },
+  "authUpdated": {
+    "other": "Ваш токен успішно оновлено"
+  },
+  "permissionsNotEnough": {
+    "other": "Недостатній рівень прав"
+  },
+  "mainMenu": {
+    "other": "Головне меню"
+  },
+  "choiceAction": {
+    "other": "Оберіть одну з дій"
+  },
+  "adminPanel": {
+    "other": "Адмін-панель"
+  },
+  "profile": {
+    "other": "Профіль"
+  },
+  "films": {
+    "other": "Фільми"
+  },
+  "collections": {
+    "other": "Колекції"
+  },
+  "settings": {
+    "other": "Налаштування"
+  },
+  "feedback": {
+    "other": "Зворотній зв'язок"
+  },
+  "logout": {
+    "other": "Вийти із системи"
+  },
+  "name": {
+    "other": "Ім'я"
+  },
+  "id": {
+    "other": "ID"
+  },
+  "email": {
+    "other": "Email"
+  },
+  "joinDate": {
+    "other": "Дата реєстрації"
+  },
+  "deleteProfileConfirm": {
+    "other": "Ви впевнені, що хочете видалити акаунт \"{{.Username}}\"?"
+  },
+  "deleteProfileFailure": {
+    "other": "Не вдалося видалити акаунт \"{{.Username}}\""
+  },
+  "deleteProfileSuccess": {
+    "other": "Акаунт \"{{.Username}}\" успішно видалено!"
+  },
+  "cancelAction": {
+    "other": "Дію скасовано"
+  },
+  "updateChoiceField": {
+    "other": "Оберіть, яке поле ви хочете змінити?"
+  },
+  "updateProfileUsername": {
+    "other": "Введіть новий username"
+  },
+  "updateProfileEmail": {
+    "other": "Введіть нову адресу електронної пошти"
+  },
+  "updateProfileFailure": {
+    "other": "Не вдалося оновити акаунт \"{{.Username}}\""
+  },
+  "updateProfileSuccess": {
+    "other": "Акаунт \"{{.Username}}\" успішно оновлено!"
+  },
+  "settingsChoice": {
+    "other": "Оберіть, який параметр ви хочете змінити"
+  },
+  "settingsLanguage": {
+    "other": "Змінити мову"
+  },
+  "settingsCollectionsPageSize": {
+    "other": "Змінити кількість колекцій на сторінці"
+  },
+  "settingsFilmsPageSize": {
+    "other": "Змінити кількість фільмів на сторінці"
+  },
+  "settingsObjectsPageSize": {
+    "other": "Змінити кількість об'єктів на сторінці"
+  },
+  "parseLanguagesFailure": {
+    "other": "Помилка під час отримання списку доступних мов"
+  },
+  "currentLanguage": {
+    "other": "Поточна мова"
+  },
+  "settingsLanguageChoice": {
+    "other": "Оберіть бажану мову"
+  },
+  "settingsLanguageSuccess": {
+    "other": "Мову успішно змінено на {{.Language}}"
+  },
+  "currentCollectionsPageSize": {
+    "other": "Розмір сторінки для колекцій"
+  },
+  "settingsPageSizeChoice": {
+    "other": "Оберіть бажаний розмір (від 1 і більше)"
+  },
+  "settingsCollectionsPageSizeSuccess": {
+    "other": "Новий розмір сторінки для списку колекцій"
+  },
+  "currentFilmsPageSize": {
+    "other": "Розмір сторінки для фільмів"
+  },
+  "settingsFilmsPageSizeSuccess": {
+    "other": "Новий розмір сторінки для списку фільмів"
+  },
+  "currentObjectsPageSize": {
+    "other": "Розмір сторінки для об'єктів"
+  },
+  "settingsObjectsPageSizeSuccess": {
+    "other": "Новий розмір сторінки для списку об'єктів"
+  },
+  "feedbackMessageHeader": {
+    "other": "Залиште ваш відгук"
+  },
+  "feedbackMessageBody": {
+    "other": "Напишіть вашу думку, пропозиції чи ідеї, і ми обов'язково їх врахуємо!"
+  },
+  "feedbackCategoryChoice": {
+    "other": "Оберіть категорію"
+  },
+  "feedbackCurrentCategory": {
+    "other": "Ви обрали категорію"
+  },
+  "feedbackTextRequest": {
+    "other": "Будь ласка, напишіть ваш відгук"
+  },
+  "feedbackFailure": {
+    "other": "Помилка збереження відгуку"
+  },
+  "feedbackSuccess": {
+    "other": "Дякуємо за ваш відгук! Ми цінуємо вашу думку"
+  },
+  "tryLater": {
+    "other": "Спробуйте пізніше"
+  },
+  "loginSuccess": {
+    "other": "Успішний вхід до акаунту \"{{.Username}}\"!"
+  },
+  "registrationSuccess": {
+    "other": "Успішна реєстрація акаунту \"{{.Username}}\"!"
+  },
+  "logoutConfirm": {
+    "other": "Ви впевнені, що хочете вийти з акаунту \"{{.Username}}\"?"
+  },
+  "logoutFailure": {
+    "other": "Не вдалося вийти з акаунту \"{{.Username}}\""
+  },
+  "logoutSuccess": {
+    "other": "Успішно вийшли з акаунту \"{{.Username}}\""
+  },
+  "logoutCancel": {
+    "other": "Вихід з акаунту \"{{.Username}}\" скасовано"
+  },
+  "unknownState": {
+    "other": "Невідомий стан. Введіть /reset для скидання."
+  },
+  "viewedFilmViewed": {
+    "other": "Фільм переглянуто"
+  },
+  "viewedFilmRequestRating": {
+    "other": "Оцініть фільм"
+  },
+  "viewedFilmCanCancel": {
+    "other": "Ви можете скасувати \"перегляд\" фільму, натиснувши кнопку скасування"
+  },
+  "viewedFilmRequestReview": {
+    "other": "Залиште відгук про фільм"
+  },
+  "image": {
+    "other": "Зображення"
+  },
+  "title": {
+    "other": "Назва"
+  },
+  "description": {
+    "other": "Опис"
+  },
+  "genre": {
+    "other": "Жанр"
+  },
+  "rating": {
+    "other": "Рейтинг"
+  },
+  "yearOfRelease": {
+    "other": "Рік випуску"
+  },
+  "comment": {
+    "other": "Коментар"
+  },
+  "viewed": {
+    "other": "Переглянуто"
+  },
+  "userRating": {
+    "other": "Оцінка користувача"
+  },
+  "Review": {
+    "other": "Рецензія"
+  },
+  "filmRequestImage": {
+    "other": "Надішліть зображення або посилання на нього"
+  },
+  "getImageFailure": {
+    "other": "Помилка отримання зображення"
+  },
+  "filmRequestTitle": {
+    "other": "Введіть назву фільму"
+  },
+  "filmRequestDescription": {
+    "other": "Введіть опис фільму"
+  },
+  "filmRequestYear": {
+    "other": "Введіть рік випуску фільму"
+  },
+  "filmRequestGenre": {
+    "other": "Введіть жанр фільму"
+  },
+  "filmRequestRating": {
+    "other": "Введіть рейтинг фільму"
+  },
+  "filmRequestComment": {
+    "other": "Введіть ваш коментар до фільму"
+  },
+  "filmRequestViewed": {
+    "other": "Ви вже переглянули цей фільм?"
+  },
+  "filmRequestUserRating": {
+    "other": "Введіть вашу оцінку фільму"
+  },
+  "filmRequestReview": {
+    "other": "Введіть ваш відгук до фільму"
+  },
+  "updateFilmFailure": {
+    "other": "Не вдалося оновити фільм"
+  },
+  "updateFilmListFailure": {
+    "other": "Помилка при оновленні списку фільмів"
+  },
+  "choiceWay": {
+    "other": "Оберіть один зі способів"
+  },
+  "filmRequestLink": {
+    "other": "Надішліть посилання на фільм"
+  },
+  "supportedServices": {
+    "other": "Підтримувані сервіси"
+  },
+  "getFilmFailure": {
+    "other": "Помилка при отриманні фільму"
+  },
+  "createFilmFailure": {
+    "other": "Не вдалося створити фільм"
+  },
+  "createFilmSuccess": {
+    "other": "Новий фільм успішно створено"
+  },
+  "createCollectionFilmSuccess": {
+    "other": "Новий фільм успішно додано до колекції \"{{.Collection}}\""
+  },
+  "lastPageAlert": {
+    "other": "Ви вже на останній сторінці"
+  },
+  "firstPageAlert": {
+    "other": "Ви вже на першій сторінці"
+  },
+  "deleteFilmConfirm": {
+    "other": "Ви впевнені, що хочете видалити фільм \"{{.Film}}\"?"
+  },
+  "deleteFilmFailure": {
+    "other": "Не вдалося видалити фільм \"{{.Film}}\""
+  },
+  "deleteFilmSuccess": {
+    "other": "Фільм \"{{.Film}}\" успішно видалено"
+  },
+  "collectionRequestName": {
+    "other": "Введіть назву колекції"
+  },
+  "collectionRequestDescription": {
+    "other": "Введіть опис колекції"
+  },
+  "updateCollectionFailure": {
+    "other": "Не вдалося оновити колекцію"
+  },
+  "updateCollectionSuccess": {
+    "other": "Колекцію успішно оновлено"
+  },
+  "createCollectionFailure": {
+    "other": "Не вдалося створити колекцію"
+  },
+  "createCollectionSuccess": {
+    "other": "Нову колекцію успішно створено!"
+  },
+  "deleteCollectionConfirm": {
+    "other": "Ви впевнені, що хочете видалити колекцію \"{{.Collection}}\"?"
+  },
+  "deleteCollectionFailure": {
+    "other": "Не вдалося видалити колекцію \"{{.Collection}}\""
+  },
+  "deleteCollectionSuccess": {
+    "other": "Колекцію \"{{.Collection}}\" успішно видалено"
+  },
+  "getCollectionFailure": {
+    "other": "Помилка при отриманні колекції"
+  },
+  "filmToCollectionSuccess": {
+    "other": "Фільм \"{{.Film}}\" успішно додано до колекції \"{{.Collection}}\""
+  },
+  "filmsNotFound": {
+    "other": "Фільми не знайдено"
+  },
+  "choiceFilmToCollection": {
+    "other": "Оберіть, який фільм додати до колекції?"
+  },
+  "collectionsNotFound": {
+    "other": "Колекції не знайдено"
+  },
+  "choiceCollectionToFilm": {
+    "other": "Оберіть, до якої колекції додати фільм?"
+  },
+  "adminOptionUserCount": {
+    "other": "Дізнатися кількість користувачів"
+  },
+  "adminOptionBroadcast": {
+    "other": "Надіслати розсилку"
+  },
+  "adminOptionFeedback": {
+    "other": "Переглянути відгуки"
+  },
+  "adminOptionUserList": {
+    "other": "Список користувачів"
+  },
+  "requestFailure": {
+    "other": "Не вдалося виконати запит"
+  },
+  "uniqueUsersCount": {
+    "other": "Унікальні користувачі бота"
+  },
+  "recipientCount": {
+    "other": "Кількість одержувачів"
+  },
+  "requestBroadcastMessage": {
+    "other": "Введіть повідомлення для розсилки"
+  },
+  "emptyFeedbackList": {
+    "other": "Немає нових відгуків для перегляду"
+  },
+  "feedbackList": {
+    "other": "Список відгуків"
+  },
+  "category": {
+    "other": "Категорія"
+  },
+  "user": {
+    "other": "Користувач"
+  },
+  "deleteFeedbackFailure": {
+    "other": "Не вдалося видалити відгук"
+  },
+  "deleteFeedbackSuccess": {
+    "other": "Відгук успішно видалено"
+  },
+  "emptyUserList": {
+    "other": "Список користувачів порожній"
+  },
+  "userList": {
+    "other": "Список користувачів"
+  },
+  "telegramID": {
+    "other": "Telegram ID"
+  },
+  "admin": {
+    "other": "Адмін"
+  },
+  "banned": {
+    "other": "Заблокований"
+  },
+  "created": {
+    "other": "Створено"
+  },
+  "badFormatID": {
+    "other": "Неправильний формат ID"
+  },
+  "banFailure": {
+    "other": "Помилка при блокуванні користувача"
+  },
+  "banSuccess": {
+    "other": "Користувач \"{{.User}}\" успішно заблокований"
+  },
+  "unbanFailure": {
+    "other": "Помилка при розблокуванні користувача"
+  },
+  "unbanSuccess": {
+    "other": "Користувач \"{{.User}}\" успішно розблокований"
+  },
+  "helpMessage": {
+    "other": "Використовуйте /menu для роботи з ботом"
+  },
+  "unknownContext": {
+    "other": "Невідомий контекст"
+  },
+  "totalFilms": {
+    "other": "Всього фільмів"
+  },
+  "pageCounter": {
+    "other": "Сторінка {{.CurrentPage}} із {{.LastPage}}"
+  },
+  "choiceFilmForDetails": {
+    "other": "Оберіть фільм, щоб дізнатися більше"
+  },
+  "collection": {
+    "other": "Колекція"
+  },
+  "notFoundFilmsInCollection": {
+    "other": "Фільми у цій колекції не знайдено"
+  },
+  "yourRating": {
+    "other": "Ваша оцінка"
+  },
+  "film": {
+    "other": "Фільм"
+  },
+  "notViewed": {
+    "other": "Не переглянуто"
+  },
+  "totalCollections": {
+    "other": "Всього колекцій"
+  },
+  "choiceCollectionForDetails": {
+    "other": "Оберіть колекцію, щоб дізнатися більше"
+  },
+  "backward": {
+    "other": "Назад"
+  },
+  "forward": {
+    "other": "Далі"
+  },
+  "cancel": {
+    "other": "Скасувати"
+  },
+  "skip": {
+    "other": "Пропустити"
+  },
+  "yes": {
+    "other": "Так"
+  },
+  "no": {
+    "other": "Ні"
+  },
+  "back": {
+    "other": "Повернутися"
+  },
+  "offers": {
+    "other": "Пропозиції"
+  },
+  "mistakes": {
+    "other": "Помилки"
+  },
+  "otherIssues": {
+    "other": "Інші питання"
+  },
+  "edit": {
+    "other": "Редагувати"
+  },
+  "delete": {
+    "other": "Видалити"
+  },
+  "createFilm": {
+    "other": "Створити фільм"
+  },
+  "updateFilm": {
+    "other": "Оновити фільм"
+  },
+  "deleteFilm": {
+    "other": "Видалити фільм"
+  },
+  "manageFilm": {
+    "other": "Керування фільмом"
+  },
+  "manually": {
+    "other": "Вручну"
+  },
+  "fromURL": {
+    "other": "З зовнішнього URL"
+  },
+  "createCollection": {
+    "other": "Створити колекцію"
+  },
+  "updateCollection": {
+    "other": "Оновити колекцію"
+  },
+  "deleteCollection": {
+    "other": "Видалити колекцію"
+  },
+  "manageCollection": {
+    "other": "Керування колекцією"
+  },
+  "addFilmToCollection": {
+    "other": "Додати фільм"
+  },
+  "addCollectionToFilm": {
+    "other": "Додати фільм до колекції"
+  },
+  "choiceFromFilms": {
+    "other": "Оберіть із моїх фільмів"
+  },
+  "unknownCommand": {
+    "other": "Невідома команда. Введіть /menu"
+  },
+  "sendImageFailure": {
+    "other": "Помилка під час відправлення зображення"
+  },
+  "author": {
+    "other": "Автор"
+  },
+  "duration": {
+    "other": "Тривалість"
+  },
+  "views": {
+    "other": "Перегляди"
+  },
+  "grades": {
+    "other": "Оцінки"
+  },
+  "comments": {
+    "other": "Коментарі"
+  },
+  "dateOfRelease": {
+    "other": "Дата публікації"
+  },
+  "year": {
+    "other": "Рік"
+  }
+}

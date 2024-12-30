@@ -22,12 +22,15 @@ type App struct {
 }
 
 type Vars struct {
+	Version           string
 	BotToken          string
 	Environment       string
 	DSN               string
 	Host              string
 	Secret            string
+	AdminID           int
 	KinopoiskAPIToken string
+	YoutubeAPIToken   string
 }
 
 func (app App) send(msg tgbotapi.Chattable) {
@@ -75,7 +78,7 @@ func (app App) SendMessage(text string, keyboard *tgbotapi.InlineKeyboardMarkup)
 func (app App) SendImage(imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	imagePath, err := utils.DownloadImage(imageURL)
 	if err != nil {
-		app.SendMessage("Ошибка при отправке изображения", nil)
+		app.SendMessage("Error when sending the image", nil)
 		return
 	}
 

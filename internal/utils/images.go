@@ -10,7 +10,7 @@ import (
 
 func processImageFromMessage(bot *tgbotapi.BotAPI, update *tgbotapi.Update) ([]byte, error) {
 	if update.Message == nil || update.Message.Photo == nil {
-		return nil, fmt.Errorf("No photo")
+		return nil, fmt.Errorf("not found photo")
 	}
 
 	photo := (*update.Message.Photo)[len(*update.Message.Photo)-1]
@@ -43,19 +43,19 @@ func processImageFromURL(imageURL string) ([]byte, error) {
 func DownloadImage(imageURL string) (string, error) {
 	resp, err := http.Get(imageURL)
 	if err != nil {
-		return "", fmt.Errorf("Ошибка загрузки изображения по URL: %v", err)
+		return "", fmt.Errorf("error uploading an image by URL:%v", err)
 	}
 	defer resp.Body.Close()
 
 	file, err := os.CreateTemp("", "image_*.jpg")
 	if err != nil {
-		return "", fmt.Errorf("Ошибка создания временного файла: %v", err)
+		return "", fmt.Errorf("error creating a temporary file: %v", err)
 	}
 	defer file.Close()
 
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("Ошибка копирования данных изображения в файл: %v", err)
+		return "", fmt.Errorf("error copying image data to a file: %v", err)
 	}
 
 	return file.Name(), nil

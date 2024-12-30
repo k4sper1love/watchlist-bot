@@ -1,13 +1,13 @@
 package collectionFilms
 
 import (
-	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/films"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleCollectionFilmsButtons(app models.App, session *models.Session) {
@@ -24,13 +24,18 @@ func HandleCollectionFilmsButtons(app models.App, session *models.Session) {
 func addFilmToCollection(app models.App, session *models.Session) {
 	collectionFilm, err := watchlist.AddCollectionFilm(app, session)
 	if err != nil {
-		app.SendMessage("Не удалось создать фильм", nil)
+		msg := translator.Translate(session.Lang, "createFilmFailure", nil, nil)
+		app.SendMessage(msg, nil)
 		films.HandleFilmsCommand(app, session)
 		return
 	}
 
-	msg := fmt.Sprintf("Фильм %q успешно добавлен в коллекцию %q\n", collectionFilm.Film.Title, collectionFilm.Collection.Name)
-	msg += messages.BuildFilmDetailMessage(&collectionFilm.Film)
+	msg := translator.Translate(session.Lang, "filmToCollectionSuccess", map[string]interface{}{
+		"Film":       collectionFilm.Film.Title,
+		"Collection": collectionFilm.Collection.Name,
+	}, nil)
+
+	msg += messages.BuildFilmDetailMessage(session, &collectionFilm.Film)
 
 	imageURL := collectionFilm.Film.ImageURL
 	app.SendImage(imageURL, msg, nil)

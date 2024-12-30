@@ -7,12 +7,15 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleDeleteFilmCommand(app models.App, session *models.Session) {
-	msg := fmt.Sprintf("Вы уверены, что хотите удалить фильм %q", session.FilmDetailState.Film.Title)
+	msg := translator.Translate(session.Lang, "deleteFilmConfirm", map[string]interface{}{
+		"Film": session.FilmDetailState.Title,
+	}, nil)
 
-	keyboard := keyboards.NewKeyboard().AddSurvey().Build()
+	keyboard := keyboards.NewKeyboard().AddSurvey().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -32,15 +35,25 @@ func parseDeleteFilmConfirm(app models.App, session *models.Session) {
 	switch utils.IsAgree(app.Upd) {
 	case true:
 		if err := DeleteFilm(app, session); err != nil {
-			app.SendMessage("Не удалось удалить фильм", nil)
+			msg := translator.Translate(session.Lang, "deleteFilmFailure", map[string]interface{}{
+				"Film": session.FilmDetailState.Title,
+			}, nil)
+
+			app.SendMessage(msg, nil)
 			HandleManageFilmCommand(app, session)
 			break
 		}
-		app.SendMessage("Фильм удален успешно", nil)
+
+		msg := translator.Translate(session.Lang, "deleteFilmSuccess", map[string]interface{}{
+			"Film": session.FilmDetailState.Title,
+		}, nil)
+
+		app.SendMessage(msg, nil)
 		HandleFilmsDetailCommand(app, session)
 
 	case false:
-		app.SendMessage("Действие отменено", nil)
+		msg := translator.Translate(session.Lang, "cancelAction", nil, nil)
+		app.SendMessage(msg, nil)
 		HandleFilmsDetailCommand(app, session)
 	}
 }

@@ -9,19 +9,19 @@ import (
 )
 
 var updateFilmButtons = []Button{
-	{"Изображение", states.CallbackUpdateFilmSelectImage},
-	{"Название", states.CallbackUpdateFilmSelectTitle},
-	{"Описание", states.CallbackUpdateFilmSelectDescription},
-	{"Жанр", states.CallbackUpdateFilmSelectGenre},
-	{"Рейтинг", states.CallbackUpdateFilmSelectRating},
-	{"Год выпуска", states.CallbackUpdateFilmSelectYear},
-	{"Комментарий", states.CallbackUpdateFilmSelectComment},
-	{"Просмотрено", states.CallbackUpdateFilmSelectViewed},
+	{"", "image", states.CallbackUpdateFilmSelectImage},
+	{"", "title", states.CallbackUpdateFilmSelectTitle},
+	{"", "description", states.CallbackUpdateFilmSelectDescription},
+	{"", "genre", states.CallbackUpdateFilmSelectGenre},
+	{"", "rating", states.CallbackUpdateFilmSelectRating},
+	{"", "yearOfRelease", states.CallbackUpdateFilmSelectYear},
+	{"", "comment", states.CallbackUpdateFilmSelectComment},
+	{"", "viewed", states.CallbackUpdateFilmSelectViewed},
 }
 
 var updateFilmsAfterViewedButtons = []Button{
-	{"Оценка пользователя", states.CallbackUpdateFilmSelectUserRating},
-	{"Рецензия", states.CallbackUpdateFilmSelectReview},
+	{"", "userRating", states.CallbackUpdateFilmSelectUserRating},
+	{"", "Review", states.CallbackUpdateFilmSelectReview},
 }
 
 func BuildFilmsKeyboard(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
@@ -47,7 +47,7 @@ func BuildFilmsKeyboard(session *models.Session, currentPage, lastPage int) *tgb
 		keyboard.AddBack(states.CallbackFilmsBack)
 	}
 
-	return keyboard.Build()
+	return keyboard.Build(session.Lang)
 }
 
 func BuildFilmDetailKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
@@ -58,7 +58,7 @@ func BuildFilmDetailKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMa
 	keyboard := NewKeyboard()
 
 	if !film.IsViewed {
-		keyboard.AddButton("Просмотрено✔️", states.CallbackFilmDetailViewed)
+		keyboard.AddButton("✔️", "viewed", states.CallbackFilmDetailViewed)
 	}
 
 	keyboard.AddFilmManage()
@@ -75,10 +75,10 @@ func BuildFilmDetailKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMa
 
 	keyboard.AddBack(states.CallbackFilmDetailBack)
 
-	return keyboard.Build()
+	return keyboard.Build(session.Lang)
 }
 
-func BuildFilmManageKeyboard() *tgbotapi.InlineKeyboardMarkup {
+func BuildFilmManageKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
 	keyboard.AddFilmUpdate()
@@ -87,10 +87,10 @@ func BuildFilmManageKeyboard() *tgbotapi.InlineKeyboardMarkup {
 
 	keyboard.AddBack(states.CallbackManageFilmSelectBack)
 
-	return keyboard.Build()
+	return keyboard.Build(session.Lang)
 }
 
-func BuildFilmNewKeyboard() *tgbotapi.InlineKeyboardMarkup {
+func BuildFilmNewKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
 	keyboard.AddNewFilmManually()
@@ -99,7 +99,7 @@ func BuildFilmNewKeyboard() *tgbotapi.InlineKeyboardMarkup {
 
 	keyboard.AddBack(states.CallbackNewFilmSelectBack)
 
-	return keyboard.Build()
+	return keyboard.Build(session.Lang)
 }
 
 func BuildFilmUpdateKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
@@ -114,17 +114,17 @@ func BuildFilmUpdateKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMa
 
 	keyboard.AddBack(states.CallbackUpdateFilmSelectBack)
 
-	return keyboard.Build()
+	return keyboard.Build(session.Lang)
 }
 
-func BuildFilmViewedKeyboard() *tgbotapi.InlineKeyboardMarkup {
+func BuildFilmViewedKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
 	keyboard.AddSkip()
 
 	keyboard.AddCancel()
 
-	return keyboard.Build()
+	return keyboard.Build(session.Lang)
 }
 
 func (k *Keyboard) AddFilmSelect(session *models.Session) *Keyboard {
@@ -133,7 +133,7 @@ func (k *Keyboard) AddFilmSelect(session *models.Session) *Keyboard {
 	for i, film := range session.FilmsState.Films {
 		itemID := utils.GetItemID(i, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
 
-		buttons = append(buttons, Button{fmt.Sprintf("%s (%d)", film.Title, itemID), fmt.Sprintf("select_film_%d", i)})
+		buttons = append(buttons, Button{"", fmt.Sprintf("%s (%d)", film.Title, itemID), fmt.Sprintf("select_film_%d", i)})
 	}
 
 	k.AddButtonsWithRowSize(2, buttons...)
@@ -142,25 +142,25 @@ func (k *Keyboard) AddFilmSelect(session *models.Session) *Keyboard {
 }
 
 func (k *Keyboard) AddFilmNew() *Keyboard {
-	return k.AddButton("➕ Создать фильм", states.CallbackFilmsNew)
+	return k.AddButton("➕", "createFilm", states.CallbackFilmsNew)
 }
 
 func (k *Keyboard) AddFilmDelete() *Keyboard {
-	return k.AddButton("🗑️ Удалить фильм", states.CallbackManageFilmSelectDelete)
+	return k.AddButton("🗑️", "deleteFilm", states.CallbackManageFilmSelectDelete)
 }
 
 func (k *Keyboard) AddFilmUpdate() *Keyboard {
-	return k.AddButton("✏️ Обновить фильм", states.CallbackManageFilmSelectUpdate)
+	return k.AddButton("✏️", "updateFilm", states.CallbackManageFilmSelectUpdate)
 }
 
 func (k *Keyboard) AddFilmManage() *Keyboard {
-	return k.AddButton("⚙️ Управление фильмом", states.CallbackFilmsManage)
+	return k.AddButton("⚙️", "manageFilm", states.CallbackFilmsManage)
 }
 
 func (k *Keyboard) AddNewFilmManually() *Keyboard {
-	return k.AddButton("Вручную", states.CallbackNewFilmSelectManually)
+	return k.AddButton("", "manually", states.CallbackNewFilmSelectManually)
 }
 
 func (k *Keyboard) AddNewFilmFromURL() *Keyboard {
-	return k.AddButton("Из внешнего URL", states.CallbackNewFilmSelectFromURL)
+	return k.AddButton("", "fromURL", states.CallbackNewFilmSelectFromURL)
 }

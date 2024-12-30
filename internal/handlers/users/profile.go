@@ -15,14 +15,15 @@ func HandleProfileCommand(app models.App, session *models.Session) {
 		app.SendMessage(err.Error(), nil)
 		return
 	}
+	session.User = *user
 
-	msg := messages.BuildProfileMessage(user)
+	msg := messages.BuildProfileMessage(session)
 
 	keyboard := keyboards.NewKeyboard().
 		AddProfileUpdate().
 		AddProfileDelete().
 		AddBack("").
-		Build()
+		Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 }

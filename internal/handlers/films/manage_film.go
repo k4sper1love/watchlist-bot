@@ -6,15 +6,16 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleManageFilmCommand(app models.App, session *models.Session) {
 	film := session.FilmDetailState.Film
 
-	msg := messages.BuildFilmDetailMessage(&film)
-	msg += "Выберите действие"
+	msg := messages.BuildFilmDetailMessage(session, &film)
+	msg += translator.Translate(session.Lang, "choiceAction", nil, nil)
 
-	keyboard := keyboards.BuildFilmManageKeyboard()
+	keyboard := keyboards.BuildFilmManageKeyboard(session)
 
 	app.SendImage(film.ImageURL, msg, keyboard)
 }

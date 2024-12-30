@@ -5,8 +5,10 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func GetItemID(index, currentPage, pageSize int) int {
@@ -20,6 +22,35 @@ func ParseTelegramID(update *tgbotapi.Update) int {
 		return update.CallbackQuery.From.ID
 	}
 	return -1
+}
+
+func ParseTelegramName(update *tgbotapi.Update) string {
+	if update.Message != nil {
+		return update.Message.From.FirstName
+	} else if update.CallbackQuery.Message != nil {
+		return update.Message.From.FirstName
+	}
+
+	return "Guest"
+}
+
+func ParseTelegramTag(update *tgbotapi.Update) string {
+	if update.Message != nil {
+		return update.Message.From.UserName
+	} else if update.CallbackQuery.Message != nil {
+		return update.Message.From.UserName
+	}
+
+	return ""
+}
+
+func ParseLanguageCode(update *tgbotapi.Update) string {
+	if update.Message != nil {
+		return update.Message.From.LanguageCode
+	} else if update.CallbackQuery != nil {
+		return update.CallbackQuery.Message.From.LanguageCode
+	}
+	return "en"
 }
 
 func ParseCallback(update *tgbotapi.Update) string {
@@ -132,4 +163,75 @@ func CalculateNewElementPageAndIndex(totalRecords, pageSize int) (int, int) {
 	newIndex := (newTotalRecords - 1) % pageSize
 
 	return newPage, newIndex
+}
+
+func ExtractYoutubeVideoID(rawUrl string) (string, error) {
+	parsedURL, err := url.Parse(rawUrl)
+	if err != nil {
+		return "", err
+	}
+
+	if parsedURL.Host == "youtu.be" {
+		return parsedURL.Path[1:], nil
+	}
+
+	query := parsedURL.Query()
+
+	videoID := query.Get("v")
+
+	if videoID == "" {
+		return "", fmt.Errorf("couldn't extract video ID")
+	}
+
+	return videoID, nil
+}
+
+func Round(v float64) (float64, error) {
+	return strconv.ParseFloat(fmt.Sprintf("%.2f", v), 64)
+}
+
+func FormatTextDate(date string) string {
+	parsedDate, err := time.Parse(time.RFC3339, date)
+	if err != nil {
+		return ""
+	}
+	return parsedDate.Format("02.01.2006 15:04")
+}
+
+func ParseISO8601Duration(isoDuration string) (string, error) {
+	duration, err := time.ParseDuration(strings.ReplaceAll(strings.ToLower(isoDuration), "pt", ""))
+	if err != nil {
+		return "", nil
+	}
+
+	hours := int(duration.Hours())
+	minutes := int(duration.Minutes()) % 60
+	seconds := int(duration.Seconds()) % 60
+
+	if hours > 0 {
+		return fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds), nil
+	}
+	return fmt.Sprintf("%02d:%02d", minutes, seconds), nil
+}
+
+func ParseSupportedLanguages(dir string) ([]string, error) {
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	var languages []string
+
+	for _, file := range files {
+		if !file.IsDir() {
+			fileName := file.Name()
+
+			if strings.HasSuffix(fileName, ".json") {
+				lang := strings.TrimSuffix(fileName, ".json")
+				languages = append(languages, lang)
+			}
+		}
+	}
+
+	return languages, nil
 }

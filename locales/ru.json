@@ -1,0 +1,581 @@
+{
+  "choiceLanguage": {
+    "other": "Пожалуйста, выберите язык для общения с ботом. Вы сможете поменять его в настройках"
+  },
+  "someError": {
+    "other": "Произошла какая-то ошибка"
+  },
+  "setDefaultLanguage": {
+    "other": "Установлен язык по умолчанию"
+  },
+  "welcomeMessageGreeting": {
+    "other": "Добро пожаловать в Watchlist Bot, {{.Name}}!"
+  },
+  "welcomeMessageBody": {
+    "other": "На данный момент бот находится в разработке (версия {{.Version}}), но основные функции уже доступны."
+  },
+  "welcomeMessageCallToAction": {
+    "other": "Введите /help, чтобы увидеть список доступных команд."
+  },
+  "listOfCommands": {
+    "other": "Список доступных команд:"
+  },
+  "sessionError": {
+    "other": "Произошла ошибка при получении сессии"
+  },
+  "bannedHeader": {
+    "other": "Вы заблокированы."
+  },
+  "bannedBody": {
+    "other": "Обратитесь к администратору для разблокировки."
+  },
+  "authRequest": {
+    "other": "Для выполнения этой команды нужно быть авторизованным. Используйте /start"
+  },
+  "authExpired": {
+    "other": "Ваши токены истекли. Производим вход в систему"
+  },
+  "authFailure": {
+    "other": "Не удалось войти в систему. Используйте /start."
+  },
+  "authUpdated": {
+    "other": "Ваш токен был успешно обновлен"
+  },
+  "permissionsNotEnough": {
+    "other": "Недостаточный уровень прав"
+  },
+  "mainMenu": {
+    "other":"Главное меню"
+  },
+  "choiceAction": {
+    "other": "Выберите одно из действий"
+  },
+  "adminPanel": {
+    "other": "Админ-панель"
+  },
+  "profile": {
+    "other": "Профиль"
+  },
+  "films": {
+    "other": "Фильмы"
+  },
+  "collections": {
+    "other": "Коллекции"
+  },
+  "settings": {
+    "other": "Настройки"
+  },
+  "feedback": {
+    "other": "Обратная связь"
+  },
+  "logout": {
+    "other": "Выйти из системы"
+  },
+  "name": {
+    "other": "Имя"
+  },
+  "id": {
+    "other": "ID"
+  },
+  "email": {
+    "other": "Email"
+  },
+  "joinDate": {
+    "other": "Дата регистрации"
+  },
+  "deleteProfileConfirm": {
+    "other": "Вы уверены, что хотите удалить аккаунт \"{{.Username}}\""
+  },
+  "deleteProfileFailure": {
+    "other": "Не удалось удалить аккаунт \"{{.Username}}\""
+  },
+  "deleteProfileSuccess": {
+    "other": "Аккаунт \"{{.Username}}\" успешно удален!"
+  },
+  "cancelAction": {
+    "other": "Действие отменено"
+  },
+  "updateChoiceField": {
+    "other": "Выберите, какое поле вы хотите изменить?"
+  },
+  "updateProfileUsername": {
+    "other": "Введите новый username"
+  },
+  "updateProfileEmail": {
+    "other": "Введите новый адрес электронной почты"
+  },
+  "updateProfileFailure": {
+    "other": "Не удалось обновить аккаунт \"{{.Username}}\""
+  },
+  "updateProfileSuccess": {
+    "other": "Аккаунт \"{{.Username}}\" успешно обновлен!"
+  },
+  "settingsChoice": {
+    "other": "Выберите, какой параметр вы хотите изменить"
+  },
+  "settingsLanguage": {
+    "other": "Изменить язык"
+  },
+  "settingsCollectionsPageSize": {
+    "other": "Изменить количество коллекций на странице"
+  },
+  "settingsFilmsPageSize": {
+    "other": "Изменить количество фильмов на странице"
+  },
+  "settingsObjectsPageSize": {
+    "other": "Изменить количество объектов на странице"
+  },
+  "parseLanguagesFailure": {
+    "other": "Ошибка при получении списка доступных языков"
+  },
+  "currentLanguage": {
+    "other": "Текущий язык"
+  },
+  "settingsLanguageChoice": {
+    "other": "Выберите желаемый язык"
+  },
+  "settingsLanguageSuccess": {
+    "other": "Язык успешно изменен на {{.Language}}"
+  },
+  "currentCollectionsPageSize": {
+    "other": "Размер страницы для коллекций"
+  },
+  "settingsPageSizeChoice": {
+    "other": "Выберите желаемый размер (от 1 и выше)"
+  },
+  "settingsCollectionsPageSizeSuccess": {
+    "other": "Новый размер страницы для списка коллекций"
+  },
+  "currentFilmsPageSize": {
+    "other": "Размер страницы для фильмов"
+  },
+  "settingsFilmsPageSizeSuccess": {
+    "other": "Новый размер страницы для списка фильмов"
+  },
+  "currentObjectsPageSize": {
+    "other": "Размер страницы для объектов"
+  },
+  "settingsObjectsPageSizeSuccess": {
+    "other": "Новый размер страницы для списка объектов"
+  },
+  "feedbackMessageHeader": {
+    "other": "Оставьте ваш фидбек"
+  },
+  "feedbackMessageBody": {
+    "other": "Напишите ваше мнение, предложения или идеи, и мы обязательно их учтем!"
+  },
+  "feedbackCategoryChoice": {
+    "other": "Выберите категорию"
+  },
+  "feedbackCurrentCategory": {
+    "other": "Вы выбрали категорию"
+  },
+  "feedbackTextRequest": {
+    "other": "Пожалуйста, напишите ваш фидбек"
+  },
+  "feedbackFailure": {
+    "other": "Ошибка сохранения фидбека"
+  },
+  "feedbackSuccess": {
+    "other": "Спасибо за ваш фидбек! Мы ценим ваше мнение"
+  },
+  "tryLater": {
+    "other": "Попробуйте позже"
+  },
+  "loginSuccess": {
+    "other": "Успешный вход в аккаунт \"{{.Username}}\"!"
+  },
+  "registrationSuccess": {
+    "other": "Успешная регистрация аккаунта \"{{.Username}}\"!"
+  },
+  "logoutConfirm": {
+    "other": "Вы точно хотите выйти из аккаунта \"{{.Username}}\"?"
+  },
+  "logoutFailure": {
+    "other": "Неудачный выход из аккаунта \"{{.Username}}\""
+  },
+  "logoutSuccess": {
+    "other": "Успешно вышли из аккаунта \"{{.Username}}\""
+  },
+  "logoutCancel": {
+    "other": "Отмена выхода из аккаунта \"{{.Username}}\""
+  },
+  "unknownState": {
+    "other": "Неизвестное состояние. Введите /reset для сброса."
+  },
+  "viewedFilmViewed": {
+    "other": "Фильм просмотрен"
+  },
+  "viewedFilmRequestRating": {
+    "other": "Поставьте оценку фильму"
+  },
+  "viewedFilmCanCancel": {
+    "other": "Вы можете отменить \"просмотр\" фильма, нажав на кнопку отмены"
+  },
+  "viewedFilmRequestReview": {
+    "other": "Оставьте отзыв к фильму"
+  },
+  "image": {
+    "other": "Изображение"
+  },
+  "title": {
+    "other": "Название"
+  },
+  "description": {
+    "other": "Описание"
+  },
+  "genre": {
+    "other": "Жанр"
+  },
+  "rating": {
+    "other": "Рейтинг"
+  },
+  "yearOfRelease": {
+    "other": "Год выпуска"
+  },
+  "comment": {
+    "other": "Комментарий"
+  },
+  "viewed": {
+    "other": "Просмотрено"
+  },
+  "userRating": {
+    "other": "Оценка пользователя"
+  },
+  "Review": {
+    "other": "Рецензия"
+  },
+  "filmRequestImage": {
+    "other": "Отправьте изображение или ссылку на него"
+  },
+  "getImageFailure": {
+    "other": "Ошибка при получении изображения"
+  },
+  "filmRequestTitle": {
+    "other": "Введите название фильма"
+  },
+  "filmRequestDescription": {
+    "other": "Введите описание фильма"
+  },
+  "filmRequestYear": {
+    "other": "Введите год выпуска фильма"
+  },
+  "filmRequestGenre": {
+    "other": "Введите жанр фильма"
+  },
+  "filmRequestRating": {
+    "other": "Введите рейтинг фильма"
+  },
+  "filmRequestComment": {
+    "other": "Введите ваш комментарий к фильму"
+  },
+  "filmRequestViewed": {
+    "other": "Вы уже посмотрели этот фильм?"
+  },
+  "filmRequestUserRating": {
+    "other": "Введите вашу оценку фильму"
+  },
+  "filmRequestReview": {
+    "other": "Введите ваш отзыв к фильму"
+  },
+  "updateFilmFailure": {
+    "other": "Не удалось обновить фильм"
+  },
+  "updateFilmListFailure": {
+    "other": "Ошибка при обновлении списка фильмов"
+  },
+  "choiceWay": {
+    "other": "Выберите один из способов"
+  },
+  "filmRequestLink": {
+    "other": "Отправьте ссылку на фильм"
+  },
+  "supportedServices": {
+    "other": "Поддерживаемые сервисы"
+  },
+  "getFilmFailure": {
+    "other": "Ошибка при получении фильма"
+  },
+  "createFilmFailure": {
+    "other": "Не удалось создать фильм"
+  },
+  "createFilmSuccess": {
+    "other": "Новый фильм успешно создан"
+  },
+  "createCollectionFilmSuccess": {
+    "other": "Новый фильм в коллекции \"{{.Collection}}\" успешно создан"
+  },
+  "lastPageAlert": {
+    "other": "Вы уже на последней странице"
+  },
+  "firstPageAlert": {
+    "other": "Вы уже на первой странице"
+  },
+  "deleteFilmConfirm": {
+    "other": "Вы уверены, что хотите удалить фильм \"{{.Film}}\""
+  },
+  "deleteFilmFailure": {
+    "other": "Не удалось удалить фильм \"{{.Film}}\""
+  },
+  "deleteFilmSuccess": {
+    "other": "Фильм \"{{.Film}}\" удален успешно"
+  },
+  "collectionRequestName": {
+    "other": "Введите название коллекции"
+  },
+  "collectionRequestDescription": {
+    "other": "Введите описание коллекции"
+  },
+  "updateCollectionFailure": {
+    "other": "Не удалось обновить коллекцию"
+  },
+  "updateCollectionSuccess": {
+    "other": "Коллекция успешно обновлена"
+  },
+  "createCollectionFailure": {
+    "other": "Не удалось создать коллекцию"
+  },
+  "createCollectionSuccess": {
+    "other": "Новая коллекция успешно создана!"
+  },
+  "deleteCollectionConfirm": {
+    "other": "Вы уверены, что хотите удалить коллекцию \"{{.Collection}}\""
+  },
+  "deleteCollectionFailure": {
+    "other": "Не удалось удалить коллекцию \"{{.Collection}}\""
+  },
+  "deleteCollectionSuccess": {
+    "other": "Коллекция \"{{.Collection}}\" успешно удалена"
+  },
+  "getCollectionFailure": {
+    "other": "Ошибка при получении коллекции"
+  },
+  "filmToCollectionSuccess": {
+    "other": "Фильм \"{{.Film}}\" успешно добавлен в коллекцию \"{{.Collection}}\""
+  },
+  "filmsNotFound": {
+    "other": "Фильмы не найдены"
+  },
+  "choiceFilmToCollection": {
+    "other": "Выберите, какой фильм добавить в коллекцию?"
+  },
+  "collectionsNotFound": {
+    "other": "Коллекции не найдены"
+  },
+  "choiceCollectionToFilm": {
+    "other": "Выберите, в какую коллекцию добавить фильм?"
+  },
+  "adminOptionUserCount": {
+    "other": "Узнать количество пользователей"
+  },
+  "adminOptionBroadcast": {
+    "other": "Отправить рассылку"
+  },
+  "adminOptionFeedback": {
+    "other": "Просмотр фидбеков"
+  },
+  "adminOptionUserList": {
+    "other": "Список пользователей"
+  },
+  "requestFailure": {
+    "other": "Не удалось выполнить запрос"
+  },
+  "uniqueUsersCount": {
+    "other": "Уникальных пользователей бота"
+  },
+  "recipientCount": {
+    "other": "Количество получателей"
+  },
+  "requestBroadcastMessage": {
+    "other": "Введите сообщение для рассылки"
+  },
+  "emptyFeedbackList": {
+    "other": "Нет новых фидбеков для просмотра"
+  },
+  "feedbackList": {
+    "other": "Список фидбеков"
+  },
+  "category": {
+    "other": "Категория"
+  },
+  "user": {
+    "other": "Пользователь"
+  },
+  "deleteFeedbackFailure": {
+    "other": "Не удалось удалить фидбек"
+  },
+  "deleteFeedbackSuccess": {
+    "other": "Фидбек успешно удален"
+  },
+  "emptyUserList": {
+    "other": "Список пользователей пуст"
+  },
+  "userList": {
+    "other": "Список пользователей"
+  },
+  "telegramID": {
+    "other": "Telegram ID"
+  },
+  "admin": {
+    "other": "Админ"
+  },
+  "banned": {
+    "other": "Заблокирован"
+  },
+  "created": {
+    "other": "Создан"
+  },
+  "badFormatID": {
+    "other": "Неверный формат ID"
+  },
+  "banFailure": {
+    "other": "Ошибка при блокировке пользователя"
+  },
+  "banSuccess": {
+    "other": "Пользователь \"{{.User}}\" успешно заблокирован"
+  },
+  "unbanFailure": {
+    "other": "Ошибка при разблокировке пользователя"
+  },
+  "unbanSuccess": {
+    "other": "Пользователь \"{{.User}}\" успешно разблокирован"
+  },
+  "helpMessage": {
+    "other": "Используйте /menu для работы с ботом"
+  },
+  "unknownContext": {
+    "other": "Неизвестный контекст"
+  },
+  "totalFilms": {
+    "other": "Всего фильмов"
+  },
+  "pageCounter": {
+    "other": "Страница {{.CurrentPage}} из {{.LastPage}}"
+  },
+  "choiceFilmForDetails": {
+    "other": "Выберите фильм, чтобы узнать больше"
+  },
+  "collection": {
+    "other": "Коллекция"
+  },
+  "notFoundFilmsInCollection": {
+    "other": "Не найдено фильмов в этой коллекции"
+  },
+  "yourRating": {
+    "other": "Ваша оценка"
+  },
+  "film": {
+    "other": "Фильм"
+  },
+  "notViewed": {
+    "other": "Не просмотрено"
+  },
+  "totalCollections": {
+    "other": "Всего коллекций"
+  },
+  "choiceCollectionForDetails": {
+    "other": "Выберите коллекцию, чтобы узнать больше"
+  },
+  "backward": {
+    "other": "Назад"
+  },
+  "forward": {
+    "other": "Вперед"
+  },
+  "cancel": {
+    "other": "Отмена"
+  },
+  "skip": {
+    "other": "Пропустить"
+  },
+  "yes": {
+    "other": "Да"
+  },
+  "no": {
+    "other": "Нет"
+  },
+  "back": {
+    "other": "Обратно"
+  },
+  "offers": {
+    "other": "Предложения"
+  },
+  "mistakes": {
+    "other": "Ошибки"
+  },
+  "otherIssues": {
+    "other": "Другие вопросы"
+  },
+  "edit": {
+    "other": "Редактировать"
+  },
+  "delete": {
+    "other": "Удалить"
+  },
+  "createFilm": {
+    "other": "Создать фильм"
+  },
+  "updateFilm": {
+    "other": "Обновить фильм"
+  },
+  "deleteFilm": {
+    "other": "Удалить фильм"
+  },
+  "manageFilm": {
+    "other": "Управление фильмом"
+  },
+  "manually": {
+    "other": "Вручную"
+  },
+  "fromURL": {
+    "other": "Из внешнего URL"
+  },
+  "createCollection": {
+    "other": "Создать коллекцию"
+  },
+  "updateCollection": {
+    "other": "Обновить коллекцию"
+  },
+  "deleteCollection": {
+    "other": "Удалить коллекцию"
+  },
+  "manageCollection": {
+    "other": "Управление коллекцией"
+  },
+  "addFilmToCollection": {
+    "other": "Добавить фильм"
+  },
+  "addCollectionToFilm": {
+    "other": "Добавить фильм в коллекцию"
+  },
+  "choiceFromFilms": {
+    "other": "Выбрать из моих фильмов"
+  },
+  "unknownCommand": {
+    "other": "Неизвестная комманда. Введите /menu"
+  },
+  "sendImageFailure": {
+    "other": "Ошибка при отправке изображения"
+  },
+  "author": {
+    "other": "Автор"
+  },
+  "duration": {
+    "other": "Длительность"
+  },
+  "views": {
+    "other": "Просмотры"
+  },
+  "grades": {
+    "other": "Оценки"
+  },
+  "comments": {
+    "other": "Комментарии"
+  },
+  "dateOfRelease": {
+    "other": "Дата публикации"
+  },
+  "year": {
+    "other": "Год"
+  }
+}

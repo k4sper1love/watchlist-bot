@@ -24,7 +24,7 @@ func BuildCollectionsKeyboard(session *models.Session, currentPage, lastPage int
 
 	keyboard.AddBack("")
 
-	return keyboard.Build()
+	return keyboard.Build(session.Lang)
 }
 
 func (k *Keyboard) AddCollectionsSelect(session *models.Session) *Keyboard {
@@ -33,7 +33,7 @@ func (k *Keyboard) AddCollectionsSelect(session *models.Session) *Keyboard {
 	for i, collection := range session.CollectionsState.Collections {
 		itemID := utils.GetItemID(i, session.CollectionsState.CurrentPage, session.CollectionsState.PageSize)
 
-		buttons = append(buttons, Button{fmt.Sprintf("%s (%d)", collection.Name, itemID), fmt.Sprintf("select_collection_%d", collection.ID)})
+		buttons = append(buttons, Button{"", fmt.Sprintf("%s (%d)", collection.Name, itemID), fmt.Sprintf("select_collection_%d", collection.ID)})
 	}
 
 	k.AddButtonsWithRowSize(2, buttons...)
@@ -42,17 +42,17 @@ func (k *Keyboard) AddCollectionsSelect(session *models.Session) *Keyboard {
 }
 
 func (k *Keyboard) AddCollectionsNew() *Keyboard {
-	return k.AddButton("➕ Создать коллекцию", states.CallbackCollectionsNew)
+	return k.AddButton("➕", "createCollection", states.CallbackCollectionsNew)
 }
 
 func (k *Keyboard) AddCollectionsDelete() *Keyboard {
-	return k.AddButton("🗑️ Удалить коллекцию", states.CallbackManageCollectionSelectDelete)
+	return k.AddButton("🗑️", "deleteCollection", states.CallbackManageCollectionSelectDelete)
 }
 
 func (k *Keyboard) AddCollectionsUpdate() *Keyboard {
-	return k.AddButton("✏️ Обновить коллекцию", states.CallbackManageCollectionSelectUpdate)
+	return k.AddButton("✏️", "updateCollection", states.CallbackManageCollectionSelectUpdate)
 }
 
 func (k *Keyboard) AddCollectionsManage() *Keyboard {
-	return k.AddButton("⚙️ Управление коллекцией", states.CallbackCollectionsManage)
+	return k.AddButton("⚙️", "manageCollection", states.CallbackCollectionsManage)
 }

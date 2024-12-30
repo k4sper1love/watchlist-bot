@@ -7,7 +7,14 @@ import (
 	"strings"
 )
 
-func GetFilmByURL(app models.App, url string) (*apiModels.Film, error) {
+var supportedServices = []string{
+	"kinopoisk",
+	"rezka",
+	"kinoafisha",
+	"youtube",
+}
+
+func GetFilmByURL(app models.App, session *models.Session, url string) (*apiModels.Film, error) {
 	switch {
 	case strings.Contains(url, "kinopoisk"):
 		return GetFilmFromKinopoisk(app, url)
@@ -21,7 +28,14 @@ func GetFilmByURL(app models.App, url string) (*apiModels.Film, error) {
 	case strings.Contains(url, "kinoafisha") && strings.Contains(url, "series"):
 		return GetSeriesFromKinoafisha(url)
 
+	case strings.Contains(url, "youtube") || strings.Contains(url, "youtu.be"):
+		return GetFilmFromYoutube(app, session, url)
+
 	default:
 		return nil, fmt.Errorf("unsupported URL")
 	}
+}
+
+func GetSupportedServicesInline() string {
+	return strings.Join(supportedServices, ", ")
 }

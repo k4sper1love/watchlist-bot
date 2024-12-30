@@ -1,11 +1,14 @@
 package keyboards
 
 import (
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 type Button struct {
+	Emoji        string
 	Text         string
 	CallbackData string
 }
@@ -23,13 +26,13 @@ func (k *Keyboard) AddRow(buttons ...Button) *Keyboard {
 	return k
 }
 
-func (k *Keyboard) AddButton(text, callbackData string) *Keyboard {
-	return k.AddRow(Button{Text: text, CallbackData: callbackData})
+func (k *Keyboard) AddButton(emoji, text, callbackData string) *Keyboard {
+	return k.AddRow(Button{Emoji: emoji, Text: text, CallbackData: callbackData})
 }
 
 func (k *Keyboard) AddButtons(buttons ...Button) *Keyboard {
 	for _, button := range buttons {
-		k.AddButton(button.Text, button.CallbackData)
+		k.AddButton(button.Emoji, button.Text, button.CallbackData)
 	}
 
 	return k
@@ -52,13 +55,21 @@ func (k *Keyboard) AddButtonsWithRowSize(rowSize int, buttons ...Button) *Keyboa
 	return k
 }
 
-func (k *Keyboard) Build() *tgbotapi.InlineKeyboardMarkup {
+func (k *Keyboard) Build(languageCode string) *tgbotapi.InlineKeyboardMarkup {
+	if languageCode != "" {
+		k.translate(languageCode)
+	}
+
 	var inlineButtons [][]tgbotapi.InlineKeyboardButton
 
 	for _, row := range k.Rows {
 		var inlineRow []tgbotapi.InlineKeyboardButton
 		for _, btn := range row {
-			inlineRow = append(inlineRow, tgbotapi.NewInlineKeyboardButtonData(btn.Text, btn.CallbackData))
+			fullText := btn.Text
+			if btn.Emoji != "" {
+				fullText = fmt.Sprintf("%s %s", btn.Emoji, btn.Text)
+			}
+			inlineRow = append(inlineRow, tgbotapi.NewInlineKeyboardButtonData(fullText, btn.CallbackData))
 		}
 		inlineButtons = append(inlineButtons, inlineRow)
 	}
@@ -72,10 +83,10 @@ func (k *Keyboard) AddNavigation(currentPage, lastPage int, prevData, nextData s
 	var buttons []Button
 
 	if currentPage > 1 {
-		buttons = append(buttons, Button{Text: "⬅ Назад", CallbackData: prevData})
+		buttons = append(buttons, Button{Emoji: "⬅", Text: "backward", CallbackData: prevData})
 	}
 	if currentPage < lastPage {
-		buttons = append(buttons, Button{Text: "➡ Вперед", CallbackData: nextData})
+		buttons = append(buttons, Button{Emoji: "➡", Text: "forward", CallbackData: nextData})
 	}
 
 	if len(buttons) > 0 {
@@ -86,17 +97,17 @@ func (k *Keyboard) AddNavigation(currentPage, lastPage int, prevData, nextData s
 }
 
 func (k *Keyboard) AddCancel() *Keyboard {
-	return k.AddButton("Отмена", states.CallbackProcessCancel)
+	return k.AddButton("", "cancel", states.CallbackProcessCancel)
 }
 
 func (k *Keyboard) AddSkip() *Keyboard {
-	return k.AddButton("Пропустить", states.CallbackProcessSkip)
+	return k.AddButton("", "skip", states.CallbackProcessSkip)
 }
 
 func (k *Keyboard) AddSurvey() *Keyboard {
 	return k.AddButtonsWithRowSize(2,
-		Button{"Да", states.CallbackYes},
-		Button{"Нет", states.CallbackNo},
+		Button{"", "yes", states.CallbackYes},
+		Button{"", "no", states.CallbackNo},
 	)
 }
 
@@ -104,10 +115,21 @@ func (k *Keyboard) AddBack(callbackData string) *Keyboard {
 	var buttons []Button
 
 	if callbackData != "" {
-		buttons = append(buttons, Button{"← Обратно", callbackData})
+		buttons = append(buttons, Button{"←", "back", callbackData})
 	}
 
-	buttons = append(buttons, Button{"🏠 Главное меню", states.CallbackMainMenu})
+	buttons = append(buttons, Button{"🏠 ", "mainMenu", states.CallbackMainMenu})
 
 	return k.AddButtonsWithRowSize(len(buttons), buttons...)
+}
+
+func (k *Keyboard) translate(languageCode string) *Keyboard {
+	for i, row := range k.Rows {
+		for j, btn := range row {
+			translatedText := translator.Translate(languageCode, btn.Text, nil, nil)
+			k.Rows[i][j].Text = translatedText
+		}
+	}
+
+	return k
 }

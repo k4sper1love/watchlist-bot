@@ -2,11 +2,16 @@ package general
 
 import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"log"
 )
 
 func HandleMenuCommand(app models.App, session *models.Session) {
-	keyboard := keyboards.BuildMenuKeyboard(session.IsAdmin)
+	log.Println(session.Lang)
+	keyboard := keyboards.BuildMenuKeyboard(session)
 
-	app.SendMessage("📋 <b>Главное меню:</b>\n\nВыберите одно из действий", keyboard)
+	msg := messages.BuildMenuMessage(session)
+
+	app.SendMessage(msg, keyboard)
 }

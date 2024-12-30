@@ -7,21 +7,23 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 var updateCollectionButtons = []keyboards.Button{
-	{"Название", states.CallbackUpdateCollectionSelectName},
-	{"Описание", states.CallbackUpdateCollectionSelectDescription},
+	{"", "title", states.CallbackUpdateCollectionSelectName},
+	{"", "description", states.CallbackUpdateCollectionSelectDescription},
 }
 
 func HandleUpdateCollectionCommand(app models.App, session *models.Session) {
-	msg := messages.BuildCollectionDetailMessage(&session.CollectionDetailState.Collection)
-	msg += "\nВыберите, какое поле вы хотите изменить?"
+	msg := messages.BuildCollectionDetailMessage(session, &session.CollectionDetailState.Collection)
+	msg += "\n"
+	msg += translator.Translate(session.Lang, "updateChoiceField", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().
 		AddButtons(updateCollectionButtons...).
 		AddBack(states.CallbackUpdateCollectionSelectBack).
-		Build()
+		Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 }
@@ -56,9 +58,9 @@ func HandleUpdateCollectionProcess(app models.App, session *models.Session) {
 }
 
 func handleUpdateCollectionName(app models.App, session *models.Session) {
-	msg := "Введите новое имя для коллекции"
+	msg := translator.Translate(session.Lang, "collectionRequestName", nil, nil)
 
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -72,9 +74,9 @@ func parseUpdateCollectionName(app models.App, session *models.Session) {
 }
 
 func handleUpdateCollectionDescription(app models.App, session *models.Session) {
-	msg := "Введите новое описание для коллекции"
+	msg := translator.Translate(session.Lang, "collectionRequestDescription", nil, nil)
 
-	keyboard := keyboards.NewKeyboard().AddCancel().Build()
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -90,12 +92,15 @@ func parseUpdateCollectionDescription(app models.App, session *models.Session) {
 func updateCollection(app models.App, session *models.Session) {
 	collection, err := watchlist.UpdateCollection(app, session)
 	if err != nil {
-		app.SendMessage("Не удалось обновить коллекцию", nil)
+		msg := translator.Translate(session.Lang, "updateCollectionFailure", nil, nil)
+		app.SendMessage(msg, nil)
 		return
 	}
 
 	session.CollectionDetailState.Collection = *collection
-	app.SendMessage("Коллекция успешно обновлена", nil)
+
+	msg := translator.Translate(session.Lang, "updateCollectionSuccess", nil, nil)
+	app.SendMessage(msg, nil)
 }
 
 func finishUpdateCollectionProcess(app models.App, session *models.Session) {

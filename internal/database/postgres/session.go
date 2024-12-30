@@ -1,9 +1,16 @@
 package postgres
 
-import "github.com/k4sper1love/watchlist-bot/internal/models"
+import (
+	"github.com/k4sper1love/watchlist-bot/config"
+	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
+)
 
-func GetSessionByTelegramID(telegramID int) (*models.Session, error) {
+func GetSessionByTelegramID(app models.App) (*models.Session, error) {
 	var session models.Session
+
+	telegramID := utils.ParseTelegramID(app.Upd)
+	lang := utils.ParseLanguageCode(app.Upd)
 
 	if err := GetDB().
 		Preload("ProfileState").
@@ -15,6 +22,14 @@ func GetSessionByTelegramID(telegramID int) (*models.Session, error) {
 		Preload("CollectionFilmsState").
 		FirstOrInit(&session, models.Session{TelegramID: telegramID}).Error; err != nil {
 		return nil, err
+	}
+
+	if session.TelegramID == app.Vars.AdminID {
+		session.Role = config.SuperAdminRole
+	}
+
+	if session.Lang == "" {
+		session.Lang = lang
 	}
 
 	if session.ProfileState == nil {

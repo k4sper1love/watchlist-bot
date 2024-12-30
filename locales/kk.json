@@ -1,0 +1,578 @@
+{
+  "choiceLanguage": {
+    "other": "Ботпен сөйлесу үшін Тілді таңдаңыз. Сіз оны параметрлерде өзгерте аласыз"
+  },
+  "someError": {
+    "other": "Қандай да бір қателік болды"
+  },
+  "setDefaultLanguage": {
+    "other": "Әдепкі тіл орнатылған"
+  },
+  "welcomeMessageBody": {
+    "other": "Қазіргі уақытта бот әзірлену кезеңінде (нұсқа {{.Version}}), бірақ негізгі функциялары қолжетімді."
+  },
+  "welcomeMessageCallToAction": {
+    "other": "/help пәрменін енгізіп, қолжетімді командалардың тізімін көріңіз."
+  },
+  "listOfCommands": {
+    "other": "Қолжетімді командалардың тізімі"
+  },
+  "sessionError": {
+    "other": "Сессияны алу кезінде қате орын алды."
+  },
+  "bannedHeader": {
+    "other": "Сіз бұғатталғансыз."
+  },
+  "bannedBody": {
+    "other": "Бұғаттан шығу үшін әкімшіге хабарласыңыз."
+  },
+  "authRequest": {
+    "other": "Бұл пәрменді іске қосу үшін авторизация қажет. /start пәрменін қолданыңыз"
+  },
+  "authExpired": {
+    "other": "Сіздің токендеріңіздің мерзімі аяқталды. Жүйеге қайта кіріңіз."
+  },
+  "authFailure": {
+    "other": "Кіру мүмкін болмады. /start пәрменін қолданыңыз."
+  },
+  "authUpdated": {
+    "other": "Сіздің токеніңіз сәтті жаңартылды."
+  },
+  "permissionsNotEnough": {
+    "other": "Құқықтар деңгейі жеткіліксіз."
+  },
+  "mainMenu": {
+    "other": "Негізгі мәзір"
+  },
+  "choiceAction": {
+    "other": "Әрекеттердің бірін таңдаңыз"
+  },
+  "adminPanel": {
+    "other": "Әкімші панелі"
+  },
+  "profile": {
+    "other": "Профиль"
+  },
+  "films": {
+    "other": "Фильмдер"
+  },
+  "collections": {
+    "other": "Коллекциялар"
+  },
+  "settings": {
+    "other": "Параметрлер"
+  },
+  "feedback": {
+    "other": "Пікірлер"
+  },
+  "logout": {
+    "other": "Шығу"
+  },
+  "name": {
+    "other": "Аты"
+  },
+  "id": {
+    "other": "ID"
+  },
+  "email": {
+    "other": "Электрондық пошта"
+  },
+  "joinDate": {
+    "other": "Тіркеу күні"
+  },
+  "deleteProfileConfirm": {
+    "other": "Сіз \"{{.Username}}\" аккаунтын жойғыңыз келетініне сенімдісіз бе?"
+  },
+  "deleteProfileFailure": {
+    "other": "\"{{.Username}}\" аккаунтын жою мүмкін болмады."
+  },
+  "deleteProfileSuccess": {
+    "other": "\"{{.Username}}\" аккаунты сәтті жойылды!"
+  },
+  "cancelAction": {
+    "other": "Әрекет тоқтатылды."
+  },
+  "updateChoiceField": {
+    "other": "Қай өрісті өзгерткіңіз келеді?"
+  },
+  "updateProfileUsername": {
+    "other": "Жаңа пайдаланушы атын енгізіңіз."
+  },
+  "updateProfileEmail": {
+    "other": "Жаңа электрондық поштаны енгізіңіз."
+  },
+  "updateProfileFailure": {
+    "other": "\"{{.Username}}\" аккаунтын жаңарту сәтсіз аяқталды."
+  },
+  "updateProfileSuccess": {
+    "other": "\"{{.Username}}\" аккаунты сәтті жаңартылды!"
+  },
+  "settingsChoice": {
+    "other": "Өзгерту қажет параметрді таңдаңыз."
+  },
+  "settingsLanguage": {
+    "other": "Тілді өзгерту."
+  },
+  "settingsCollectionsPageSize": {
+    "other": "Беттегі коллекциялар санын өзгерту."
+  },
+  "settingsFilmsPageSize": {
+    "other": "Беттегі фильмдер санын өзгерту."
+  },
+  "settingsObjectsPageSize": {
+    "other": "Беттегі объектілер санын өзгерту."
+  },
+  "parseLanguagesFailure": {
+    "other": "Қолжетімді тілдер тізімін алу кезінде қате орын алды."
+  },
+  "currentLanguage": {
+    "other": "Ағымдағы тіл."
+  },
+  "settingsLanguageChoice": {
+    "other": "Қажетті тілді таңдаңыз."
+  },
+  "settingsLanguageSuccess": {
+    "other": "Тіл \"{{.Language}}\" сәтті өзгертілді."
+  },
+  "currentCollectionsPageSize": {
+    "other": "Коллекциялар үшін бет өлшемі."
+  },
+  "settingsPageSizeChoice": {
+    "other": "Қажетті өлшемді таңдаңыз (1 және одан жоғары)."
+  },
+  "settingsCollectionsPageSizeSuccess": {
+    "other": "Коллекциялар тізімі үшін жаңа бет өлшемі."
+  },
+  "currentFilmsPageSize": {
+    "other": "Фильмдер үшін бет өлшемі."
+  },
+  "settingsFilmsPageSizeSuccess": {
+    "other": "Фильмдер тізімі үшін жаңа бет өлшемі."
+  },
+  "currentObjectsPageSize": {
+    "other": "Объектілер үшін бет өлшемі."
+  },
+  "settingsObjectsPageSizeSuccess": {
+    "other": "Объектілер тізімі үшін жаңа бет өлшемі."
+  },
+  "feedbackMessageHeader": {
+    "other": "Өз пікіріңізді қалдырыңыз."
+  },
+  "feedbackMessageBody": {
+    "other": "Өз ойларыңызды, ұсыныстарыңызды немесе идеяларыңызды жазыңыз, біз оларды міндетті түрде қарастырамыз!"
+  },
+  "feedbackCategoryChoice": {
+    "other": "Санатты таңдаңыз."
+  },
+  "feedbackCurrentCategory": {
+    "other": "Сіз санатты таңдадыңыз."
+  },
+  "feedbackTextRequest": {
+    "other": "Өтінеміз, өз пікіріңізді жазыңыз."
+  },
+  "feedbackFailure": {
+    "other": "Пікірді сақтау сәтсіз аяқталды."
+  },
+  "feedbackSuccess": {
+    "other": "Пікіріңіз үшін рахмет! Біз сіздің пікіріңізді бағалаймыз."
+  },
+  "tryLater": {
+    "other": "Кейінірек көріңіз."
+  },
+  "loginSuccess": {
+    "other": "\"{{.Username}}\" аккаунтына сәтті кірдіңіз!"
+  },
+  "registrationSuccess": {
+    "other": "\"{{.Username}}\" аккаунты сәтті тіркелді!"
+  },
+  "logoutConfirm": {
+    "other": "\"{{.Username}}\" аккаунтынан шығу керек екеніне сенімдісіз бе?"
+  },
+  "logoutFailure": {
+    "other": "\"{{.Username}}\" аккаунтынан шығу мүмкін болмады."
+  },
+  "logoutSuccess": {
+    "other": "\"{{.Username}}\" аккаунтынан сәтті шықтыңыз."
+  },
+  "logoutCancel": {
+    "other": "\"{{.Username}}\" аккаунтынан шығу тоқтатылды."
+  },
+  "unknownState": {
+    "other": "Белгісіз күй. Қалпына келтіру үшін /reset енгізіңіз."
+  },
+  "viewedFilmViewed": {
+    "other": "Фильм қаралды"
+  },
+  "viewedFilmRequestRating": {
+    "other": "Фильмге баға қойыңыз"
+  },
+  "viewedFilmCanCancel": {
+    "other": "Фильмді \"қаралған\" ретінде алып тастау үшін болдырмау батырмасын басыңыз"
+  },
+  "viewedFilmRequestReview": {
+    "other": "Фильмге пікір қалдырыңыз"
+  },
+  "image": {
+    "other": "Сурет"
+  },
+  "title": {
+    "other": "Атауы"
+  },
+  "description": {
+    "other": "Сипаттама"
+  },
+  "genre": {
+    "other": "Жанр"
+  },
+  "rating": {
+    "other": "Бағасы"
+  },
+  "yearOfRelease": {
+    "other": "Шығарылған жылы"
+  },
+  "comment": {
+    "other": "Пікір"
+  },
+  "viewed": {
+    "other": "Қаралды"
+  },
+  "userRating": {
+    "other": "Пайдаланушының бағасы"
+  },
+  "Review": {
+    "other": "Шолу"
+  },
+  "filmRequestImage": {
+    "other": "Суретті немесе оның сілтемесін жіберіңіз"
+  },
+  "getImageFailure": {
+    "other": "Суретті алу кезінде қате орын алды"
+  },
+  "filmRequestTitle": {
+    "other": "Фильмнің атауын енгізіңіз"
+  },
+  "filmRequestDescription": {
+    "other": "Фильмнің сипаттамасын енгізіңіз"
+  },
+  "filmRequestYear": {
+    "other": "Фильмнің шығарылған жылын енгізіңіз"
+  },
+  "filmRequestGenre": {
+    "other": "Фильмнің жанрын енгізіңіз"
+  },
+  "filmRequestRating": {
+    "other": "Фильмнің бағасын енгізіңіз"
+  },
+  "filmRequestComment": {
+    "other": "Фильмге пікіріңізді енгізіңіз"
+  },
+  "filmRequestViewed": {
+    "other": "Сіз бұл фильмді көрдіңіз бе?"
+  },
+  "filmRequestUserRating": {
+    "other": "Фильмге өз бағаңызды енгізіңіз"
+  },
+  "filmRequestReview": {
+    "other": "Фильмге пікіріңізді енгізіңіз"
+  },
+  "updateFilmFailure": {
+    "other": "Фильмді жаңарту мүмкін болмады"
+  },
+  "updateFilmListFailure": {
+    "other": "Фильмдер тізімін жаңарту кезінде қате орын алды"
+  },
+  "choiceWay": {
+    "other": "Бір әдісті таңдаңыз"
+  },
+  "filmRequestLink": {
+    "other": "Фильмнің сілтемесін жіберіңіз"
+  },
+  "supportedServices": {
+    "other": "Қолдау көрсетілетін қызметтер"
+  },
+  "getFilmFailure": {
+    "other": "Фильмді алу мүмкін болмады"
+  },
+  "createFilmFailure": {
+    "other": "Фильмді жасау мүмкін болмады"
+  },
+  "createFilmSuccess": {
+    "other": "Фильм сәтті жасалды"
+  },
+  "createCollectionFilmSuccess": {
+    "other": "\"{{.Collection}}\" коллекциясына фильм сәтті қосылды"
+  },
+  "lastPageAlert": {
+    "other": "Сіз соңғы бетте тұрсыз"
+  },
+  "firstPageAlert": {
+    "other": "Сіз бірінші бетте тұрсыз"
+  },
+  "deleteFilmConfirm": {
+    "other": "\"{{.Film}}\" фильмін жою керек екеніне сенімдісіз бе?"
+  },
+  "deleteFilmFailure": {
+    "other": "\"{{.Film}}\" фильмін жою мүмкін болмады"
+  },
+  "deleteFilmSuccess": {
+    "other": "\"{{.Film}}\" фильмі сәтті жойылды"
+  },
+  "collectionRequestName": {
+    "other": "Коллекцияның атауын енгізіңіз"
+  },
+  "collectionRequestDescription": {
+    "other": "Коллекцияның сипаттамасын енгізіңіз"
+  },
+  "updateCollectionFailure": {
+    "other": "Коллекцияны жаңарту мүмкін болмады"
+  },
+  "updateCollectionSuccess": {
+    "other": "Коллекция сәтті жаңартылды"
+  },
+  "createCollectionFailure": {
+    "other": "Коллекцияны жасау мүмкін болмады"
+  },
+  "createCollectionSuccess": {
+    "other": "Жаңа коллекция сәтті жасалды!"
+  },
+  "deleteCollectionConfirm": {
+    "other": "\"{{.Collection}}\" коллекциясын жою керек екеніне сенімдісіз бе?"
+  },
+  "deleteCollectionFailure": {
+    "other": "\"{{.Collection}}\" коллекциясын жою мүмкін болмады"
+  },
+  "deleteCollectionSuccess": {
+    "other": "\"{{.Collection}}\" коллекциясы сәтті жойылды"
+  },
+  "getCollectionFailure": {
+    "other": "Коллекцияны алу кезінде қате орын алды"
+  },
+  "filmToCollectionSuccess": {
+    "other": "\"{{.Film}}\" фильмі \"{{.Collection}}\" коллекциясына сәтті қосылды"
+  },
+  "filmsNotFound": {
+    "other": "Фильмдер табылмады"
+  },
+  "choiceFilmToCollection": {
+    "other": "Коллекцияға қосу үшін фильмді таңдаңыз"
+  },
+  "collectionsNotFound": {
+    "other": "Коллекциялар табылмады"
+  },
+  "choiceCollectionToFilm": {
+    "other": "Фильм қосу үшін коллекцияны таңдаңыз"
+  },
+  "adminOptionUserCount": {
+    "other": "Пайдаланушылар санын тексеру"
+  },
+  "adminOptionBroadcast": {
+    "other": "Хабарлама жіберу"
+  },
+  "adminOptionFeedback": {
+    "other": "Пікірлерді қарау"
+  },
+  "adminOptionUserList": {
+    "other": "Пайдаланушылар тізімі"
+  },
+  "requestFailure": {
+    "other": "Сұранысты орындау мүмкін болмады"
+  },
+  "uniqueUsersCount": {
+    "other": "Боттың бірегей пайдаланушылары"
+  },
+  "recipientCount": {
+    "other": "Қабылдаушылар саны"
+  },
+  "requestBroadcastMessage": {
+    "other": "Хабарлама үшін мәтінді енгізіңіз"
+  },
+  "emptyFeedbackList": {
+    "other": "Қарауға жаңа пікірлер жоқ"
+  },
+  "feedbackList": {
+    "other": "Пікірлер тізімі"
+  },
+  "category": {
+    "other": "Санат"
+  },
+  "user": {
+    "other": "Пайдаланушы"
+  },
+  "deleteFeedbackFailure": {
+    "other": "Пікірді жою мүмкін болмады"
+  },
+  "deleteFeedbackSuccess": {
+    "other": "Пікір сәтті жойылды"
+  },
+  "emptyUserList": {
+    "other": "Пайдаланушылар тізімі бос"
+  },
+  "userList": {
+    "other": "Пайдаланушылар тізімі"
+  },
+  "telegramID": {
+    "other": "Telegram ID"
+  },
+  "admin": {
+    "other": "Әкімші"
+  },
+  "banned": {
+    "other": "Бұғатталған"
+  },
+  "created": {
+    "other": "Жасалған"
+  },
+  "badFormatID": {
+    "other": "ID форматы дұрыс емес"
+  },
+  "banFailure": {
+    "other": "Пайдаланушыны бұғаттау кезінде қате орын алды"
+  },
+  "banSuccess": {
+    "other": "\"{{.User}}\" пайдаланушысы сәтті бұғатталды"
+  },
+  "unbanFailure": {
+    "other": "Пайдаланушыны бұғаттан шығару кезінде қате орын алды"
+  },
+  "unbanSuccess": {
+    "other": "\"{{.User}}\" пайдаланушысы сәтті бұғаттан шығарылды"
+  },
+  "helpMessage": {
+    "other": "Ботпен жұмыс істеу үшін /menu пәрменін қолданыңыз"
+  },
+  "unknownContext": {
+    "other": "Белгісіз контекст"
+  },
+  "totalFilms": {
+    "other": "Фильмдердің жалпы саны"
+  },
+  "pageCounter": {
+    "other": "{{.CurrentPage}} беті {{.LastPage}} ішінен"
+  },
+  "choiceFilmForDetails": {
+    "other": "Толығырақ білу үшін фильмді таңдаңыз"
+  },
+  "collection": {
+    "other": "Коллекция"
+  },
+  "notFoundFilmsInCollection": {
+    "other": "Бұл коллекцияда фильмдер табылмады"
+  },
+  "yourRating": {
+    "other": "Сіздің бағаңыз"
+  },
+  "film": {
+    "other": "Фильм"
+  },
+  "notViewed": {
+    "other": "Қаралмаған"
+  },
+  "totalCollections": {
+    "other": "Коллекциялардың жалпы саны"
+  },
+  "choiceCollectionForDetails": {
+    "other": "Толығырақ білу үшін коллекцияны таңдаңыз"
+  },
+  "backward": {
+    "other": "Артқа"
+  },
+  "forward": {
+    "other": "Алға"
+  },
+  "cancel": {
+    "other": "Бас тарту"
+  },
+  "skip": {
+    "other": "Өткізіп жіберу"
+  },
+  "yes": {
+    "other": "Иә"
+  },
+  "no": {
+    "other": "Жоқ"
+  },
+  "back": {
+    "other": "Артқа"
+  },
+  "offers": {
+    "other": "Ұсыныстар"
+  },
+  "mistakes": {
+    "other": "Қателер"
+  },
+  "otherIssues": {
+    "other": "Басқа сұрақтар"
+  },
+  "edit": {
+    "other": "Өңдеу"
+  },
+  "delete": {
+    "other": "Жою"
+  },
+  "createFilm": {
+    "other": "Фильм жасау"
+  },
+  "updateFilm": {
+    "other": "Фильмді жаңарту"
+  },
+  "deleteFilm": {
+    "other": "Фильмді жою"
+  },
+  "manageFilm": {
+    "other": "Фильмді басқару"
+  },
+  "manually": {
+    "other": "Қолмен"
+  },
+  "fromURL": {
+    "other": "Сыртқы URL-дан"
+  },
+  "createCollection": {
+    "other": "Коллекция жасау"
+  },
+  "updateCollection": {
+    "other": "Коллекцияны жаңарту"
+  },
+  "deleteCollection": {
+    "other": "Коллекцияны жою"
+  },
+  "manageCollection": {
+    "other": "Коллекцияны басқару"
+  },
+  "addFilmToCollection": {
+    "other": "Фильм қосу"
+  },
+  "addCollectionToFilm": {
+    "other": "Фильмді коллекцияға қосу"
+  },
+  "choiceFromFilms": {
+    "other": "Менің фильмдерімнен таңдау"
+  },
+  "unknownCommand": {
+    "other": "Белгісіз команда. /menu енгізіңіз"
+  },
+  "sendImageFailure": {
+    "other": "Суретті жіберу кезінде қате орын алды"
+  },
+  "author": {
+    "other": "Автор"
+  },
+  "duration": {
+    "other": "Ұзақтығы"
+  },
+  "views": {
+    "other": "Көрілімдер"
+  },
+  "grades": {
+    "other": "Бағалар"
+  },
+  "comments": {
+    "other": "Пікірлер"
+  },
+  "dateOfRelease": {
+    "other": "Шығарылған күні"
+  },
+  "year": {
+    "other": "Жыл"
+  }
+}

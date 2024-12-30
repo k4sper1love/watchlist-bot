@@ -13,6 +13,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/users"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 	"log"
 	"log/slog"
 	"strings"
@@ -20,9 +21,11 @@ import (
 
 func HandleUpdates(app models.App) {
 	telegramID := utils.ParseTelegramID(app.Upd)
-	session, err := postgres.GetSessionByTelegramID(telegramID)
+	lang := utils.ParseLanguageCode(app.Upd)
+	session, err := postgres.GetSessionByTelegramID(telegramID, lang)
 	if err != nil {
-		app.SendMessage("Произошла ошибка при получении сессии", nil)
+		msg := translator.Translate(lang, "session_error", nil, nil)
+		app.SendMessage(msg, nil)
 		log.Println(err)
 		return
 	}
@@ -88,7 +91,8 @@ func handleCommands(app models.App, session *models.Session) {
 		general.RequireAdmin(app, session, admin.HandleAdminCommand)
 
 	default:
-		app.SendMessage("Неизвестная команда. Введите /help", nil)
+		msg := translator.Translate(session.Lang, "unknownCommand", nil, nil)
+		app.SendMessage(msg, nil)
 	}
 }
 
@@ -134,7 +138,8 @@ func handleUserInput(app models.App, session *models.Session) {
 		general.HandleSettingsProcess(app, session)
 
 	default:
-		app.SendMessage("Неизвестное состояние. Введите /reset для сброса.", nil)
+		msg := translator.Translate(session.Lang, "unknownState", nil, nil)
+		app.SendMessage(msg, nil)
 	}
 }
 
@@ -147,7 +152,10 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, "menu_select_"):
 		handleCommands(app, session)
 
-	case strings.HasPrefix(callbackData, "settings_"):
+	case strings.HasPrefix(callbackData, "select_start_lang_"):
+		general.HandleLanguageButton(app, session)
+
+	case strings.HasPrefix(callbackData, "settings_") || strings.HasPrefix(callbackData, "select_lang_"):
 		general.HandleSettingsButton(app, session)
 
 	case strings.HasPrefix(callbackData, "admin_select"):
