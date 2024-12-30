@@ -2,6 +2,7 @@ package models
 
 import (
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
+	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 	"gorm.io/gorm"
 )
 
@@ -9,7 +10,7 @@ type Session struct {
 	gorm.Model
 	TelegramID            int `gorm:"unique"`
 	TelegramUsername      string
-	Role                  string `gorm:"default:user"`
+	Role                  roles.Role `json:"role" gorm:"serializer:json"`
 	Lang                  string
 	IsBanned              bool           `gorm:"default:false"`
 	User                  apiModels.User `json:"user" gorm:"serializer:json"`
@@ -17,6 +18,7 @@ type Session struct {
 	RefreshToken          string         `json:"refresh_token"`
 	State                 string
 	Context               string
+	AdminState            *AdminState            `gorm:"foreignKey:SessionID"`
 	ProfileState          *ProfileState          `gorm:"foreignKey:SessionID"`
 	FeedbackState         *FeedbackState         `gorm:"foreignKey:SessionID"`
 	CollectionsState      *CollectionsState      `gorm:"foreignKey:SessionID"`
@@ -52,6 +54,7 @@ func (s *Session) ClearAllStates() {
 	s.FeedbackState.Clear()
 	s.FilmDetailState.Clear()
 	s.CollectionDetailState.Clear()
+	s.AdminState.Clear()
 }
 
 func (s *Session) Logout() {

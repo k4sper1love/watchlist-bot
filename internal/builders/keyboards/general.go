@@ -5,6 +5,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 	"strings"
 )
 
@@ -18,7 +19,7 @@ var menuButtons = []Button{
 }
 
 var settingsButtons = []Button{
-	{"🔢", "settingsLanguage", states.CallbackSettingsLanguage},
+	{"🈳", "settingsLanguage", states.CallbackSettingsLanguage},
 	{"🔢", "settingsCollectionsPageSize", states.CallbackSettingsCollectionsPageSize},
 	{"🔢", "settingsFilmsPageSize", states.CallbackSettingsFilmsPageSize},
 	{"🔢", "settingsObjectsPageSize", states.CallbackSettingsObjectsPageSize},
@@ -33,7 +34,7 @@ var feedbackCategoryButtons = []Button{
 func BuildMenuKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
-	if session.IsAdmin {
+	if session.Role.HasAccess(roles.Helper) {
 		keyboard.AddButton("🛠️", "adminPanel", states.CallbackMenuSelectAdmin)
 	}
 

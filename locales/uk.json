@@ -8,6 +8,135 @@
   "setDefaultLanguage": {
     "other": "Встановлено мову за замовчуванням."
   },
+  "admins": {
+    "other": "Адміністратори"
+  },
+  "users": {
+    "other": "Користувачі"
+  },
+  "message": {
+    "other": "Повідомлення"
+  },
+  "broadcast": {
+    "other": "Розсилка"
+  },
+  "findUser": {
+    "other": "Знайти користувача"
+  },
+  "requestIDOrUsername": {
+    "other": "Введіть ID або @username"
+  },
+  "superAdmin": {
+    "other": "Старший Адміністратор"
+  },
+  "helper": {
+    "other": "Помічник"
+  },
+  "root": {
+    "other": "Суперкористувач"
+  },
+  "manageUserRole": {
+    "other": "Змінити роль"
+  },
+  "unban": {
+    "other": "Розблокувати"
+  },
+  "ban": {
+    "other": "Заблокувати"
+  },
+  "alreadyMaxRole": {
+    "other": "У користувача вже максимальна роль"
+  },
+  "alreadyMinRole": {
+    "other": "У користувача вже мінімальна роль"
+  },
+  "findAdmin": {
+    "other": "Знайти адміністратора"
+  },
+  "foundFeedbacks": {
+    "other": "Знайдено відгуків"
+  },
+  "noAccess": {
+    "other": "Немає доступу"
+  },
+  "viewFeedback": {
+    "other": "Переглянути відгук"
+  },
+  "foundUsers": {
+    "other": "Знайдено користувачів"
+  },
+  "role": {
+    "other": "Роль"
+  },
+  "unknown": {
+    "other": "Невідомо"
+  },
+  "requestBroadcastImage": {
+    "other": "Надішліть посилання або зображення для розсилки"
+  },
+  "send": {
+    "other": "Надіслати"
+  },
+  "broadcastEmpty": {
+    "other": "Неможливо надіслати порожню розсилку"
+  },
+  "feedbackDetails": {
+    "other": "Деталі відгуку"
+  },
+  "currentRole": {
+    "other": "Поточна роль"
+  },
+  "choiceUserForDetails": {
+    "other": "Оберіть користувача"
+  },
+  "language": {
+    "other": "Мова"
+  },
+  "state": {
+    "other": "Стан"
+  },
+  "empty": {
+    "other": "Порожньо"
+  },
+  "sessionDetails": {
+    "other": "Деталі сесії"
+  },
+  "apiDetails": {
+    "other": "Деталі API"
+  },
+  "updated": {
+    "other": "Оновлено"
+  },
+  "choiceForDetails": {
+    "other": "Оберіть для перегляду деталей"
+  },
+  "needRemoveRole": {
+    "other": "Спочатку потрібно змінити роль на користувача"
+  },
+  "unbanned": {
+    "other": "Розблоковано"
+  },
+  "currenRole": {
+    "other": "Поточна роль"
+  },
+  "choiceRole": {
+    "other": "Оберіть роль"
+  },
+  "success": {
+    "other": "Успішно"
+  },
+  "notFound": {
+    "other": "Не знайдено"
+  },
+  "raiseRole": {
+    "other": "Підвищити роль"
+  },
+  "lowerRole": {
+    "other": "Знизити роль"
+  },
+  "removeAdminRole": {
+    "other": "Вилучити права адміністратора"
+  },
   "welcomeMessageGreeting": {
     "other": "Ласкаво просимо до Watchlist Bot, {{.Name}}!"
   },
@@ -417,7 +546,7 @@
     "other": "Telegram ID"
   },
   "admin": {
-    "other": "Адмін"
+    "other": "Адміністратор"
   },
   "banned": {
     "other": "Заблокований"

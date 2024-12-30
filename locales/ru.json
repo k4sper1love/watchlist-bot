@@ -8,6 +8,136 @@
   "setDefaultLanguage": {
     "other": "Установлен язык по умолчанию"
   },
+  "admins": {
+    "other": "Администраторы"
+  },
+  "users":{
+    "other": "Пользователи"
+  },
+  "message": {
+    "other": "Сообщение"
+  },
+  "broadcast": {
+    "other": "Рассылка"
+  },
+  "findUser": {
+    "other": "Найти пользователя"
+  },
+  "requestIDOrUsername": {
+    "other": "Введите ID или @username"
+  },
+  "superAdmin": {
+    "other": "Старший Администратор"
+  },
+  "helper": {
+    "other": "Хелпер"
+  },
+  "root": {
+    "other": "Супер-пользователь"
+  },
+
+  "manageUserRole": {
+    "other": "Изменить роль"
+  },
+  "unban": {
+    "other": "Разблокировать"
+  },
+  "ban": {
+    "other": "Заблокировать"
+  },
+  "alreadyMaxRole": {
+    "other": "У пользователя уже максимальная роль"
+  },
+  "alreadyMinRole": {
+    "other": "У пользователя уже минимальная роль"
+  },
+  "findAdmin": {
+    "other": "Найти администратора"
+  },
+  "foundFeedbacks": {
+    "other": "Найдено сообщений"
+  },
+  "noAccess": {
+    "other": "Нет доступа"
+  },
+  "viewFeedback": {
+    "other": "Посмотреть фидбек"
+  },
+  "foundUsers": {
+    "other": "Найдено пользователей"
+  },
+ "role": {
+   "other": "Роль"
+ },
+  "unknown": {
+    "other": "Неизвестный"
+  },
+  "requestBroadcastImage": {
+    "other": "Отправьте ссылку или изображение для рассылки"
+  },
+  "send": {
+    "other": "Отправить"
+  },
+  "broadcastEmpty": {
+    "other": "Невозможно отправить пустую рассылку"
+  },
+  "feedbackDetails": {
+    "other": "Детали фидбека"
+  },
+  "currentRole": {
+    "other": "Текущая роль"
+  },
+ "choiceUserForDetails":{
+   "other": "Выберите пользователя"
+ },
+  "language": {
+    "other": "Язык"
+  },
+  "state": {
+    "other": "Состояние"
+  },
+  "empty": {
+    "other": "Пусто"
+  },
+  "sessionDetails": {
+    "other": "Данные сессии"
+  },
+  "apiDetails": {
+    "other": "Данные API"
+  },
+  "updated": {
+    "other": "Обновлен"
+  },
+  "choiceForDetails": {
+    "other": "Выберите для просмотра деталей"
+  },
+  "needRemoveRole": {
+    "other": "Сначала нужно установить роль user"
+  },
+  "unbanned": {
+    "other": "Разблокирован"
+  },
+  "currenRole": {
+    "other": "Текущая роль"
+  },
+  "choiceRole": {
+    "other": "Выберите роль"
+  },
+  "success": {
+    "other": "Успешно"
+  },
+  "notFound": {
+    "other": "Не найдено"
+  },
+  "raiseRole": {
+    "other": "Повысить роль"
+  },
+  "lowerRole": {
+    "other": "Понизить роль"
+  },
+  "removeAdminRole": {
+    "other": "Забрать права администратора"
+  },
   "welcomeMessageGreeting": {
     "other": "Добро пожаловать в Watchlist Bot, {{.Name}}!"
   },
@@ -417,7 +547,7 @@
     "other": "Telegram ID"
   },
   "admin": {
-    "other": "Админ"
+    "other": "Администратор"
   },
   "banned": {
     "other": "Заблокирован"

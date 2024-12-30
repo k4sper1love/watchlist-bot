@@ -5,6 +5,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
+	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
@@ -36,8 +37,8 @@ func RequireAuth(app models.App, session *models.Session, next func(models.App, 
 	next(app, session)
 }
 
-func RequireAdmin(app models.App, session *models.Session, next func(models.App, *models.Session)) {
-	if !session.IsAdmin {
+func RequireRole(app models.App, session *models.Session, next func(models.App, *models.Session), role roles.Role) {
+	if !session.Role.HasAccess(role) {
 		msg := translator.Translate(session.Lang, "permissionsNotEnough", nil, nil)
 		app.SendMessage(msg, nil)
 		session.ClearState()

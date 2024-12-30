@@ -8,6 +8,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 	"log"
 	"strconv"
@@ -73,7 +74,7 @@ func HandleAdminProcess(app models.App, session *models.Session) {
 	}
 
 	switch session.State {
-	case states.ProcessAdminAwaitingBroadcastMessageText:
+	case states.ProcessAdminBroadcastAwaitingText:
 		parseAdminBroadcastMessageText(app, session)
 	}
 }
@@ -109,7 +110,7 @@ func handleAdminBroadcastMessage(app models.App, session *models.Session) {
 
 	app.SendMessage(msg, keyboard)
 
-	session.SetState(states.ProcessAdminAwaitingBroadcastMessageText)
+	session.SetState(states.ProcessAdminBroadcastAwaitingText)
 }
 
 func parseAdminBroadcastMessageText(app models.App, session *models.Session) {
@@ -132,7 +133,7 @@ func parseAdminBroadcastMessageText(app models.App, session *models.Session) {
 func handleAdminFeedback(app models.App, session *models.Session) {
 	keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectBackPanel).Build(session.Lang)
 
-	feedbacks, err := postgres.FetchAllFeedbacks()
+	feedbacks, err := postgres.GetAllFeedbacks()
 	if err != nil || len(feedbacks) == 0 {
 		emptyListMsg := translator.Translate(session.Lang, "emptyFeedbackList", nil, nil)
 		msg := fmt.Sprintf("📭 %s", emptyListMsg)
@@ -201,7 +202,7 @@ func handleDeleteFeedback(app models.App, session *models.Session) {
 func handleAdminUsers(app models.App, session *models.Session) {
 	keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectBackPanel).Build(session.Lang)
 
-	users, err := postgres.FetchAllUsers()
+	users, err := postgres.GetAllUsers()
 	if err != nil || len(users) == 0 {
 		msg := translator.Translate(session.Lang, "emptyUserList", nil, nil)
 		app.SendMessage(msg, keyboard)
@@ -225,12 +226,12 @@ func handleAdminUsers(app models.App, session *models.Session) {
 				"🔐 <b>%s:</b> %s\n"+
 				"📅 <b>%s:</b> %s\n",
 			telegramIDMsg, user.TelegramID,
-			adminMsg, boolToString(user.IsAdmin),
+			adminMsg, boolToString(user.Role.HasAccess(roles.Helper)),
 			bannedMsg, boolToString(user.IsBanned),
 			createdMsg, user.CreatedAt.Format("02.01.2006 15:04"),
 		)
 
-		if !user.IsAdmin && !user.IsBanned {
+		if !user.Role.HasAccess(roles.Helper) && !user.IsBanned {
 			entry += fmt.Sprintf("🛑 /ban_%d\n", user.TelegramID)
 		}
 

@@ -7,6 +7,9 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/joho/godotenv v1.5.1
 	github.com/k4sper1love/watchlist-api v0.0.0-20241212131753-a2c0ba75551d
+	github.com/nicksnyder/go-i18n/v2 v2.4.1
+	golang.org/x/text v0.21.0
+	google.golang.org/api v0.211.0
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.12
 )
