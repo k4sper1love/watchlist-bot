@@ -66,5 +66,5 @@ func parseViewedFilmReview(app models.App, session *models.Session) {
 		session.FilmDetailState.Review = utils.ParseMessageString(app.Upd)
 	}
 
-	finishUpdateFilmProcess(app, session)
+	finishUpdateFilmProcess(app, session, HandleFilmsDetailCommand)
 }

@@ -64,11 +64,6 @@ func handleCommands(app models.App, session *models.Session) {
 	case command == "profile" || callbackData == states.CallbackMenuSelectProfile:
 		general.RequireAuth(app, session, users.HandleProfileCommand)
 
-	case strings.HasPrefix(command, "delete_feedback_") ||
-		strings.HasPrefix(command, "ban_") ||
-		strings.HasPrefix(command, "unban_"):
-		general.RequireRole(app, session, admin.HandleAdminButtons, roles.Admin)
-
 	case command == "logout" || callbackData == states.CallbackMenuSelectLogout:
 		general.RequireAuth(app, session, general.HandleLogoutCommand)
 
@@ -103,6 +98,9 @@ func handleUserInput(app models.App, session *models.Session) {
 
 	case strings.HasPrefix(session.State, "admin_manage_users_awaiting"):
 		general.RequireRole(app, session, admin.HandleUsersProcess, roles.Admin)
+
+	case strings.HasPrefix(session.State, "admin_user_detail_awaiting"):
+		general.RequireRole(app, session, admin.HandleUserDetailProcess, roles.Admin)
 
 	case strings.HasPrefix(session.State, "admin_list_awaiting"):
 		general.RequireRole(app, session, admin.HandleAdminsProcess, roles.Admin)
@@ -254,7 +252,7 @@ func answerCallbackQuery(app models.App, session *models.Session) {
 
 	if err != nil {
 		sl.Log.Error("Failed to answer callback", slog.Any("error", err))
-		general.HandleStartCommand(app, session)
+		general.HandleMenuCommand(app, session)
 		return
 	}
 }

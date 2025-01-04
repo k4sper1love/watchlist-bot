@@ -11,6 +11,7 @@ type Button struct {
 	Emoji        string
 	Text         string
 	CallbackData string
+	URL          string
 }
 
 type Keyboard struct {
@@ -26,13 +27,13 @@ func (k *Keyboard) AddRow(buttons ...Button) *Keyboard {
 	return k
 }
 
-func (k *Keyboard) AddButton(emoji, text, callbackData string) *Keyboard {
-	return k.AddRow(Button{Emoji: emoji, Text: text, CallbackData: callbackData})
+func (k *Keyboard) AddButton(emoji, text, callbackData, url string) *Keyboard {
+	return k.AddRow(Button{Emoji: emoji, Text: text, CallbackData: callbackData, URL: url})
 }
 
 func (k *Keyboard) AddButtons(buttons ...Button) *Keyboard {
 	for _, button := range buttons {
-		k.AddButton(button.Emoji, button.Text, button.CallbackData)
+		k.AddButton(button.Emoji, button.Text, button.CallbackData, "")
 	}
 
 	return k
@@ -61,7 +62,6 @@ func (k *Keyboard) Build(languageCode string) *tgbotapi.InlineKeyboardMarkup {
 	}
 
 	var inlineButtons [][]tgbotapi.InlineKeyboardButton
-
 	for _, row := range k.Rows {
 		var inlineRow []tgbotapi.InlineKeyboardButton
 		for _, btn := range row {
@@ -69,9 +69,17 @@ func (k *Keyboard) Build(languageCode string) *tgbotapi.InlineKeyboardMarkup {
 			if btn.Emoji != "" {
 				fullText = fmt.Sprintf("%s %s", btn.Emoji, btn.Text)
 			}
-			inlineRow = append(inlineRow, tgbotapi.NewInlineKeyboardButtonData(fullText, btn.CallbackData))
+
+			if btn.URL != "" {
+				inlineRow = append(inlineRow, tgbotapi.NewInlineKeyboardButtonURL(fullText, btn.URL))
+			} else if btn.CallbackData != "" {
+				inlineRow = append(inlineRow, tgbotapi.NewInlineKeyboardButtonData(fullText, btn.CallbackData))
+			}
 		}
-		inlineButtons = append(inlineButtons, inlineRow)
+
+		if len(inlineRow) > 0 {
+			inlineButtons = append(inlineButtons, inlineRow)
+		}
 	}
 
 	keyboard := tgbotapi.InlineKeyboardMarkup{InlineKeyboard: inlineButtons}
@@ -96,18 +104,22 @@ func (k *Keyboard) AddNavigation(currentPage, lastPage int, prevData, nextData s
 	return k
 }
 
+func (k *Keyboard) AddURLButton(emoji, text, url string) *Keyboard {
+	return k.AddButton(emoji, text, "", url)
+}
+
 func (k *Keyboard) AddCancel() *Keyboard {
-	return k.AddButton("", "cancel", states.CallbackProcessCancel)
+	return k.AddButton("", "cancel", states.CallbackProcessCancel, "")
 }
 
 func (k *Keyboard) AddSkip() *Keyboard {
-	return k.AddButton("", "skip", states.CallbackProcessSkip)
+	return k.AddButton("", "skip", states.CallbackProcessSkip, "")
 }
 
 func (k *Keyboard) AddSurvey() *Keyboard {
 	return k.AddButtonsWithRowSize(2,
-		Button{"", "yes", states.CallbackYes},
-		Button{"", "no", states.CallbackNo},
+		Button{"", "yes", states.CallbackYes, ""},
+		Button{"", "no", states.CallbackNo, ""},
 	)
 }
 
@@ -115,10 +127,10 @@ func (k *Keyboard) AddBack(callbackData string) *Keyboard {
 	var buttons []Button
 
 	if callbackData != "" {
-		buttons = append(buttons, Button{"←", "back", callbackData})
+		buttons = append(buttons, Button{"←", "back", callbackData, ""})
 	}
 
-	buttons = append(buttons, Button{"🏠 ", "mainMenu", states.CallbackMainMenu})
+	buttons = append(buttons, Button{"🏠 ", "mainMenu", states.CallbackMainMenu, ""})
 
 	return k.AddButtonsWithRowSize(len(buttons), buttons...)
 }

@@ -2,11 +2,74 @@
   "choiceLanguage": {
     "other": "Please select a language to communicate with the bot. You can change it in the settings"
   },
-  "someError": {
+  "raisedTo": {
+    "other": "You have been promoted to the role of \"{{.Role}}\""
+  },
+  "lowerTo": {
+    "other": "You have been demoted to the role of \"{{.Role}}\""
+  },
+  "raiseUser": {
+    "other": "You promoted {{.ID}} to the role of {{.Role}}"
+  },
+  "lowerUser": {
+    "other": "You demoted {{.ID}} to the role of {{.Role}}"
+  },
+  "cannotLowerSelf": {
+    "other": "You cannot demote your own role"
+  },
+  "removedRole": {
+    "other": "Your administrator rights have been removed"
+  },
+  "removeUserRole": {
+    "other": "You removed administrator rights from {{.ID}}"
+  },
+  "changedRole": {
+    "other": "Your role {{.OldRole}} has been changed to {{.NewRole}}"
+  },
+  "changeUserRole": {
+    "other": "You changed the role of {{.ID}} from {{.OldRole}} to {{.NewRole}}"
+  },
+"someError": {
     "other": "Some kind of error has occurred."
   },
   "setDefaultLanguage": {
     "other": "The default language is set"
+  },
+  "openInBrowser": {
+    "other": "Open in browser"
+  },
+  "filmURL": {
+    "other": "Film URL"
+  },
+  "removeFilmFromCollection": {
+    "other": "Remove film from collection"
+  },
+  "removeFilmFailure": {
+    "other": "Failed to remove film from collection"
+  },
+  "removeFilmSuccess": {
+    "other": "Film successfully removed from collection"
+  },
+  "requestBanReason": {
+    "other": "Specify the reason for blocking the user"
+  },
+  "bannedBy": {
+    "other": "You have been banned by {{.Role}}"
+  },
+  "unbannedBy": {
+    "other": "You have been unbanned by {{.Role}}"
+  },
+  "reason": {
+    "other": "Reason"
+  },
+  "botAccessDenied": {
+    "other": "Access to the bot is denied"
+  },
+  "banUser": {
+    "other": "User \"{{.ID}}\" has been banned"
+  },
+  "unbanUser": {
+    "other": "User \"{{.ID}}\" has been unbanned"
   },
   "admins": {
     "other": "Administrators"
@@ -33,7 +96,7 @@
     "other": "Helper"
   },
   "root": {
-    "other": "Root"
+    "other": "Chief Administrator"
   },
   "manageUserRole": {
     "other": "Change Role"
@@ -111,7 +174,7 @@
     "other": "Select to view details"
   },
   "needRemoveRole": {
-    "other": "You must first set the role to user"
+    "other": "You need to revoke admin rights first"
   },
   "unbanned": {
     "other": "Unblocked"

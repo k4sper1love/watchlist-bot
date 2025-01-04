@@ -49,12 +49,12 @@ func parseDeleteFilmConfirm(app models.App, session *models.Session) {
 		}, nil)
 
 		app.SendMessage(msg, nil)
-		HandleFilmsDetailCommand(app, session)
+		HandleFilmsCommand(app, session)
 
 	case false:
 		msg := translator.Translate(session.Lang, "cancelAction", nil, nil)
 		app.SendMessage(msg, nil)
-		HandleFilmsDetailCommand(app, session)
+		HandleManageFilmCommand(app, session)
 	}
 }
 

@@ -10,6 +10,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
+	"log"
 )
 
 func HandleNewFilmCommand(app models.App, session *models.Session) {
@@ -49,6 +50,9 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 
 	case states.ProcessNewFilmAwaitingComment:
 		parseNewFilmComment(app, session)
+
+	case states.ProcessNewFilmAwaitingFilmURL:
+		parseNewFilmURL(app, session)
 
 	case states.ProcessNewFilmAwaitingViewed:
 		parseNewFilmViewed(app, session)
@@ -100,6 +104,7 @@ func parseNewFilmFromURL(app models.App, session *models.Session) {
 	}
 
 	session.FilmDetailState.SetFromFilm(film)
+	session.FilmDetailState.URL = url
 
 	imageURL, err := parseAndUploadImageFromURL(app, film.ImageURL)
 	if err != nil {
@@ -201,7 +206,7 @@ func parseNewFilmRating(app models.App, session *models.Session) {
 
 func parseNewFilmImage(app models.App, session *models.Session) {
 	if utils.IsSkip(app.Upd) {
-		requestNewFilmComment(app, session)
+		requestNewFilmURL(app, session)
 		return
 	}
 
@@ -209,11 +214,31 @@ func parseNewFilmImage(app models.App, session *models.Session) {
 	if err != nil {
 		msg := translator.Translate(session.Lang, "getImageFailure", nil, nil)
 		app.SendMessage(msg, nil)
-		requestNewFilmComment(app, session)
+		requestNewFilmURL(app, session)
 		return
 	}
 
 	session.FilmDetailState.SetImageURL(imageURL)
+
+	requestNewFilmURL(app, session)
+}
+
+func requestNewFilmURL(app models.App, session *models.Session) {
+	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
+
+	msg := translator.Translate(session.Lang, "filmRequestLink", nil, nil)
+
+	app.SendMessage(msg, keyboard)
+
+	session.SetState(states.ProcessNewFilmAwaitingFilmURL)
+}
+
+func parseNewFilmURL(app models.App, session *models.Session) {
+	if utils.IsSkip(app.Upd) {
+		session.FilmDetailState.URL = ""
+	} else {
+		session.FilmDetailState.URL = utils.ParseMessageString(app.Upd)
+	}
 
 	requestNewFilmComment(app, session)
 }
@@ -291,6 +316,7 @@ func parseNewFilmReview(app models.App, session *models.Session) {
 }
 
 func finishNewFilmProcess(app models.App, session *models.Session) {
+	log.Println(session.FilmDetailState)
 	if err := CreateNewFilm(app, session); err != nil {
 		msg := translator.Translate(session.Lang, "createFilmFailure", nil, nil)
 		app.SendMessage(msg, nil)

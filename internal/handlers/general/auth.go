@@ -22,11 +22,11 @@ func HandleAuthProcess(app models.App, session *models.Session) error {
 
 	err := watchlist.Login(app, session)
 	if err == nil {
-		msg := translator.Translate(session.Lang, "loginSuccess", map[string]interface{}{
-			"Username": session.User.Username,
-		}, nil)
-
-		app.SendMessage(msg, nil)
+		//msg := translator.Translate(session.Lang, "loginSuccess", map[string]interface{}{
+		//	"Username": session.User.Username,
+		//}, nil)
+		//
+		//app.SendMessage(msg, nil)
 		return nil
 	}
 

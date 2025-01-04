@@ -56,14 +56,14 @@ func collectionFilmsToString(session *models.Session, metadata *filters.Metadata
 	collection := session.CollectionDetailState.Collection
 
 	collectionMsg := translator.Translate(session.Lang, "collection", nil, nil)
-	msg := fmt.Sprintf("<b>%s:</b> \"%s\"\n", collectionMsg, collection.Name)
+	msg := fmt.Sprintf("<b>%s:</b> \"%s\"", collectionMsg, collection.Name)
 
 	if collection.Description != "" {
 		descriptionMsg := translator.Translate(session.Lang, "description", nil, nil)
-		msg += fmt.Sprintf("<b>%s:</b> %s\n", descriptionMsg, collection.Description)
-	} else {
-		msg += "\n"
+		msg += fmt.Sprintf("\n<b>%s:</b> %s", descriptionMsg, collection.Description)
 	}
+
+	msg += "\n\n"
 
 	if collection.TotalFilms == 0 {
 		msg += translator.Translate(session.Lang, "notFoundFilmsInCollection", nil, nil)

@@ -3,6 +3,7 @@ package messages
 import (
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
@@ -10,6 +11,12 @@ import (
 
 func BuildFilmDetailMessage(session *models.Session, film *apiModels.Film) string {
 	msg := ""
+
+	if session.Context == states.ContextCollection {
+		msg += fmt.Sprintf(" <code>%s</code>", session.CollectionDetailState.Collection.Name)
+	}
+
+	msg += "\n"
 
 	if film.Title != "" {
 		part := translator.Translate(session.Lang, "title", nil, nil)
@@ -60,7 +67,7 @@ func BuildFilmDetailMessage(session *models.Session, film *apiModels.Film) strin
 func BuildFilmDetailWithNumberMessage(session *models.Session, itemID int, film *apiModels.Film) string {
 	numberEmoji := numberToEmoji(itemID)
 
-	msg := fmt.Sprintf("%s\n", numberEmoji)
+	msg := fmt.Sprintf("%s", numberEmoji)
 	return msg + BuildFilmDetailMessage(session, film)
 }
 

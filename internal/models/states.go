@@ -2,6 +2,7 @@ package models
 
 import (
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
+	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 	"gorm.io/gorm"
 )
 
@@ -45,6 +46,7 @@ type FilmDetailState struct {
 	IsEditViewed bool           `json:"-"`
 	UserRating   float64        `json:"user_rating"`
 	Review       string         `json:"review"`
+	URL          string         `json:"url,omitempty"`
 }
 
 type CollectionsState struct {
@@ -76,15 +78,17 @@ type CollectionFilmsState struct {
 
 type AdminState struct {
 	gorm.Model       `json:"-"`
-	SessionID        uint   `json:"-"`
-	UserID           int    `json:"-"`
-	FeedbackID       int    `json:"-"`
-	LastPage         int    `json:"-"`
-	PageSize         int    `json:"-" gorm:"default:4"`
-	CurrentPage      int    `json:"-"`
-	TotalRecords     int    `json:"-"`
-	FeedbackMessage  string `json:"-"`
-	FeedbackImageURL string `json:"-"`
+	SessionID        uint       `json:"-"`
+	UserID           int        `json:"-"`
+	UserLang         string     `json:"-"`
+	UserRole         roles.Role `json:"-"`
+	FeedbackID       int        `json:"-"`
+	LastPage         int        `json:"-"`
+	PageSize         int        `json:"-" gorm:"default:4"`
+	CurrentPage      int        `json:"-"`
+	TotalRecords     int        `json:"-"`
+	FeedbackMessage  string     `json:"-"`
+	FeedbackImageURL string     `json:"-"`
 }
 
 func (s *AdminState) Clear() {
@@ -114,6 +118,7 @@ func (s *FilmDetailState) Clear() {
 	s.IsEditViewed = false
 	s.UserRating = 0
 	s.Review = ""
+	s.URL = ""
 }
 
 func (s *CollectionDetailState) Clear() {

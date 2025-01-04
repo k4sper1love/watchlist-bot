@@ -11,8 +11,8 @@ import (
 )
 
 var updateCollectionButtons = []keyboards.Button{
-	{"", "title", states.CallbackUpdateCollectionSelectName},
-	{"", "description", states.CallbackUpdateCollectionSelectDescription},
+	{"", "title", states.CallbackUpdateCollectionSelectName, ""},
+	{"", "description", states.CallbackUpdateCollectionSelectDescription, ""},
 }
 
 func HandleUpdateCollectionCommand(app models.App, session *models.Session) {

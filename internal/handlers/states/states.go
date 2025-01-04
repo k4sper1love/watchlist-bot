@@ -72,11 +72,12 @@ const (
 	ProcessAdminListAwaitingFind = "admin_list_awaiting_find"
 
 	// admin user detail states
-	CallbackAdminUserDetailBack     = "admin_user_detail_back"
-	CallbackAdminUserDetailRole     = "admin_user_detail_role"
-	CallbackAdminUserDetailBan      = "admin_user_detail_ban"
-	CallbackAdminUserDetailUnban    = "admin_user_detail_unban"
-	CallbackAdminUserDetailFeedback = "admin_user_detail_feedback"
+	CallbackAdminUserDetailBack          = "admin_user_detail_back"
+	CallbackAdminUserDetailRole          = "admin_user_detail_role"
+	CallbackAdminUserDetailBan           = "admin_user_detail_ban"
+	ProcessAdminUserDetailAwaitingReason = "admin_user_detail_awaiting_reason"
+	CallbackAdminUserDetailUnban         = "admin_user_detail_unban"
+	CallbackAdminUserDetailFeedback      = "admin_user_detail_feedback"
 
 	// admin detail states
 	CallbackAdminDetailBack       = "admin_detail_back"
@@ -129,9 +130,10 @@ const (
 	CallbackFilmsBack     = "films_back"
 
 	// manage film states
-	CallbackManageFilmSelectBack   = "manage_film_select_back"
-	CallbackManageFilmSelectUpdate = "manage_film_select_update"
-	CallbackManageFilmSelectDelete = "manage_film_select_delete"
+	CallbackManageFilmSelectBack                 = "manage_film_select_back"
+	CallbackManageFilmSelectUpdate               = "manage_film_select_update"
+	CallbackManageFilmSelectDelete               = "manage_film_select_delete"
+	CallbackManageFilmSelectRemoveFromCollection = "manage_film_select_remove_from_collection"
 
 	// new film states
 	CallbackNewFilmSelectBack         = "new_film_select_back"
@@ -146,6 +148,7 @@ const (
 	ProcessNewFilmAwaitingImage       = "new_film_awaiting_image"
 	ProcessNewFilmAwaitingComment     = "new_film_awaiting_comment"
 	ProcessNewFilmAwaitingViewed      = "new_film_awaiting_viewed"
+	ProcessNewFilmAwaitingFilmURL     = "new_film_awaiting_film_url"
 	ProcessNewFilmAwaitingUserRating  = "new_film_awaiting_user_rating"
 	ProcessNewFilmAwaitingReview      = "new_film_awaiting_review"
 
@@ -166,6 +169,8 @@ const (
 	ProcessUpdateFilmAwaitingRating      = "update_film_awaiting_rating"
 	CallbackUpdateFilmSelectImage        = "update_film_select_image"
 	ProcessUpdateFilmAwaitingImage       = "update_film_awaiting_image"
+	CallbackUpdateFilmSelectURL          = "update_film_select_url"
+	ProcessUpdateFilmAwaitingURL         = "update_film_awaiting_url"
 	CallbackUpdateFilmSelectComment      = "update_film_select_comment"
 	ProcessUpdateFilmAwaitingComment     = "update_film_awaiting_comment"
 	CallbackUpdateFilmSelectViewed       = "update_film_select_viewed"

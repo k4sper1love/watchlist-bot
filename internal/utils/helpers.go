@@ -28,7 +28,7 @@ func ParseTelegramName(update *tgbotapi.Update) string {
 	if update.Message != nil {
 		return update.Message.From.FirstName
 	} else if update.CallbackQuery.Message != nil {
-		return update.CallbackQuery.From.FirstName
+		return update.CallbackQuery.Message.From.FirstName
 	}
 
 	return "Guest"
@@ -38,7 +38,7 @@ func ParseTelegramUsername(update *tgbotapi.Update) string {
 	if update.Message != nil {
 		return update.Message.From.UserName
 	} else if update.CallbackQuery.Message != nil {
-		return update.CallbackQuery.From.UserName
+		return update.CallbackQuery.Message.From.UserName
 	}
 
 	return ""

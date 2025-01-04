@@ -2,11 +2,74 @@
   "choiceLanguage": {
     "other": "Пожалуйста, выберите язык для общения с ботом. Вы сможете поменять его в настройках"
   },
+  "raisedTo": {
+    "other": "Вы были повышены до роли \"{{.Role}}\""
+  },
+  "lowerTo": {
+    "other": "Вы были понижены до роли \"{{.Role}}\""
+  },
+  "raiseUser": {
+    "other": "Вы повысили {{.ID}} до роли {{.Role}}"
+  },
+  "lowerUser": {
+    "other": "Вы понизили {{.ID}} до роли {{.Role}}"
+  },
+  "cannotLowerSelf": {
+    "other": "Вы не можете понизить свою собственную роль"
+  },
+  "removedRole": {
+    "other": "У вас были отобраны права администратора"
+  },
+  "removeUserRole": {
+    "other": "Вы отобрали права администратора у {{.ID}}"
+  },
+  "changedRole": {
+    "other": "Ваша роль {{.OldRole}} была изменена на {{.NewRole}}"
+  },
+  "changeUserRole": {
+    "other": "Вы изменили роль {{.ID}} с {{.OldRole}} на {{.NewRole}}"
+  },
   "someError": {
     "other": "Произошла какая-то ошибка"
   },
   "setDefaultLanguage": {
     "other": "Установлен язык по умолчанию"
+  },
+  "openInBrowser": {
+    "other": "Открыть в браузере"
+  },
+  "filmURL": {
+    "other": "Ссылка на фильм"
+  },
+  "removeFilmFromCollection": {
+    "other": "Убрать фильм из коллекции"
+  },
+  "removeFilmFailure": {
+    "other": "Не удалось убрать фильм из коллекции"
+  },
+  "removeFilmSuccess": {
+    "other": "Фильм успешно убран из коллекции"
+  },
+  "requestBanReason": {
+    "other": "Укажите причину блокировки пользователя"
+  },
+  "bannedBy": {
+    "other": "Вас заблокировал {{.Role}}"
+  },
+  "unbannedBy": {
+    "other": "Вас разблокировал {{.Role}}"
+  },
+  "reason": {
+    "other": "Причина"
+  },
+  "botAccessDenied": {
+    "other": "Доступ к боту запрещен"
+  },
+  "banUser": {
+    "other": "Пользователь \"{{.ID}}\" был заблокирован"
+  },
+  "unbanUser": {
+    "other": "Пользователь \"{{.ID}}\" был разблокирован"
   },
   "admins": {
     "other": "Администраторы"
@@ -33,9 +96,8 @@
     "other": "Хелпер"
   },
   "root": {
-    "other": "Супер-пользователь"
+    "other": "Главный Администратор"
   },
-
   "manageUserRole": {
     "other": "Изменить роль"
   },
@@ -112,7 +174,7 @@
     "other": "Выберите для просмотра деталей"
   },
   "needRemoveRole": {
-    "other": "Сначала нужно установить роль user"
+    "other": "Сначала нужно забрать права администратора"
   },
   "unbanned": {
     "other": "Разблокирован"

@@ -65,3 +65,11 @@ func BuildLanguageMessage() (string, error) {
 
 	return res, nil
 }
+
+func toBold(text string) string {
+	return fmt.Sprintf("<b>%s</b>", text)
+}
+
+func toCode(text string) string {
+	return fmt.Sprintf("<code>%s</code>", text)
+}

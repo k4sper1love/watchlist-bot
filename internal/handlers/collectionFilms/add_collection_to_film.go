@@ -23,7 +23,7 @@ func HandleAddCollectionToFilmCommand(app models.App, session *models.Session) {
 
 	if len(collections) == 0 {
 		msg := translator.Translate(session.Lang, "collectionsNotFound", nil, nil)
-		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAddCollectionToFilmBack).Build(session.Lang)
+		keyboard := keyboards.NewKeyboard().AddCollectionsNew().AddBack(states.CallbackAddCollectionToFilmBack).Build(session.Lang)
 		app.SendMessage(msg, keyboard)
 		return
 	}

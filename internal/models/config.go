@@ -134,3 +134,38 @@ func (app App) SendBroadcastImage(telegramIDs []int, imageURL, text string, keyb
 		app.sendImageInternal(imagePath, text, keyboard)
 	}
 }
+
+func (app App) SendMessageByID(id int, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
+	tempApp := App{
+		Bot: app.Bot,
+		Upd: &tgbotapi.Update{
+			Message: &tgbotapi.Message{
+				Chat: &tgbotapi.Chat{ID: int64(id)},
+			},
+		},
+	}
+	tempApp.SendMessage(text, keyboard)
+}
+
+func (app App) SendImageByID(id int, imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
+	imagePath, err := utils.DownloadImage(imageURL)
+	if err != nil {
+		app.SendMessageByID(id, "Error when sending the image", nil)
+		return
+	}
+	defer func() {
+		if err := os.Remove(imagePath); err != nil {
+			log.Println("Failed to remove temp file", slog.Any("error", err))
+		}
+	}()
+
+	tempApp := App{
+		Bot: app.Bot,
+		Upd: &tgbotapi.Update{
+			Message: &tgbotapi.Message{
+				Chat: &tgbotapi.Chat{ID: int64(id)},
+			},
+		},
+	}
+	tempApp.SendImage(imagePath, text, keyboard)
+}

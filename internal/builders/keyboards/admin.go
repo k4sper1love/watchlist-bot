@@ -10,25 +10,25 @@ import (
 )
 
 var superAdminMenuButtons = []Button{
-	{"🛡️", "admins", states.CallbackAdminSelectAdmins},
+	{"🛡️", "admins", states.CallbackAdminSelectAdmins, ""},
 }
 
 var adminMenuButtons = []Button{
-	{"👥", "users", states.CallbackAdminSelectUsers},
-	{"📢", "broadcast", states.CallbackAdminSelectBroadcast},
+	{"👥", "users", states.CallbackAdminSelectUsers, ""},
+	{"📢", "broadcast", states.CallbackAdminSelectBroadcast, ""},
 }
 
 var helperMenuButtons = []Button{
-	{"💬", "feedback", states.CallbackAdminSelectFeedback},
+	{"💬", "feedback", states.CallbackAdminSelectFeedback, ""},
 }
 
 var rolesButtons = []Button{
-	{"👤", "user", states.CallbackAdminUserRoleSelectUser},
-	{"👷🏼", "helper", states.CallbackAdminUserRoleSelectHelper},
-	{"👨🏻‍💼", "admin", states.CallbackAdminUserRoleSelectAdmin},
+	{"👤", "user", states.CallbackAdminUserRoleSelectUser, ""},
+	{"👷🏼", "helper", states.CallbackAdminUserRoleSelectHelper, ""},
+	{"👨🏻‍💼", "admin", states.CallbackAdminUserRoleSelectAdmin, ""},
 }
 
-var superRoleButton = Button{"🦸", "superAdmin", states.CallbackAdminUserRoleSelectSuper}
+var superRoleButton = Button{"🦸", "superAdmin", states.CallbackAdminUserRoleSelectSuper, ""}
 
 func BuildAdminMenuKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
@@ -209,7 +209,7 @@ func (k *Keyboard) AddFeedbackSelect(session *models.Session, feedbacks []models
 
 		text := fmt.Sprintf("%d - ID: %d", itemID, feedback.ID)
 
-		buttons = append(buttons, Button{"", text, fmt.Sprintf("select_admin_feedback_%d", feedback.ID)})
+		buttons = append(buttons, Button{"", text, fmt.Sprintf("select_admin_feedback_%d", feedback.ID), ""})
 	}
 
 	k.AddButtonsWithRowSize(2, buttons...)
@@ -218,47 +218,47 @@ func (k *Keyboard) AddFeedbackSelect(session *models.Session, feedbacks []models
 }
 
 func (k *Keyboard) AddUserManageRole() *Keyboard {
-	return k.AddButton("🎭", "manageUserRole", states.CallbackAdminUserDetailRole)
+	return k.AddButton("🎭", "manageUserRole", states.CallbackAdminUserDetailRole, "")
 }
 
 func (k *Keyboard) AddUnbanUser() *Keyboard {
-	return k.AddButton("🟢", "unban", states.CallbackAdminUserDetailUnban)
+	return k.AddButton("🟢", "unban", states.CallbackAdminUserDetailUnban, "")
 }
 
 func (k *Keyboard) AddBanUser() *Keyboard {
-	return k.AddButton("🔴️", "ban", states.CallbackAdminUserDetailBan)
+	return k.AddButton("🔴️", "ban", states.CallbackAdminUserDetailBan, "")
 }
 
 func (k *Keyboard) AddViewUserFeedback() *Keyboard {
-	return k.AddButton("📩", "viewFeedback", states.CallbackAdminUserDetailFeedback)
+	return k.AddButton("📩", "viewFeedback", states.CallbackAdminUserDetailFeedback, "")
 }
 
 func (k *Keyboard) AddRaiseRank() *Keyboard {
-	return k.AddButton("⬆️", "raiseRole", states.CallbackAdminDetailRaiseRole)
+	return k.AddButton("⬆️", "raiseRole", states.CallbackAdminDetailRaiseRole, "")
 }
 
 func (k *Keyboard) AddLowerRank() *Keyboard {
-	return k.AddButton("⬇️", "lowerRole", states.CallbackAdminDetailLowerRole)
+	return k.AddButton("⬇️", "lowerRole", states.CallbackAdminDetailLowerRole, "")
 }
 
 func (k *Keyboard) AddRemoveAdminRole() *Keyboard {
-	return k.AddButton("❌", "removeAdminRole", states.CallbackAdminDetailRemoveRole)
+	return k.AddButton("❌", "removeAdminRole", states.CallbackAdminDetailRemoveRole, "")
 }
 
 func (k *Keyboard) AddFeedbackDelete() *Keyboard {
-	return k.AddButton("🗑️", "delete", states.CallbackAdminFeedbackDetailDelete)
+	return k.AddButton("🗑️", "delete", states.CallbackAdminFeedbackDetailDelete, "")
 }
 
 func (k *Keyboard) addFindUser() *Keyboard {
-	return k.AddButton("🔎", "findUser", states.CallbackAdminManageUsersSelectFind)
+	return k.AddButton("🔎", "findUser", states.CallbackAdminManageUsersSelectFind, "")
 }
 
 func (k *Keyboard) addFindAdmin() *Keyboard {
-	return k.AddButton("🔎", "findAdmin", states.CallbackAdminListSelectFind)
+	return k.AddButton("🔎", "findAdmin", states.CallbackAdminListSelectFind, "")
 }
 
 func (k *Keyboard) addSendBroadcast() *Keyboard {
-	return k.AddButton("➤", "send", states.CallbackAdminBroadcastSend)
+	return k.AddButton("➤", "send", states.CallbackAdminBroadcastSend, "")
 }
 
 func userSelectButtons(session *models.Session, users []models.Session, callback string) []Button {
@@ -273,7 +273,7 @@ func userSelectButtons(session *models.Session, users []models.Session, callback
 			text += fmt.Sprintf(" (@%s)", user.TelegramUsername)
 		}
 
-		buttons = append(buttons, Button{"", text, fmt.Sprintf("%s_%d", callback, user.TelegramID)})
+		buttons = append(buttons, Button{"", text, fmt.Sprintf("%s_%d", callback, user.TelegramID), ""})
 	}
 
 	return buttons

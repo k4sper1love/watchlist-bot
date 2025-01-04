@@ -24,6 +24,9 @@ func HandleUserDetailCommand(app models.App, session *models.Session) {
 		return
 	}
 
+	session.AdminState.UserLang = user.Lang
+	session.AdminState.UserRole = user.Role
+
 	msg := messages.BuildAdminUserDetailMessage(session, user)
 	keyboard := keyboards.BuildAdminUserDetailKeyboard(session, user)
 
@@ -53,59 +56,80 @@ func HandleUserDetailButton(app models.App, session *models.Session) {
 	}
 }
 
+func HandleUserDetailProcess(app models.App, session *models.Session) {
+	if utils.IsCancel(app.Upd) {
+		session.ClearAllStates()
+		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
+		return
+	}
+
+	switch session.State {
+	case states.ProcessAdminUserDetailAwaitingReason:
+		processUserBan(app, session)
+	}
+}
+
 func handleUserUnban(app models.App, session *models.Session) {
 	err := postgres.UnbanUser(session.AdminState.UserID)
 	if err != nil {
 		msg := translator.Translate(session.Lang, "someError", nil, nil)
 		app.SendMessage(msg, nil)
 	} else {
-		msg := translator.Translate(session.Lang, "unbanned", nil, nil)
+		msg := messages.BuildUnbanMessage(session)
 		app.SendMessage(msg, nil)
+
+		msg = messages.BuildUserUnbanNotificationMessage(session)
+		app.SendMessageByID(session.AdminState.UserID, msg, nil)
 	}
 
 	general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 }
 
 func handleUserBan(app models.App, session *models.Session) {
-	user, err := postgres.GetUserByTelegramID(session.AdminState.UserID)
-	if err != nil {
-		msg := translator.Translate(session.Lang, "someError", nil, nil)
-		app.SendMessage(msg, nil)
-		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
-		return
-	}
-
-	if user.Role.HasAccess(roles.Helper) {
+	if session.AdminState.UserRole.HasAccess(roles.Helper) {
 		msg := translator.Translate(session.Lang, "needRemoveRole", nil, nil)
 		app.SendMessage(msg, nil)
 		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 		return
 	}
 
-	err = postgres.BanUser(session.AdminState.UserID)
+	msg := translator.Translate(session.Lang, "requestBanReason", nil, nil)
+	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
+
+	app.SendMessage(msg, keyboard)
+
+	session.SetState(states.ProcessAdminUserDetailAwaitingReason)
+}
+
+func processUserBan(app models.App, session *models.Session) {
+	var reason string
+
+	if !utils.IsSkip(app.Upd) {
+		reason = utils.ParseMessageString(app.Upd)
+	}
+
+	err := postgres.BanUser(session.AdminState.UserID)
 	if err != nil {
 		msg := translator.Translate(session.Lang, "someError", nil, nil)
 		app.SendMessage(msg, nil)
 	} else {
-		msg := translator.Translate(session.Lang, "banned", nil, nil)
+		msg := messages.BuildBanMessage(session, reason)
 		app.SendMessage(msg, nil)
+
+		msg = messages.BuildUserBanNotificationMessage(session, reason)
+		app.SendMessageByID(session.AdminState.UserID, msg, nil)
 	}
+
+	session.ClearAllStates()
 
 	general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 }
 
 func handleUserRole(app models.App, session *models.Session) {
-	user, err := postgres.GetUserByTelegramID(session.AdminState.UserID)
-	if err != nil {
-		msg := translator.Translate(session.Lang, "someError", nil, nil)
-		app.SendMessage(msg, nil)
-		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
-		return
-	}
-
 	part1 := translator.Translate(session.Lang, "currentRole", nil, nil)
-	part2 := translator.Translate(session.Lang, "choiceRole", nil, nil)
-	msg := fmt.Sprintf("%s: %s\n\n%s", part1, user.Role.String(), part2)
+	part2 := translator.Translate(session.Lang, session.AdminState.UserRole.String(), nil, nil)
+	part3 := translator.Translate(session.Lang, "choiceRole", nil, nil)
+	msg := fmt.Sprintf("%s: %s\n\n%s", part1, part2, part3)
 
 	keyboard := keyboards.BuildAdminUserRoleKeyboard(session)
 
@@ -113,22 +137,7 @@ func handleUserRole(app models.App, session *models.Session) {
 }
 
 func processUserRole(app models.App, session *models.Session) {
-	user, err := postgres.GetUserByTelegramID(session.AdminState.UserID)
-	if err != nil {
-		msg := translator.Translate(session.Lang, "someError", nil, nil)
-		app.SendMessage(msg, nil)
-		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
-		return
-	}
-
-	if user.Role == roles.SuperAdmin && !session.Role.HasAccess(roles.Root) {
-		msg := translator.Translate(session.Lang, "noAccess", nil, nil)
-		app.SendMessage(msg, nil)
-		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
-		return
-	}
-
-	if user.Role.HasAccess(roles.Root) {
+	if (session.AdminState.UserRole == roles.SuperAdmin && !session.Role.HasAccess(roles.Root)) || session.AdminState.UserRole.HasAccess(roles.Root) {
 		msg := translator.Translate(session.Lang, "noAccess", nil, nil)
 		app.SendMessage(msg, nil)
 		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
@@ -157,11 +166,14 @@ func processUserRole(app models.App, session *models.Session) {
 
 	msg := " "
 
-	_, err = postgres.SetUserRole(user.TelegramID, role)
+	_, err := postgres.SetUserRole(session.AdminState.UserID, role)
 	if err != nil {
 		msg = translator.Translate(session.Lang, "someError", nil, nil)
 	} else {
-		msg = translator.Translate(session.Lang, "success", nil, nil)
+		msg = messages.BuildChangeRoleNotificationMessage(session, role)
+		app.SendMessageByID(session.AdminState.UserID, msg, nil)
+
+		msg = messages.BuildChangeRoleMessage(session, role)
 	}
 
 	app.SendMessage(msg, nil)

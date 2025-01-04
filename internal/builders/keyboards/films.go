@@ -8,20 +8,22 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
+var updateFilmURLButton = Button{"", "filmURL", states.CallbackUpdateFilmSelectURL, ""}
+
 var updateFilmButtons = []Button{
-	{"", "image", states.CallbackUpdateFilmSelectImage},
-	{"", "title", states.CallbackUpdateFilmSelectTitle},
-	{"", "description", states.CallbackUpdateFilmSelectDescription},
-	{"", "genre", states.CallbackUpdateFilmSelectGenre},
-	{"", "rating", states.CallbackUpdateFilmSelectRating},
-	{"", "yearOfRelease", states.CallbackUpdateFilmSelectYear},
-	{"", "comment", states.CallbackUpdateFilmSelectComment},
-	{"", "viewed", states.CallbackUpdateFilmSelectViewed},
+	{"", "image", states.CallbackUpdateFilmSelectImage, ""},
+	{"", "title", states.CallbackUpdateFilmSelectTitle, ""},
+	{"", "description", states.CallbackUpdateFilmSelectDescription, ""},
+	{"", "genre", states.CallbackUpdateFilmSelectGenre, ""},
+	{"", "rating", states.CallbackUpdateFilmSelectRating, ""},
+	{"", "yearOfRelease", states.CallbackUpdateFilmSelectYear, ""},
+	{"", "comment", states.CallbackUpdateFilmSelectComment, ""},
+	{"", "viewed", states.CallbackUpdateFilmSelectViewed, ""},
 }
 
 var updateFilmsAfterViewedButtons = []Button{
-	{"", "userRating", states.CallbackUpdateFilmSelectUserRating},
-	{"", "Review", states.CallbackUpdateFilmSelectReview},
+	{"", "userRating", states.CallbackUpdateFilmSelectUserRating, ""},
+	{"", "Review", states.CallbackUpdateFilmSelectReview, ""},
 }
 
 func BuildFilmsKeyboard(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
@@ -57,8 +59,12 @@ func BuildFilmDetailKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMa
 
 	keyboard := NewKeyboard()
 
+	if film.URL != "" {
+		keyboard.AddURLButton("", "openInBrowser", film.URL)
+	}
+
 	if !film.IsViewed {
-		keyboard.AddButton("✔️", "viewed", states.CallbackFilmDetailViewed)
+		keyboard.AddButton("✔️", "viewed", states.CallbackFilmDetailViewed, "")
 	}
 
 	keyboard.AddFilmManage()
@@ -83,6 +89,10 @@ func BuildFilmManageKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMa
 
 	keyboard.AddFilmUpdate()
 
+	if session.Context == states.ContextCollection {
+		keyboard.AddFilmRemoveFromCollection()
+	}
+
 	keyboard.AddFilmDelete()
 
 	keyboard.AddBack(states.CallbackManageFilmSelectBack)
@@ -105,6 +115,8 @@ func BuildFilmNewKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarku
 func BuildFilmUpdateKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	film := session.FilmDetailState.Film
 	keyboard := NewKeyboard()
+
+	keyboard.AddRow(updateFilmURLButton)
 
 	keyboard.AddButtonsWithRowSize(2, updateFilmButtons...)
 
@@ -133,7 +145,7 @@ func (k *Keyboard) AddFilmSelect(session *models.Session) *Keyboard {
 	for i, film := range session.FilmsState.Films {
 		itemID := utils.GetItemID(i, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
 
-		buttons = append(buttons, Button{"", fmt.Sprintf("%s (%d)", film.Title, itemID), fmt.Sprintf("select_film_%d", i)})
+		buttons = append(buttons, Button{"", fmt.Sprintf("%s (%d)", film.Title, itemID), fmt.Sprintf("select_film_%d", i), ""})
 	}
 
 	k.AddButtonsWithRowSize(2, buttons...)
@@ -142,25 +154,29 @@ func (k *Keyboard) AddFilmSelect(session *models.Session) *Keyboard {
 }
 
 func (k *Keyboard) AddFilmNew() *Keyboard {
-	return k.AddButton("➕", "createFilm", states.CallbackFilmsNew)
+	return k.AddButton("➕", "createFilm", states.CallbackFilmsNew, "")
 }
 
 func (k *Keyboard) AddFilmDelete() *Keyboard {
-	return k.AddButton("🗑️", "deleteFilm", states.CallbackManageFilmSelectDelete)
+	return k.AddButton("🗑️", "deleteFilm", states.CallbackManageFilmSelectDelete, "")
 }
 
 func (k *Keyboard) AddFilmUpdate() *Keyboard {
-	return k.AddButton("✏️", "updateFilm", states.CallbackManageFilmSelectUpdate)
+	return k.AddButton("✏️", "updateFilm", states.CallbackManageFilmSelectUpdate, "")
 }
 
 func (k *Keyboard) AddFilmManage() *Keyboard {
-	return k.AddButton("⚙️", "manageFilm", states.CallbackFilmsManage)
+	return k.AddButton("⚙️", "manageFilm", states.CallbackFilmsManage, "")
+}
+
+func (k *Keyboard) AddFilmRemoveFromCollection() *Keyboard {
+	return k.AddButton("❌", "removeFilmFromCollection", states.CallbackManageFilmSelectRemoveFromCollection, "")
 }
 
 func (k *Keyboard) AddNewFilmManually() *Keyboard {
-	return k.AddButton("", "manually", states.CallbackNewFilmSelectManually)
+	return k.AddButton("", "manually", states.CallbackNewFilmSelectManually, "")
 }
 
 func (k *Keyboard) AddNewFilmFromURL() *Keyboard {
-	return k.AddButton("", "fromURL", states.CallbackNewFilmSelectFromURL)
+	return k.AddButton("", "fromURL", states.CallbackNewFilmSelectFromURL, "")
 }

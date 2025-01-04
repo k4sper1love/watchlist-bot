@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
@@ -156,6 +157,154 @@ func BuildFeedbackDetailMessage(session *models.Session, feedback *models.Feedba
 
 	createdMsg := translator.Translate(session.Lang, "created", nil, nil)
 	msg += fmt.Sprintf("<b>%s:</b> %s\n", createdMsg, feedback.CreatedAt.Format("02.01.2006 15:04"))
+
+	return msg
+}
+
+func BuildUserBanNotificationMessage(session *models.Session, reason string) string {
+	roleMsg := translator.Translate(session.AdminState.UserLang, session.Role.String(), nil, nil)
+	bannedByMsg := translator.Translate(session.AdminState.UserLang, "bannedBy", map[string]interface{}{
+		"Role": roleMsg,
+	}, nil)
+
+	msg := fmt.Sprintf("❌ %s", bannedByMsg)
+
+	if reason != "" {
+		reasonMsg := translator.Translate(session.AdminState.UserLang, "reason", nil, nil)
+		msg += fmt.Sprintf("\n\n<b>%s</b>: %s", reasonMsg, reason)
+	}
+
+	accessDeniedMsg := translator.Translate(session.AdminState.UserLang, "botAccessDenied", nil, nil)
+	msg += fmt.Sprintf("\n\n⛔ %s", accessDeniedMsg)
+
+	return msg
+}
+
+func BuildBanMessage(session *models.Session, reason string) string {
+	banUserMsg := translator.Translate(session.Lang, "banUser", map[string]interface{}{
+		"ID": session.AdminState.UserID,
+	}, nil)
+
+	msg := fmt.Sprintf("❌ %s", banUserMsg)
+
+	if reason != "" {
+		reasonMsg := translator.Translate(session.Lang, "reason", nil, nil)
+		msg += fmt.Sprintf("\n\n<b>%s</b>: %s", reasonMsg, reason)
+	}
+
+	return msg
+}
+
+func BuildUserUnbanNotificationMessage(session *models.Session) string {
+	roleMsg := translator.Translate(session.AdminState.UserLang, session.Role.String(), nil, nil)
+	bannedByMsg := translator.Translate(session.AdminState.UserLang, "unbannedBy", map[string]interface{}{
+		"Role": roleMsg,
+	}, nil)
+
+	msg := fmt.Sprintf("🟢 %s", bannedByMsg)
+
+	return msg
+}
+
+func BuildUnbanMessage(session *models.Session) string {
+	unbanUserMsg := translator.Translate(session.Lang, "unbanUser", map[string]interface{}{
+		"ID": session.AdminState.UserID,
+	}, nil)
+
+	msg := fmt.Sprintf("🟢 %s", unbanUserMsg)
+
+	return msg
+}
+
+func BuildRaiseRoleNotificationMessage(session *models.Session) string {
+	roleMsg := translator.Translate(session.AdminState.UserLang, session.AdminState.UserRole.NextRole().String(), nil, nil)
+	raiseMsg := translator.Translate(session.AdminState.UserLang, "raisedTo", map[string]interface{}{
+		"Role": toBold(roleMsg),
+	}, nil)
+
+	msg := fmt.Sprintf("⬆️ %s", raiseMsg)
+
+	return msg
+}
+
+func BuildRaiseRoleMessage(session *models.Session) string {
+	roleMsg := translator.Translate(session.Lang, session.AdminState.UserRole.NextRole().String(), nil, nil)
+	raiseMsg := translator.Translate(session.Lang, "raiseUser", map[string]interface{}{
+		"ID":   toCode(fmt.Sprintf("%d", session.AdminState.UserID)),
+		"Role": toBold(roleMsg),
+	}, nil)
+
+	msg := fmt.Sprintf("⬆️ %s", raiseMsg)
+
+	return msg
+}
+
+func BuildLowerRoleNotificationMessage(session *models.Session) string {
+	roleMsg := translator.Translate(session.AdminState.UserLang, session.AdminState.UserRole.PrevRole().String(), nil, nil)
+	raiseMsg := translator.Translate(session.AdminState.UserLang, "lowerTo", map[string]interface{}{
+		"Role": toBold(roleMsg),
+	}, nil)
+
+	msg := fmt.Sprintf("⬇️ %s", raiseMsg)
+
+	return msg
+}
+
+func BuildLowerRoleMessage(session *models.Session) string {
+	roleMsg := translator.Translate(session.Lang, session.AdminState.UserRole.PrevRole().String(), nil, nil)
+	raiseMsg := translator.Translate(session.Lang, "lowerUser", map[string]interface{}{
+		"ID":   toCode(fmt.Sprintf("%d", session.AdminState.UserID)),
+		"Role": toBold(roleMsg),
+	}, nil)
+
+	msg := fmt.Sprintf("⬇️ %s", raiseMsg)
+
+	return msg
+}
+
+func BuildRemoveRoleNotificationMessage(session *models.Session) string {
+	removedMsg := translator.Translate(session.AdminState.UserLang, "removedRole", nil, nil)
+
+	msg := fmt.Sprintf("❌ %s", removedMsg)
+
+	return msg
+}
+
+func BuildRemoveRoleMessage(session *models.Session) string {
+	removeMsg := translator.Translate(session.Lang, "removeUserRole", map[string]interface{}{
+		"ID": toCode(fmt.Sprintf("%d", session.AdminState.UserID)),
+	}, nil)
+
+	msg := fmt.Sprintf("⚠️ %s", removeMsg)
+
+	return msg
+}
+
+func BuildChangeRoleNotificationMessage(session *models.Session, newRole roles.Role) string {
+	oldRoleMsg := translator.Translate(session.AdminState.UserLang, session.AdminState.UserRole.String(), nil, nil)
+	newRoleMsg := translator.Translate(session.AdminState.UserLang, newRole.String(), nil, nil)
+
+	changedMsg := translator.Translate(session.AdminState.UserLang, "changedRole", map[string]interface{}{
+		"OldRole": toBold(oldRoleMsg),
+		"NewRole": toBold(newRoleMsg),
+	}, nil)
+
+	msg := fmt.Sprintf("🔄 %s", changedMsg)
+
+	return msg
+}
+
+func BuildChangeRoleMessage(session *models.Session, newRole roles.Role) string {
+	oldRoleMsg := translator.Translate(session.Lang, session.AdminState.UserRole.String(), nil, nil)
+	newRoleMsg := translator.Translate(session.AdminState.UserLang, newRole.String(), nil, nil)
+
+	changeMsg := translator.Translate(session.Lang, "changeUserRole", map[string]interface{}{
+		"ID":      toCode(fmt.Sprintf("%d", session.AdminState.UserID)),
+		"OldRole": toBold(oldRoleMsg),
+		"NewRole": toBold(newRoleMsg),
+	}, nil)
+
+	msg := fmt.Sprintf("🔄 %s", changeMsg)
 
 	return msg
 }
