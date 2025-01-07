@@ -443,6 +443,15 @@
   "filmRequestTitle": {
     "other": "Фильмнің атауын енгізіңіз"
   },
+  "totalFindFilms": {
+    "other": "Фильмдер табылды"
+  },
+  "again": {
+    "other": "Қайтадан"
+  },
+  "findFilmByTitle": {
+    "other": "Атауы бойынша іздеу"
+  },
   "filmRequestDescription": {
     "other": "Фильмнің сипаттамасын енгізіңіз"
   },

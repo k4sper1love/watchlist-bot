@@ -17,6 +17,8 @@ import (
 )
 
 func HandleFilmsCommand(app models.App, session *models.Session) {
+	session.FilmsState.Title = ""
+
 	metadata, err := GetFilms(app, session)
 	if err != nil {
 		app.SendMessage(err.Error(), nil)
@@ -64,8 +66,24 @@ func HandleFilmsButtons(app models.App,
 	case callback == states.CallbackFilmsManage:
 		HandleManageFilmCommand(app, session)
 
+	case callback == states.CallbackFilmsFind:
+		handleFilmsFindByTitle(app, session)
+
 	case strings.HasPrefix(callback, "select_film_"):
 		handleFilmSelect(app, session)
+	}
+}
+
+func HandleFilmsProcess(app models.App, session *models.Session) {
+	if utils.IsCancel(app.Upd) {
+		session.ClearAllStates()
+		HandleFilmsCommand(app, session)
+		return
+	}
+
+	switch session.State {
+	case states.ProcessFindFilmsAwaitingTitle:
+		parseFindFilmTitle(app, session)
 	}
 }
 
@@ -83,6 +101,26 @@ func handleFilmSelect(app models.App, session *models.Session) {
 	session.FilmDetailState.Index = index
 
 	HandleFilmsDetailCommand(app, session)
+}
+
+func handleFilmsFindByTitle(app models.App, session *models.Session) {
+	msg := translator.Translate(session.Lang, "filmRequestTitle", nil, nil)
+
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
+
+	app.SendMessage(msg, keyboard)
+
+	session.SetState(states.ProcessFindFilmsAwaitingTitle)
+}
+
+func parseFindFilmTitle(app models.App, session *models.Session) {
+	title := utils.ParseMessageString(app.Upd)
+
+	session.FilmsState.Title = title
+
+	session.ClearState()
+
+	HandleFindFilmsCommand(app, session)
 }
 
 func UpdateFilmsList(app models.App, session *models.Session, next bool) error {

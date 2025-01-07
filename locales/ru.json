@@ -446,6 +446,15 @@
   "filmRequestTitle": {
     "other": "Введите название фильма"
   },
+  "totalFindFilms": {
+    "other": "Найдено фильмов"
+  },
+  "again": {
+    "other": "Заново"
+  },
+  "findFilmByTitle": {
+    "other": "Поиск по названию"
+  },
   "filmRequestDescription": {
     "other": "Введите описание фильма"
   },

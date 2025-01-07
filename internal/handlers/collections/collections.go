@@ -82,6 +82,7 @@ func HandleCollectionSelect(app models.App, session *models.Session) {
 	session.FilmsState.CurrentPage = 1
 
 	session.SetContext(states.ContextCollection)
+
 	films.HandleFilmsCommand(app, session)
 }
 

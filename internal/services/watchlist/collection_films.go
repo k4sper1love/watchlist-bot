@@ -14,7 +14,7 @@ func GetCollectionFilms(app models.App, session *models.Session) (*models.Collec
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films?page=%d&page_size=%d", app.Vars.Host, session.CollectionDetailState.ObjectID, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
+	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films?page=%d&page_size=%d&title=%s", app.Vars.Host, session.CollectionDetailState.ObjectID, session.FilmsState.CurrentPage, session.FilmsState.PageSize, session.FilmsState.Title)
 
 	resp, err := client.SendRequestWithOptions(requestURL, http.MethodGet, nil, headers)
 	if err != nil {

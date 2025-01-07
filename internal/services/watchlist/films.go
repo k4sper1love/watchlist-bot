@@ -17,12 +17,16 @@ func GetFilmsExcludeCollection(app models.App, session *models.Session) (*models
 	return getFilmsRequest(app, session, session.CollectionDetailState.Collection.ID, session.CollectionFilmsState.CurrentPage, session.CollectionFilmsState.PageSize)
 }
 
+//func GetFilmsByTitle(app models.App, session *models.Session) (*models.FilmsResponse, error) {
+//	return getFilmsRequest(app, session, -1, session.FilmsState.CurrentPage, session.FilmsState.PageSize, session.FilmsState.Title)
+//}
+
 func getFilmsRequest(app models.App, session *models.Session, collectionID, currentPage, pageSize int) (*models.FilmsResponse, error) {
 	headers := map[string]string{
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/films?exclude_collection=%d&page=%d&page_size=%d", app.Vars.Host, collectionID, currentPage, pageSize)
+	requestURL := fmt.Sprintf("%s/api/v1/films?exclude_collection=%d&page=%d&page_size=%d&title=%s", app.Vars.Host, collectionID, currentPage, pageSize, session.FilmsState.Title)
 
 	resp, err := client.SendRequestWithOptions(requestURL, http.MethodGet, nil, headers)
 	if err != nil {

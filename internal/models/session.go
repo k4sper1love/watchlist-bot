@@ -52,6 +52,7 @@ func (s *Session) ClearAllStates() {
 	s.ClearState()
 	s.ProfileState.Clear()
 	s.FeedbackState.Clear()
+	s.FilmsState.Clear()
 	s.FilmDetailState.Clear()
 	s.CollectionDetailState.Clear()
 	s.AdminState.Clear()

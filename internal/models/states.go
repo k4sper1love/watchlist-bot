@@ -28,6 +28,7 @@ type FilmsState struct {
 	PageSize     int              `json:"-" gorm:"default:4"`
 	CurrentPage  int              `json:"-"`
 	TotalRecords int
+	Title        string `json:"-"`
 }
 
 type FilmDetailState struct {
@@ -89,6 +90,10 @@ type AdminState struct {
 	TotalRecords     int        `json:"-"`
 	FeedbackMessage  string     `json:"-"`
 	FeedbackImageURL string     `json:"-"`
+}
+
+func (s *FilmsState) Clear() {
+	s.Title = ""
 }
 
 func (s *AdminState) Clear() {

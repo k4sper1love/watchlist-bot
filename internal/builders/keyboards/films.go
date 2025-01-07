@@ -29,6 +29,10 @@ var updateFilmsAfterViewedButtons = []Button{
 func BuildFilmsKeyboard(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
+	if len(session.FilmsState.Films) > 0 {
+		keyboard.AddFilmFind()
+	}
+
 	keyboard.AddFilmSelect(session)
 
 	keyboard.AddNavigation(
@@ -48,6 +52,23 @@ func BuildFilmsKeyboard(session *models.Session, currentPage, lastPage int) *tgb
 		keyboard.AddCollectionsManage()
 		keyboard.AddBack(states.CallbackFilmsBack)
 	}
+
+	return keyboard.Build(session.Lang)
+}
+
+func BuildFindFilmsKeyboard(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
+	keyboard := NewKeyboard()
+
+	keyboard.AddFilmSelect(session)
+
+	keyboard.AddNavigation(
+		currentPage,
+		lastPage,
+		states.CallbackFindFilmsPrevPage,
+		states.CallbackFindFilmsNextPage,
+	)
+
+	keyboard.AddBack(states.CallbackFindFilmsBack)
 
 	return keyboard.Build(session.Lang)
 }
@@ -153,6 +174,10 @@ func (k *Keyboard) AddFilmSelect(session *models.Session) *Keyboard {
 	return k
 }
 
+func (k *Keyboard) AddFilmFind() *Keyboard {
+	return k.AddButton("🔎", "findFilmByTitle", states.CallbackFilmsFind, "")
+}
+
 func (k *Keyboard) AddFilmNew() *Keyboard {
 	return k.AddButton("➕", "createFilm", states.CallbackFilmsNew, "")
 }
@@ -179,4 +204,8 @@ func (k *Keyboard) AddNewFilmManually() *Keyboard {
 
 func (k *Keyboard) AddNewFilmFromURL() *Keyboard {
 	return k.AddButton("", "fromURL", states.CallbackNewFilmSelectFromURL, "")
+}
+
+func (k *Keyboard) AddAgain(callback string) *Keyboard {
+	return k.AddButton("↻", "again", callback, "")
 }

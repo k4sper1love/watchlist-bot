@@ -446,6 +446,16 @@
   "filmRequestTitle": {
     "other": "Enter the film title"
   },
+  "totalFindFilms": {
+    "other": "Films found"
+  },
+  "again": {
+    "other": "Again"
+  },
+  "findFilmByTitle": {
+    "other": "Search by title"
+  },
+
   "filmRequestDescription": {
     "other": "Enter the film description"
   },

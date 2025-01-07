@@ -123,11 +123,19 @@ const (
 	ProcessDeleteProfileAwaitingConfirm = "delete_profile_awaiting_confirm"
 
 	// films states
-	CallbackFilmsNew      = "films_new"
-	CallbackFilmsManage   = "films_manage"
-	CallbackFilmsNextPage = "films_next_page"
-	CallbackFilmsPrevPage = "films_prev_page"
-	CallbackFilmsBack     = "films_back"
+	CallbackFilmsNew              = "films_new"
+	CallbackFilmsManage           = "films_manage"
+	CallbackFilmsNextPage         = "films_next_page"
+	CallbackFilmsPrevPage         = "films_prev_page"
+	CallbackFilmsBack             = "films_back"
+	CallbackFilmsFind             = "films_find"
+	ProcessFindFilmsAwaitingTitle = "find_films_awaiting_title"
+
+	// find films states
+	CallbackFindFilmsBack     = "find_films_back"
+	CallbackFindFilmsNextPage = "find_films_next_page"
+	CallbackFindFilmsPrevPage = "find_films_prev_page"
+	CallbackFindFilmsAgain    = "find_films_again"
 
 	// manage film states
 	CallbackManageFilmSelectBack                 = "manage_film_select_back"
