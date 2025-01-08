@@ -32,7 +32,7 @@ func BuildAdminUserListMessage(session *models.Session, users []models.Session) 
 		}
 
 		bannedMsg := translator.Translate(session.Lang, "banned", nil, nil)
-		msg += fmt.Sprintf("%s: %s\n", bannedMsg, boolToEmoji(user.IsBanned))
+		msg += fmt.Sprintf("%s: %s\n", bannedMsg, utils.BoolToEmoji(user.IsBanned))
 
 		msg += "\n"
 	}
@@ -63,7 +63,7 @@ func BuildAdminUserDetailMessage(session *models.Session, user *models.Session) 
 	msg += fmt.Sprintf("<b>%s:</b> %s\n", roleMsg, roleValueMsg)
 
 	bannedMsg := translator.Translate(session.Lang, "banned", nil, nil)
-	msg += fmt.Sprintf("<b>%s:</b> %s\n", bannedMsg, boolToEmoji(user.IsBanned))
+	msg += fmt.Sprintf("<b>%s:</b> %s\n", bannedMsg, utils.BoolToEmoji(user.IsBanned))
 
 	languageMsg := translator.Translate(session.Lang, "language", nil, nil)
 	language := ""

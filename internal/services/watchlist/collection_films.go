@@ -7,6 +7,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"net/http"
+	"net/url"
 )
 
 func GetCollectionFilms(app models.App, session *models.Session) (*models.CollectionFilmsResponse, error) {
@@ -14,7 +15,7 @@ func GetCollectionFilms(app models.App, session *models.Session) (*models.Collec
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films?page=%d&page_size=%d&title=%s", app.Vars.Host, session.CollectionDetailState.ObjectID, session.FilmsState.CurrentPage, session.FilmsState.PageSize, session.FilmsState.Title)
+	requestURL := buildGetCollectionFilmsURL(app, session)
 
 	resp, err := client.SendRequestWithOptions(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
@@ -23,7 +24,7 @@ func GetCollectionFilms(app models.App, session *models.Session) (*models.Collec
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("get_films failed: %s", resp.Status)
+		return nil, fmt.Errorf("get_collection_films failed: %s", resp.Status)
 	}
 
 	var collectionFilmsResponse models.CollectionFilmsResponse
@@ -102,4 +103,37 @@ func DeleteCollectionFilm(app models.App, session *models.Session) error {
 	}
 
 	return nil
+}
+
+func buildGetCollectionFilmsURL(app models.App, session *models.Session) string {
+	baseURL := fmt.Sprintf("%s/api/v1/collections/%d/films", app.Vars.Host, session.CollectionDetailState.ObjectID)
+	queryParams := url.Values{}
+
+	if session.FilmsState.CurrentPage > 0 {
+		queryParams.Add("page", fmt.Sprintf("%d", session.FilmsState.CurrentPage))
+	}
+
+	if session.FilmsState.PageSize > 0 {
+		queryParams.Add("page_size", fmt.Sprintf("%d", session.FilmsState.PageSize))
+	}
+
+	if session.FilmsState.Title != "" {
+		queryParams.Add("title", session.FilmsState.Title)
+	}
+
+	if session.FilmsState.CollectionFilters.MinRating > 0 {
+		queryParams.Add("rating_min", fmt.Sprintf("%.2f", session.FilmsState.CollectionFilters.MinRating))
+	}
+
+	if session.FilmsState.CollectionFilters.MaxRating > 0 {
+		queryParams.Add("rating_max", fmt.Sprintf("%.2f", session.FilmsState.CollectionFilters.MaxRating))
+	}
+
+	if session.FilmsState.CollectionSorting.Sort != "" {
+		queryParams.Add("sort", session.FilmsState.CollectionSorting.Sort)
+	}
+
+	requestURL := fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
+
+	return requestURL
 }

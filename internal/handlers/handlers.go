@@ -44,7 +44,7 @@ func HandleUpdates(app models.App) {
 		general.CheckBanned(app, session, handleUserInput)
 	}
 
-	postgres.SaveSessionWihDependencies(session)
+	postgres.SaveSessionWithDependencies(session)
 }
 
 func handleCommands(app models.App, session *models.Session) {
@@ -113,6 +113,12 @@ func handleUserInput(app models.App, session *models.Session) {
 
 	case strings.HasPrefix(session.State, "update_profile_awaiting"):
 		users.HandleUpdateProfileProcess(app, session)
+
+	case strings.HasPrefix(session.State, "filters_films_awaiting"):
+		films.HandleFiltersFilmsProcess(app, session)
+
+	case strings.HasPrefix(session.State, "sorting_films_awaiting"):
+		films.HandleSortingFilmsProcess(app, session)
 
 	case strings.HasPrefix(session.State, "find_films_awaiting"):
 		films.HandleFilmsProcess(app, session)
@@ -203,6 +209,12 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 		} else if session.Context == states.ContextCollection {
 			films.HandleFilmsButtons(app, session, collections.HandleCollectionsCommand)
 		}
+
+	case strings.HasPrefix(callbackData, "filters_films_select"):
+		films.HandleFiltersFilmsButtons(app, session)
+
+	case strings.HasPrefix(callbackData, "sorting_films_select"):
+		films.HandleSortingFilmsButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "find_films"):
 		films.HandleFindFilmsButtons(app, session)

@@ -2,7 +2,77 @@
   "choiceLanguage": {
     "other": "Будь ласка, виберіть мову для спілкування з ботом. Ви зможете поміняти його в налаштуваннях"
   },
-  "raisedTo": {
+  "filters": {
+    "other": "Фільтри"
+  },
+  "sorting": {
+    "other": "Сортування"
+  },
+  "choiceFilter": {
+    "other": "Оберіть фільтр, щоб увімкнути/вимкнути його"
+  },
+  "choiceSorting": {
+    "other": "Оберіть поле для сортування"
+  },
+  "minRating": {
+    "other": "Мінімальний рейтинг"
+  },
+  "maxRating": {
+    "other": "Максимальний рейтинг"
+  },
+  "requestMinRating": {
+    "other": "Введіть мінімальний рейтинг"
+  },
+  "requestMaxRating": {
+    "other": "Введіть максимальний рейтинг"
+  },
+  "badRating": {
+    "other": "Рейтинг повинен бути більше 0 і менше 10"
+  },
+  "filterApplied": {
+    "other": "Фільтр успішно застосовано!"
+  },
+  "resetFilters": {
+    "other": "Скинути фільтри"
+  },
+  "reset": {
+    "other": "Скинути"
+  },
+  "currentValue": {
+    "other": "Поточне значення"
+  },
+  "ratingMustBeLower": {
+    "other": "Рейтинг повинен бути меншим або рівним максимальному рейтингу"
+  },
+  "ratingMustBeHigher": {
+    "other": "Рейтинг повинен бути більшим або рівним мінімальному рейтингу"
+  },
+  "filterResetSuccess": {
+    "one": "Фільтр успішно скинуто!",
+    "other": "Фільтри успішно скинуто!"
+  },
+  "sortingResetSuccess": {
+    "other": "Параметри сортування успішно скинуто!"
+  },
+  "selectedSortField": {
+    "other": "Ви обрали сортування за <b>{{.Field}}</b>"
+  },
+  "requestDirection": {
+    "other": "Оберіть напрямок"
+  },
+  "increaseOrder": {
+    "other": "За зростанням"
+  },
+  "decreaseOrder": {
+    "other": "За спаданням"
+  },
+  "sortingApplied": {
+    "other": "Сортування успішно застосовано!"
+  },
+  "resetSorting": {
+    "other": "Скинути сортування"
+  },
+"raisedTo": {
     "other": "Вас підвищено до ролі \"{{.Role}}\""
   },
   "lowerTo": {

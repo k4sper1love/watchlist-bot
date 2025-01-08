@@ -50,7 +50,6 @@ func buildFilmsList(session *models.Session, metadata *filters.Metadata, isFind 
 		msg += BuildFilmGeneralMessage(session, &film)
 	}
 
-	// Информация о страницах
 	pageMsg := translator.Translate(session.Lang, "pageCounter", map[string]interface{}{
 		"CurrentPage": metadata.CurrentPage,
 		"LastPage":    metadata.LastPage,
@@ -78,4 +77,63 @@ func buildCollectionHeader(session *models.Session) string {
 		msg += translator.Translate(session.Lang, "notFoundFilmsInCollection", nil, nil)
 	}
 	return msg
+}
+
+func BuildRatingFilterMessage(session *models.Session, filterType string) string {
+	var msg string
+
+	switch filterType {
+	case "minRating":
+		msg = translator.Translate(session.Lang, "requestMinRating", nil, nil)
+	case "maxRating":
+		msg = translator.Translate(session.Lang, "requestMaxRating", nil, nil)
+	}
+
+	rating := parseRatingValue(session, filterType)
+
+	if rating > 0 {
+		valueMsg := translator.Translate(session.Lang, "currentValue", nil, nil)
+		msg += fmt.Sprintf("\n\n<b>%s</b>: %.2f", valueMsg, rating)
+	}
+
+	return msg
+}
+
+func BuildValidateFilterMessage(session *models.Session, filterType string) string {
+	switch filterType {
+	case "minRating":
+		return translator.Translate(session.Lang, "ratingMustBeLower", nil, nil)
+	case "maxRating":
+		return translator.Translate(session.Lang, "ratingMustBeHigher", nil, nil)
+	}
+	return translator.Translate(session.Lang, "someError", nil, nil)
+}
+
+func BuildSelectedSortMessage(session *models.Session) string {
+	sorting := session.GetFilmsSortingByContext()
+
+	field := translator.Translate(session.Lang, sorting.Field, nil, nil)
+	part1 := translator.Translate(session.Lang, "selectedSortField", map[string]interface{}{
+		"Field": field,
+	}, nil)
+	part2 := translator.Translate(session.Lang, "requestDirection", nil, nil)
+
+	msg := fmt.Sprintf("%s\n\n%s", part1, part2)
+
+	return msg
+}
+
+func parseRatingValue(session *models.Session, filterType string) float64 {
+	filter := session.GetFilmsFiltersByContext()
+
+	switch filterType {
+	case "minRating":
+		return filter.MinRating
+
+	case "maxRating":
+		return filter.MaxRating
+
+	default:
+		return 0
+	}
 }
