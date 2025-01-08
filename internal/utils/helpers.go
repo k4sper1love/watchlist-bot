@@ -108,6 +108,10 @@ func IsCancel(update *tgbotapi.Update) bool {
 	return ParseCallback(update) == states.CallbackProcessCancel
 }
 
+func IsReset(update *tgbotapi.Update) bool {
+	return ParseCallback(update) == states.CallbackProcessReset
+}
+
 func IsAgree(update *tgbotapi.Update) bool {
 	return ParseCallback(update) == states.CallbackYes
 }
@@ -234,4 +238,19 @@ func ParseSupportedLanguages(dir string) ([]string, error) {
 	}
 
 	return languages, nil
+}
+
+func BoolToEmoji(value bool) string {
+	if value {
+		return "✔️"
+	}
+	return "✖️"
+}
+
+func SortDirectionToEmoji(value string) string {
+	if strings.HasPrefix(value, "-") {
+		return "⬇️"
+	}
+
+	return "⬆️"
 }

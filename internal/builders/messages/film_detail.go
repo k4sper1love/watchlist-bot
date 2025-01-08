@@ -24,7 +24,7 @@ func BuildFilmDetailMessage(session *models.Session, film *apiModels.Film) strin
 	}
 
 	part := translator.Translate(session.Lang, "viewed", nil, nil)
-	msg += fmt.Sprintf("<b>%s</b>: %s\n", part, boolToEmoji(film.IsViewed))
+	msg += fmt.Sprintf("<b>%s</b>: %s\n", part, utils.BoolToEmoji(film.IsViewed))
 
 	if film.Genre != "" {
 		part = translator.Translate(session.Lang, "genre", nil, nil)
@@ -110,13 +110,6 @@ func BuildFilmGeneralMessage(session *models.Session, film *apiModels.Film) stri
 	msg += fmt.Sprintf("%s\n\n", boolToString(session, film.IsViewed))
 
 	return msg
-}
-
-func boolToEmoji(viewed bool) string {
-	if viewed {
-		return "✔️"
-	}
-	return "✖️"
 }
 
 func boolToString(session *models.Session, viewed bool) string {

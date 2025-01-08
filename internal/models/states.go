@@ -21,14 +21,18 @@ type FeedbackState struct {
 }
 
 type FilmsState struct {
-	gorm.Model   `json:"-"`
-	SessionID    uint             `json:"-"`
-	Films        []apiModels.Film `json:"films" gorm:"serializer:json"`
-	LastPage     int              `json:"-"`
-	PageSize     int              `json:"-" gorm:"default:4"`
-	CurrentPage  int              `json:"-"`
-	TotalRecords int
-	Title        string `json:"-"`
+	gorm.Model        `json:"-"`
+	SessionID         uint             `json:"-"`
+	Films             []apiModels.Film `json:"films" gorm:"serializer:json"`
+	LastPage          int              `json:"-"`
+	PageSize          int              `json:"-" gorm:"default:4"`
+	CurrentPage       int              `json:"-"`
+	TotalRecords      int
+	Title             string        `json:"-"`
+	FilmFilters       *FilmsFilters `gorm:"polymorphic:Filterable;polymorphicValue:FilmFilters"`
+	CollectionFilters *FilmsFilters `gorm:"polymorphic:Filterable;polymorphicValue:CollectionFilters"`
+	FilmSorting       *FilmsSorting `gorm:"polymorphic:Sortable;polymorphicValue:FilmSorting"`
+	CollectionSorting *FilmsSorting `gorm:"polymorphic:Sortable;polymorphicValue:CollectionSorting"`
 }
 
 type FilmDetailState struct {
@@ -94,6 +98,8 @@ type AdminState struct {
 
 func (s *FilmsState) Clear() {
 	s.Title = ""
+	s.FilmSorting.Clear()
+	s.CollectionSorting.Clear()
 }
 
 func (s *AdminState) Clear() {

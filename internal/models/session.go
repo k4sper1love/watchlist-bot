@@ -2,6 +2,7 @@ package models
 
 import (
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 	"gorm.io/gorm"
 )
@@ -64,4 +65,30 @@ func (s *Session) Logout() {
 	s.ClearUser()
 	s.ClearContext()
 	s.ClearAllStates()
+}
+
+func (s *Session) GetFilmsFiltersByContext() *FilmsFilters {
+	switch s.Context {
+	case states.ContextFilm:
+		return s.FilmsState.FilmFilters
+
+	case states.ContextCollection:
+		return s.FilmsState.CollectionFilters
+
+	default:
+		return &FilmsFilters{}
+	}
+}
+
+func (s *Session) GetFilmsSortingByContext() *FilmsSorting {
+	switch s.Context {
+	case states.ContextFilm:
+		return s.FilmsState.FilmSorting
+
+	case states.ContextCollection:
+		return s.FilmsState.CollectionSorting
+
+	default:
+		return &FilmsSorting{}
+	}
 }

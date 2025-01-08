@@ -7,6 +7,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"net/http"
+	"net/url"
 )
 
 func GetFilms(app models.App, session *models.Session) (*models.FilmsResponse, error) {
@@ -26,7 +27,7 @@ func getFilmsRequest(app models.App, session *models.Session, collectionID, curr
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/films?exclude_collection=%d&page=%d&page_size=%d&title=%s", app.Vars.Host, collectionID, currentPage, pageSize, session.FilmsState.Title)
+	requestURL := buildGetFilmsURL(app, session, collectionID, currentPage, pageSize)
 
 	resp, err := client.SendRequestWithOptions(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
@@ -114,4 +115,41 @@ func DeleteFilm(app models.App, session *models.Session) error {
 	}
 
 	return nil
+}
+
+func buildGetFilmsURL(app models.App, session *models.Session, collectionID, currentPage, pageSize int) string {
+	baseURL := fmt.Sprintf("%s/api/v1/films", app.Vars.Host)
+	queryParams := url.Values{}
+
+	if collectionID >= 0 {
+		queryParams.Add("exclude_collection", fmt.Sprintf("%d", collectionID))
+	}
+
+	if currentPage > 0 {
+		queryParams.Add("page", fmt.Sprintf("%d", currentPage))
+	}
+
+	if pageSize > 0 {
+		queryParams.Add("page_size", fmt.Sprintf("%d", pageSize))
+	}
+
+	if session.FilmsState.Title != "" {
+		queryParams.Add("title", session.FilmsState.Title)
+	}
+
+	if session.FilmsState.FilmFilters.MinRating > 0 {
+		queryParams.Add("rating_min", fmt.Sprintf("%.2f", session.FilmsState.FilmFilters.MinRating))
+	}
+
+	if session.FilmsState.FilmFilters.MaxRating > 0 {
+		queryParams.Add("rating_max", fmt.Sprintf("%.2f", session.FilmsState.FilmFilters.MaxRating))
+	}
+
+	if session.FilmsState.FilmSorting.Sort != "" {
+		queryParams.Add("sort", session.FilmsState.FilmSorting.Sort)
+	}
+
+	requestURL := fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
+
+	return requestURL
 }

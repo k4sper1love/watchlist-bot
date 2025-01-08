@@ -69,6 +69,12 @@ func HandleFilmsButtons(app models.App,
 	case callback == states.CallbackFilmsFind:
 		handleFilmsFindByTitle(app, session)
 
+	case callback == states.CallbackFilmsFilters:
+		HandleFiltersFilmsCommand(app, session)
+
+	case callback == states.CallbackFilmsSorting:
+		HandleSortingFilmsCommand(app, session)
+
 	case strings.HasPrefix(callback, "select_film_"):
 		handleFilmSelect(app, session)
 	}

@@ -2,7 +2,77 @@
   "choiceLanguage": {
     "other": "Please select a language to communicate with the bot. You can change it in the settings"
   },
-  "raisedTo": {
+  "filters": {
+    "other": "Filters"
+  },
+  "sorting": {
+    "other": "Sorting"
+  },
+  "choiceFilter": {
+    "other": "Choose a filter to enable/disable it"
+  },
+  "choiceSorting": {
+    "other": "Choose a field for sorting"
+  },
+  "minRating": {
+    "other": "Minimum rating"
+  },
+  "maxRating": {
+    "other": "Maximum rating"
+  },
+  "requestMinRating": {
+    "other": "Enter the minimum rating"
+  },
+  "requestMaxRating": {
+    "other": "Enter the maximum rating"
+  },
+  "badRating": {
+    "other": "The rating must be greater than 0 and less than 10"
+  },
+  "filterApplied": {
+    "other": "Filter successfully applied!"
+  },
+  "resetFilters": {
+    "other": "Reset filters"
+  },
+  "reset": {
+    "other": "Reset"
+  },
+  "currentValue": {
+    "other": "Current value"
+  },
+  "ratingMustBeLower": {
+    "other": "The rating must be less than or equal to the maximum rating"
+  },
+  "ratingMustBeHigher": {
+    "other": "The rating must be greater than or equal to the minimum rating"
+  },
+  "filterResetSuccess": {
+    "one": "Filter successfully reset!",
+    "other": "Filters successfully reset!"
+  },
+  "sortingResetSuccess": {
+    "other": "Sorting parameters successfully reset!"
+  },
+  "selectedSortField": {
+    "other": "You have chosen sorting by <b>{{.Field}}</b>"
+  },
+  "requestDirection": {
+    "other": "Choose the direction"
+  },
+  "increaseOrder": {
+    "other": "Ascending"
+  },
+  "decreaseOrder": {
+    "other": "Descending"
+  },
+  "sortingApplied": {
+    "other": "Sorting successfully applied!"
+  },
+  "resetSorting": {
+    "other": "Reset sorting"
+  },
+"raisedTo": {
     "other": "You have been promoted to the role of \"{{.Role}}\""
   },
   "lowerTo": {

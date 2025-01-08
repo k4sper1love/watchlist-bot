@@ -2,7 +2,77 @@
   "choiceLanguage": {
     "other": "Ботпен сөйлесу үшін Тілді таңдаңыз. Сіз оны параметрлерде өзгерте аласыз"
   },
-  "raisedTo": {
+  "filters": {
+    "other": "Сүзгілер"
+  },
+  "sorting": {
+    "other": "Сұрыптау"
+  },
+  "choiceFilter": {
+    "other": "Сүзгіні қосу/өшiру үшін таңдаңыз"
+  },
+  "choiceSorting": {
+    "other": "Сұрыптау үшін өрісті таңдаңыз"
+  },
+  "minRating": {
+    "other": "Ең төменгі рейтинг"
+  },
+  "maxRating": {
+    "other": "Ең жоғары рейтинг"
+  },
+  "requestMinRating": {
+    "other": "Ең төменгі рейтингті енгізіңіз"
+  },
+  "requestMaxRating": {
+    "other": "Ең жоғары рейтингті енгізіңіз"
+  },
+  "badRating": {
+    "other": "Рейтинг 0-ден үлкен және 10-нан кіші болуы керек"
+  },
+  "filterApplied": {
+    "other": "Сүзгі сәтті қолданылды!"
+  },
+  "resetFilters": {
+    "other": "Сүзгілерді қалпына келтіру"
+  },
+  "reset": {
+    "other": "Қалпына келтіру"
+  },
+  "currentValue": {
+    "other": "Ағымдағы мән"
+  },
+  "ratingMustBeLower": {
+    "other": "Рейтинг ең жоғары рейтингтен төмен немесе тең болуы керек"
+  },
+  "ratingMustBeHigher": {
+    "other": "Рейтинг ең төменгі рейтингтен жоғары немесе тең болуы керек"
+  },
+  "filterResetSuccess": {
+    "one": "Сүзгі сәтті қалпына келтірілді!",
+    "other": "Сүзгілер сәтті қалпына келтірілді!"
+  },
+  "sortingResetSuccess": {
+    "other": "Сұрыптау параметрлері сәтті қалпына келтірілді!"
+  },
+  "selectedSortField": {
+    "other": "Сіз <b>{{.Field}}</b> сұрыптауды таңдадыңыз"
+  },
+  "requestDirection": {
+    "other": "Бағытты таңдаңыз"
+  },
+  "increaseOrder": {
+    "other": "Өсу бойынша"
+  },
+  "decreaseOrder": {
+    "other": "Кему бойынша"
+  },
+  "sortingApplied": {
+    "other": "Сұрыптау сәтті қолданылды!"
+  },
+  "resetSorting": {
+    "other": "Сұрыптауды қалпына келтіру"
+  },
+"raisedTo": {
     "other": "Сіз \"{{.Role}}\" рөліне жоғарылатылдыңыз"
   },
   "lowerTo": {

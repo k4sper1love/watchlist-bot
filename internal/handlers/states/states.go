@@ -8,6 +8,10 @@ const (
 	// general states
 	CallbackProcessSkip   = "process_skip"
 	CallbackProcessCancel = "process_cancel"
+	CallbackProcessReset  = "process_reset"
+
+	CallbackIncrease  = "increase"
+	CallbacktDecrease = "decrease"
 
 	CallbackYes = "yes"
 	CallbackNo  = "no"
@@ -124,6 +128,8 @@ const (
 
 	// films states
 	CallbackFilmsNew              = "films_new"
+	CallbackFilmsFilters          = "films_filters"
+	CallbackFilmsSorting          = "films_sorting"
 	CallbackFilmsManage           = "films_manage"
 	CallbackFilmsNextPage         = "films_next_page"
 	CallbackFilmsPrevPage         = "films_prev_page"
@@ -136,6 +142,22 @@ const (
 	CallbackFindFilmsNextPage = "find_films_next_page"
 	CallbackFindFilmsPrevPage = "find_films_prev_page"
 	CallbackFindFilmsAgain    = "find_films_again"
+
+	// filters films states
+	CallbackFiltersFilmsSelectBack       = "filters_films_select_back"
+	CallbackFiltersFilmsSelectAllReset   = "filters_films_select_all_reset"
+	CallbackFiltersFilmsSelectMinRating  = "filters_films_select_min_rating"
+	ProcessFiltersFilmsAwaitingMinRating = "filters_films_awaiting_min_rating"
+	CallbackFiltersFilmsSelectMaxRating  = "filters_films_select_max_rating"
+	ProcessFiltersFilmsAwaitingMaxRating = "filters_films_awaiting_max_rating"
+
+	// sorting films states
+	CallbackSortingFilmsSelectBack       = "sorting_films_select_back"
+	CallbackSortingFilmsSelectAllReset   = "sorting_films_select_all_reset"
+	ProcessSortingFilmsAwaitingDirection = "sorting_films_awaiting_direction"
+	CallbackSortingFilmsSelectID         = "sorting_films_select_id"
+	CallbackSortingFilmsSelectTitle      = "sorting_films_select_title"
+	CallbackSortingFilmsSelectRating     = "sorting_films_select_rating"
 
 	// manage film states
 	CallbackManageFilmSelectBack                 = "manage_film_select_back"
