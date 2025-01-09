@@ -2,6 +2,12 @@
   "choiceLanguage": {
     "other": "Ботпен сөйлесу үшін Тілді таңдаңыз. Сіз оны параметрлерде өзгерте аласыз"
   },
+  "CollectionRequestName": {
+    "other": "Коллекция атауын енгізіңіз"
+  },
+  "totalCollectionsFilms": {
+    "other": "Табылған коллекциялар"
+  },
   "filters": {
     "other": "Сүзгілер"
   },
@@ -519,8 +525,8 @@
   "again": {
     "other": "Қайтадан"
   },
-  "findFilmByTitle": {
-    "other": "Атауы бойынша іздеу"
+  "search": {
+    "other": "Іздеу"
   },
   "filmRequestDescription": {
     "other": "Фильмнің сипаттамасын енгізіңіз"

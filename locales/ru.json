@@ -2,8 +2,14 @@
   "choiceLanguage": {
     "other": "Пожалуйста, выберите язык для общения с ботом. Вы сможете поменять его в настройках"
   },
+  "CollectionRequestName": {
+    "other": "Введите название коллекции"
+  },
   "filters": {
     "other": "Фильтры"
+  },
+  "totalCollectionsFilms": {
+    "other": "Найдено коллекций"
   },
   "sorting": {
     "other": "Сортировка"
@@ -153,9 +159,6 @@
   "broadcast": {
     "other": "Рассылка"
   },
-  "findUser": {
-    "other": "Найти пользователя"
-  },
   "requestIDOrUsername": {
     "other": "Введите ID или @username"
   },
@@ -182,9 +185,6 @@
   },
   "alreadyMinRole": {
     "other": "У пользователя уже минимальная роль"
-  },
-  "findAdmin": {
-    "other": "Найти администратора"
   },
   "foundFeedbacks": {
     "other": "Найдено сообщений"
@@ -522,8 +522,8 @@
   "again": {
     "other": "Заново"
   },
-  "findFilmByTitle": {
-    "other": "Поиск по названию"
+  "search": {
+    "other": "Поиск"
   },
   "filmRequestDescription": {
     "other": "Введите описание фильма"

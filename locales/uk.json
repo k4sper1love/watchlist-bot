@@ -2,6 +2,12 @@
   "choiceLanguage": {
     "other": "Будь ласка, виберіть мову для спілкування з ботом. Ви зможете поміняти його в налаштуваннях"
   },
+  "CollectionRequestName": {
+    "other": "Введіть назву колекції"
+  },
+  "totalCollectionsFilms": {
+    "other": "Знайдено колекцій"
+  },
   "filters": {
     "other": "Фільтри"
   },
@@ -522,10 +528,9 @@
   "again": {
     "other": "Знову"
   },
-  "findFilmByTitle": {
-    "other": "Пошук за назвою"
+  "search": {
+    "other": "Пошук"
   },
-
   "filmRequestDescription": {
     "other": "Введіть опис фільму"
   },

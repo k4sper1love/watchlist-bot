@@ -89,7 +89,7 @@ func HandleFilmsProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.ProcessFindFilmsAwaitingTitle:
-		parseFindFilmTitle(app, session)
+		parseFilmsFindTitle(app, session)
 	}
 }
 
@@ -119,7 +119,7 @@ func handleFilmsFindByTitle(app models.App, session *models.Session) {
 	session.SetState(states.ProcessFindFilmsAwaitingTitle)
 }
 
-func parseFindFilmTitle(app models.App, session *models.Session) {
+func parseFilmsFindTitle(app models.App, session *models.Session) {
 	title := utils.ParseMessageString(app.Upd)
 
 	session.FilmsState.Title = title

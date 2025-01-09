@@ -7,6 +7,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"net/http"
+	"net/url"
 )
 
 func GetCollections(app models.App, session *models.Session) (*models.CollectionsResponse, error) {
@@ -26,7 +27,7 @@ func getCollectionsRequest(app models.App, session *models.Session, filmID, excl
 		"Authorization": session.AccessToken,
 	}
 
-	requestURL := fmt.Sprintf("%s/api/v1/collections?film=%d&exclude_film=%d&page=%d&page_size=%d", app.Vars.Host, filmID, excludeFilmID, currentPage, pageSize)
+	requestURL := buildGetCollectionsURL(app, session, filmID, excludeFilmID, currentPage, pageSize)
 
 	resp, err := client.SendRequestWithOptions(requestURL, http.MethodGet, nil, headers)
 	if err != nil {
@@ -112,4 +113,33 @@ func DeleteCollection(app models.App, session *models.Session) error {
 	}
 
 	return nil
+}
+
+func buildGetCollectionsURL(app models.App, session *models.Session, filmID, excludeFilmID, currentPage, pageSize int) string {
+	baseURL := fmt.Sprintf("%s/api/v1/collections", app.Vars.Host)
+	queryParams := url.Values{}
+
+	if filmID >= 0 {
+		queryParams.Add("film", fmt.Sprintf("%d", filmID))
+	}
+
+	if excludeFilmID >= 0 {
+		queryParams.Add("exclude_film", fmt.Sprintf("%d", excludeFilmID))
+	}
+
+	if currentPage > 0 {
+		queryParams.Add("page", fmt.Sprintf("%d", currentPage))
+	}
+
+	if pageSize > 0 {
+		queryParams.Add("page_size", fmt.Sprintf("%d", pageSize))
+	}
+
+	if session.CollectionsState.Name != "" {
+		queryParams.Add("name", session.CollectionsState.Name)
+	}
+
+	requestURL := fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
+
+	return requestURL
 }

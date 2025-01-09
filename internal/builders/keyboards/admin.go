@@ -50,16 +50,12 @@ func BuildAdminMenuKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMar
 	return keyboard.Build(session.Lang)
 }
 
-func BuildAdminUsersKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	keyboard := NewKeyboard()
-
-	keyboard.AddBack(states.CallbackAdminManageUsersSelectBack)
-
-	return keyboard.Build(session.Lang)
-}
-
 func BuildAdminUserListKeyboard(session *models.Session, users []models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
+
+	if len(users) > 0 {
+		keyboard.AddSearch(states.CallbackAdminManageUsersSelectFind)
+	}
 
 	keyboard.AddAdminUserSelect(session, users)
 
@@ -70,8 +66,6 @@ func BuildAdminUserListKeyboard(session *models.Session, users []models.Session)
 		states.CallbackAdminUsersListNextPage,
 	)
 
-	keyboard.addFindUser()
-
 	keyboard.AddBack(states.CallbackAdminManageUsersSelectBack)
 
 	return keyboard.Build(session.Lang)
@@ -79,6 +73,10 @@ func BuildAdminUserListKeyboard(session *models.Session, users []models.Session)
 
 func BuildAdminListKeyboard(session *models.Session, admins []models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
+
+	if len(admins) > 0 {
+		keyboard.AddSearch(states.CallbackAdminListSelectFind)
+	}
 
 	keyboard.AddAdminSelect(session, admins)
 
@@ -88,8 +86,6 @@ func BuildAdminListKeyboard(session *models.Session, admins []models.Session) *t
 		states.CallbackAdminListPrevPage,
 		states.CallbackAdminListNextPage,
 	)
-
-	keyboard.addFindAdmin()
 
 	keyboard.AddBack(states.CallbackAdminListBack)
 
@@ -247,14 +243,6 @@ func (k *Keyboard) AddRemoveAdminRole() *Keyboard {
 
 func (k *Keyboard) AddFeedbackDelete() *Keyboard {
 	return k.AddButton("🗑️", "delete", states.CallbackAdminFeedbackDetailDelete, "")
-}
-
-func (k *Keyboard) addFindUser() *Keyboard {
-	return k.AddButton("🔎", "findUser", states.CallbackAdminManageUsersSelectFind, "")
-}
-
-func (k *Keyboard) addFindAdmin() *Keyboard {
-	return k.AddButton("🔎", "findAdmin", states.CallbackAdminListSelectFind, "")
 }
 
 func (k *Keyboard) addSendBroadcast() *Keyboard {

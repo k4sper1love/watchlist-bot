@@ -11,6 +11,10 @@ import (
 func BuildCollectionsKeyboard(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
+	if len(session.CollectionsState.Collections) > 0 {
+		keyboard.AddSearch(states.CallbackCollectionsFind)
+	}
+
 	keyboard.AddCollectionsSelect(session)
 
 	keyboard.AddNavigation(
@@ -27,13 +31,30 @@ func BuildCollectionsKeyboard(session *models.Session, currentPage, lastPage int
 	return keyboard.Build(session.Lang)
 }
 
+func BuildFindCollectionsKeyboard(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
+	keyboard := NewKeyboard()
+
+	keyboard.AddCollectionsSelect(session)
+
+	keyboard.AddNavigation(
+		currentPage,
+		lastPage,
+		states.CallbackFindCollectionsPrevPage,
+		states.CallbackFindCollectionsNextPage,
+	)
+
+	keyboard.AddBack(states.CallbackFindCollectionsBack)
+
+	return keyboard.Build(session.Lang)
+}
+
 func (k *Keyboard) AddCollectionsSelect(session *models.Session) *Keyboard {
 	var buttons []Button
 
 	for i, collection := range session.CollectionsState.Collections {
 		itemID := utils.GetItemID(i, session.CollectionsState.CurrentPage, session.CollectionsState.PageSize)
 
-		buttons = append(buttons, Button{"", fmt.Sprintf("%s (%d)", collection.Name, itemID), fmt.Sprintf("select_collection_%d", collection.ID), ""})
+		buttons = append(buttons, Button{"", fmt.Sprintf("%s %s", utils.NumberToEmoji(itemID), collection.Name), fmt.Sprintf("select_collection_%d", collection.ID), ""})
 	}
 
 	k.AddButtonsWithRowSize(2, buttons...)

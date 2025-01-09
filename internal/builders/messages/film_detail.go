@@ -65,7 +65,7 @@ func BuildFilmDetailMessage(session *models.Session, film *apiModels.Film) strin
 }
 
 func BuildFilmDetailWithNumberMessage(session *models.Session, itemID int, film *apiModels.Film) string {
-	numberEmoji := numberToEmoji(itemID)
+	numberEmoji := utils.NumberToEmoji(itemID)
 
 	msg := fmt.Sprintf("%s", numberEmoji)
 	return msg + BuildFilmDetailMessage(session, film)

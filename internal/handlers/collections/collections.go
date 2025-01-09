@@ -18,13 +18,15 @@ import (
 )
 
 func HandleCollectionsCommand(app models.App, session *models.Session) {
+	session.CollectionsState.Name = ""
+
 	metadata, err := GetCollections(app, session)
 	if err != nil {
 		app.SendMessage(err.Error(), nil)
 		return
 	}
 
-	msg := messages.BuildCollectionsMessage(session, metadata)
+	msg := messages.BuildCollectionsMessage(session, metadata, false)
 
 	keyboard := keyboards.BuildCollectionsKeyboard(session, metadata.CurrentPage, metadata.LastPage)
 
@@ -61,8 +63,24 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 	case callback == states.CallbackCollectionsManage:
 		HandleManageCollectionCommand(app, session)
 
+	case callback == states.CallbackCollectionsFind:
+		handleCollectionsFindByName(app, session)
+
 	case strings.HasPrefix(callback, "select_collection_"):
 		HandleCollectionSelect(app, session)
+	}
+}
+
+func HandleCollectionProcess(app models.App, session *models.Session) {
+	if utils.IsCancel(app.Upd) {
+		session.ClearAllStates()
+		HandleCollectionsCommand(app, session)
+		return
+	}
+
+	switch session.State {
+	case states.ProcessFindCollectionsAwaitingName:
+		parseCollectionsFindName(app, session)
 	}
 }
 
@@ -84,6 +102,26 @@ func HandleCollectionSelect(app models.App, session *models.Session) {
 	session.SetContext(states.ContextCollection)
 
 	films.HandleFilmsCommand(app, session)
+}
+
+func handleCollectionsFindByName(app models.App, session *models.Session) {
+	msg := translator.Translate(session.Lang, "collectionRequestName", nil, nil)
+
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
+
+	app.SendMessage(msg, keyboard)
+
+	session.SetState(states.ProcessFindCollectionsAwaitingName)
+}
+
+func parseCollectionsFindName(app models.App, session *models.Session) {
+	name := utils.ParseMessageString(app.Upd)
+
+	session.CollectionsState.Name = name
+
+	session.ClearState()
+
+	HandleFindCollectionsCommand(app, session)
 }
 
 func GetCollections(app models.App, session *models.Session) (*filters.Metadata, error) {

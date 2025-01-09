@@ -254,3 +254,18 @@ func SortDirectionToEmoji(value string) string {
 
 	return "⬆️"
 }
+
+func NumberToEmoji(number int) string {
+	emojis := []string{"0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"}
+	if number < 10 {
+		return emojis[number]
+	}
+
+	result := ""
+	for number > 0 {
+		digit := number % 10
+		result = emojis[digit] + result
+		number /= 10
+	}
+	return result
+}

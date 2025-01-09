@@ -221,11 +221,19 @@ const (
 	ProcessViewedFilmAwaitingReview = "viewed_film_awaiting_review"
 
 	// collections states
-	CallbackCollectionsNew      = "collections_new"
-	CallbackCollectionsManage   = "collections_manage"
-	CallbackCollectionsNextPage = "collections_next_page"
-	CallbackCollectionsPrevPage = "collections_prev_page"
-	CallbackCollectionsBack     = "collections_back"
+	CallbackCollectionsNew             = "collections_new"
+	CallbackCollectionsManage          = "collections_manage"
+	CallbackCollectionsNextPage        = "collections_next_page"
+	CallbackCollectionsPrevPage        = "collections_prev_page"
+	CallbackCollectionsBack            = "collections_back"
+	CallbackCollectionsFind            = "collections_find"
+	ProcessFindCollectionsAwaitingName = "find_collections_awaiting_name"
+
+	// find collections states
+	CallbackFindCollectionsBack     = "find_collections_back"
+	CallbackFindCollectionsNextPage = "find_collections_next_page"
+	CallbackFindCollectionsPrevPage = "find_collections_prev_page"
+	CallbackFindCollectionsAgain    = "find_collections_again"
 
 	// manage collection states
 	CallbackManageCollectionSelectBack   = "manage_collection_select_back"

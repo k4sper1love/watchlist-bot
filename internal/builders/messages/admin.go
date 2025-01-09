@@ -20,7 +20,7 @@ func BuildAdminUserListMessage(session *models.Session, users []models.Session) 
 	for i, user := range users {
 		itemID := utils.GetItemID(i, currentPage, pageSize)
 
-		numberEmoji := numberToEmoji(itemID)
+		numberEmoji := utils.NumberToEmoji(itemID)
 
 		roleMsg := translator.Translate(session.Lang, user.Role.String(), nil, nil)
 		msg += fmt.Sprintf("<b>%s %s</b>\n", numberEmoji, roleMsg)
@@ -119,7 +119,7 @@ func BuildFeedbackListMessage(session *models.Session, feedbacks []models.Feedba
 	for i, feedback := range feedbacks {
 		itemID := utils.GetItemID(i, currentPage, pageSize)
 
-		numberEmoji := numberToEmoji(itemID)
+		numberEmoji := utils.NumberToEmoji(itemID)
 
 		categoryMsg := translator.Translate(session.Lang, feedback.Category, nil, nil)
 		msg += fmt.Sprintf("<b>%s %s</b>\n", numberEmoji, categoryMsg)

@@ -62,6 +62,7 @@ type CollectionsState struct {
 	LastPage    int                    `json:"-"`
 	PageSize    int                    `json:"-" gorm:"default:4"`
 	CurrentPage int                    `json:"-"`
+	Name        string                 `json:"-"`
 }
 
 type CollectionDetailState struct {
@@ -100,6 +101,10 @@ func (s *FilmsState) Clear() {
 	s.Title = ""
 	s.FilmSorting.Clear()
 	s.CollectionSorting.Clear()
+}
+
+func (s *CollectionsState) Clear() {
+	s.Name = ""
 }
 
 func (s *AdminState) Clear() {

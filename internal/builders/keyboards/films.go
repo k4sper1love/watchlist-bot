@@ -31,7 +31,7 @@ func BuildFilmsKeyboard(session *models.Session, currentPage, lastPage int) *tgb
 	keyboard := NewKeyboard()
 
 	if len(session.FilmsState.Films) > 0 {
-		keyboard.AddFilmFind()
+		keyboard.AddSearch(states.CallbackFilmsFind)
 	}
 
 	keyboard.AddFilmSelect(session)
@@ -205,7 +205,7 @@ func (k *Keyboard) AddFilmSelect(session *models.Session) *Keyboard {
 	for i, film := range session.FilmsState.Films {
 		itemID := utils.GetItemID(i, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
 
-		buttons = append(buttons, Button{"", fmt.Sprintf("%s (%d)", film.Title, itemID), fmt.Sprintf("select_film_%d", i), ""})
+		buttons = append(buttons, Button{"", fmt.Sprintf("%s %s", utils.NumberToEmoji(itemID), film.Title), fmt.Sprintf("select_film_%d", i), ""})
 	}
 
 	k.AddButtonsWithRowSize(2, buttons...)

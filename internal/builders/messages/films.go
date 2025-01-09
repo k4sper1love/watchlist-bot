@@ -45,7 +45,7 @@ func buildFilmsList(session *models.Session, metadata *filters.Metadata, isFind 
 
 	for i, film := range films {
 		itemID := utils.GetItemID(i, metadata.CurrentPage, metadata.PageSize)
-		numberEmoji := numberToEmoji(itemID)
+		numberEmoji := utils.NumberToEmoji(itemID)
 		msg += fmt.Sprintf("%s\n", numberEmoji)
 		msg += BuildFilmGeneralMessage(session, &film)
 	}
@@ -73,9 +73,6 @@ func buildCollectionHeader(session *models.Session) string {
 
 	msg += "\n\n"
 
-	if collection.TotalFilms == 0 {
-		msg += translator.Translate(session.Lang, "notFoundFilmsInCollection", nil, nil)
-	}
 	return msg
 }
 

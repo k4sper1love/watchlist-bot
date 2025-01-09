@@ -2,6 +2,12 @@
   "choiceLanguage": {
     "other": "Please select a language to communicate with the bot. You can change it in the settings"
   },
+  "CollectionRequestName": {
+    "other": "Enter the collection name"
+  },
+  "totalCollectionsFilms": {
+    "other": "Collections found"
+  },
   "filters": {
     "other": "Filters"
   },
@@ -72,7 +78,7 @@
   "resetSorting": {
     "other": "Reset sorting"
   },
-"raisedTo": {
+  "raisedTo": {
     "other": "You have been promoted to the role of \"{{.Role}}\""
   },
   "lowerTo": {
@@ -522,10 +528,9 @@
   "again": {
     "other": "Again"
   },
-  "findFilmByTitle": {
-    "other": "Search by title"
+  "search": {
+    "other": "Search"
   },
-
   "filmRequestDescription": {
     "other": "Enter the film description"
   },
