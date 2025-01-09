@@ -66,6 +66,9 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 	case callback == states.CallbackCollectionsFind:
 		handleCollectionsFindByName(app, session)
 
+	case callback == states.CallbackCollectionsSorting:
+		HandleSortingCollectionsCommand(app, session)
+
 	case strings.HasPrefix(callback, "select_collection_"):
 		HandleCollectionSelect(app, session)
 	}

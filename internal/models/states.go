@@ -28,11 +28,11 @@ type FilmsState struct {
 	PageSize          int              `json:"-" gorm:"default:4"`
 	CurrentPage       int              `json:"-"`
 	TotalRecords      int
-	Title             string        `json:"-"`
-	FilmFilters       *FilmsFilters `gorm:"polymorphic:Filterable;polymorphicValue:FilmFilters"`
-	CollectionFilters *FilmsFilters `gorm:"polymorphic:Filterable;polymorphicValue:CollectionFilters"`
-	FilmSorting       *FilmsSorting `gorm:"polymorphic:Sortable;polymorphicValue:FilmSorting"`
-	CollectionSorting *FilmsSorting `gorm:"polymorphic:Sortable;polymorphicValue:CollectionSorting"`
+	Title             string       `json:"-"`
+	FilmFilters       *FiltersFilm `gorm:"polymorphic:Filterable;polymorphicValue:FilmFilters"`
+	CollectionFilters *FiltersFilm `gorm:"polymorphic:Filterable;polymorphicValue:CollectionFilters"`
+	FilmSorting       *Sorting     `gorm:"polymorphic:Sortable;polymorphicValue:FilmSorting"`
+	CollectionSorting *Sorting     `gorm:"polymorphic:Sortable;polymorphicValue:CollectionSorting"`
 }
 
 type FilmDetailState struct {
@@ -63,6 +63,7 @@ type CollectionsState struct {
 	PageSize    int                    `json:"-" gorm:"default:4"`
 	CurrentPage int                    `json:"-"`
 	Name        string                 `json:"-"`
+	Sorting     *Sorting               `gorm:"polymorphic:Sortable;polymorphicValue:Sorting"`
 }
 
 type CollectionDetailState struct {

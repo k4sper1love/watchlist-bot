@@ -228,6 +228,16 @@ const (
 	CallbackCollectionsBack            = "collections_back"
 	CallbackCollectionsFind            = "collections_find"
 	ProcessFindCollectionsAwaitingName = "find_collections_awaiting_name"
+	CallbackCollectionsSorting         = "collections_sorting"
+
+	// sorting collections states
+	CallbackSortingCollectionsSelectBack       = "sorting_collections_select_back"
+	CallbackSortingCollectionsSelectAllReset   = "sorting_collections_select_all_reset"
+	ProcessSortingCollectionsAwaitingDirection = "sorting_collections_awaiting_direction"
+	CallbackSortingCollectionsSelectID         = "sorting_collections_select_id"
+	CallbackSortingCollectionsSelectName       = "sorting_collections_select_name"
+	CallbackSortingCollectionsSelectCreatedAt  = "sorting_collections_select_created_at"
+	CallbackSortingCollectionsSelectTotalFilms = "sorting_collections_select_total_films"
 
 	// find collections states
 	CallbackFindCollectionsBack     = "find_collections_back"

@@ -68,7 +68,7 @@ func (s *Session) Logout() {
 	s.ClearAllStates()
 }
 
-func (s *Session) GetFilmsFiltersByContext() *FilmsFilters {
+func (s *Session) GetFilmsFiltersByContext() *FiltersFilm {
 	switch s.Context {
 	case states.ContextFilm:
 		return s.FilmsState.FilmFilters
@@ -77,11 +77,11 @@ func (s *Session) GetFilmsFiltersByContext() *FilmsFilters {
 		return s.FilmsState.CollectionFilters
 
 	default:
-		return &FilmsFilters{}
+		return &FiltersFilm{}
 	}
 }
 
-func (s *Session) GetFilmsSortingByContext() *FilmsSorting {
+func (s *Session) GetFilmsSortingByContext() *Sorting {
 	switch s.Context {
 	case states.ContextFilm:
 		return s.FilmsState.FilmSorting
@@ -90,6 +90,6 @@ func (s *Session) GetFilmsSortingByContext() *FilmsSorting {
 		return s.FilmsState.CollectionSorting
 
 	default:
-		return &FilmsSorting{}
+		return &Sorting{}
 	}
 }

@@ -135,10 +135,6 @@ func (k *Keyboard) AddBack(callbackData string) *Keyboard {
 	return k.AddButtonsWithRowSize(len(buttons), buttons...)
 }
 
-func (k *Keyboard) AddSearch(callback string) *Keyboard {
-	return k.AddButton("🔎", "search", callback, "")
-}
-
 func (k *Keyboard) translate(languageCode string) *Keyboard {
 	for i, row := range k.Rows {
 		for j, btn := range row {

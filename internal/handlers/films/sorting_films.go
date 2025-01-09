@@ -65,9 +65,9 @@ func handleSortingFilmsAllReset(app models.App, session *models.Session) {
 }
 
 func handleSortingFilmsDirection(app models.App, session *models.Session) {
-	msg := messages.BuildSelectedSortMessage(session)
+	msg := messages.BuildSelectedSortMessage(session, session.GetFilmsSortingByContext())
 
-	keyboard := keyboards.BuildFilmsSortingDirectionKeyboard(session)
+	keyboard := keyboards.BuildSortingDirectionKeyboard(session, session.GetFilmsSortingByContext())
 
 	app.SendMessage(msg, keyboard)
 

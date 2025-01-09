@@ -106,20 +106,6 @@ func BuildValidateFilterMessage(session *models.Session, filterType string) stri
 	return translator.Translate(session.Lang, "someError", nil, nil)
 }
 
-func BuildSelectedSortMessage(session *models.Session) string {
-	sorting := session.GetFilmsSortingByContext()
-
-	field := translator.Translate(session.Lang, sorting.Field, nil, nil)
-	part1 := translator.Translate(session.Lang, "selectedSortField", map[string]interface{}{
-		"Field": field,
-	}, nil)
-	part2 := translator.Translate(session.Lang, "requestDirection", nil, nil)
-
-	msg := fmt.Sprintf("%s\n\n%s", part1, part2)
-
-	return msg
-}
-
 func parseRatingValue(session *models.Session, filterType string) float64 {
 	filter := session.GetFilmsFiltersByContext()
 

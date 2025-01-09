@@ -18,6 +18,7 @@ func GetSessionByTelegramID(app models.App) (*models.Session, error) {
 		Preload("ProfileState").
 		Preload("FeedbackState").
 		Preload("CollectionsState").
+		Preload("CollectionsState.Sorting").
 		Preload("CollectionDetailState").
 		Preload("FilmsState").
 		Preload("FilmsState.FilmFilters").
@@ -65,6 +66,10 @@ func initializeSessionDefaults(session models.Session, lang, username string, ro
 		session.CollectionsState = &models.CollectionsState{}
 	}
 
+	if session.CollectionsState.Sorting == nil {
+		session.CollectionsState.Sorting = &models.Sorting{}
+	}
+
 	if session.CollectionDetailState == nil {
 		session.CollectionDetailState = &models.CollectionDetailState{ObjectID: -1}
 	}
@@ -74,19 +79,19 @@ func initializeSessionDefaults(session models.Session, lang, username string, ro
 	}
 
 	if session.FilmsState.FilmFilters == nil {
-		session.FilmsState.FilmFilters = &models.FilmsFilters{}
+		session.FilmsState.FilmFilters = &models.FiltersFilm{}
 	}
 
 	if session.FilmsState.CollectionFilters == nil {
-		session.FilmsState.CollectionFilters = &models.FilmsFilters{}
+		session.FilmsState.CollectionFilters = &models.FiltersFilm{}
 	}
 
 	if session.FilmsState.FilmSorting == nil {
-		session.FilmsState.FilmSorting = &models.FilmsSorting{}
+		session.FilmsState.FilmSorting = &models.Sorting{}
 	}
 
 	if session.FilmsState.CollectionSorting == nil {
-		session.FilmsState.CollectionSorting = &models.FilmsSorting{}
+		session.FilmsState.CollectionSorting = &models.Sorting{}
 	}
 
 	if session.FilmDetailState == nil {

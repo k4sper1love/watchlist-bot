@@ -2,10 +2,13 @@
   "choiceLanguage": {
     "other": "Please select a language to communicate with the bot. You can change it in the settings"
   },
-  "CollectionRequestName": {
-    "other": "Enter the collection name"
+  "created_at": {
+    "other": "Creation date"
   },
-  "totalCollectionsFilms": {
+  "total_films": {
+    "other": "Number of films"
+  },
+"totalCollectionsFilms": {
     "other": "Collections found"
   },
   "filters": {

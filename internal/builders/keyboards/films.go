@@ -180,21 +180,9 @@ func BuildFilmsSortingKeyboard(session *models.Session) *tgbotapi.InlineKeyboard
 
 	keyboard.AddButtons(parseSortingFilmsButtons(session)...)
 
-	keyboard.AddResetAllSorting()
+	keyboard.AddResetAllSorting(states.CallbackSortingFilmsSelectAllReset)
 
 	keyboard.AddBack(states.CallbackSortingFilmsSelectBack)
-
-	return keyboard.Build(session.Lang)
-}
-
-func BuildFilmsSortingDirectionKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	keyboard := NewKeyboard()
-
-	keyboard.AddSortingDirection()
-
-	keyboard.AddResetSorting(session)
-
-	keyboard.AddCancel()
 
 	return keyboard.Build(session.Lang)
 }
@@ -271,27 +259,6 @@ func (k *Keyboard) AddResetFilter(session *models.Session, filterType string) *K
 	}
 
 	return k
-}
-
-func (k *Keyboard) AddResetAllSorting() *Keyboard {
-	return k.AddButton("", "resetSorting", states.CallbackSortingFilmsSelectAllReset, "")
-}
-
-func (k *Keyboard) AddResetSorting(session *models.Session) *Keyboard {
-	sorting := session.GetFilmsSortingByContext()
-
-	if sorting.IsSortingFieldEnabled(sorting.Field) {
-		return k.AddButton("", "reset", states.CallbackProcessReset, "")
-	}
-
-	return k
-}
-
-func (k *Keyboard) AddSortingDirection() *Keyboard {
-	return k.AddButtonsWithRowSize(2,
-		Button{"⬆️", "increaseOrder", states.CallbackIncrease, ""},
-		Button{"⬇️", "decreaseOrder", states.CallbacktDecrease, ""},
-	)
 }
 
 func parseFiltersFilmsButtons(session *models.Session) []Button {

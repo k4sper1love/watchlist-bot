@@ -12,29 +12,29 @@ type Feedback struct {
 	Message    string `gorm:"not null"`
 }
 
-type FilmsFilters struct {
+type FiltersFilm struct {
 	gorm.Model
-	FilterableID   uint   `json:"-"` // ID связанной сущности
-	FilterableType string `json:"-"` // Тип связанной сущности (FilmFilters или CollectionFilters)
+	FilterableID   uint   `json:"-"`
+	FilterableType string `json:"-"`
 	MinRating      float64
 	MaxRating      float64
 }
 
-type FilmsSorting struct {
+type Sorting struct {
 	gorm.Model
-	SortableID   uint   `json:"-"` // ID связанной сущности
-	SortableType string `json:"-"` // Тип связанной сущности (FilmSorting или CollectionSorting)
-	Field        string `json:"-"` // Поле для сортировки (например, "rating")
-	Direction    string `json:"-"` // Направление ("asc" или "desc")
-	Sort         string `json:"-"` // Любая дополнительная информация о сортировке
+	SortableID   uint   `json:"-"`
+	SortableType string `json:"-"`
+	Field        string `json:"-"`
+	Direction    string `json:"-"`
+	Sort         string `json:"-"`
 }
 
-func (f *FilmsSorting) Clear() {
+func (f *Sorting) Clear() {
 	f.Field = ""
 	f.Direction = ""
 }
 
-func (f *FilmsFilters) IsFiltersEnabled() bool {
+func (f *FiltersFilm) IsFiltersEnabled() bool {
 	if f.MaxRating > 0 || f.MinRating > 0 {
 		return true
 	}
@@ -42,12 +42,12 @@ func (f *FilmsFilters) IsFiltersEnabled() bool {
 	return false
 }
 
-func (f *FilmsFilters) ResetFilters() {
+func (f *FiltersFilm) ResetFilters() {
 	f.MinRating = 0
 	f.MaxRating = 0
 }
 
-func (f *FilmsFilters) IsFilterEnabled(filterType string) bool {
+func (f *FiltersFilm) IsFilterEnabled(filterType string) bool {
 	switch filterType {
 	case "minRating":
 		return f.MinRating != 0
@@ -58,14 +58,14 @@ func (f *FilmsFilters) IsFilterEnabled(filterType string) bool {
 	}
 }
 
-func (f *FilmsSorting) IsSortingEnabled() bool {
+func (f *Sorting) IsSortingEnabled() bool {
 	return f.Sort != ""
 }
 
-func (f *FilmsSorting) IsSortingFieldEnabled(field string) bool {
+func (f *Sorting) IsSortingFieldEnabled(field string) bool {
 	return field == strings.TrimPrefix(f.Sort, "-")
 }
 
-func (f *FilmsSorting) ResetSorting() {
+func (f *Sorting) ResetSorting() {
 	f.Sort = ""
 }

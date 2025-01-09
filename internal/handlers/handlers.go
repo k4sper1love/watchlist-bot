@@ -138,6 +138,9 @@ func handleUserInput(app models.App, session *models.Session) {
 	case strings.HasPrefix(session.State, "delete_profile_awaiting"):
 		users.HandleDeleteProfileProcess(app, session)
 
+	case strings.HasPrefix(session.State, "sorting_collections_awaiting"):
+		collections.HandleSortingCollectionsProcess(app, session)
+
 	case strings.HasPrefix(session.State, "find_collections_awaiting"):
 		collections.HandleCollectionProcess(app, session)
 
@@ -236,6 +239,9 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 
 	case strings.HasPrefix(callbackData, "collections_") || strings.HasPrefix(callbackData, "select_collection_"):
 		general.RequireAuth(app, session, collections.HandleCollectionsButtons)
+
+	case strings.HasPrefix(callbackData, "sorting_collections_select"):
+		collections.HandleSortingCollectionsButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "find_collections"):
 		collections.HandleFindCollectionsButtons(app, session)

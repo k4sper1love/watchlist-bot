@@ -2,8 +2,11 @@
   "choiceLanguage": {
     "other": "Будь ласка, виберіть мову для спілкування з ботом. Ви зможете поміняти його в налаштуваннях"
   },
-  "CollectionRequestName": {
-    "other": "Введіть назву колекції"
+  "created_at": {
+    "other": "Дата створення"
+  },
+  "total_films": {
+    "other": "Кількість фільмів"
   },
   "totalCollectionsFilms": {
     "other": "Знайдено колекцій"

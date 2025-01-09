@@ -2,8 +2,11 @@
   "choiceLanguage": {
     "other": "Ботпен сөйлесу үшін Тілді таңдаңыз. Сіз оны параметрлерде өзгерте аласыз"
   },
-  "CollectionRequestName": {
-    "other": "Коллекция атауын енгізіңіз"
+  "created_at": {
+    "other": "Жасалған күні"
+  },
+  "total_films": {
+    "other": "Фильмдер саны"
   },
   "totalCollectionsFilms": {
     "other": "Табылған коллекциялар"

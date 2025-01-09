@@ -139,6 +139,10 @@ func buildGetCollectionsURL(app models.App, session *models.Session, filmID, exc
 		queryParams.Add("name", session.CollectionsState.Name)
 	}
 
+	if session.CollectionsState.Sorting.Sort != "" {
+		queryParams.Add("sort", session.CollectionsState.Sorting.Sort)
+	}
+
 	requestURL := fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
 
 	return requestURL
