@@ -10,7 +10,6 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log"
 )
 
 func HandleNewFilmCommand(app models.App, session *models.Session) {
@@ -316,7 +315,6 @@ func parseNewFilmReview(app models.App, session *models.Session) {
 }
 
 func finishNewFilmProcess(app models.App, session *models.Session) {
-	log.Println(session.FilmDetailState)
 	if err := CreateNewFilm(app, session); err != nil {
 		msg := translator.Translate(session.Lang, "createFilmFailure", nil, nil)
 		app.SendMessage(msg, nil)

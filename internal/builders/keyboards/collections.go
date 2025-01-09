@@ -9,6 +9,11 @@ import (
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
+var updateCollectionButtons = []Button{
+	{"", "title", states.CallbackUpdateCollectionSelectName, "", true},
+	{"", "description", states.CallbackUpdateCollectionSelectDescription, "", true},
+}
+
 func BuildCollectionsKeyboard(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
@@ -30,6 +35,16 @@ func BuildCollectionsKeyboard(session *models.Session, currentPage, lastPage int
 	keyboard.AddCollectionsNew()
 
 	keyboard.AddBack("")
+
+	return keyboard.Build(session.Lang)
+}
+
+func BuildCollectionUpdateKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	keyboard := NewKeyboard()
+
+	keyboard.AddButtons(updateCollectionButtons...)
+
+	keyboard.AddBack(states.CallbackUpdateCollectionSelectBack)
 
 	return keyboard.Build(session.Lang)
 }
@@ -69,7 +84,7 @@ func (k *Keyboard) AddCollectionsSelect(session *models.Session) *Keyboard {
 	for i, collection := range session.CollectionsState.Collections {
 		itemID := utils.GetItemID(i, session.CollectionsState.CurrentPage, session.CollectionsState.PageSize)
 
-		buttons = append(buttons, Button{"", fmt.Sprintf("%s %s", utils.NumberToEmoji(itemID), collection.Name), fmt.Sprintf("select_collection_%d", collection.ID), ""})
+		buttons = append(buttons, Button{"", fmt.Sprintf("%s %s", utils.NumberToEmoji(itemID), collection.Name), fmt.Sprintf("select_collection_%d", collection.ID), "", false})
 	}
 
 	k.AddButtonsWithRowSize(2, buttons...)
@@ -78,26 +93,26 @@ func (k *Keyboard) AddCollectionsSelect(session *models.Session) *Keyboard {
 }
 
 func (k *Keyboard) AddCollectionsNew() *Keyboard {
-	return k.AddButton("➕", "createCollection", states.CallbackCollectionsNew, "")
+	return k.AddButton("➕", "createCollection", states.CallbackCollectionsNew, "", true)
 }
 
 func (k *Keyboard) AddCollectionsDelete() *Keyboard {
-	return k.AddButton("🗑️", "deleteCollection", states.CallbackManageCollectionSelectDelete, "")
+	return k.AddButton("🗑️", "deleteCollection", states.CallbackManageCollectionSelectDelete, "", true)
 }
 
 func (k *Keyboard) AddCollectionsUpdate() *Keyboard {
-	return k.AddButton("✏️", "updateCollection", states.CallbackManageCollectionSelectUpdate, "")
+	return k.AddButton("✏️", "updateCollection", states.CallbackManageCollectionSelectUpdate, "", true)
 }
 
 func (k *Keyboard) AddCollectionsManage() *Keyboard {
-	return k.AddButton("⚙️", "manageCollection", states.CallbackCollectionsManage, "")
+	return k.AddButton("⚙️", "manageCollection", states.CallbackCollectionsManage, "", true)
 }
 
 func (k *Keyboard) AddCollectionFiltersAndSorting(session *models.Session) *Keyboard {
 	sortingEnable := session.CollectionsState.Sorting.IsSortingEnabled()
 
 	return k.AddButtonsWithRowSize(2,
-		Button{utils.BoolToEmoji(sortingEnable), "sorting", states.CallbackCollectionsSorting, ""},
+		Button{utils.BoolToEmoji(sortingEnable), "sorting", states.CallbackCollectionsSorting, "", true},
 		//Button{utils.BoolToEmoji(filtersEnable), "filters", states.CallbackFilmsFilters, ""},
 	)
 }
@@ -111,28 +126,28 @@ func parseSortingCollectionsButtons(session *models.Session) []Button {
 	if sortingEnabled {
 		text += fmt.Sprintf(": %s", utils.SortDirectionToEmoji(sorting.Sort))
 	}
-	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingCollectionsSelectID, ""})
+	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingCollectionsSelectID, "", true})
 
 	sortingEnabled = sorting.IsSortingFieldEnabled("name")
 	text = translator.Translate(session.Lang, "name", nil, nil)
 	if sortingEnabled {
 		text += fmt.Sprintf(": %s", utils.SortDirectionToEmoji(sorting.Sort))
 	}
-	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingCollectionsSelectName, ""})
+	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingCollectionsSelectName, "", true})
 
 	sortingEnabled = sorting.IsSortingFieldEnabled("created_at")
 	text = translator.Translate(session.Lang, "created_at", nil, nil)
 	if sortingEnabled {
 		text += fmt.Sprintf(": %s", utils.SortDirectionToEmoji(sorting.Sort))
 	}
-	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingCollectionsSelectCreatedAt, ""})
+	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingCollectionsSelectCreatedAt, "", true})
 
 	sortingEnabled = sorting.IsSortingFieldEnabled("total_films")
 	text = translator.Translate(session.Lang, "total_films", nil, nil)
 	if sortingEnabled {
 		text += fmt.Sprintf(": %s", utils.SortDirectionToEmoji(sorting.Sort))
 	}
-	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingCollectionsSelectTotalFilms, ""})
+	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingCollectionsSelectTotalFilms, "", true})
 
 	return buttons
 }

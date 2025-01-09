@@ -10,32 +10,32 @@ import (
 )
 
 var menuButtons = []Button{
-	{"👤", "profile", states.CallbackMenuSelectProfile, ""},
-	{"🎥", "films", states.CallbackMenuSelectFilms, ""},
-	{"📚", "collections", states.CallbackMenuSelectCollections, ""},
-	{"⚙️", "settings", states.CallbackMenuSelectSettings, ""},
-	{"💬", "feedback", states.CallbackMenuSelectFeedback, ""},
-	{"🚪", "logout", states.CallbackMenuSelectLogout, ""},
+	{"👤", "profile", states.CallbackMenuSelectProfile, "", true},
+	{"🎥", "films", states.CallbackMenuSelectFilms, "", true},
+	{"📚", "collections", states.CallbackMenuSelectCollections, "", true},
+	{"⚙️", "settings", states.CallbackMenuSelectSettings, "", true},
+	{"💬", "feedback", states.CallbackMenuSelectFeedback, "", true},
+	{"🚪", "logout", states.CallbackMenuSelectLogout, "", true},
 }
 
 var settingsButtons = []Button{
-	{"🈳", "settingsLanguage", states.CallbackSettingsLanguage, ""},
-	{"🔢", "settingsCollectionsPageSize", states.CallbackSettingsCollectionsPageSize, ""},
-	{"🔢", "settingsFilmsPageSize", states.CallbackSettingsFilmsPageSize, ""},
-	{"🔢", "settingsObjectsPageSize", states.CallbackSettingsObjectsPageSize, ""},
+	{"🈳", "settingsLanguage", states.CallbackSettingsLanguage, "", true},
+	{"🔢", "settingsCollectionsPageSize", states.CallbackSettingsCollectionsPageSize, "", true},
+	{"🔢", "settingsFilmsPageSize", states.CallbackSettingsFilmsPageSize, "", true},
+	{"🔢", "settingsObjectsPageSize", states.CallbackSettingsObjectsPageSize, "", true},
 }
 
 var feedbackCategoryButtons = []Button{
-	{"💡", "offers", states.CallbackFeedbackCategorySuggestions, ""},
-	{"🐞", "mistakes", states.CallbackFeedbackCategoryBugs, ""},
-	{"❓", "otherIssues", states.CallbackFeedbackCategoryOther, ""},
+	{"💡", "offers", states.CallbackFeedbackCategorySuggestions, "", true},
+	{"🐞", "mistakes", states.CallbackFeedbackCategoryBugs, "", true},
+	{"❓", "otherIssues", states.CallbackFeedbackCategoryOther, "", true},
 }
 
 func BuildMenuKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
 	if session.Role.HasAccess(roles.Helper) {
-		keyboard.AddButton("🛠️", "adminPanel", states.CallbackMenuSelectAdmin, "")
+		keyboard.AddButton("🛠️", "adminPanel", states.CallbackMenuSelectAdmin, "", true)
 	}
 
 	keyboard.AddButtons(menuButtons...)
@@ -64,18 +64,18 @@ func BuildFeedbackKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMark
 }
 
 func (k *Keyboard) AddProfileUpdate() *Keyboard {
-	return k.AddButton("✏️", "edit", states.CallbackProfileSelectUpdate, "")
+	return k.AddButton("✏️", "edit", states.CallbackProfileSelectUpdate, "", true)
 }
 
 func (k *Keyboard) AddProfileDelete() *Keyboard {
-	return k.AddButton("⚠️", "delete", states.CallbackProfileSelectDelete, "")
+	return k.AddButton("⚠️", "delete", states.CallbackProfileSelectDelete, "", true)
 }
 
 func (k *Keyboard) AddLanguageSelect(languages []string, callback string) *Keyboard {
 	var buttons []Button
 
 	for _, lang := range languages {
-		buttons = append(buttons, Button{"", fmt.Sprintf(strings.ToUpper(lang)), fmt.Sprintf("%s_%s", callback, lang), ""})
+		buttons = append(buttons, Button{"", fmt.Sprintf(strings.ToUpper(lang)), fmt.Sprintf("%s_%s", callback, lang), "", false})
 	}
 
 	k.AddButtonsWithRowSize(2, buttons...)

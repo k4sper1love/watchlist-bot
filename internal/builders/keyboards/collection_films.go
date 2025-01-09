@@ -63,24 +63,24 @@ func BuildAddCollectionToFilmKeyboard(session *models.Session) *tgbotapi.InlineK
 }
 
 func (k *Keyboard) AddCollectionFilmFromFilm() *Keyboard {
-	return k.AddButton("➕", "addCollectionToFilm", states.CallbackCollectionFilmsFromFilm, "")
+	return k.AddButton("➕", "addCollectionToFilm", states.CallbackCollectionFilmsFromFilm, "", true)
 }
 
 func (k *Keyboard) AddCollectionFilmFromCollection() *Keyboard {
-	return k.AddButton("➕", "addFilmToCollection", states.CallbackCollectionFilmsFromCollection, "")
+	return k.AddButton("➕", "addFilmToCollection", states.CallbackCollectionFilmsFromCollection, "", true)
 }
 
 func (k *Keyboard) AddNewFilmToCollection() *Keyboard {
-	return k.AddButton("🆕", "createFilm", states.CallbackOptionsFilmToCollectionNew, "")
+	return k.AddButton("🆕", "createFilm", states.CallbackOptionsFilmToCollectionNew, "", true)
 }
 
 func (k *Keyboard) AddExistingFilmToCollection() *Keyboard {
-	return k.AddButton("\U0001F7F0", "choiceFromFilms", states.CallbackOptionsFilmToCollectionExisting, "")
+	return k.AddButton("\U0001F7F0", "choiceFromFilms", states.CallbackOptionsFilmToCollectionExisting, "", true)
 }
 
 func (k *Keyboard) AddCollectionFilmSelectFilm(films []apiModels.Film) *Keyboard {
 	for _, film := range films {
-		k.AddButton("", fmt.Sprintf("%s (%d)", film.Title, film.ID), fmt.Sprintf("select_cf_film_%d", film.ID), "")
+		k.AddButton("", fmt.Sprintf("%s (%d)", film.Title, film.ID), fmt.Sprintf("select_cf_film_%d", film.ID), "", false)
 	}
 
 	return k
@@ -88,7 +88,7 @@ func (k *Keyboard) AddCollectionFilmSelectFilm(films []apiModels.Film) *Keyboard
 
 func (k *Keyboard) AddCollectionFilmSelectCollection(collections []apiModels.Collection) *Keyboard {
 	for _, collection := range collections {
-		k.AddButton("", fmt.Sprintf("%s (%d)", collection.Name, collection.ID), fmt.Sprintf("select_cf_collection_%d", collection.ID), "")
+		k.AddButton("", fmt.Sprintf("%s (%d)", collection.Name, collection.ID), fmt.Sprintf("select_cf_collection_%d", collection.ID), "", false)
 	}
 
 	return k

@@ -14,7 +14,6 @@ func HandleUpdateFilmCommand(app models.App, session *models.Session) {
 	film := session.FilmDetailState.Film
 
 	msg := messages.BuildFilmDetailMessage(session, &film) + "\n"
-
 	msg += translator.Translate(session.Lang, "updateChoiceField", nil, nil)
 
 	keyboard := keyboards.BuildFilmUpdateKeyboard(session)

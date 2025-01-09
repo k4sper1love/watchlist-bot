@@ -100,7 +100,6 @@ func BuildFilmGeneralMessage(session *models.Session, film *apiModels.Film) stri
 	if film.Description != "" {
 		if len(film.Description) > 400 {
 			film.Description, _ = utils.SplitTextByLength(film.Description, 300)
-			fmt.Println(film.Description)
 		}
 
 		descriptionMsg := translator.Translate(session.Lang, "description", nil, nil)

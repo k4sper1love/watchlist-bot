@@ -10,20 +10,11 @@ import (
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
-var updateCollectionButtons = []keyboards.Button{
-	{"", "title", states.CallbackUpdateCollectionSelectName, ""},
-	{"", "description", states.CallbackUpdateCollectionSelectDescription, ""},
-}
-
 func HandleUpdateCollectionCommand(app models.App, session *models.Session) {
-	msg := messages.BuildCollectionDetailMessage(session, &session.CollectionDetailState.Collection)
-	msg += "\n"
+	msg := messages.BuildCollectionDetailMessage(session, &session.CollectionDetailState.Collection) + "\n"
 	msg += translator.Translate(session.Lang, "updateChoiceField", nil, nil)
 
-	keyboard := keyboards.NewKeyboard().
-		AddButtons(updateCollectionButtons...).
-		AddBack(states.CallbackUpdateCollectionSelectBack).
-		Build(session.Lang)
+	keyboard := keyboards.BuildCollectionUpdateKeyboard(session)
 
 	app.SendMessage(msg, keyboard)
 }

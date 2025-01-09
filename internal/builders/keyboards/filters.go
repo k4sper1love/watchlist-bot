@@ -19,16 +19,16 @@ func BuildSortingDirectionKeyboard(session *models.Session, sorting *models.Sort
 }
 
 func (k *Keyboard) AddSearch(callback string) *Keyboard {
-	return k.AddButton("🔎", "search", callback, "")
+	return k.AddButton("🔎", "search", callback, "", true)
 }
 
 func (k *Keyboard) AddResetAllSorting(callback string) *Keyboard {
-	return k.AddButton("", "resetSorting", callback, "")
+	return k.AddButton("", "resetSorting", callback, "", true)
 }
 
 func (k *Keyboard) AddResetSorting(sorting *models.Sorting) *Keyboard {
 	if sorting.IsSortingFieldEnabled(sorting.Field) {
-		return k.AddButton("", "reset", states.CallbackProcessReset, "")
+		return k.AddButton("", "reset", states.CallbackProcessReset, "", true)
 	}
 
 	return k
@@ -36,7 +36,7 @@ func (k *Keyboard) AddResetSorting(sorting *models.Sorting) *Keyboard {
 
 func (k *Keyboard) AddSortingDirection() *Keyboard {
 	return k.AddButtonsWithRowSize(2,
-		Button{"⬆️", "increaseOrder", states.CallbackIncrease, ""},
-		Button{"⬇️", "decreaseOrder", states.CallbacktDecrease, ""},
+		Button{"⬆️", "increaseOrder", states.CallbackIncrease, "", true},
+		Button{"⬇️", "decreaseOrder", states.CallbacktDecrease, "", true},
 	)
 }

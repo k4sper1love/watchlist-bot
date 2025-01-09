@@ -11,8 +11,8 @@ import (
 )
 
 var updateProfileButtons = []keyboards.Button{
-	{"", "Имя", states.CallbackUpdateProfileSelectUsername, ""},
-	{"", "Email", states.CallbackUpdateProfileSelectEmail, ""},
+	{"", "Имя", states.CallbackUpdateProfileSelectUsername, "", true},
+	{"", "Email", states.CallbackUpdateProfileSelectEmail, "", true},
 }
 
 func HandleUpdateProfileCommand(app models.App, session *models.Session) {
