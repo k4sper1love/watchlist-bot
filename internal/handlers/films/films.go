@@ -60,6 +60,24 @@ func HandleFilmsButtons(app models.App,
 			app.SendMessage(msg, nil)
 		}
 
+	case callback == states.CallbackFilmsLastPage:
+		if session.FilmsState.CurrentPage != session.FilmsState.LastPage {
+			session.FilmsState.CurrentPage = session.FilmsState.LastPage
+			HandleFilmsCommand(app, session)
+		} else {
+			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
+		}
+
+	case callback == states.CallbackFilmsFirstPage:
+		if session.FilmsState.CurrentPage != 1 {
+			session.FilmsState.CurrentPage = 1
+			HandleFilmsCommand(app, session)
+		} else {
+			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
+		}
+
 	case callback == states.CallbackFilmsNew:
 		HandleNewFilmCommand(app, session)
 

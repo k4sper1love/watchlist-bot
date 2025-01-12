@@ -2,6 +2,12 @@
   "choiceLanguage": {
     "other": "Please select a language to communicate with the bot. You can change it in the settings"
   },
+  "notFoundMessages": {
+    "other": "No messages found"
+  },
+  "choiceMessage": {
+    "other": "Choose a message"
+  },
   "created_at": {
     "other": "Creation date"
   },

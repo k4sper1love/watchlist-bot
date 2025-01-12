@@ -28,6 +28,8 @@ func BuildCollectionsKeyboard(session *models.Session, currentPage, lastPage int
 		lastPage,
 		states.CallbackCollectionsPrevPage,
 		states.CallbackCollectionsNextPage,
+		states.CallbackCollectionsFirstPage,
+		states.CallbackCollectionsLastPage,
 	)
 
 	keyboard.AddCollectionFiltersAndSorting(session)
@@ -59,6 +61,8 @@ func BuildFindCollectionsKeyboard(session *models.Session, currentPage, lastPage
 		lastPage,
 		states.CallbackFindCollectionsPrevPage,
 		states.CallbackFindCollectionsNextPage,
+		states.CallbackFindCollectionsFirstPage,
+		states.CallbackFindCollectionsLastPage,
 	)
 
 	keyboard.AddBack(states.CallbackFindCollectionsBack)

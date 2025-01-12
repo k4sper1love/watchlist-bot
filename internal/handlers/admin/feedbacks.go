@@ -55,6 +55,24 @@ func HandleFeedbacksButtons(app models.App, session *models.Session) {
 			app.SendMessage(msg, nil)
 		}
 
+	case callback == states.CallbackAdminFeedbackListLastPage:
+		if session.AdminState.CurrentPage != session.AdminState.LastPage {
+			session.AdminState.CurrentPage = session.AdminState.LastPage
+			HandleFeedbacksCommand(app, session)
+		} else {
+			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
+		}
+
+	case callback == states.CallbackAdminFeedbackListFirstPage:
+		if session.AdminState.CurrentPage != 1 {
+			session.AdminState.CurrentPage = 1
+			HandleFeedbacksCommand(app, session)
+		} else {
+			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
+		}
+
 	case strings.HasPrefix(callback, "select_admin_feedback_"):
 		handleFeedbackSelect(app, session)
 	}

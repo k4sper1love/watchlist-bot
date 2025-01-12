@@ -45,7 +45,7 @@ func RequireRole(app models.App, session *models.Session, next func(models.App, 
 		return
 	}
 
-	next(app, session)
+	RequireAuth(app, session, next)
 }
 
 func CheckBanned(app models.App, session *models.Session, next func(models.App, *models.Session)) {
@@ -61,7 +61,7 @@ func CheckBanned(app models.App, session *models.Session, next func(models.App, 
 		return
 	}
 
-	next(app, session)
+	RequireAuth(app, session, next)
 }
 
 func isAuth(session *models.Session) bool {

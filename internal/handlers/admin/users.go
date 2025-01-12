@@ -63,6 +63,24 @@ func HandleUsersButton(app models.App, session *models.Session) {
 			app.SendMessage(msg, nil)
 		}
 
+	case callback == states.CallbackAdminUsersListLastPage:
+		if session.AdminState.CurrentPage != session.AdminState.LastPage {
+			session.AdminState.CurrentPage = session.AdminState.LastPage
+			HandleUsersCommand(app, session)
+		} else {
+			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
+		}
+
+	case callback == states.CallbackAdminUsersListFirstPage:
+		if session.AdminState.CurrentPage != 1 {
+			session.AdminState.CurrentPage = 1
+			HandleUsersCommand(app, session)
+		} else {
+			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
+		}
+
 	case strings.HasPrefix(callback, "select_admin_user_"):
 		handleUserSelect(app, session)
 	}

@@ -65,13 +65,17 @@ const (
 	ProcessAdminManageUsersAwaitingFind = "admin_manage_users_awaiting_find"
 
 	// admin users list states
-	CallbackAdminUsersListPrevPage = "admin_users_list_prev_page"
-	CallbackAdminUsersListNextPage = "admin_users_list_next_page"
+	CallbackAdminUsersListPrevPage  = "admin_users_list_prev_page"
+	CallbackAdminUsersListNextPage  = "admin_users_list_next_page"
+	CallbackAdminUsersListLastPage  = "admin_users_list_last_page"
+	CallbackAdminUsersListFirstPage = "admin_users_list_first_page"
 
 	// admin list states
 	CallbackAdminListBack        = "admin_list_back"
 	CallbackAdminListPrevPage    = "admin_list_prev_page"
 	CallbackAdminListNextPage    = "admin_list_next_page"
+	CallbackAdminListLastPage    = "admin_list_last_page"
+	CallbackAdminListFirstPage   = "admin_list_first_page"
 	CallbackAdminListSelectFind  = "admin_list_select_find"
 	ProcessAdminListAwaitingFind = "admin_list_awaiting_find"
 
@@ -90,9 +94,11 @@ const (
 	CallbackAdminDetailRemoveRole = "admin_detail_remove_role"
 
 	// admin feedback list states
-	CallbackAdminFeedbackListBack     = "admin_feedback_list_back"
-	CallbackAdminFeedbackListPrevPage = "admin_feedback_list_prev_page"
-	CallbackAdminFeedbackListNextPage = "admin_feedback_list_next_page"
+	CallbackAdminFeedbackListBack      = "admin_feedback_list_back"
+	CallbackAdminFeedbackListPrevPage  = "admin_feedback_list_prev_page"
+	CallbackAdminFeedbackListNextPage  = "admin_feedback_list_next_page"
+	CallbackAdminFeedbackListLastPage  = "admin_feedback_list_last_page"
+	CallbackAdminFeedbackListFirstPage = "admin_feedback_list_first_page"
 
 	// admin feedback detail states
 	CallbackAdminFeedbackDetailBack   = "admin_feedback_detail_back"
@@ -133,15 +139,19 @@ const (
 	CallbackFilmsManage           = "films_manage"
 	CallbackFilmsNextPage         = "films_next_page"
 	CallbackFilmsPrevPage         = "films_prev_page"
+	CallbackFilmsLastPage         = "films_last_page"
+	CallbackFilmsFirstPage        = "films_first_page"
 	CallbackFilmsBack             = "films_back"
 	CallbackFilmsFind             = "films_find"
 	ProcessFindFilmsAwaitingTitle = "find_films_awaiting_title"
 
 	// find films states
-	CallbackFindFilmsBack     = "find_films_back"
-	CallbackFindFilmsNextPage = "find_films_next_page"
-	CallbackFindFilmsPrevPage = "find_films_prev_page"
-	CallbackFindFilmsAgain    = "find_films_again"
+	CallbackFindFilmsBack      = "find_films_back"
+	CallbackFindFilmsNextPage  = "find_films_next_page"
+	CallbackFindFilmsPrevPage  = "find_films_prev_page"
+	CallbackFindFilmsLastPage  = "find_films_last_page"
+	CallbackFindFilmsFirstPage = "find_films_first_page"
+	CallbackFindFilmsAgain     = "find_films_again"
 
 	// filters films states
 	CallbackFiltersFilmsSelectBack       = "filters_films_select_back"
@@ -225,6 +235,8 @@ const (
 	CallbackCollectionsManage          = "collections_manage"
 	CallbackCollectionsNextPage        = "collections_next_page"
 	CallbackCollectionsPrevPage        = "collections_prev_page"
+	CallbackCollectionsLastPage        = "collections_last_page"
+	CallbackCollectionsFirstPage       = "collections_first_page"
 	CallbackCollectionsBack            = "collections_back"
 	CallbackCollectionsFind            = "collections_find"
 	ProcessFindCollectionsAwaitingName = "find_collections_awaiting_name"
@@ -240,10 +252,12 @@ const (
 	CallbackSortingCollectionsSelectTotalFilms = "sorting_collections_select_total_films"
 
 	// find collections states
-	CallbackFindCollectionsBack     = "find_collections_back"
-	CallbackFindCollectionsNextPage = "find_collections_next_page"
-	CallbackFindCollectionsPrevPage = "find_collections_prev_page"
-	CallbackFindCollectionsAgain    = "find_collections_again"
+	CallbackFindCollectionsBack      = "find_collections_back"
+	CallbackFindCollectionsNextPage  = "find_collections_next_page"
+	CallbackFindCollectionsPrevPage  = "find_collections_prev_page"
+	CallbackFindCollectionsLastPage  = "find_collections_last_page"
+	CallbackFindCollectionsFirstPage = "find_collections_first_page"
+	CallbackFindCollectionsAgain     = "find_collections_again"
 
 	// manage collection states
 	CallbackManageCollectionSelectBack   = "manage_collection_select_back"
@@ -274,12 +288,16 @@ const (
 	CallbackOptionsFilmToCollectionExisting = "options_film_to_collection_existing"
 
 	// add collection to film states
-	CallbackAddCollectionToFilmBack     = "add_collection_to_film_back"
-	CallbackAddCollectionToFilmPrevPage = "add_collection_to_film_prev_page"
-	CallbackAddCollectionToFilmNextPage = "add_collection_to_film_next_page"
+	CallbackAddCollectionToFilmBack      = "add_collection_to_film_back"
+	CallbackAddCollectionToFilmPrevPage  = "add_collection_to_film_prev_page"
+	CallbackAddCollectionToFilmNextPage  = "add_collection_to_film_next_page"
+	CallbackAddCollectionToFilmLastPage  = "add_collection_to_film_last_page"
+	CallbackAddCollectionToFilmFirstPage = "add_collection_to_film_first_page"
 
 	// add film to collection states
-	CallbackAddFilmToCollectionBack     = "add_film_to_collection_back"
-	CallbackAddFilmToCollectionPrevPage = "add_film_to_collection_prev_page"
-	CallbackAddFilmToCollectionNextPage = "add_film_to_collection_next_page"
+	CallbackAddFilmToCollectionBack      = "add_film_to_collection_back"
+	CallbackAddFilmToCollectionPrevPage  = "add_film_to_collection_prev_page"
+	CallbackAddFilmToCollectionNextPage  = "add_film_to_collection_next_page"
+	CallbackAddFilmToCollectionLastPage  = "add_film_to_collection_last_page"
+	CallbackAddFilmToCollectionFirstPage = "add_film_to_collection_first_page"
 )

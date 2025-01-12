@@ -41,6 +41,8 @@ func BuildFilmsKeyboard(session *models.Session, currentPage, lastPage int) *tgb
 		lastPage,
 		states.CallbackFilmsPrevPage,
 		states.CallbackFilmsNextPage,
+		states.CallbackFilmsFirstPage,
+		states.CallbackFilmsLastPage,
 	)
 
 	keyboard.AddFilmFiltersAndSorting(session)
@@ -69,6 +71,8 @@ func BuildFindFilmsKeyboard(session *models.Session, currentPage, lastPage int) 
 		lastPage,
 		states.CallbackFindFilmsPrevPage,
 		states.CallbackFindFilmsNextPage,
+		states.CallbackFindFilmsFirstPage,
+		states.CallbackFindFilmsLastPage,
 	)
 
 	keyboard.AddBack(states.CallbackFindFilmsBack)
@@ -101,7 +105,10 @@ func BuildFilmDetailKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMa
 		itemID,
 		session.FilmsState.TotalRecords,
 		states.CallbackFilmDetailPrevPage,
-		states.CallbackFilmDetailNextPage)
+		states.CallbackFilmDetailNextPage,
+		"",
+		"",
+	)
 
 	keyboard.AddBack(states.CallbackFilmDetailBack)
 

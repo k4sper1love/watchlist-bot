@@ -61,5 +61,24 @@ func HandleFindFilmsButtons(app models.App, session *models.Session) {
 			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
+
+	case callback == states.CallbackFindFilmsLastPage:
+		if session.FilmsState.CurrentPage != session.FilmsState.LastPage {
+			session.FilmsState.CurrentPage = session.FilmsState.LastPage
+			HandleFindFilmsCommand(app, session)
+		} else {
+			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
+		}
+
+	case callback == states.CallbackFindFilmsFirstPage:
+		if session.FilmsState.CurrentPage != 1 {
+			session.FilmsState.CurrentPage = 1
+			HandleFindFilmsCommand(app, session)
+		} else {
+			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
+		}
+
 	}
 }

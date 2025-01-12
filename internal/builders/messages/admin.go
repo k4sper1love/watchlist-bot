@@ -113,6 +113,11 @@ func BuildFeedbackListMessage(session *models.Session, feedbacks []models.Feedba
 	lastPage := session.AdminState.LastPage
 	totalRecords := session.AdminState.TotalRecords
 
+	if len(feedbacks) == 0 {
+		msg := translator.Translate(session.Lang, "notFoundMessages", nil, nil)
+		return msg
+	}
+
 	foundMsg := translator.Translate(session.Lang, "foundFeedbacks", nil, nil)
 	msg := fmt.Sprintf("<b>%s:</b> %d\n\n", foundMsg, totalRecords)
 
@@ -137,7 +142,7 @@ func BuildFeedbackListMessage(session *models.Session, feedbacks []models.Feedba
 	}, nil)
 
 	msg += fmt.Sprintf("<b>📄 %s</b>\n", pageMsg)
-	msg += translator.Translate(session.Lang, "choiceUserForDetails", nil, nil)
+	msg += translator.Translate(session.Lang, "choiceMessage", nil, nil)
 
 	return msg
 }
@@ -150,7 +155,8 @@ func BuildFeedbackDetailMessage(session *models.Session, feedback *models.Feedba
 	msg += fmt.Sprintf("<b>%s:</b> <code>%d</code>\n", idMsg, feedback.TelegramID)
 
 	categoryMsg := translator.Translate(session.Lang, "category", nil, nil)
-	msg += fmt.Sprintf("<b>%s:</b> %s\n", categoryMsg, feedback.Category)
+	translatedCategory := translator.Translate(session.Lang, feedback.Category, nil, nil)
+	msg += fmt.Sprintf("<b>%s:</b> %s\n", categoryMsg, translatedCategory)
 
 	feedbackMsg := translator.Translate(session.Lang, "message", nil, nil)
 	msg += fmt.Sprintf("<b>%s:</b>\n<pre>%s</pre>\n", feedbackMsg, feedback.Message)

@@ -88,14 +88,21 @@ func (k *Keyboard) AddButtonsWithRowSize(rowSize int, buttons ...Button) *Keyboa
 	return k
 }
 
-func (k *Keyboard) AddNavigation(currentPage, lastPage int, prevData, nextData string) *Keyboard {
+func (k *Keyboard) AddNavigation(currentPage, lastPage int, prevData, nextData, firstData, lastData string) *Keyboard {
 	var buttons []Button
 
 	if currentPage > 1 {
+		if firstData != "" {
+			buttons = append(buttons, Button{Emoji: "⏮", Text: "", CallbackData: firstData, NeedTranslate: true})
+		}
 		buttons = append(buttons, Button{Emoji: "⬅", Text: "backward", CallbackData: prevData, NeedTranslate: true})
 	}
+
 	if currentPage < lastPage {
-		buttons = append(buttons, Button{Emoji: "➡", Text: "forward", CallbackData: nextData, NeedTranslate: true})
+		if nextData != "" {
+			buttons = append(buttons, Button{Emoji: "➡", Text: "forward", CallbackData: nextData, NeedTranslate: true})
+		}
+		buttons = append(buttons, Button{Emoji: "⏭", Text: "", CallbackData: lastData, NeedTranslate: true})
 	}
 
 	if len(buttons) > 0 {

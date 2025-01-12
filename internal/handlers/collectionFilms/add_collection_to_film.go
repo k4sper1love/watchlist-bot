@@ -59,6 +59,24 @@ func HandleAddCollectionToFilmButtons(app models.App, session *models.Session) {
 			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
+
+	case callback == states.CallbackAddCollectionToFilmLastPage:
+		if session.CollectionFilmsState.CurrentPage != session.CollectionFilmsState.LastPage {
+			session.CollectionFilmsState.CurrentPage = session.CollectionFilmsState.LastPage
+			HandleAddCollectionToFilmCommand(app, session)
+		} else {
+			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
+		}
+
+	case callback == states.CallbackAddCollectionToFilmFirstPage:
+		if session.CollectionFilmsState.CurrentPage != 1 {
+			session.CollectionFilmsState.CurrentPage = 1
+			HandleAddCollectionToFilmCommand(app, session)
+		} else {
+			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
+		}
 	}
 }
 func HandleAddCollectionToFilmSelect(app models.App, session *models.Session) {

@@ -34,6 +34,8 @@ func BuildAddFilmToCollectionKeyboard(session *models.Session) *tgbotapi.InlineK
 		lastPage,
 		states.CallbackAddFilmToCollectionPrevPage,
 		states.CallbackAddFilmToCollectionNextPage,
+		states.CallbackAddFilmToCollectionFirstPage,
+		states.CallbackAddFilmToCollectionLastPage,
 	)
 
 	keyboard.AddBack(states.CallbackAddFilmToCollectionBack)
@@ -55,6 +57,8 @@ func BuildAddCollectionToFilmKeyboard(session *models.Session) *tgbotapi.InlineK
 		lastPage,
 		states.CallbackAddCollectionToFilmPrevPage,
 		states.CallbackAddCollectionToFilmNextPage,
+		states.CallbackAddCollectionToFilmFirstPage,
+		states.CallbackAddCollectionToFilmLastPage,
 	)
 
 	keyboard.AddBack(states.CallbackAddCollectionToFilmBack)

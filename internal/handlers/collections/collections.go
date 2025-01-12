@@ -57,6 +57,24 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 			app.SendMessage(msg, nil)
 		}
 
+	case callback == states.CallbackCollectionsLastPage:
+		if session.CollectionsState.CurrentPage != session.CollectionsState.LastPage {
+			session.CollectionsState.CurrentPage = session.CollectionsState.LastPage
+			HandleCollectionsCommand(app, session)
+		} else {
+			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
+		}
+
+	case callback == states.CallbackCollectionsFirstPage:
+		if session.CollectionsState.CurrentPage != 1 {
+			session.CollectionsState.CurrentPage = 1
+			HandleCollectionsCommand(app, session)
+		} else {
+			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			app.SendMessage(msg, nil)
+		}
+
 	case callback == states.CallbackCollectionsNew:
 		HandleNewCollectionCommand(app, session)
 

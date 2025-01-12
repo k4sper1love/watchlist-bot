@@ -64,6 +64,8 @@ func BuildAdminUserListKeyboard(session *models.Session, users []models.Session)
 		session.AdminState.LastPage,
 		states.CallbackAdminUsersListPrevPage,
 		states.CallbackAdminUsersListNextPage,
+		states.CallbackAdminUsersListFirstPage,
+		states.CallbackAdminUsersListLastPage,
 	)
 
 	keyboard.AddBack(states.CallbackAdminManageUsersSelectBack)
@@ -85,6 +87,8 @@ func BuildAdminListKeyboard(session *models.Session, admins []models.Session) *t
 		session.AdminState.LastPage,
 		states.CallbackAdminListPrevPage,
 		states.CallbackAdminListNextPage,
+		states.CallbackAdminListFirstPage,
+		states.CallbackAdminListLastPage,
 	)
 
 	keyboard.AddBack(states.CallbackAdminListBack)
@@ -102,6 +106,8 @@ func BuildFeedbackListKeyboard(session *models.Session, feedbacks []models.Feedb
 		session.AdminState.LastPage,
 		states.CallbackAdminFeedbackListPrevPage,
 		states.CallbackAdminFeedbackListNextPage,
+		states.CallbackAdminFeedbackListFirstPage,
+		states.CallbackAdminFeedbackListLastPage,
 	)
 
 	keyboard.AddBack(states.CallbackAdminFeedbackListBack)
@@ -203,7 +209,7 @@ func (k *Keyboard) AddFeedbackSelect(session *models.Session, feedbacks []models
 	for i, feedback := range feedbacks {
 		itemID := utils.GetItemID(i, session.AdminState.CurrentPage, session.AdminState.PageSize)
 
-		text := fmt.Sprintf("%d - ID: %d", itemID, feedback.ID)
+		text := fmt.Sprintf("%s ID: %d", utils.NumberToEmoji(itemID), feedback.ID)
 
 		buttons = append(buttons, Button{"", text, fmt.Sprintf("select_admin_feedback_%d", feedback.ID), "", false})
 	}
@@ -255,7 +261,7 @@ func userSelectButtons(session *models.Session, users []models.Session, callback
 	for i, user := range users {
 		itemID := utils.GetItemID(i, session.AdminState.CurrentPage, session.AdminState.PageSize)
 
-		text := fmt.Sprintf("%d - %d", itemID, user.TelegramID)
+		text := fmt.Sprintf("%s %d", utils.NumberToEmoji(itemID), user.TelegramID)
 
 		if user.TelegramUsername != "" {
 			text += fmt.Sprintf(" (@%s)", user.TelegramUsername)
