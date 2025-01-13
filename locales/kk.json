@@ -2,7 +2,61 @@
   "choiceLanguage": {
     "other": "Ботпен сөйлесу үшін Тілді таңдаңыз. Сіз оны параметрлерде өзгерте аласыз"
   },
-  "notFoundMessages": {
+  "invalidInput": {
+    "other": "Қате енгізу."
+  },
+  "requestRangeInFormat": {
+    "other": "Нақты мәнді немесе диапазонды келесі форматта көрсетіңіз:"
+  },
+  "exampleValue": {
+    "other": "Нақты мән (мысалы)"
+  },
+  "exampleRange": {
+    "other": "Диапазон (мысалы)"
+  },
+  "examplePartialRange": {
+    "other": "Толық емес диапазон (мысалы)"
+  },
+  "rangeLimits": {
+    "other": "Осы өріс үшін рұқсат етілген диапазон: <code>{{.Min}}</code>-ден <code>{{.Max}}</code>-ге дейін."
+  },
+  "isFavorite": {
+    "other": "Таңдаулы"
+  },
+  "is_favorite": {
+    "other": "Таңдаулы"
+  },
+  "isViewed": {
+    "other": "Көрілді"
+  },
+  "filterInstructionSwitch": {
+    "other": "<b>\"{{.Filter}}\"</b> сүзгісі үшін мәнді таңдаңыз"
+  },
+  "true": {
+    "other": "Иә"
+  },
+  "false": {
+    "other": "Жоқ"
+  },
+  "createdAt": {
+    "other": "Жасалған күні"
+  },
+  "is_viewed": {
+    "other": "Көрілді"
+  },
+  "user_rating": {
+    "other": "Пайдаланушының бағасы"
+  },
+  "hasURL": {
+    "other": "Сілтеме"
+  },
+  "filterInstructionRange": {
+    "other": "<b>Мәнді немесе ауқымды енгізіңіз</b> (мысалы, <code>7.5</code> немесе <code>5-10</code>)."
+  },
+  "filterInstructionPartialRange": {
+    "other": "Жартылай диапазондар (<code>5-</code> немесе <code>-7.5</code>) автоматты түрде жетіспейтін шекті қосады."
+  },
+"notFoundMessages": {
     "other": "Хабарламалар табылмады"
   },
   "choiceMessage": {
@@ -29,20 +83,8 @@
   "choiceSorting": {
     "other": "Сұрыптау үшін өрісті таңдаңыз"
   },
-  "minRating": {
-    "other": "Ең төменгі рейтинг"
-  },
-  "maxRating": {
-    "other": "Ең жоғары рейтинг"
-  },
-  "requestMinRating": {
-    "other": "Ең төменгі рейтингті енгізіңіз"
-  },
-  "requestMaxRating": {
-    "other": "Ең жоғары рейтингті енгізіңіз"
-  },
-  "badRating": {
-    "other": "Рейтинг 0-ден үлкен және 10-нан кіші болуы керек"
+  "requestValueOrRange": {
+    "other": "Дәл мәнді немесе <code>-</code> қолдана отырып ауқымды енгізіңіз"
   },
   "filterApplied": {
     "other": "Сүзгі сәтті қолданылды!"

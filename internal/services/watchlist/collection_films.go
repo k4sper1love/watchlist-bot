@@ -109,29 +109,11 @@ func buildGetCollectionFilmsURL(app models.App, session *models.Session) string 
 	baseURL := fmt.Sprintf("%s/api/v1/collections/%d/films", app.Vars.Host, session.CollectionDetailState.ObjectID)
 	queryParams := url.Values{}
 
-	if session.FilmsState.CurrentPage > 0 {
-		queryParams.Add("page", fmt.Sprintf("%d", session.FilmsState.CurrentPage))
-	}
+	state := session.FilmsState
 
-	if session.FilmsState.PageSize > 0 {
-		queryParams.Add("page_size", fmt.Sprintf("%d", session.FilmsState.PageSize))
-	}
+	queryParams = addFilmsBasicParams(queryParams, state.Title, state.CurrentPage, state.PageSize)
 
-	if session.FilmsState.Title != "" {
-		queryParams.Add("title", session.FilmsState.Title)
-	}
-
-	if session.FilmsState.CollectionFilters.MinRating > 0 {
-		queryParams.Add("rating_min", fmt.Sprintf("%.2f", session.FilmsState.CollectionFilters.MinRating))
-	}
-
-	if session.FilmsState.CollectionFilters.MaxRating > 0 {
-		queryParams.Add("rating_max", fmt.Sprintf("%.2f", session.FilmsState.CollectionFilters.MaxRating))
-	}
-
-	if session.FilmsState.CollectionSorting.Sort != "" {
-		queryParams.Add("sort", session.FilmsState.CollectionSorting.Sort)
-	}
+	queryParams = addFilmsFilterAndSortingParams(queryParams, state.CollectionFilters, state.CollectionSorting)
 
 	requestURL := fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
 

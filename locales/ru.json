@@ -2,6 +2,60 @@
   "choiceLanguage": {
     "other": "Пожалуйста, выберите язык для общения с ботом. Вы сможете поменять его в настройках"
   },
+  "invalidInput": {
+    "other": "Некорректный ввод."
+  },
+  "requestRangeInFormat": {
+    "other": "Пожалуйста, укажите точное значение или диапазон в формате:"
+  },
+  "exampleValue": {
+    "other": "Точное значение (например)"
+  },
+  "exampleRange": {
+    "other": "Диапазон (например)"
+  },
+  "examplePartialRange": {
+    "other": "Частичный диапазон (например)"
+  },
+  "rangeLimits": {
+    "other": "Допустимый диапазон для этого поля: от <code>{{.Min}}</code> до <code>{{.Max}}</code>."
+  },
+  "isFavorite": {
+    "other": "Избранное"
+  },
+  "is_favorite": {
+    "other": "Избранное"
+  },
+  "isViewed": {
+    "other": "Просмотрено"
+  },
+  "filterInstructionSwitch": {
+    "other": "Выберите значение для фильтра <b>\"{{.Filter}}\"</b>"
+  },
+  "true": {
+    "other": "Да"
+  },
+  "false": {
+    "other": "Нет"
+  },
+  "createdAt": {
+    "other": "Дата создания"
+  },
+  "is_viewed": {
+    "other": "Просмотрено"
+  },
+  "user_rating": {
+    "other": "Оценка пользователя"
+  },
+  "hasURL": {
+    "other": "Ссылка"
+  },
+  "filterInstructionRange": {
+    "other":"<b>Введите значение или диапазон</b> (например, <code>7.5</code> или <code>5-10</code>)."
+  },
+  "filterInstructionPartialRange": {
+    "other": "Частичные диапазоны (<code>5-</code> или <code>-7.5</code>) автоматически подставят недостающую границу."
+  },
   "notFoundMessages": {
     "other": "Не найдено сообщений"
   },
@@ -29,20 +83,8 @@
   "choiceSorting": {
     "other": "Выберите поле для сортировки"
   },
-  "minRating": {
-    "other": "Минимальный рейтинг"
-  },
-  "maxRating": {
-    "other": "Максимальный рейтинг"
-  },
-  "requestMinRating": {
-    "other": "Введите минимальный рейтинг"
-  },
-  "requestMaxRating": {
-    "other": "Введите максимальный рейтинг"
-  },
-  "badRating": {
-    "other": "Рейтинг должен быть больше 0 и меньше 10"
+  "requestValueOrRange": {
+    "other": "Введите точное значение или диапазон, используя <code>-</code>"
   },
   "filterApplied": {
     "other": "Фильтр применен успешно!"

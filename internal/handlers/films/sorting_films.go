@@ -35,6 +35,21 @@ func HandleSortingFilmsButtons(app models.App, session *models.Session) {
 
 	case states.CallbackSortingFilmsSelectRating:
 		session.GetFilmsSortingByContext().Field = "rating"
+
+	case states.CallbackSortingFilmsSelectYear:
+		session.GetFilmsSortingByContext().Field = "year"
+
+	case states.CallbackSortingFilmsSelectIsFavorite:
+		session.GetFilmsSortingByContext().Field = "is_favorite"
+
+	case states.CallbackSortingFilmsSelectIsViewed:
+		session.GetFilmsSortingByContext().Field = "is_viewed"
+
+	case states.CallbackSortingFilmsSelectUserRating:
+		session.GetFilmsSortingByContext().Field = "user_rating"
+
+	case states.CallbackSortingFilmsSelectCreatedAt:
+		session.GetFilmsSortingByContext().Field = "created_at"
 	}
 
 	handleSortingFilmsDirection(app, session)

@@ -247,6 +247,13 @@ func BoolToEmoji(value bool) string {
 	return "✖️"
 }
 
+func BoolToString(value bool) string {
+	if value {
+		return "yes"
+	}
+	return "no"
+}
+
 func SortDirectionToEmoji(value string) string {
 	if strings.HasPrefix(value, "-") {
 		return "⬇️"

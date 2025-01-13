@@ -76,47 +76,55 @@ func buildCollectionHeader(session *models.Session) string {
 	return msg
 }
 
-func BuildRatingFilterMessage(session *models.Session, filterType string) string {
-	var msg string
+func BuildFilterRangeMessage(session *models.Session, filterType string) string {
+	filter := session.GetFilmsFiltersByContext()
 
-	switch filterType {
-	case "minRating":
-		msg = translator.Translate(session.Lang, "requestMinRating", nil, nil)
-	case "maxRating":
-		msg = translator.Translate(session.Lang, "requestMaxRating", nil, nil)
-	}
+	part1 := translator.Translate(session.Lang, "filterInstructionRange", nil, nil)
+	part2 := translator.Translate(session.Lang, "filterInstructionPartialRange", nil, nil)
 
-	rating := parseRatingValue(session, filterType)
+	msg := fmt.Sprintf("%s\n\n<i>%s</i>", part1, part2)
 
-	if rating > 0 {
-		valueMsg := translator.Translate(session.Lang, "currentValue", nil, nil)
-		msg += fmt.Sprintf("\n\n<b>%s</b>: %.2f", valueMsg, rating)
+	if filter.IsFilterEnabled(filterType) {
+		currentValueMsg := translator.Translate(session.Lang, "currentValue", nil, nil)
+		value := filter.ValueToString(filterType)
+		msg += fmt.Sprintf("\n\n<b>%s</b>: %s", currentValueMsg, value)
 	}
 
 	return msg
 }
 
-func BuildValidateFilterMessage(session *models.Session, filterType string) string {
-	switch filterType {
-	case "minRating":
-		return translator.Translate(session.Lang, "ratingMustBeLower", nil, nil)
-	case "maxRating":
-		return translator.Translate(session.Lang, "ratingMustBeHigher", nil, nil)
-	}
-	return translator.Translate(session.Lang, "someError", nil, nil)
-}
-
-func parseRatingValue(session *models.Session, filterType string) float64 {
+func BuildFilterSwitchMessage(session *models.Session, filterType string) string {
 	filter := session.GetFilmsFiltersByContext()
 
-	switch filterType {
-	case "minRating":
-		return filter.MinRating
+	filterMsg := translator.Translate(session.Lang, filterType, nil, nil)
+	msg := translator.Translate(session.Lang, "filterInstructionSwitch", map[string]interface{}{
+		"Filter": filterMsg,
+	}, nil)
 
-	case "maxRating":
-		return filter.MaxRating
-
-	default:
-		return 0
+	if filter.IsFilterEnabled(filterType) {
+		currentValueMsg := translator.Translate(session.Lang, "currentValue", nil, nil)
+		value := translator.Translate(session.Lang, filter.ValueToString(filterType), nil, nil)
+		msg += fmt.Sprintf("\n\n<b>%s</b>: %s", currentValueMsg, value)
 	}
+
+	return msg
+}
+
+func BuildInvalidFilterRangeInputMessage(session *models.Session, config models.FilterRangeConfig) string {
+	exampleValue := translator.Translate(session.Lang, "exampleValue", nil, nil)
+	exampleRange := translator.Translate(session.Lang, "exampleRange", nil, nil)
+	examplePartialRange := translator.Translate(session.Lang, "examplePartialRange", nil, nil)
+	rangeLimits := translator.Translate(session.Lang, "rangeLimits", map[string]interface{}{
+		"Min": fmt.Sprintf("%.2f", config.MinValue),
+		"Max": fmt.Sprintf("%.2f", config.MaxValue),
+	}, nil)
+
+	msg := "❌ " + translator.Translate(session.Lang, "invalidInput", nil, nil)
+	msg += "\n\n<b>" + translator.Translate(session.Lang, "requestRangeInFormat", nil, nil) + "</b>"
+	msg += fmt.Sprintf("\n- %s: <code>%s</code>", exampleValue, "5.5")
+	msg += fmt.Sprintf("\n- %s: <code>%s</code>", exampleRange, "1990-2023")
+	msg += fmt.Sprintf("\n- %s: <code>%s</code> или <code>%s</code>", examplePartialRange, "5-", "-10")
+	msg += fmt.Sprintf("\n\n⚠️ <i>%s</i>", rangeLimits)
+
+	return msg
 }

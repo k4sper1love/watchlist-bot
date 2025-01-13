@@ -6,7 +6,6 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 var updateCollectionButtons = []Button{
@@ -125,33 +124,13 @@ func parseSortingCollectionsButtons(session *models.Session) []Button {
 	var buttons []Button
 	sorting := session.CollectionsState.Sorting
 
-	sortingEnabled := sorting.IsSortingFieldEnabled("id")
-	text := translator.Translate(session.Lang, "id", nil, nil)
-	if sortingEnabled {
-		text += fmt.Sprintf(": %s", utils.SortDirectionToEmoji(sorting.Sort))
-	}
-	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingCollectionsSelectID, "", true})
+	buttons = addSortingButton(buttons, sorting, session.Lang, "id", states.CallbackSortingCollectionsSelectID)
 
-	sortingEnabled = sorting.IsSortingFieldEnabled("name")
-	text = translator.Translate(session.Lang, "name", nil, nil)
-	if sortingEnabled {
-		text += fmt.Sprintf(": %s", utils.SortDirectionToEmoji(sorting.Sort))
-	}
-	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingCollectionsSelectName, "", true})
+	buttons = addSortingButton(buttons, sorting, session.Lang, "name", states.CallbackSortingCollectionsSelectName)
 
-	sortingEnabled = sorting.IsSortingFieldEnabled("created_at")
-	text = translator.Translate(session.Lang, "created_at", nil, nil)
-	if sortingEnabled {
-		text += fmt.Sprintf(": %s", utils.SortDirectionToEmoji(sorting.Sort))
-	}
-	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingCollectionsSelectCreatedAt, "", true})
+	buttons = addSortingButton(buttons, sorting, session.Lang, "created_at", states.CallbackSortingCollectionsSelectCreatedAt)
 
-	sortingEnabled = sorting.IsSortingFieldEnabled("total_films")
-	text = translator.Translate(session.Lang, "total_films", nil, nil)
-	if sortingEnabled {
-		text += fmt.Sprintf(": %s", utils.SortDirectionToEmoji(sorting.Sort))
-	}
-	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingCollectionsSelectTotalFilms, "", true})
+	buttons = addSortingButton(buttons, sorting, session.Lang, "total_films", states.CallbackSortingCollectionsSelectTotalFilms)
 
 	return buttons
 }

@@ -125,6 +125,22 @@ func buildGetFilmsURL(app models.App, session *models.Session, collectionID, cur
 		queryParams.Add("exclude_collection", fmt.Sprintf("%d", collectionID))
 	}
 
+	state := session.FilmsState
+
+	queryParams = addFilmsBasicParams(queryParams, state.Title, currentPage, pageSize)
+
+	queryParams = addFilmsFilterAndSortingParams(queryParams, state.FilmFilters, state.FilmSorting)
+
+	requestURL := fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
+
+	return requestURL
+}
+
+func addFilmsBasicParams(queryParams url.Values, title string, currentPage, pageSize int) url.Values {
+	if title != "" {
+		queryParams.Add("title", title)
+	}
+
 	if currentPage > 0 {
 		queryParams.Add("page", fmt.Sprintf("%d", currentPage))
 	}
@@ -133,23 +149,33 @@ func buildGetFilmsURL(app models.App, session *models.Session, collectionID, cur
 		queryParams.Add("page_size", fmt.Sprintf("%d", pageSize))
 	}
 
-	if session.FilmsState.Title != "" {
-		queryParams.Add("title", session.FilmsState.Title)
+	return queryParams
+}
+
+func addFilmsFilterAndSortingParams(queryParams url.Values, filter *models.FiltersFilm, sorting *models.Sorting) url.Values {
+	if filter.Rating != "" {
+		queryParams.Add("rating", filter.Rating)
 	}
 
-	if session.FilmsState.FilmFilters.MinRating > 0 {
-		queryParams.Add("rating_min", fmt.Sprintf("%.2f", session.FilmsState.FilmFilters.MinRating))
+	if filter.UserRating != "" {
+		queryParams.Add("user_rating", filter.UserRating)
 	}
 
-	if session.FilmsState.FilmFilters.MaxRating > 0 {
-		queryParams.Add("rating_max", fmt.Sprintf("%.2f", session.FilmsState.FilmFilters.MaxRating))
+	if filter.Year != "" {
+		queryParams.Add("year", filter.Year)
 	}
 
-	if session.FilmsState.FilmSorting.Sort != "" {
-		queryParams.Add("sort", session.FilmsState.FilmSorting.Sort)
+	if filter.IsViewed != nil {
+		queryParams.Add("is_viewed", fmt.Sprintf("%t", *filter.IsViewed))
 	}
 
-	requestURL := fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
+	if filter.HasURL != nil {
+		queryParams.Add("has_url", fmt.Sprintf("%t", *filter.HasURL))
+	}
 
-	return requestURL
+	if sorting.Sort != "" {
+		queryParams.Add("sort", sorting.Sort)
+	}
+
+	return queryParams
 }

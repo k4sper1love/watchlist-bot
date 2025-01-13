@@ -2,7 +2,61 @@
   "choiceLanguage": {
     "other": "Будь ласка, виберіть мову для спілкування з ботом. Ви зможете поміняти його в налаштуваннях"
   },
-  "notFoundMessages": {
+  "invalidInput": {
+    "other": "Некоректний ввід."
+  },
+  "requestRangeInFormat": {
+    "other": "Будь ласка, вкажіть точне значення або діапазон у форматі:"
+  },
+  "exampleValue": {
+    "other": "Точне значення (наприклад)"
+  },
+  "exampleRange": {
+    "other": "Діапазон (наприклад)"
+  },
+  "examplePartialRange": {
+    "other": "Частковий діапазон (наприклад)"
+  },
+  "rangeLimits": {
+    "other": "Дозволений діапазон для цього поля: від <code>{{.Min}}</code> до <code>{{.Max}}</code>."
+  },
+  "isFavorite": {
+    "other": "Обране"
+  },
+  "is_favorite": {
+    "other": "Обране"
+  },
+  "isViewed": {
+    "other": "Переглянуто"
+  },
+  "filterInstructionSwitch": {
+    "other": "Виберіть значення для фільтра <b>\"{{.Filter}}\"</b>"
+  },
+  "true": {
+    "other": "Так"
+  },
+  "false": {
+    "other": "Ні"
+  },
+  "createdAt": {
+    "other": "Дата створення"
+  },
+  "is_viewed": {
+    "other": "Переглянуто"
+  },
+  "user_rating": {
+    "other": "Оцінка користувача"
+  },
+  "hasURL": {
+    "other": "Посилання"
+  },
+  "filterInstructionRange": {
+    "other": "<b>Введіть значення або діапазон</b> (наприклад, <code>7.5</code> або <code>5-10</code>)."
+  },
+  "filterInstructionPartialRange": {
+    "other": "Часткові діапазони (<code>5-</code> або <code>-7.5</code>) автоматично заповнять відсутню межу."
+  },
+"notFoundMessages": {
     "other": "Повідомлення не знайдено"
   },
   "choiceMessage": {
@@ -29,20 +83,8 @@
   "choiceSorting": {
     "other": "Оберіть поле для сортування"
   },
-  "minRating": {
-    "other": "Мінімальний рейтинг"
-  },
-  "maxRating": {
-    "other": "Максимальний рейтинг"
-  },
-  "requestMinRating": {
-    "other": "Введіть мінімальний рейтинг"
-  },
-  "requestMaxRating": {
-    "other": "Введіть максимальний рейтинг"
-  },
-  "badRating": {
-    "other": "Рейтинг повинен бути більше 0 і менше 10"
+  "requestValueOrRange": {
+    "other": "Введіть точне значення або діапазон, використовуючи <code>-</code>"
   },
   "filterApplied": {
     "other": "Фільтр успішно застосовано!"

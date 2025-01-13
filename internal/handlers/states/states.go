@@ -154,12 +154,20 @@ const (
 	CallbackFindFilmsAgain     = "find_films_again"
 
 	// filters films states
-	CallbackFiltersFilmsSelectBack       = "filters_films_select_back"
-	CallbackFiltersFilmsSelectAllReset   = "filters_films_select_all_reset"
-	CallbackFiltersFilmsSelectMinRating  = "filters_films_select_min_rating"
-	ProcessFiltersFilmsAwaitingMinRating = "filters_films_awaiting_min_rating"
-	CallbackFiltersFilmsSelectMaxRating  = "filters_films_select_max_rating"
-	ProcessFiltersFilmsAwaitingMaxRating = "filters_films_awaiting_max_rating"
+	CallbackFiltersFilmsSelectBack        = "filters_films_select_back"
+	CallbackFiltersFilmsSelectAllReset    = "filters_films_select_all_reset"
+	CallbackFiltersFilmsSelectRating      = "filters_films_select_rating"
+	CallbackFiltersFilmsSelectUserRating  = "filters_films_select_user_rating"
+	CallbackFiltersFilmsSelectYear        = "filters_films_select_year"
+	ProcessFiltersFilmsAwaitingRating     = "filters_films_awaiting_rating"
+	ProcessFiltersFilmsAwaitingUserRating = "filters_films_awaiting_user_rating"
+	ProcessFiltersFilmsAwaitingYear       = "filters_films_awaiting_year"
+	CallbackFiltersFilmsSelectIsViewed    = "filters_films_select_is_viewed"
+	ProcessFiltersFilmsAwaitingIsViewed   = "filters_films_awaiting_is_viewed"
+	CallbackFiltersFilmsSelectIsFavorite  = "filters_films_select_is_favorite"
+	ProcessFiltersFilmsAwaitingIsFavorite = "filters_films_awaiting_is_favorite"
+	CallbackFiltersFilmsSelectHasURL      = "filters_films_select_has_url"
+	ProcessFiltersFilmsAwaitingHasURL     = "filters_films_awaiting_has_url"
 
 	// sorting films states
 	CallbackSortingFilmsSelectBack       = "sorting_films_select_back"
@@ -168,6 +176,11 @@ const (
 	CallbackSortingFilmsSelectID         = "sorting_films_select_id"
 	CallbackSortingFilmsSelectTitle      = "sorting_films_select_title"
 	CallbackSortingFilmsSelectRating     = "sorting_films_select_rating"
+	CallbackSortingFilmsSelectYear       = "sorting_films_select_year"
+	CallbackSortingFilmsSelectIsViewed   = "sorting_films_select_is_viewed"
+	CallbackSortingFilmsSelectIsFavorite = "sorting_films_select_is_favorite"
+	CallbackSortingFilmsSelectUserRating = "sorting_films_select_user_rating"
+	CallbackSortingFilmsSelectCreatedAt  = "sorting_films_select_created_at"
 
 	// manage film states
 	CallbackManageFilmSelectBack                 = "manage_film_select_back"

@@ -2,7 +2,61 @@
   "choiceLanguage": {
     "other": "Please select a language to communicate with the bot. You can change it in the settings"
   },
-  "notFoundMessages": {
+  "invalidInput": {
+    "other": "Invalid input."
+  },
+  "requestRangeInFormat": {
+    "other": "Please specify an exact value or range in the format:"
+  },
+  "exampleValue": {
+    "other": "Exact value (e.g.)"
+  },
+  "exampleRange": {
+    "other": "Range (e.g.)"
+  },
+  "examplePartialRange": {
+    "other": "Partial range (e.g.)"
+  },
+  "rangeLimits": {
+    "other": "Allowed range for this field: from <code>{{.Min}}</code> to <code>{{.Max}}</code>."
+  },
+  "isFavorite": {
+    "other": "Favorite"
+  },
+  "is_favorite": {
+    "other": "Favorite"
+  },
+  "isViewed": {
+    "other": "Viewed"
+  },
+  "filterInstructionSwitch": {
+    "other": "Select a value for the filter <b>\"{{.Filter}}\"</b>"
+  },
+  "true": {
+    "other": "Yes"
+  },
+  "false": {
+    "other": "No"
+  },
+  "createdAt": {
+    "other": "Creation Date"
+  },
+  "is_viewed": {
+    "other": "Viewed"
+  },
+  "user_rating": {
+    "other": "User Rating"
+  },
+  "hasURL": {
+    "other": "Link"
+  },
+  "filterInstructionRange": {
+    "other": "<b>Enter a value or range</b> (e.g., <code>7.5</code> or <code>5-10</code>)."
+  },
+  "filterInstructionPartialRange": {
+    "other": "Partial ranges (<code>5-</code> or <code>-7.5</code>) will automatically complete the missing boundary."
+  },
+"notFoundMessages": {
     "other": "No messages found"
   },
   "choiceMessage": {
@@ -29,20 +83,8 @@
   "choiceSorting": {
     "other": "Choose a field for sorting"
   },
-  "minRating": {
-    "other": "Minimum rating"
-  },
-  "maxRating": {
-    "other": "Maximum rating"
-  },
-  "requestMinRating": {
-    "other": "Enter the minimum rating"
-  },
-  "requestMaxRating": {
-    "other": "Enter the maximum rating"
-  },
-  "badRating": {
-    "other": "The rating must be greater than 0 and less than 10"
+  "requestValueOrRange": {
+    "other": "Enter an exact value or range using <code>-</code>"
   },
   "filterApplied": {
     "other": "Filter successfully applied!"

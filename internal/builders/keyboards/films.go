@@ -6,7 +6,6 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 var updateFilmURLButton = Button{"", "filmURL", states.CallbackUpdateFilmSelectURL, "", true}
@@ -269,62 +268,45 @@ func (k *Keyboard) AddResetFilter(session *models.Session, filterType string) *K
 }
 
 func parseFiltersFilmsButtons(session *models.Session) []Button {
+	filter := session.GetFilmsFiltersByContext()
+
 	var buttons []Button
-	filters := session.GetFilmsFiltersByContext()
 
-	filterEnabled := filters.IsFilterEnabled("minRating")
-	text := translator.Translate(session.Lang, "minRating", nil, nil)
-	if filterEnabled {
-		text += fmt.Sprintf(": %.2f", filters.MinRating)
-	}
-	buttons = append(buttons, Button{
-		utils.BoolToEmoji(filterEnabled),
-		text,
-		states.CallbackFiltersFilmsSelectMinRating,
-		"",
-		true,
-	})
+	buttons = addFiltersFilmsButton(buttons, filter, session.Lang, "rating", states.CallbackFiltersFilmsSelectRating, false)
 
-	filterEnabled = filters.IsFilterEnabled("maxRating")
-	text = translator.Translate(session.Lang, "maxRating", nil, nil)
-	if filterEnabled {
-		text += fmt.Sprintf(": %.2f", filters.MaxRating)
-	}
-	buttons = append(buttons, Button{
-		utils.BoolToEmoji(filterEnabled),
-		text,
-		states.CallbackFiltersFilmsSelectMaxRating,
-		"",
-		true,
-	})
+	buttons = addFiltersFilmsButton(buttons, filter, session.Lang, "userRating", states.CallbackFiltersFilmsSelectUserRating, false)
+
+	buttons = addFiltersFilmsButton(buttons, filter, session.Lang, "year", states.CallbackFiltersFilmsSelectYear, false)
+
+	buttons = addFiltersFilmsButton(buttons, filter, session.Lang, "isViewed", states.CallbackFiltersFilmsSelectIsViewed, true)
+
+	buttons = addFiltersFilmsButton(buttons, filter, session.Lang, "isFavorite", states.CallbackFiltersFilmsSelectIsFavorite, true)
+
+	buttons = addFiltersFilmsButton(buttons, filter, session.Lang, "hasURL", states.CallbackFiltersFilmsSelectHasURL, true)
 
 	return buttons
 }
 
 func parseSortingFilmsButtons(session *models.Session) []Button {
-	var buttons []Button
 	sorting := session.GetFilmsSortingByContext()
 
-	sortingEnabled := sorting.IsSortingFieldEnabled("id")
-	text := translator.Translate(session.Lang, "id", nil, nil)
-	if sortingEnabled {
-		text += fmt.Sprintf(": %s", utils.SortDirectionToEmoji(sorting.Sort))
-	}
-	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingFilmsSelectID, "", true})
+	var buttons []Button
 
-	sortingEnabled = sorting.IsSortingFieldEnabled("title")
-	text = translator.Translate(session.Lang, "title", nil, nil)
-	if sortingEnabled {
-		text += fmt.Sprintf(": %s", utils.SortDirectionToEmoji(sorting.Sort))
-	}
-	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingFilmsSelectTitle, "", true})
+	buttons = addSortingButton(buttons, sorting, session.Lang, "id", states.CallbackSortingFilmsSelectID)
 
-	sortingEnabled = sorting.IsSortingFieldEnabled("rating")
-	text = translator.Translate(session.Lang, "rating", nil, nil)
-	if sortingEnabled {
-		text += fmt.Sprintf(": %s", utils.SortDirectionToEmoji(sorting.Sort))
-	}
-	buttons = append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, states.CallbackSortingFilmsSelectRating, "", true})
+	buttons = addSortingButton(buttons, sorting, session.Lang, "title", states.CallbackSortingFilmsSelectTitle)
+
+	buttons = addSortingButton(buttons, sorting, session.Lang, "rating", states.CallbackSortingFilmsSelectRating)
+
+	buttons = addSortingButton(buttons, sorting, session.Lang, "year", states.CallbackSortingFilmsSelectYear)
+
+	buttons = addSortingButton(buttons, sorting, session.Lang, "is_viewed", states.CallbackSortingFilmsSelectIsViewed)
+
+	buttons = addSortingButton(buttons, sorting, session.Lang, "is_favorite", states.CallbackSortingFilmsSelectIsFavorite)
+
+	buttons = addSortingButton(buttons, sorting, session.Lang, "user_rating", states.CallbackSortingFilmsSelectUserRating)
+
+	buttons = addSortingButton(buttons, sorting, session.Lang, "created_at", states.CallbackSortingFilmsSelectCreatedAt)
 
 	return buttons
 }
