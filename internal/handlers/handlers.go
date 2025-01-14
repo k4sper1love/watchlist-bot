@@ -30,18 +30,26 @@ func HandleUpdates(app models.App) {
 		return
 	}
 
+	if utils.ParseMessageCommand(app.Upd) == "reset" {
+		session.Logout()
+		general.RequireAuth(app, session, general.HandleStartCommand)
+		return
+	}
+
+	if ok := general.Auth(app, session); !ok {
+		postgres.SaveSessionWithDependencies(session)
+		return
+	}
+
 	switch {
 	case app.Upd.CallbackQuery != nil:
-		general.CheckBanned(app, session, handleCallbackQuery)
-
-	case app.Upd.Message.Command() == "reset":
-		session.ClearState()
+		handleCallbackQuery(app, session)
 
 	case session.State == "":
-		general.CheckBanned(app, session, handleCommands)
+		handleCommands(app, session)
 
 	default:
-		general.CheckBanned(app, session, handleUserInput)
+		handleUserInput(app, session)
 	}
 
 	postgres.SaveSessionWithDependencies(session)
@@ -62,19 +70,19 @@ func handleCommands(app models.App, session *models.Session) {
 		general.HandleMenuCommand(app, session)
 
 	case command == "profile" || callbackData == states.CallbackMenuSelectProfile:
-		general.RequireAuth(app, session, users.HandleProfileCommand)
+		users.HandleProfileCommand(app, session)
 
 	case command == "logout" || callbackData == states.CallbackMenuSelectLogout:
-		general.RequireAuth(app, session, general.HandleLogoutCommand)
+		general.HandleLogoutCommand(app, session)
 
 	case command == "films" || callbackData == states.CallbackMenuSelectFilms:
 		session.FilmsState.CurrentPage = 1
 		session.SetContext(states.ContextFilm)
-		general.RequireAuth(app, session, films.HandleFilmsCommand)
+		films.HandleFilmsCommand(app, session)
 
 	case command == "collections" || callbackData == states.CallbackMenuSelectCollections:
 		session.CollectionsState.CurrentPage = 1
-		general.RequireAuth(app, session, collections.HandleCollectionsCommand)
+		collections.HandleCollectionsCommand(app, session)
 
 	case command == "settings" || callbackData == states.CallbackMenuSelectSettings:
 		general.HandleSettingsCommand(app, session)
@@ -201,13 +209,13 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 		general.RequireRole(app, session, admin.HandleFeedbackDetailButtons, roles.Helper)
 
 	case strings.HasPrefix(callbackData, "feedback_category"):
-		general.RequireAuth(app, session, general.HandleFeedbackButtons)
+		general.HandleFeedbackButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "profile_"):
-		general.RequireAuth(app, session, users.HandleProfileButtons)
+		users.HandleProfileButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "update_profile_select"):
-		general.RequireAuth(app, session, users.HandleUpdateProfileButtons)
+		users.HandleUpdateProfileButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "films_") || strings.HasPrefix(callbackData, "select_film_"):
 		if session.Context == states.ContextFilm {
@@ -238,7 +246,7 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 		films.HandleFilmsDetailButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "collections_") || strings.HasPrefix(callbackData, "select_collection_"):
-		general.RequireAuth(app, session, collections.HandleCollectionsButtons)
+		collections.HandleCollectionsButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "sorting_collections_select"):
 		collections.HandleSortingCollectionsButtons(app, session)
@@ -247,10 +255,10 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 		collections.HandleFindCollectionsButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "manage_collection_select"):
-		general.RequireAuth(app, session, collections.HandleManageCollectionButtons)
+		collections.HandleManageCollectionButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "update_collection_select"):
-		general.RequireAuth(app, session, collections.HandleUpdateCollectionButtons)
+		collections.HandleUpdateCollectionButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "collection_films_"):
 		session.CollectionFilmsState.CurrentPage = 1

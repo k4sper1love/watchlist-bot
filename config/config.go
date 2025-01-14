@@ -14,7 +14,6 @@ func LoadApp() (*models.App, error) {
 		log.Println("no .env file found")
 	}
 
-
 	rootID, err := strconv.Atoi(os.Getenv("ROOT_TELEGRAM_ID"))
 	if err != nil {
 		return nil, err
@@ -30,6 +29,7 @@ func LoadApp() (*models.App, error) {
 		RootID:            rootID,
 		KinopoiskAPIToken: os.Getenv("KINOPOISK_API_TOKEN"),
 		YoutubeAPIToken:   os.Getenv("YOUTUBE_API_TOKEN"),
+		IMDBAPIToken:      os.Getenv("IMDB_API_TOKEN"),
 	}
 
 	app := &models.App{

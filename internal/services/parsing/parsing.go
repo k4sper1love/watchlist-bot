@@ -8,6 +8,7 @@ import (
 )
 
 var supportedServices = []string{
+	"IMDB",
 	"kinopoisk",
 	"rezka",
 	"kinoafisha",
@@ -16,6 +17,9 @@ var supportedServices = []string{
 
 func GetFilmByURL(app models.App, session *models.Session, url string) (*apiModels.Film, error) {
 	switch {
+	case strings.Contains(url, "imdb"):
+		return GetFilmFromIMDB(app, url)
+
 	case strings.Contains(url, "kinopoisk"):
 		return GetFilmFromKinopoisk(app, url)
 

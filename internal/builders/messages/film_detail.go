@@ -3,65 +3,58 @@ package messages
 import (
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
-	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
+	"strings"
 )
 
 func BuildFilmDetailMessage(session *models.Session, film *apiModels.Film) string {
-	msg := ""
+	var msg strings.Builder
 
-	if session.Context == states.ContextCollection {
-		msg += fmt.Sprintf(" <code>%s</code>", session.CollectionDetailState.Collection.Name)
-	}
-
-	msg += "\n"
-
-	if film.Title != "" {
-		part := translator.Translate(session.Lang, "title", nil, nil)
-		msg += fmt.Sprintf("<b>%s</b>: %s\n", part, film.Title)
-	}
-
-	part := translator.Translate(session.Lang, "viewed", nil, nil)
-	msg += fmt.Sprintf("<b>%s</b>: %s\n", part, utils.BoolToEmoji(film.IsViewed))
-
-	if film.Genre != "" {
-		part = translator.Translate(session.Lang, "genre", nil, nil)
-		msg += fmt.Sprintf("<b>%s</b>: %s\n", part, film.Genre)
-	}
+	msg.WriteString(fmt.Sprintf("<b>%s</b>", film.Title))
 
 	if film.Year != 0 {
-		part = translator.Translate(session.Lang, "year", nil, nil)
-		msg += fmt.Sprintf("<b>%s</b>: %d\n", part, film.Year)
+		msg.WriteString(fmt.Sprintf(" <i>(%d)</i>", film.Year))
 	}
 
+	if film.IsFavorite {
+		msg.WriteString(fmt.Sprintf(" ⭐"))
+	}
+
+	msg.WriteString("\n\n")
+
+	details := make([]string, 0)
+	details = append(details, utils.BoolToEmojiColored(film.IsViewed))
+
+	if film.Genre != "" {
+		details = append(details, fmt.Sprintf("%s", film.Genre))
+	}
 	if film.Rating != 0 {
-		part = translator.Translate(session.Lang, "rating", nil, nil)
-		msg += fmt.Sprintf("<b>%s</b>: %.2f★\n", part, film.Rating)
+		details = append(details, fmt.Sprintf("★%.2f", film.Rating))
 	}
-
 	if film.IsViewed && film.UserRating != 0 {
-		part = translator.Translate(session.Lang, "yourRating", nil, nil)
-		msg += fmt.Sprintf("<b>%s</b>: %.2f★\n", part, film.UserRating)
+		details = append(details, fmt.Sprintf("👤%.2f", film.UserRating))
+	}
+	if len(details) > 0 {
+		msg.WriteString(strings.Join(details, " | ") + "\n\n")
 	}
 
 	if film.Description != "" {
-		part = translator.Translate(session.Lang, "description", nil, nil)
-		msg += fmt.Sprintf("<b>%s</b>:\n%s\n", part, film.Description)
+		msg.WriteString(fmt.Sprintf("<b>Описание:</b>\n<i>%s</i>\n\n", film.Description))
 	}
 
 	if film.Comment != "" {
-		part = translator.Translate(session.Lang, "comment", nil, nil)
-		msg += fmt.Sprintf("<b>%s</b>:\n%s\n", part, film.Comment)
+		commentMsg := translator.Translate(session.Lang, "comment", nil, nil)
+		msg.WriteString(fmt.Sprintf("<b>%s:</b>\n<i>%s</i>\n", commentMsg, film.Comment))
 	}
 
 	if film.IsViewed && film.Review != "" {
-		part = translator.Translate(session.Lang, "review", nil, nil)
-		msg += fmt.Sprintf("<b>%s</b>:\n%s\n", part, film.Review)
+		reviewMsg := translator.Translate(session.Lang, "review", nil, nil)
+		msg.WriteString(fmt.Sprintf("\n<b>%s:</b>\n<i>%s</i>\n", reviewMsg, film.Review))
 	}
 
-	return msg
+	return msg.String()
 }
 
 func BuildFilmDetailWithNumberMessage(session *models.Session, itemID int, film *apiModels.Film) string {
@@ -72,53 +65,54 @@ func BuildFilmDetailWithNumberMessage(session *models.Session, itemID int, film 
 }
 
 func BuildFilmGeneralMessage(session *models.Session, film *apiModels.Film) string {
-	filmMsg := translator.Translate(session.Lang, "film", nil, nil)
-	msg := fmt.Sprintf("<b>%s</b>:  %s\n", filmMsg, film.Title)
+	var msg strings.Builder
 
+	msg.WriteString(fmt.Sprintf("<b>%s</b>", film.Title))
+
+	if film.Year != 0 {
+		msg.WriteString(fmt.Sprintf(" <i>(%d)</i>", film.Year))
+	}
+
+	msg.WriteString(fmt.Sprintf(" | %s\n", utils.BoolToEmojiColored(film.IsViewed)))
+
+	details := make([]string, 0)
+	if film.Genre != "" {
+		details = append(details, fmt.Sprintf("%s", film.Genre))
+	}
 	if film.Rating != 0 {
-		ratingMsg := translator.Translate(session.Lang, "rating", nil, nil)
-		msg += fmt.Sprintf("<b>%s:</b> %.2f★\n", ratingMsg, film.Rating)
+		details = append(details, fmt.Sprintf("★%.2f", film.Rating))
+	}
+	if film.IsViewed && film.UserRating != 0 {
+		details = append(details, fmt.Sprintf("👤%.2f", film.UserRating))
+	}
+	if len(details) > 0 {
+		msg.WriteString(strings.Join(details, " , "))
 	}
 
-	if film.Genre != "" && film.Year != 0 {
-		msg += "🎭 "
-
-		if film.Genre != "" {
-			msg += fmt.Sprintf("%d", film.Year)
-		}
-
-		if film.Genre != "" {
-			if film.Year != 0 {
-				msg += ", "
-			}
-			msg += fmt.Sprintf("%s", film.Genre)
-		}
-
-		msg += "\n"
-	}
+	msg.WriteString("\n")
 
 	if film.Description != "" {
-		if len(film.Description) > 400 {
+		if len(film.Description) > 300 {
 			film.Description, _ = utils.SplitTextByLength(film.Description, 300)
 		}
 
 		descriptionMsg := translator.Translate(session.Lang, "description", nil, nil)
-		msg += fmt.Sprintf("<b>%s:</b> %s\n", descriptionMsg, film.Description)
+		msg.WriteString(fmt.Sprintf("<b>%s:</b>\n<i>%s</i>\n", descriptionMsg, film.Description))
 	}
 
-	msg += fmt.Sprintf("%s\n\n", boolToString(session, film.IsViewed))
+	msg.WriteString("\n\n")
 
-	return msg
+	return msg.String()
 }
 
-func boolToString(session *models.Session, viewed bool) string {
+func viewedToString(session *models.Session, viewed bool) string {
+	var messageCode string
+
 	if viewed {
-		viewedMsg := translator.Translate(session.Lang, "viewed", nil, nil)
-		msg := fmt.Sprintf("<b>%s</b>✔️", viewedMsg)
-		return msg
+		messageCode = "viewed"
+	} else {
+		messageCode = "notViewed"
 	}
 
-	notViewedMsg := translator.Translate(session.Lang, "notViewed", nil, nil)
-	msg := fmt.Sprintf("<b>%s</b>✖️", notViewedMsg)
-	return msg
+	return translator.Translate(session.Lang, messageCode, nil, nil)
 }

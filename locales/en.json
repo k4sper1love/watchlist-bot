@@ -2,6 +2,21 @@
   "choiceLanguage": {
     "other": "Please select a language to communicate with the bot. You can change it in the settings"
   },
+  "status": {
+    "other": "Status"
+  },
+  "hintAPIUserID": {
+    "other": "<code>api_ID</code> to search API users"
+  },
+  "makeFavorite": {
+    "other": "Add to favorites"
+  },
+  "removeFavorite": {
+    "other": "Remove from favorites"
+  },
+  "inFavorite": {
+    "other": "In favorites"
+  },
   "invalidInput": {
     "other": "Invalid input."
   },
@@ -561,7 +576,7 @@
   "userRating": {
     "other": "User rating"
   },
-  "Review": {
+  "review": {
     "other": "Review"
   },
   "filmRequestImage": {

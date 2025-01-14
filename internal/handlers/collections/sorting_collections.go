@@ -7,6 +7,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
+	"log"
 )
 
 func HandleSortingCollectionsCommand(app models.App, session *models.Session) {
@@ -26,6 +27,9 @@ func HandleSortingCollectionsButtons(app models.App, session *models.Session) {
 	case states.CallbackSortingCollectionsSelectAllReset:
 		handleSortingCollectionsAllReset(app, session)
 		return
+
+	case states.CallbackSortingCollectionsSelectIsFavorite:
+		session.CollectionsState.Sorting.Field = "is_favorite"
 
 	case states.CallbackSortingCollectionsSelectID:
 		session.CollectionsState.Sorting.Field = "id"
@@ -64,7 +68,8 @@ func handleSortingCollectionsAllReset(app models.App, session *models.Session) {
 
 	app.SendMessage(msg, nil)
 
-	HandleSortingCollectionsCommand(app, session)
+	session.CollectionsState.CurrentPage = 1
+	HandleCollectionsCommand(app, session)
 }
 
 func handleSortingCollectionsDirection(app models.App, session *models.Session) {
@@ -86,9 +91,12 @@ func parseSortingCollectionsDirection(app models.App, session *models.Session) {
 		return
 	}
 
+	log.Println(utils.ParseCallback(app.Upd))
+
 	if utils.ParseCallback(app.Upd) == states.CallbacktDecrease {
 		sorting.Direction = "-"
 	}
+
 	sorting.Sort = sorting.Direction + sorting.Field
 
 	msg := translator.Translate(session.Lang, "sortingApplied", nil, nil)
@@ -96,7 +104,8 @@ func parseSortingCollectionsDirection(app models.App, session *models.Session) {
 
 	session.ClearAllStates()
 
-	HandleSortingCollectionsCommand(app, session)
+	session.CollectionsState.CurrentPage = 1
+	HandleCollectionsCommand(app, session)
 }
 
 func handleSortingCollectionsReset(app models.App, session *models.Session) {
@@ -104,5 +113,7 @@ func handleSortingCollectionsReset(app models.App, session *models.Session) {
 	app.SendMessage(msg, nil)
 
 	session.ClearAllStates()
+
+	session.CollectionsState.CurrentPage = 1
 	HandleSortingCollectionsCommand(app, session)
 }

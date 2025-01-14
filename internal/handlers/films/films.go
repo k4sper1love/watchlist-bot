@@ -40,6 +40,9 @@ func HandleFilmsButtons(app models.App,
 
 	switch {
 	case callback == states.CallbackFilmsBack:
+		if session.Context == states.ContextCollection {
+			session.CollectionsState.CurrentPage = 1
+		}
 		backFunc(app, session)
 
 	case callback == states.CallbackFilmsNextPage:

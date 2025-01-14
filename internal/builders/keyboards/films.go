@@ -53,6 +53,7 @@ func BuildFilmsKeyboard(session *models.Session, currentPage, lastPage int) *tgb
 
 	case states.ContextCollection:
 		keyboard.AddCollectionFilmFromCollection()
+		keyboard.AddFavorite(session.CollectionDetailState.Collection.IsFavorite, states.CallbackCollectionsFavorite)
 		keyboard.AddCollectionsManage()
 		keyboard.AddBack(states.CallbackFilmsBack)
 	}
@@ -85,6 +86,8 @@ func BuildFilmDetailKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMa
 	film := session.FilmDetailState.Film
 
 	keyboard := NewKeyboard()
+
+	keyboard.AddFavorite(film.IsFavorite, states.CallbackFilmDetailFavorite)
 
 	if film.URL != "" {
 		keyboard.AddURLButton("", "openInBrowser", film.URL, true)
@@ -170,11 +173,15 @@ func BuildFilmViewedKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMa
 }
 
 func BuildFilmsFilterKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	filter := session.GetFilmsFiltersByContext()
+
 	keyboard := NewKeyboard()
 
-	keyboard.AddButtons(parseFiltersFilmsButtons(session)...)
+	keyboard.AddButtons(parseFiltersFilmsButtons(filter, session.Lang)...)
 
-	keyboard.AddResetAllFilters()
+	if filter.IsFiltersEnabled() {
+		keyboard.AddResetAllFilmsFilters()
+	}
 
 	keyboard.AddBack(states.CallbackFiltersFilmsSelectBack)
 
@@ -182,11 +189,15 @@ func BuildFilmsFilterKeyboard(session *models.Session) *tgbotapi.InlineKeyboardM
 }
 
 func BuildFilmsSortingKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	sorting := session.GetFilmsSortingByContext()
+
 	keyboard := NewKeyboard()
 
-	keyboard.AddButtons(parseSortingFilmsButtons(session)...)
+	keyboard.AddButtons(parseSortingFilmsButtons(sorting, session.Lang)...)
 
-	keyboard.AddResetAllSorting(states.CallbackSortingFilmsSelectAllReset)
+	if sorting.IsSortingEnabled() {
+		keyboard.AddResetAllSorting(states.CallbackSortingFilmsSelectAllReset)
+	}
 
 	keyboard.AddBack(states.CallbackSortingFilmsSelectBack)
 
@@ -253,11 +264,11 @@ func (k *Keyboard) AddAgain(callback string) *Keyboard {
 	return k.AddButton("↻", "again", callback, "", true)
 }
 
-func (k *Keyboard) AddResetAllFilters() *Keyboard {
+func (k *Keyboard) AddResetAllFilmsFilters() *Keyboard {
 	return k.AddButton("", "resetFilters", states.CallbackFiltersFilmsSelectAllReset, "", true)
 }
 
-func (k *Keyboard) AddResetFilter(session *models.Session, filterType string) *Keyboard {
+func (k *Keyboard) AddResetFilmsFilter(session *models.Session, filterType string) *Keyboard {
 	filter := session.GetFilmsFiltersByContext()
 
 	if filter.IsFilterEnabled(filterType) {
@@ -267,46 +278,53 @@ func (k *Keyboard) AddResetFilter(session *models.Session, filterType string) *K
 	return k
 }
 
-func parseFiltersFilmsButtons(session *models.Session) []Button {
-	filter := session.GetFilmsFiltersByContext()
+func (k *Keyboard) AddFavorite(isFavorite bool, callback string) *Keyboard {
+	var messageCode string
+	if isFavorite {
+		messageCode = "removeFavorite"
+	} else {
+		messageCode = "makeFavorite"
+	}
 
+	return k.AddButton(utils.BoolToStar(!isFavorite), messageCode, callback, "", true)
+}
+
+func parseFiltersFilmsButtons(filter *models.FiltersFilm, lang string) []Button {
 	var buttons []Button
 
-	buttons = addFiltersFilmsButton(buttons, filter, session.Lang, "rating", states.CallbackFiltersFilmsSelectRating, false)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "rating", states.CallbackFiltersFilmsSelectRating, false)
 
-	buttons = addFiltersFilmsButton(buttons, filter, session.Lang, "userRating", states.CallbackFiltersFilmsSelectUserRating, false)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "userRating", states.CallbackFiltersFilmsSelectUserRating, false)
 
-	buttons = addFiltersFilmsButton(buttons, filter, session.Lang, "year", states.CallbackFiltersFilmsSelectYear, false)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "year", states.CallbackFiltersFilmsSelectYear, false)
 
-	buttons = addFiltersFilmsButton(buttons, filter, session.Lang, "isViewed", states.CallbackFiltersFilmsSelectIsViewed, true)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "isViewed", states.CallbackFiltersFilmsSelectIsViewed, true)
 
-	buttons = addFiltersFilmsButton(buttons, filter, session.Lang, "isFavorite", states.CallbackFiltersFilmsSelectIsFavorite, true)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "isFavorite", states.CallbackFiltersFilmsSelectIsFavorite, true)
 
-	buttons = addFiltersFilmsButton(buttons, filter, session.Lang, "hasURL", states.CallbackFiltersFilmsSelectHasURL, true)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "hasURL", states.CallbackFiltersFilmsSelectHasURL, true)
 
 	return buttons
 }
 
-func parseSortingFilmsButtons(session *models.Session) []Button {
-	sorting := session.GetFilmsSortingByContext()
-
+func parseSortingFilmsButtons(sorting *models.Sorting, lang string) []Button {
 	var buttons []Button
 
-	buttons = addSortingButton(buttons, sorting, session.Lang, "id", states.CallbackSortingFilmsSelectID)
+	buttons = addSortingButton(buttons, sorting, lang, "id", states.CallbackSortingFilmsSelectID)
 
-	buttons = addSortingButton(buttons, sorting, session.Lang, "title", states.CallbackSortingFilmsSelectTitle)
+	buttons = addSortingButton(buttons, sorting, lang, "title", states.CallbackSortingFilmsSelectTitle)
 
-	buttons = addSortingButton(buttons, sorting, session.Lang, "rating", states.CallbackSortingFilmsSelectRating)
+	buttons = addSortingButton(buttons, sorting, lang, "rating", states.CallbackSortingFilmsSelectRating)
 
-	buttons = addSortingButton(buttons, sorting, session.Lang, "year", states.CallbackSortingFilmsSelectYear)
+	buttons = addSortingButton(buttons, sorting, lang, "year", states.CallbackSortingFilmsSelectYear)
 
-	buttons = addSortingButton(buttons, sorting, session.Lang, "is_viewed", states.CallbackSortingFilmsSelectIsViewed)
+	buttons = addSortingButton(buttons, sorting, lang, "is_viewed", states.CallbackSortingFilmsSelectIsViewed)
 
-	buttons = addSortingButton(buttons, sorting, session.Lang, "is_favorite", states.CallbackSortingFilmsSelectIsFavorite)
+	buttons = addSortingButton(buttons, sorting, lang, "is_favorite", states.CallbackSortingFilmsSelectIsFavorite)
 
-	buttons = addSortingButton(buttons, sorting, session.Lang, "user_rating", states.CallbackSortingFilmsSelectUserRating)
+	buttons = addSortingButton(buttons, sorting, lang, "user_rating", states.CallbackSortingFilmsSelectUserRating)
 
-	buttons = addSortingButton(buttons, sorting, session.Lang, "created_at", states.CallbackSortingFilmsSelectCreatedAt)
+	buttons = addSortingButton(buttons, sorting, lang, "created_at", states.CallbackSortingFilmsSelectCreatedAt)
 
 	return buttons
 }

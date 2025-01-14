@@ -28,13 +28,18 @@ func processImageFromMessage(bot *tgbotapi.BotAPI, update *tgbotapi.Update) ([]b
 func processImageFromURL(imageURL string) ([]byte, error) {
 	resp, err := http.Get(imageURL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch URL: %w", err)
 	}
 	defer resp.Body.Close()
 
+	contentType := resp.Header.Get("Content-Type")
+	if !isSupportedImageType(contentType) {
+		return nil, fmt.Errorf("unsupported content type: %s", contentType)
+	}
+
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	return data, nil
@@ -84,4 +89,14 @@ func ParseImageFromMessage(bot *tgbotapi.BotAPI, update *tgbotapi.Update) ([]byt
 
 func ParseImageFromURL(imageURL string) ([]byte, error) {
 	return processImageFromURL(imageURL)
+}
+
+func isSupportedImageType(contentType string) bool {
+	supportedTypes := []string{"image/jpeg", "image/png", "image/gif"}
+	for _, t := range supportedTypes {
+		if contentType == t {
+			return true
+		}
+	}
+	return false
 }

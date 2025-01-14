@@ -10,6 +10,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
+	"log"
 )
 
 func HandleNewFilmCommand(app models.App, session *models.Session) {
@@ -95,6 +96,7 @@ func parseNewFilmFromURL(app models.App, session *models.Session) {
 
 	film, err := parsing.GetFilmByURL(app, session, url)
 	if err != nil {
+		log.Println(err)
 		msg := translator.Translate(session.Lang, "getFilmFailure", nil, nil)
 		app.SendMessage(msg, nil)
 		session.ClearAllStates()

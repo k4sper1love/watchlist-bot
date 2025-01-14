@@ -238,6 +238,7 @@ const (
 	CallbackFilmDetailPrevPage = "film_detail_prev_page"
 	CallbackFilmDetailBack     = "film_detail_back"
 	CallbackFilmDetailViewed   = "film_detail_viewed"
+	CallbackFilmDetailFavorite = "film_detail_favorite"
 
 	// viewed film states
 	ProcessViewedFilmAwaitingRating = "viewed_film_awaiting_rating"
@@ -246,6 +247,7 @@ const (
 	// collections states
 	CallbackCollectionsNew             = "collections_new"
 	CallbackCollectionsManage          = "collections_manage"
+	CallbackCollectionsFavorite        = "collections_favorite"
 	CallbackCollectionsNextPage        = "collections_next_page"
 	CallbackCollectionsPrevPage        = "collections_prev_page"
 	CallbackCollectionsLastPage        = "collections_last_page"
@@ -259,6 +261,7 @@ const (
 	CallbackSortingCollectionsSelectBack       = "sorting_collections_select_back"
 	CallbackSortingCollectionsSelectAllReset   = "sorting_collections_select_all_reset"
 	ProcessSortingCollectionsAwaitingDirection = "sorting_collections_awaiting_direction"
+	CallbackSortingCollectionsSelectIsFavorite = "sorting_collections_select_is_favorite"
 	CallbackSortingCollectionsSelectID         = "sorting_collections_select_id"
 	CallbackSortingCollectionsSelectName       = "sorting_collections_select_name"
 	CallbackSortingCollectionsSelectCreatedAt  = "sorting_collections_select_created_at"

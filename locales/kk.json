@@ -2,6 +2,21 @@
   "choiceLanguage": {
     "other": "Ботпен сөйлесу үшін Тілді таңдаңыз. Сіз оны параметрлерде өзгерте аласыз"
   },
+  "status": {
+    "other": "Статус"
+  },
+  "hintAPIUserID": {
+    "other": "<code>api_ID</code> API қолданушыларын іздеу үшін"
+  },
+  "makeFavorite": {
+    "other": "Таңдаулыға қосу"
+  },
+  "removeFavorite": {
+    "other": "Таңдаулылардан алып тастау"
+  },
+  "inFavorite": {
+    "other": "Таңдаулыларда"
+  },
   "invalidInput": {
     "other": "Қате енгізу."
   },
@@ -558,7 +573,7 @@
   "userRating": {
     "other": "Пайдаланушының бағасы"
   },
-  "Review": {
+  "review": {
     "other": "Шолу"
   },
   "filmRequestImage": {

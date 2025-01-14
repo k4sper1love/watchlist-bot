@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"errors"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 )
@@ -125,6 +126,23 @@ func GetUserByTelegramUsername(username string) (*models.Session, error) {
 	}
 
 	return &session, nil
+}
+
+func GetUserByAPIUserID(id int) (*models.Session, error) {
+	var sessions []models.Session
+
+	err := GetDB().Find(&sessions).Error
+	if err != nil {
+		return nil, err
+	}
+
+	for _, session := range sessions {
+		if session.User.ID == id {
+			return &session, nil
+		}
+	}
+
+	return nil, errors.New("session not found")
 }
 
 func GetAdminByTelegramID(telegramID int) (*models.Session, error) {

@@ -2,6 +2,21 @@
   "choiceLanguage": {
     "other": "Пожалуйста, выберите язык для общения с ботом. Вы сможете поменять его в настройках"
   },
+  "status": {
+    "other": "Статус"
+  },
+  "hintAPIUserID": {
+    "other": "<code>api_ID</code> для поиска API пользователей"
+  },
+  "makeFavorite": {
+    "other": "Добавить в избранное"
+  },
+  "removeFavorite": {
+    "other": "Убрать из избранного"
+  },
+  "inFavorite": {
+    "other": "В избранном"
+  },
   "invalidInput": {
     "other": "Некорректный ввод."
   },
@@ -555,7 +570,7 @@
   "userRating": {
     "other": "Оценка пользователя"
   },
-  "Review": {
+  "review": {
     "other": "Рецензия"
   },
   "filmRequestImage": {

@@ -31,6 +31,7 @@ type Vars struct {
 	RootID            int
 	KinopoiskAPIToken string
 	YoutubeAPIToken   string
+	IMDBAPIToken      string
 }
 
 func (app App) send(msg tgbotapi.Chattable) {

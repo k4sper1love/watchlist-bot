@@ -70,11 +70,15 @@ func BuildFindCollectionsKeyboard(session *models.Session, currentPage, lastPage
 }
 
 func BuildCollectionsSortingKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	sorting := session.CollectionsState.Sorting
+
 	keyboard := NewKeyboard()
 
-	keyboard.AddButtons(parseSortingCollectionsButtons(session)...)
+	keyboard.AddButtons(parseSortingCollectionsButtons(sorting, session.Lang)...)
 
-	keyboard.AddResetAllSorting(states.CallbackSortingCollectionsSelectAllReset)
+	if sorting.IsSortingEnabled() {
+		keyboard.AddResetAllSorting(states.CallbackSortingCollectionsSelectAllReset)
+	}
 
 	keyboard.AddBack(states.CallbackSortingCollectionsSelectBack)
 
@@ -120,17 +124,18 @@ func (k *Keyboard) AddCollectionFiltersAndSorting(session *models.Session) *Keyb
 	)
 }
 
-func parseSortingCollectionsButtons(session *models.Session) []Button {
+func parseSortingCollectionsButtons(sorting *models.Sorting, lang string) []Button {
 	var buttons []Button
-	sorting := session.CollectionsState.Sorting
 
-	buttons = addSortingButton(buttons, sorting, session.Lang, "id", states.CallbackSortingCollectionsSelectID)
+	buttons = addSortingButton(buttons, sorting, lang, "is_favorite", states.CallbackSortingCollectionsSelectIsFavorite)
 
-	buttons = addSortingButton(buttons, sorting, session.Lang, "name", states.CallbackSortingCollectionsSelectName)
+	buttons = addSortingButton(buttons, sorting, lang, "id", states.CallbackSortingCollectionsSelectID)
 
-	buttons = addSortingButton(buttons, sorting, session.Lang, "created_at", states.CallbackSortingCollectionsSelectCreatedAt)
+	buttons = addSortingButton(buttons, sorting, lang, "name", states.CallbackSortingCollectionsSelectName)
 
-	buttons = addSortingButton(buttons, sorting, session.Lang, "total_films", states.CallbackSortingCollectionsSelectTotalFilms)
+	buttons = addSortingButton(buttons, sorting, lang, "created_at", states.CallbackSortingCollectionsSelectCreatedAt)
+
+	buttons = addSortingButton(buttons, sorting, lang, "total_films", states.CallbackSortingCollectionsSelectTotalFilms)
 
 	return buttons
 }

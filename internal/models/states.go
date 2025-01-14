@@ -40,6 +40,7 @@ type FilmDetailState struct {
 	SessionID    uint           `json:"-"`
 	Index        int            `json:"-"`
 	Film         apiModels.Film `json:"film" gorm:"serializer:json"`
+	IsFavorite   bool           `json:"is_favorite"`
 	Title        string         `json:"title,omitempty"`
 	Year         int            `json:"year,omitempty"`
 	Genre        string         `json:"genre,omitempty"`
@@ -71,6 +72,7 @@ type CollectionDetailState struct {
 	SessionID   uint                 `json:"-"`
 	ObjectID    int                  `json:"-"`
 	Collection  apiModels.Collection `json:"collection" gorm:"serializer:json"`
+	IsFavorite  bool                 `json:"is_favorite"`
 	Name        string               `json:"name,omitempty"`
 	Description string               `json:"description,omitempty"`
 }
@@ -106,6 +108,7 @@ func (s *FilmsState) Clear() {
 
 func (s *CollectionsState) Clear() {
 	s.Name = ""
+	s.Sorting.Clear()
 }
 
 func (s *AdminState) Clear() {
@@ -132,6 +135,7 @@ func (s *FilmDetailState) Clear() {
 	s.ImageURL = ""
 	s.Comment = ""
 	s.IsViewed = false
+	s.IsFavorite = false
 	s.IsEditViewed = false
 	s.UserRating = 0
 	s.Review = ""
@@ -139,6 +143,7 @@ func (s *FilmDetailState) Clear() {
 }
 
 func (s *CollectionDetailState) Clear() {
+	s.IsFavorite = false
 	s.Name = ""
 	s.Description = ""
 }

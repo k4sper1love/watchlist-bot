@@ -29,10 +29,13 @@ func BuildCollectionsMessage(session *models.Session, metadata *filters.Metadata
 	for i, collection := range collections {
 		itemID := utils.GetItemID(i, metadata.CurrentPage, metadata.PageSize)
 
-		numberEmoji := utils.NumberToEmoji(itemID)
+		msg += utils.NumberToEmoji(itemID)
 
-		msg += fmt.Sprintf("%s\n", numberEmoji)
-		msg += BuildCollectionDetailMessage(session, &collection)
+		if collection.IsFavorite {
+			msg += "⭐"
+		}
+
+		msg += "\n" + BuildCollectionDetailMessage(session, &collection)
 	}
 
 	pageMsg := translator.Translate(session.Lang, "pageCounter", map[string]interface{}{

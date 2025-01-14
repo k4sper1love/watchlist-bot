@@ -80,13 +80,14 @@ func handleFiltersFilmsAllReset(app models.App, session *models.Session) {
 
 	app.SendMessage(msg, nil)
 
+	session.FilmsState.CurrentPage = 1
 	HandleFiltersFilmsCommand(app, session)
 }
 
 func handleFiltersFilmsSwitch(app models.App, session *models.Session, filterType string) {
 	msg := messages.BuildFilterSwitchMessage(session, filterType)
 
-	keyboard := keyboards.NewKeyboard().AddSurvey().AddResetFilter(session, filterType).AddCancel().Build(session.Lang)
+	keyboard := keyboards.NewKeyboard().AddSurvey().AddResetFilmsFilter(session, filterType).AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -112,7 +113,7 @@ func parseFiltersFilmsSwitch(app models.App, session *models.Session, filterType
 func handleFiltersFilmsRange(app models.App, session *models.Session, filterType string) {
 	msg := messages.BuildFilterRangeMessage(session, filterType)
 
-	keyboard := keyboards.NewKeyboard().AddResetFilter(session, filterType).AddCancel().Build(session.Lang)
+	keyboard := keyboards.NewKeyboard().AddResetFilmsFilter(session, filterType).AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 
@@ -166,6 +167,8 @@ func handleFiltersFilmsReset(app models.App, session *models.Session) {
 	app.SendMessage(msg, nil)
 
 	session.ClearState()
+
+	session.FilmsState.CurrentPage = 1
 	HandleFiltersFilmsCommand(app, session)
 }
 
@@ -175,6 +178,7 @@ func handleFiltersFilmsApplied(app models.App, session *models.Session) {
 
 	session.ClearState()
 
+	session.FilmsState.CurrentPage = 1
 	HandleFiltersFilmsCommand(app, session)
 }
 

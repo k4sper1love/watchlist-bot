@@ -330,11 +330,12 @@ func finishUpdateFilmProcess(app models.App, session *models.Session, backFunc f
 
 	updateFilm(app, session)
 
-	if _, err := GetFilms(app, session); err != nil {
-		msg := translator.Translate(session.Lang, "updateFilmListFailure", nil, nil)
+	if err := UpdateFilmInList(app, session); err != nil {
+		msg := translator.Translate(session.Lang, "updateFilmFailure", nil, nil)
 		app.SendMessage(msg, nil)
 	}
 
 	session.ClearAllStates()
+
 	backFunc(app, session)
 }

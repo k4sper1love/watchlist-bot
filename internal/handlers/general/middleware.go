@@ -9,31 +9,37 @@ import (
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
-func RequireAuth(app models.App, session *models.Session, next func(models.App, *models.Session)) {
+func Auth(app models.App, session *models.Session) bool {
+	if IsBanned(app, session) {
+		return false
+	}
+
 	if !isAuth(session) {
 		if err := HandleAuthProcess(app, session); err != nil {
-			msg := translator.Translate(session.Lang, "authRequest", nil, nil)
+			msg := translator.Translate(session.Lang, "authFailure", nil, nil)
 			app.SendMessage(msg, nil)
-			session.ClearState()
-			return
+			session.ClearAllStates()
+			return false
 		}
 	} else if !watchlist.IsTokenValid(app, session.AccessToken) {
 		if err := watchlist.RefreshAccessToken(app, session); err != nil {
-			//msg := translator.Translate(session.Lang, "authExpired", nil, nil)
-			//app.SendMessage(msg, nil)
 			if err := HandleAuthProcess(app, session); err != nil {
 				msg := translator.Translate(session.Lang, "authFailure", nil, nil)
 				app.SendMessage(msg, nil)
-				session.ClearState()
-				return
+				session.ClearAllStates()
+				return false
 			}
 
-		} else {
-			//msg := translator.Translate(session.Lang, "authUpdated", nil, nil)
-			//app.SendMessage(msg, nil)
 		}
 	}
-	next(app, session)
+
+	return true
+}
+
+func RequireAuth(app models.App, session *models.Session, next func(app models.App, session *models.Session)) {
+	if ok := Auth(app, session); ok {
+		next(app, session)
+	}
 }
 
 func RequireRole(app models.App, session *models.Session, next func(models.App, *models.Session), role roles.Role) {
@@ -45,10 +51,10 @@ func RequireRole(app models.App, session *models.Session, next func(models.App, 
 		return
 	}
 
-	RequireAuth(app, session, next)
+	next(app, session)
 }
 
-func CheckBanned(app models.App, session *models.Session, next func(models.App, *models.Session)) {
+func IsBanned(app models.App, session *models.Session) bool {
 	isBanned, _ := postgres.IsUserBanned(session.TelegramID)
 
 	if isBanned {
@@ -58,10 +64,10 @@ func CheckBanned(app models.App, session *models.Session, next func(models.App, 
 		msg := fmt.Sprintf("❌ %s\n\n%s", part1, part2)
 
 		app.SendMessage(msg, nil)
-		return
+		return true
 	}
 
-	RequireAuth(app, session, next)
+	return false
 }
 
 func isAuth(session *models.Session) bool {

@@ -87,6 +87,9 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 	case callback == states.CallbackCollectionsSorting:
 		HandleSortingCollectionsCommand(app, session)
 
+	case callback == states.CallbackCollectionsFavorite:
+		handleFavoriteCollection(app, session)
+
 	case strings.HasPrefix(callback, "select_collection_"):
 		HandleCollectionSelect(app, session)
 	}
@@ -143,6 +146,16 @@ func parseCollectionsFindName(app models.App, session *models.Session) {
 	session.ClearState()
 
 	HandleFindCollectionsCommand(app, session)
+}
+
+func handleFavoriteCollection(app models.App, session *models.Session) {
+	session.CollectionDetailState.IsFavorite = !session.CollectionDetailState.Collection.IsFavorite
+
+	updateCollection(app, session)
+
+	session.ClearAllStates()
+
+	films.HandleFilmsCommand(app, session)
 }
 
 func GetCollections(app models.App, session *models.Session) (*filters.Metadata, error) {

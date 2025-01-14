@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
@@ -87,6 +88,12 @@ func HandleUsersButton(app models.App, session *models.Session) {
 }
 
 func HandleUsersProcess(app models.App, session *models.Session) {
+	if utils.IsCancel(app.Upd) {
+		session.ClearAllStates()
+		HandleUsersCommand(app, session)
+		return
+	}
+
 	switch session.State {
 	case states.ProcessAdminManageUsersAwaitingFind:
 		general.RequireRole(app, session, processUserFindSelect, roles.Admin)
@@ -112,6 +119,9 @@ func handleUserSelect(app models.App, session *models.Session) {
 func handleUserFindCommand(app models.App, session *models.Session) {
 	msg := translator.Translate(session.Lang, "requestIDOrUsername", nil, nil)
 
+	hintMsg := translator.Translate(session.Lang, "hintAPIUserID", nil, nil)
+	msg += fmt.Sprintf("\n\n<i>%s</i>", hintMsg)
+
 	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
@@ -119,12 +129,6 @@ func handleUserFindCommand(app models.App, session *models.Session) {
 }
 
 func processUserFindSelect(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
-		session.ClearAllStates()
-		HandleUsersCommand(app, session)
-		return
-	}
-
 	param := utils.ParseMessageString(app.Upd)
 
 	if strings.HasPrefix(param, "@") {
@@ -137,11 +141,28 @@ func processUserFindSelect(app models.App, session *models.Session) {
 			return
 		}
 		session.AdminState.UserID = user.TelegramID
-	} else {
-		telegramID, err := strconv.Atoi(param)
+
+	} else if strings.HasPrefix(param, "api_") {
+		param = strings.TrimPrefix(param, "api_")
+		id, err := handleAndParseID(app, session, param)
 		if err != nil {
-			msg := translator.Translate(session.Lang, "someError", nil, nil)
+			handleUserFindCommand(app, session)
+			return
+		}
+
+		user, err := postgres.GetUserByAPIUserID(id)
+		if err != nil {
+			msg := translator.Translate(session.Lang, "notFound", nil, nil)
 			app.SendMessage(msg, nil)
+			handleUserFindCommand(app, session)
+			return
+		}
+
+		session.AdminState.UserID = user.TelegramID
+
+	} else {
+		telegramID, err := handleAndParseID(app, session, param)
+		if err != nil {
 			handleUserFindCommand(app, session)
 			return
 		}
@@ -183,4 +204,15 @@ func parseUsers(session *models.Session) ([]models.Session, error) {
 	session.AdminState.TotalRecords = int(totalCount)
 
 	return users, nil
+}
+
+func handleAndParseID(app models.App, session *models.Session, param string) (int, error) {
+	parsed, err := strconv.Atoi(param)
+	if err != nil {
+		msg := translator.Translate(session.Lang, "someError", nil, nil)
+		app.SendMessage(msg, nil)
+		return -1, err
+	}
+
+	return parsed, nil
 }

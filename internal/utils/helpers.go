@@ -247,11 +247,25 @@ func BoolToEmoji(value bool) string {
 	return "✖️"
 }
 
+func BoolToEmojiColored(value bool) string {
+	if value {
+		return "✅"
+	}
+	return "👀"
+}
+
 func BoolToString(value bool) string {
 	if value {
 		return "yes"
 	}
 	return "no"
+}
+
+func BoolToStar(value bool) string {
+	if value {
+		return "⭐"
+	}
+	return "☆"
 }
 
 func SortDirectionToEmoji(value string) string {

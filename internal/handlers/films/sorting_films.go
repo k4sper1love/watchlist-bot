@@ -76,7 +76,8 @@ func handleSortingFilmsAllReset(app models.App, session *models.Session) {
 
 	app.SendMessage(msg, nil)
 
-	HandleSortingFilmsCommand(app, session)
+	session.FilmsState.CurrentPage = 1
+	HandleFilmsCommand(app, session)
 }
 
 func handleSortingFilmsDirection(app models.App, session *models.Session) {
@@ -108,7 +109,8 @@ func parseSortingFilmsDirection(app models.App, session *models.Session) {
 
 	session.ClearAllStates()
 
-	HandleSortingFilmsCommand(app, session)
+	session.FilmsState.CurrentPage = 1
+	HandleFilmsCommand(app, session)
 }
 
 func handleSortingFilmsReset(app models.App, session *models.Session) {
@@ -116,5 +118,7 @@ func handleSortingFilmsReset(app models.App, session *models.Session) {
 	app.SendMessage(msg, nil)
 
 	session.ClearAllStates()
+
+	session.FilmsState.CurrentPage = 1
 	HandleSortingFilmsCommand(app, session)
 }

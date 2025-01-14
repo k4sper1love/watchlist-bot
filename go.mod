@@ -6,7 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.10.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/joho/godotenv v1.5.1
-	github.com/k4sper1love/watchlist-api v0.0.0-20241230202119-ae0e42bfcc8f
+	github.com/k4sper1love/watchlist-api v0.0.0-20250113232134-c0ba1dd01cb7
 	github.com/nicksnyder/go-i18n/v2 v2.4.1
 	golang.org/x/text v0.21.0
 	google.golang.org/api v0.211.0

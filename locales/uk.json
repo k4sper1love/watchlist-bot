@@ -2,6 +2,21 @@
   "choiceLanguage": {
     "other": "Будь ласка, виберіть мову для спілкування з ботом. Ви зможете поміняти його в налаштуваннях"
   },
+  "status": {
+    "other": "Статус"
+  },
+  "hintAPIUserID": {
+    "other": "<code>api_ID</code> для пошуку API користувачів"
+  },
+  "makeFavorite": {
+    "other": "Додати до улюблених"
+  },
+  "removeFavorite": {
+    "other": "Видалити з улюблених"
+  },
+  "inFavorite": {
+    "other": "В улюблених"
+  },
   "invalidInput": {
     "other": "Некоректний ввід."
   },
@@ -561,7 +576,7 @@
   "userRating": {
     "other": "Оцінка користувача"
   },
-  "Review": {
+  "review": {
     "other": "Рецензія"
   },
   "filmRequestImage": {

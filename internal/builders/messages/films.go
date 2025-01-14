@@ -36,7 +36,7 @@ func buildFilmsList(session *models.Session, metadata *filters.Metadata, isFind 
 	}
 
 	totalFilmsMsg := translator.Translate(session.Lang, totalFilmsMsgKey, nil, nil)
-	msg := fmt.Sprintf("<b>%s</b> %d\n\n", totalFilmsMsg, metadata.TotalRecords)
+	msg := fmt.Sprintf("<b>%s:</b> %d\n\n", totalFilmsMsg, metadata.TotalRecords)
 
 	if metadata.TotalRecords == 0 {
 		msg += translator.Translate(session.Lang, "filmsNotFound", nil, nil)
@@ -46,8 +46,15 @@ func buildFilmsList(session *models.Session, metadata *filters.Metadata, isFind 
 	for i, film := range films {
 		itemID := utils.GetItemID(i, metadata.CurrentPage, metadata.PageSize)
 		numberEmoji := utils.NumberToEmoji(itemID)
-		msg += fmt.Sprintf("%s\n", numberEmoji)
-		msg += BuildFilmGeneralMessage(session, &film)
+		msg += fmt.Sprintf("%s ", numberEmoji)
+
+		if film.IsFavorite {
+			msg += "⭐ "
+		}
+
+		msg += fmt.Sprintf(" <i>ID: %d</i>", film.ID)
+
+		msg += "\n" + BuildFilmGeneralMessage(session, &film)
 	}
 
 	pageMsg := translator.Translate(session.Lang, "pageCounter", map[string]interface{}{
@@ -65,6 +72,10 @@ func buildCollectionHeader(session *models.Session) string {
 
 	collectionMsg := translator.Translate(session.Lang, "collection", nil, nil)
 	msg := fmt.Sprintf("<b>%s:</b> \"%s\"", collectionMsg, collection.Name)
+
+	if collection.IsFavorite {
+		msg += " ⭐"
+	}
 
 	if collection.Description != "" {
 		descriptionMsg := translator.Translate(session.Lang, "description", nil, nil)

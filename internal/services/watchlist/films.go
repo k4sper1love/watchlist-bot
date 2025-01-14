@@ -47,6 +47,31 @@ func getFilmsRequest(app models.App, session *models.Session, collectionID, curr
 	return &filmsResponse, nil
 }
 
+func GetFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
+	headers := map[string]string{
+		"Authorization": session.AccessToken,
+	}
+
+	requestURL := fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID)
+
+	resp, err := client.SendRequestWithOptions(requestURL, http.MethodGet, nil, headers)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("get_film failed: %d", resp.StatusCode)
+	}
+
+	film := &apiModels.Film{}
+	if err := parseFilm(film, resp.Body); err != nil {
+		return nil, fmt.Errorf("failed to parse film: %w", err)
+	}
+
+	return film, nil
+}
+
 func UpdateFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
 	headers := map[string]string{
 		"Authorization": session.AccessToken,
@@ -66,7 +91,7 @@ func UpdateFilm(app models.App, session *models.Session) (*apiModels.Film, error
 
 	film := &apiModels.Film{}
 	if err := parseFilm(film, resp.Body); err != nil {
-		return nil, fmt.Errorf("failed to parse collection film: %w", err)
+		return nil, fmt.Errorf("failed to parse film: %w", err)
 	}
 
 	return film, nil
@@ -167,6 +192,10 @@ func addFilmsFilterAndSortingParams(queryParams url.Values, filter *models.Filte
 
 	if filter.IsViewed != nil {
 		queryParams.Add("is_viewed", fmt.Sprintf("%t", *filter.IsViewed))
+	}
+
+	if filter.IsFavorite != nil {
+		queryParams.Add("is_favorite", fmt.Sprintf("%t", *filter.IsFavorite))
 	}
 
 	if filter.HasURL != nil {

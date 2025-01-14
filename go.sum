@@ -64,6 +64,10 @@ github.com/k4sper1love/watchlist-api v0.0.0-20241212131753-a2c0ba75551d h1:zj47m
 github.com/k4sper1love/watchlist-api v0.0.0-20241212131753-a2c0ba75551d/go.mod h1:Ncpjds5BmYN847RmPisPyHs3JYNH4lKsyTGqyf8XO/0=
 github.com/k4sper1love/watchlist-api v0.0.0-20241230202119-ae0e42bfcc8f h1:wFAvqbewhf7yLArPs5tUvyCh08XrBnUhdeu5Dg+L+rc=
 github.com/k4sper1love/watchlist-api v0.0.0-20241230202119-ae0e42bfcc8f/go.mod h1:Ncpjds5BmYN847RmPisPyHs3JYNH4lKsyTGqyf8XO/0=
+github.com/k4sper1love/watchlist-api v0.0.0-20250113212259-c1d28c5e884e h1:d5TtXm1+6/VVCWQ2hjPqc1nfVUAMB42NbJcgCFuMcIw=
+github.com/k4sper1love/watchlist-api v0.0.0-20250113212259-c1d28c5e884e/go.mod h1:Ncpjds5BmYN847RmPisPyHs3JYNH4lKsyTGqyf8XO/0=
+github.com/k4sper1love/watchlist-api v0.0.0-20250113232134-c0ba1dd01cb7 h1:S9ILvLNORkf9jpGCrX55LWWNkle/XBfAC0eqG5yrUpU=
+github.com/k4sper1love/watchlist-api v0.0.0-20250113232134-c0ba1dd01cb7/go.mod h1:Ncpjds5BmYN847RmPisPyHs3JYNH4lKsyTGqyf8XO/0=
 github.com/leodido/go-urn v1.4.0 h1:WT9HwE9SGECu3lg4d/dIA+jxlljEa1/ffXKmRjqdmIQ=
 github.com/leodido/go-urn v1.4.0/go.mod h1:bvxc+MVxLKB4z00jd1z+Dvzr47oO32F/QSNjSBOlFxI=
 github.com/nicksnyder/go-i18n/v2 v2.4.1 h1:zwzjtX4uYyiaU02K5Ia3zSkpJZrByARkRB4V3YPrr0g=
