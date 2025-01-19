@@ -10,7 +10,7 @@ import (
 )
 
 func HandleDeleteCollectionCommand(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "deleteCollectionConfirm", map[string]interface{}{
+	msg := "⚠️" + translator.Translate(session.Lang, "deleteCollectionConfirm", map[string]interface{}{
 		"Collection": session.CollectionDetailState.Collection.Name,
 	}, nil)
 
@@ -34,7 +34,7 @@ func parseDeleteCollectionConfirm(app models.App, session *models.Session) {
 	switch utils.IsAgree(app.Upd) {
 	case true:
 		if err := watchlist.DeleteCollection(app, session); err != nil {
-			msg := translator.Translate(session.Lang, "deleteCollectionFailure", map[string]interface{}{
+			msg := "🚨 " + translator.Translate(session.Lang, "deleteCollectionFailure", map[string]interface{}{
 				"Collection": session.CollectionDetailState.Collection.Name,
 			}, nil)
 
@@ -43,7 +43,7 @@ func parseDeleteCollectionConfirm(app models.App, session *models.Session) {
 			break
 		}
 
-		msg := translator.Translate(session.Lang, "deleteCollectionSuccess", map[string]interface{}{
+		msg := "🗑️ " + translator.Translate(session.Lang, "deleteCollectionSuccess", map[string]interface{}{
 			"Collection": session.CollectionDetailState.Collection.Name,
 		}, nil)
 
@@ -51,7 +51,7 @@ func parseDeleteCollectionConfirm(app models.App, session *models.Session) {
 		HandleCollectionsCommand(app, session)
 
 	case false:
-		msg := translator.Translate(session.Lang, "cancelAction", nil, nil)
+		msg := "🚫 " + translator.Translate(session.Lang, "cancelAction", nil, nil)
 		app.SendMessage(msg, nil)
 		HandleManageCollectionCommand(app, session)
 	}

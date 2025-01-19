@@ -17,7 +17,7 @@ func HandleFindCollectionsCommand(app models.App, session *models.Session) {
 	}
 
 	if metadata.TotalRecords == 0 {
-		msg := translator.Translate(session.Lang, "collectionsNotFound", nil, nil)
+		msg := "❗️" + translator.Translate(session.Lang, "collectionsNotFound", nil, nil)
 		keyboard := keyboards.NewKeyboard().AddAgain(states.CallbackFindCollectionsAgain).AddBack(states.CallbackFindCollectionsBack).Build(session.Lang)
 		app.SendMessage(msg, keyboard)
 		return
@@ -49,7 +49,7 @@ func HandleFindCollectionsButtons(app models.App, session *models.Session) {
 			session.CollectionsState.CurrentPage++
 			HandleCollectionsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -58,7 +58,7 @@ func HandleFindCollectionsButtons(app models.App, session *models.Session) {
 			session.CollectionsState.CurrentPage--
 			HandleCollectionsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 	}

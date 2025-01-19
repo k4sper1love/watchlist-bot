@@ -12,15 +12,11 @@ import (
 )
 
 func HandleManageCollectionCommand(app models.App, session *models.Session) {
-	part1 := messages.BuildCollectionDetailMessage(session, &session.CollectionDetailState.Collection)
-	part2 := translator.Translate(session.Lang, "updateChoiceField", nil, nil)
-	msg := fmt.Sprintf("%s⚡️ <b>%s</b>", part1, part2)
+	msg := messages.BuildCollectionHeader(session)
+	choiceMsg := translator.Translate(session.Lang, "choiceAction", nil, nil)
+	msg += fmt.Sprintf("<b>%s</b>", choiceMsg)
 
-	keyboard := keyboards.NewKeyboard().
-		AddCollectionsUpdate().
-		AddCollectionsDelete().
-		AddBack(states.CallbackManageCollectionSelectBack).
-		Build(session.Lang)
+	keyboard := keyboards.BuildCollectionManageKeyboard(session)
 
 	app.SendMessage(msg, keyboard)
 }

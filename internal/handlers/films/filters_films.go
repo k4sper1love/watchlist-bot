@@ -15,7 +15,8 @@ import (
 )
 
 func HandleFiltersFilmsCommand(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "choiceFilter", nil, nil)
+	choiceMsg := translator.Translate(session.Lang, "choiceFilter", nil, nil)
+	msg := fmt.Sprintf("<b>%s</b>", choiceMsg)
 
 	keyboard := keyboards.BuildFilmsFilterKeyboard(session)
 
@@ -76,7 +77,7 @@ func HandleFiltersFilmsProcess(app models.App, session *models.Session) {
 func handleFiltersFilmsAllReset(app models.App, session *models.Session) {
 	session.GetFilmsFiltersByContext().ResetFilters()
 
-	msg := translator.Translate(session.Lang, "filterResetSuccess", nil, nil)
+	msg := "🔄 " + translator.Translate(session.Lang, "filterResetSuccess", nil, nil)
 
 	app.SendMessage(msg, nil)
 
@@ -99,7 +100,7 @@ func parseFiltersFilmsSwitch(app models.App, session *models.Session, filterType
 
 	if utils.IsReset(app.Upd) {
 		filter.ResetFilter(filterType)
-		handleFiltersFilmsReset(app, session)
+		handleFiltersFilmsReset(app, session, filterType)
 		return
 	}
 
@@ -107,7 +108,7 @@ func parseFiltersFilmsSwitch(app models.App, session *models.Session, filterType
 
 	filter.ApplySwitchValue(filterType, value)
 
-	handleFiltersFilmsApplied(app, session)
+	handleFiltersFilmsApplied(app, session, filterType, "🔀 ")
 }
 
 func handleFiltersFilmsRange(app models.App, session *models.Session, filterType string) {
@@ -125,7 +126,7 @@ func parseFiltersFilmsRange(app models.App, session *models.Session, filterType 
 
 	if utils.IsReset(app.Upd) {
 		filter.ResetFilter(filterType)
-		handleFiltersFilmsReset(app, session)
+		handleFiltersFilmsReset(app, session, filterType)
 		return
 	}
 
@@ -150,7 +151,7 @@ func parseFiltersFilmsRange(app models.App, session *models.Session, filterType 
 		}
 
 	default:
-		msg := translator.Translate(session.Lang, "someError", nil, nil)
+		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
 		app.SendMessage(msg, nil)
 		session.ClearState()
 		HandleFiltersFilmsCommand(app, session)
@@ -159,11 +160,15 @@ func parseFiltersFilmsRange(app models.App, session *models.Session, filterType 
 
 	filter.ApplyRangeValue(filterType, input)
 
-	handleFiltersFilmsApplied(app, session)
+	handleFiltersFilmsApplied(app, session, filterType, "↕️ ")
 }
 
-func handleFiltersFilmsReset(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "filterResetSuccess", nil, 1)
+func handleFiltersFilmsReset(app models.App, session *models.Session, filterType string) {
+	filterMsg := translator.Translate(session.Lang, filterType, nil, nil)
+	msg := "🔄 " + translator.Translate(session.Lang, "filterResetSuccess", map[string]interface{}{
+		"Filter": filterMsg,
+	}, 1)
+
 	app.SendMessage(msg, nil)
 
 	session.ClearState()
@@ -172,8 +177,12 @@ func handleFiltersFilmsReset(app models.App, session *models.Session) {
 	HandleFiltersFilmsCommand(app, session)
 }
 
-func handleFiltersFilmsApplied(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "filterApplied", nil, nil)
+func handleFiltersFilmsApplied(app models.App, session *models.Session, filterType, emoji string) {
+	filterMsg := translator.Translate(session.Lang, filterType, nil, nil)
+	msg := emoji + translator.Translate(session.Lang, "filterApplied", map[string]interface{}{
+		"Filter": filterMsg,
+	}, nil)
+
 	app.SendMessage(msg, nil)
 
 	session.ClearState()

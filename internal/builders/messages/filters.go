@@ -13,7 +13,7 @@ func BuildSelectedSortMessage(session *models.Session, sorting *models.Sorting) 
 	}, nil)
 	part2 := translator.Translate(session.Lang, "requestDirection", nil, nil)
 
-	msg := fmt.Sprintf("%s\n\n%s", part1, part2)
+	msg := fmt.Sprintf("🗂️ %s\n\n%s", part1, part2)
 
 	return msg
 }

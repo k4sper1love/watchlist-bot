@@ -40,6 +40,18 @@ func BuildCollectionsKeyboard(session *models.Session, currentPage, lastPage int
 	return keyboard.Build(session.Lang)
 }
 
+func BuildCollectionManageKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	keyboard := NewKeyboard()
+
+	keyboard.AddUpdate(states.CallbackManageCollectionSelectUpdate)
+
+	keyboard.AddDelete(states.CallbackManageCollectionSelectDelete)
+
+	keyboard.AddBack(states.CallbackManageCollectionSelectBack)
+
+	return keyboard.Build(session.Lang)
+}
+
 func BuildCollectionUpdateKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
@@ -101,18 +113,6 @@ func (k *Keyboard) AddCollectionsSelect(session *models.Session) *Keyboard {
 
 func (k *Keyboard) AddCollectionsNew() *Keyboard {
 	return k.AddButton("➕", "createCollection", states.CallbackCollectionsNew, "", true)
-}
-
-func (k *Keyboard) AddCollectionsDelete() *Keyboard {
-	return k.AddButton("🗑️", "deleteCollection", states.CallbackManageCollectionSelectDelete, "", true)
-}
-
-func (k *Keyboard) AddCollectionsUpdate() *Keyboard {
-	return k.AddButton("✏️", "updateCollection", states.CallbackManageCollectionSelectUpdate, "", true)
-}
-
-func (k *Keyboard) AddCollectionsManage() *Keyboard {
-	return k.AddButton("⚙️", "manageCollection", states.CallbackCollectionsManage, "", true)
 }
 
 func (k *Keyboard) AddCollectionFiltersAndSorting(session *models.Session) *Keyboard {

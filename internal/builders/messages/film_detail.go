@@ -3,10 +3,12 @@ package messages
 import (
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 	"strings"
+	"unicode/utf8"
 )
 
 func BuildFilmDetailMessage(session *models.Session, film *apiModels.Film) string {
@@ -25,8 +27,9 @@ func BuildFilmDetailMessage(session *models.Session, film *apiModels.Film) strin
 	msg.WriteString("\n\n")
 
 	details := make([]string, 0)
-	details = append(details, utils.BoolToEmojiColored(film.IsViewed))
+	details = append(details, utils.ViewedToEmojiColored(film.IsViewed))
 
+	details = append(details, fmt.Sprintf("%d", film.ID))
 	if film.Genre != "" {
 		details = append(details, fmt.Sprintf("%s", film.Genre))
 	}
@@ -46,12 +49,16 @@ func BuildFilmDetailMessage(session *models.Session, film *apiModels.Film) strin
 
 	if film.Comment != "" {
 		commentMsg := translator.Translate(session.Lang, "comment", nil, nil)
-		msg.WriteString(fmt.Sprintf("<b>%s:</b>\n<i>%s</i>\n", commentMsg, film.Comment))
+		msg.WriteString(fmt.Sprintf("<b>%s:</b>\n<i>%s</i>\n\n", commentMsg, film.Comment))
 	}
 
 	if film.IsViewed && film.Review != "" {
 		reviewMsg := translator.Translate(session.Lang, "review", nil, nil)
-		msg.WriteString(fmt.Sprintf("\n<b>%s:</b>\n<i>%s</i>\n", reviewMsg, film.Review))
+		msg.WriteString(fmt.Sprintf("<b>%s:</b>\n<i>%s</i>\n\n", reviewMsg, film.Review))
+	}
+
+	if session.Context == states.ContextCollection {
+		msg.WriteString(fmt.Sprintf("📚 <i>%s</i>\n\n", session.CollectionDetailState.Collection.Name))
 	}
 
 	return msg.String()
@@ -64,7 +71,7 @@ func BuildFilmDetailWithNumberMessage(session *models.Session, itemID int, film 
 	return msg + BuildFilmDetailMessage(session, film)
 }
 
-func BuildFilmGeneralMessage(session *models.Session, film *apiModels.Film) string {
+func BuildFilmGeneralMessage(session *models.Session, film *apiModels.Film, needViewed bool) string {
 	var msg strings.Builder
 
 	msg.WriteString(fmt.Sprintf("<b>%s</b>", film.Title))
@@ -73,7 +80,7 @@ func BuildFilmGeneralMessage(session *models.Session, film *apiModels.Film) stri
 		msg.WriteString(fmt.Sprintf(" <i>(%d)</i>", film.Year))
 	}
 
-	msg.WriteString(fmt.Sprintf(" | %s\n", utils.BoolToEmojiColored(film.IsViewed)))
+	msg.WriteString(fmt.Sprintf(" | %s\n", utils.ViewedToEmojiColored(film.IsViewed)))
 
 	details := make([]string, 0)
 	if film.Genre != "" {
@@ -82,25 +89,33 @@ func BuildFilmGeneralMessage(session *models.Session, film *apiModels.Film) stri
 	if film.Rating != 0 {
 		details = append(details, fmt.Sprintf("★%.2f", film.Rating))
 	}
-	if film.IsViewed && film.UserRating != 0 {
+	if needViewed && film.IsViewed && film.UserRating != 0 {
 		details = append(details, fmt.Sprintf("👤%.2f", film.UserRating))
 	}
 	if len(details) > 0 {
-		msg.WriteString(strings.Join(details, " , "))
+		msg.WriteString(strings.Join(details, " , ") + "\n")
+	}
+
+	if film.Description != "" {
+		if film.Genre == "YouTube Video" {
+			parts := strings.Split(film.Description, "\n")
+			parts = strings.Split(parts[0], ":")
+			author := strings.TrimSpace(parts[1])
+			film.Description = fmt.Sprintf("👨‍💼 <i>%s</i>", author)
+
+			msg.WriteString(fmt.Sprintf("%s\n", film.Description))
+
+		} else {
+			if utf8.RuneCountInString(film.Description) > 230 {
+				film.Description, _ = utils.SplitTextByLength(film.Description, 230)
+			}
+
+			descriptionMsg := translator.Translate(session.Lang, "description", nil, nil)
+			msg.WriteString(fmt.Sprintf("<b>%s:</b>\n<i>%s</i>\n", descriptionMsg, film.Description))
+		}
 	}
 
 	msg.WriteString("\n")
-
-	if film.Description != "" {
-		if len(film.Description) > 300 {
-			film.Description, _ = utils.SplitTextByLength(film.Description, 300)
-		}
-
-		descriptionMsg := translator.Translate(session.Lang, "description", nil, nil)
-		msg.WriteString(fmt.Sprintf("<b>%s:</b>\n<i>%s</i>\n", descriptionMsg, film.Description))
-	}
-
-	msg.WriteString("\n\n")
 
 	return msg.String()
 }

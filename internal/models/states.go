@@ -158,4 +158,5 @@ func (s *FilmDetailState) SetFromFilm(film *apiModels.Film) {
 	s.Genre = film.Genre
 	s.Year = film.Year
 	s.Rating = film.Rating
+	s.URL = film.URL
 }

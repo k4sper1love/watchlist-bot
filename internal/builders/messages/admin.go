@@ -31,8 +31,12 @@ func BuildAdminUserListMessage(session *models.Session, users []models.Session) 
 			msg += fmt.Sprintf("Username: @%s\n", user.TelegramUsername)
 		}
 
-		bannedMsg := translator.Translate(session.Lang, "banned", nil, nil)
-		msg += fmt.Sprintf("%s: %s\n", bannedMsg, utils.BoolToEmoji(user.IsBanned))
+		if user.User.ID != 1 {
+			msg += fmt.Sprintf("API ID: <code>%d</code>\n", user.User.ID)
+		}
+
+		bannedMsg := translator.Translate(session.Lang, "access", nil, nil)
+		msg += fmt.Sprintf("%s: %s\n", bannedMsg, utils.BoolToEmojiColored(!user.IsBanned))
 
 		msg += "\n"
 	}
@@ -42,8 +46,7 @@ func BuildAdminUserListMessage(session *models.Session, users []models.Session) 
 		"LastPage":    lastPage,
 	}, nil)
 
-	msg += fmt.Sprintf("<b>📄 %s</b>\n", pageMsg)
-	msg += translator.Translate(session.Lang, "choiceUserForDetails", nil, nil)
+	msg += fmt.Sprintf("<b>📄 %s</b>", pageMsg)
 
 	return msg
 }
@@ -52,18 +55,17 @@ func BuildAdminUserDetailMessage(session *models.Session, user *models.Session) 
 	detailsMsg := translator.Translate(session.Lang, "sessionDetails", nil, nil)
 	msg := fmt.Sprintf("💻 <b>%s:</b>\n", detailsMsg)
 
+	roleMsg := translator.Translate(session.Lang, "role", nil, nil)
+	roleValueMsg := translator.Translate(session.Lang, user.Role.String(), nil, nil)
+	msg += fmt.Sprintf("<b>%s:</b> %s\n", roleMsg, roleValueMsg)
+
 	msg += fmt.Sprintf("<b>Telegram ID:</b> <code>%d</code>\n", user.TelegramID)
 
 	if user.TelegramUsername != "" {
 		msg += fmt.Sprintf("<b>Username:</b> @%s\n", user.TelegramUsername)
 	}
-
-	roleMsg := translator.Translate(session.Lang, "role", nil, nil)
-	roleValueMsg := translator.Translate(session.Lang, user.Role.String(), nil, nil)
-	msg += fmt.Sprintf("<b>%s:</b> %s\n", roleMsg, roleValueMsg)
-
-	bannedMsg := translator.Translate(session.Lang, "banned", nil, nil)
-	msg += fmt.Sprintf("<b>%s:</b> %s\n", bannedMsg, utils.BoolToEmoji(user.IsBanned))
+	bannedMsg := translator.Translate(session.Lang, "access", nil, nil)
+	msg += fmt.Sprintf("<b>%s</b>: %s\n", bannedMsg, utils.BoolToEmojiColored(!user.IsBanned))
 
 	languageMsg := translator.Translate(session.Lang, "language", nil, nil)
 	language := ""
@@ -114,7 +116,7 @@ func BuildFeedbackListMessage(session *models.Session, feedbacks []models.Feedba
 	totalRecords := session.AdminState.TotalRecords
 
 	if len(feedbacks) == 0 {
-		msg := translator.Translate(session.Lang, "notFoundMessages", nil, nil)
+		msg := "❗️" + translator.Translate(session.Lang, "notFoundMessages", nil, nil)
 		return msg
 	}
 
@@ -129,8 +131,11 @@ func BuildFeedbackListMessage(session *models.Session, feedbacks []models.Feedba
 		categoryMsg := translator.Translate(session.Lang, feedback.Category, nil, nil)
 		msg += fmt.Sprintf("<b>%s %s</b>\n", numberEmoji, categoryMsg)
 
-		idMsg := translator.Translate(session.Lang, "user", nil, nil)
-		msg += fmt.Sprintf("%s: <code>%d</code>\n", idMsg, feedback.TelegramID)
+		msg += fmt.Sprintf("Telegram ID: <code>%d</code>\n", feedback.TelegramID)
+
+		if feedback.TelegramUsername != "" {
+			msg += fmt.Sprintf("Username: @%s\n", feedback.TelegramUsername)
+		}
 
 		createdMsg := translator.Translate(session.Lang, "created", nil, nil)
 		msg += fmt.Sprintf("%s: %s\n\n", createdMsg, feedback.CreatedAt.Format("02.01.2006 15:04"))
@@ -141,25 +146,29 @@ func BuildFeedbackListMessage(session *models.Session, feedbacks []models.Feedba
 		"LastPage":    lastPage,
 	}, nil)
 
-	msg += fmt.Sprintf("<b>📄 %s</b>\n", pageMsg)
-	msg += translator.Translate(session.Lang, "choiceMessage", nil, nil)
+	msg += fmt.Sprintf("<b>📄 %s</b>", pageMsg)
 
 	return msg
 }
 
 func BuildFeedbackDetailMessage(session *models.Session, feedback *models.Feedback) string {
-	detailsMsg := translator.Translate(session.Lang, "feedbackDetails", nil, nil)
-	msg := fmt.Sprintf("<b>%s:</b>\n\n", detailsMsg)
+	detailsMsg := "💬 " + translator.Translate(session.Lang, "feedbackDetails", nil, nil)
+	msg := fmt.Sprintf("<b>%s:</b>\n", detailsMsg)
 
-	idMsg := translator.Translate(session.Lang, "user", nil, nil)
-	msg += fmt.Sprintf("<b>%s:</b> <code>%d</code>\n", idMsg, feedback.TelegramID)
+	msg += fmt.Sprintf("<b>Telegram ID</b>: <code>%d</code>\n", feedback.TelegramID)
+
+	if feedback.TelegramUsername != "" {
+		msg += fmt.Sprintf("<b>Username</b>: @%s\n", feedback.TelegramUsername)
+	}
+
+	msg += fmt.Sprintf("\n")
 
 	categoryMsg := translator.Translate(session.Lang, "category", nil, nil)
 	translatedCategory := translator.Translate(session.Lang, feedback.Category, nil, nil)
-	msg += fmt.Sprintf("<b>%s:</b> %s\n", categoryMsg, translatedCategory)
+	msg += fmt.Sprintf("<b>%s:</b> %s\n\n", categoryMsg, translatedCategory)
 
 	feedbackMsg := translator.Translate(session.Lang, "message", nil, nil)
-	msg += fmt.Sprintf("<b>%s:</b>\n<pre>%s</pre>\n", feedbackMsg, feedback.Message)
+	msg += fmt.Sprintf("<b>%s:</b>\n<pre>%s</pre>\n\n", feedbackMsg, feedback.Message)
 
 	createdMsg := translator.Translate(session.Lang, "created", nil, nil)
 	msg += fmt.Sprintf("<b>%s:</b> %s\n", createdMsg, feedback.CreatedAt.Format("02.01.2006 15:04"))
@@ -207,7 +216,7 @@ func BuildUserUnbanNotificationMessage(session *models.Session) string {
 		"Role": roleMsg,
 	}, nil)
 
-	msg := fmt.Sprintf("🟢 %s", bannedByMsg)
+	msg := fmt.Sprintf("✅ %s", bannedByMsg)
 
 	return msg
 }
@@ -217,7 +226,7 @@ func BuildUnbanMessage(session *models.Session) string {
 		"ID": session.AdminState.UserID,
 	}, nil)
 
-	msg := fmt.Sprintf("🟢 %s", unbanUserMsg)
+	msg := fmt.Sprintf("✅ %s", unbanUserMsg)
 
 	return msg
 }
@@ -271,7 +280,7 @@ func BuildLowerRoleMessage(session *models.Session) string {
 func BuildRemoveRoleNotificationMessage(session *models.Session) string {
 	removedMsg := translator.Translate(session.AdminState.UserLang, "removedRole", nil, nil)
 
-	msg := fmt.Sprintf("❌ %s", removedMsg)
+	msg := fmt.Sprintf("⚠️ %s", removedMsg)
 
 	return msg
 }

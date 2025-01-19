@@ -14,7 +14,7 @@ func BuildCollectionsMessage(session *models.Session, metadata *filters.Metadata
 	msg := ""
 
 	if metadata.TotalRecords == 0 {
-		msg += translator.Translate(session.Lang, "collectionsNotFound", nil, nil)
+		msg += "❗️" + translator.Translate(session.Lang, "collectionsNotFound", nil, nil)
 		return msg
 	}
 
@@ -35,6 +35,8 @@ func BuildCollectionsMessage(session *models.Session, metadata *filters.Metadata
 			msg += "⭐"
 		}
 
+		msg += fmt.Sprintf(" <i>ID: %d</i>", collection.ID)
+
 		msg += "\n" + BuildCollectionDetailMessage(session, &collection)
 	}
 
@@ -43,9 +45,7 @@ func BuildCollectionsMessage(session *models.Session, metadata *filters.Metadata
 		"LastPage":    metadata.LastPage,
 	}, nil)
 
-	msg += fmt.Sprintf("<b>📄 %s</b>\n\n", pageMsg)
-
-	msg += translator.Translate(session.Lang, "choiceCollectionForDetails", nil, nil)
+	msg += fmt.Sprintf("<b>📄 %s</b>", pageMsg)
 
 	return msg
 }

@@ -44,7 +44,7 @@ func BuildMenuMessage(session *models.Session) string {
 	part1 := translator.Translate(session.Lang, "mainMenu", nil, nil)
 	part2 := translator.Translate(session.Lang, "choiceAction", nil, nil)
 
-	msg := fmt.Sprintf("📋 <b>%s:</b>\n\n%s", part1, part2)
+	msg := fmt.Sprintf("📋 <b>%s</b>\n\n%s", part1, part2)
 
 	return msg
 }

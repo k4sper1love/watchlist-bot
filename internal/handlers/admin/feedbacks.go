@@ -18,7 +18,7 @@ import (
 func HandleFeedbacksCommand(app models.App, session *models.Session) {
 	feedbacks, err := parseFeedbacks(session)
 	if err != nil {
-		msg := translator.Translate(session.Lang, "someError", nil, nil)
+		msg := "⚠️ " + translator.Translate(session.Lang, "someError", nil, nil)
 		app.SendMessage(msg, nil)
 		general.RequireRole(app, session, HandleMenuCommand, roles.Admin)
 		return
@@ -88,7 +88,7 @@ func handleFeedbackSelect(app models.App, session *models.Session) {
 	idStr := strings.TrimPrefix(callback, "select_admin_feedback_")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		msg := translator.Translate(session.Lang, "someError", nil, nil)
+		msg := "⚠️ " + translator.Translate(session.Lang, "someError", nil, nil)
 		app.SendMessage(msg, nil)
 		log.Printf("error parsing user ID: %v", err)
 		return

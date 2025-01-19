@@ -16,7 +16,7 @@ import (
 func GetFilmFromIMDB(app models.App, url string) (*apiModels.Film, error) {
 	id := parseIDFromIMDB(url)
 
-	reqUrl := fmt.Sprintf("http://www.omdbapi.com/?apikey=%s&i=%s", app.Vars.IMDBAPIToken, id)
+	reqUrl := fmt.Sprintf("http://www.omdbapi.com/?apikey=%s&i=%s&plot=full", app.Vars.IMDBAPIToken, id)
 
 	resp, err := client.SendRequestWithOptions(reqUrl, http.MethodGet, nil, nil)
 	if err != nil {

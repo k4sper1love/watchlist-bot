@@ -1,6 +1,7 @@
 package collectionFilms
 
 import (
+	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/films"
@@ -22,13 +23,14 @@ func HandleAddCollectionToFilmCommand(app models.App, session *models.Session) {
 	}
 
 	if len(collections) == 0 {
-		msg := translator.Translate(session.Lang, "collectionsNotFound", nil, nil)
+		msg := "❗️" + translator.Translate(session.Lang, "collectionsNotFound", nil, nil)
 		keyboard := keyboards.NewKeyboard().AddCollectionsNew().AddBack(states.CallbackAddCollectionToFilmBack).Build(session.Lang)
 		app.SendMessage(msg, keyboard)
 		return
 	}
 
-	msg := translator.Translate(session.Lang, "choiceCollectionToFilm", nil, nil)
+	choiceMsg := translator.Translate(session.Lang, "choiceCollection", nil, nil)
+	msg := fmt.Sprintf("<b>%s</b>", choiceMsg)
 	keyboard := keyboards.BuildAddCollectionToFilmKeyboard(session)
 	app.SendMessage(msg, keyboard)
 }
@@ -85,7 +87,7 @@ func HandleAddCollectionToFilmSelect(app models.App, session *models.Session) {
 	id, err := strconv.Atoi(idStr)
 
 	if err != nil {
-		msg := translator.Translate(session.Lang, "getCollectionFailure", nil, nil)
+		msg := "🚨" + translator.Translate(session.Lang, "getCollectionFailure", nil, nil)
 		app.SendMessage(msg, nil)
 		log.Printf("error parsing collection ID: %v", err)
 		return

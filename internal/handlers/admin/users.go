@@ -17,11 +17,6 @@ import (
 )
 
 func HandleUsersCommand(app models.App, session *models.Session) {
-	//msg := translator.Translate(session.Lang, "choiceAction", nil, nil)
-	//
-	//keyboard := keyboards.BuildAdminUsersKeyboard(session)
-	//
-	//app.SendMessage(msg, keyboard)
 	users, err := parseUsers(session)
 	if err != nil {
 		msg := translator.Translate(session.Lang, "someError", nil, nil)
@@ -135,7 +130,7 @@ func processUserFindSelect(app models.App, session *models.Session) {
 		param = strings.TrimPrefix(param, "@")
 		user, err := postgres.GetUserByTelegramUsername(param)
 		if err != nil || user == nil {
-			msg := translator.Translate(session.Lang, "notFound", nil, nil)
+			msg := "❗" + translator.Translate(session.Lang, "notFound", nil, nil)
 			app.SendMessage(msg, nil)
 			handleUserFindCommand(app, session)
 			return
@@ -152,7 +147,7 @@ func processUserFindSelect(app models.App, session *models.Session) {
 
 		user, err := postgres.GetUserByAPIUserID(id)
 		if err != nil {
-			msg := translator.Translate(session.Lang, "notFound", nil, nil)
+			msg := "❗" + translator.Translate(session.Lang, "notFound", nil, nil)
 			app.SendMessage(msg, nil)
 			handleUserFindCommand(app, session)
 			return
@@ -169,7 +164,7 @@ func processUserFindSelect(app models.App, session *models.Session) {
 
 		user, err := postgres.GetUserByTelegramID(telegramID)
 		if err != nil || user == nil {
-			msg := translator.Translate(session.Lang, "notFound", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "notFound", nil, nil)
 			app.SendMessage(msg, nil)
 			handleUserFindCommand(app, session)
 			return
@@ -209,7 +204,7 @@ func parseUsers(session *models.Session) ([]models.Session, error) {
 func handleAndParseID(app models.App, session *models.Session, param string) (int, error) {
 	parsed, err := strconv.Atoi(param)
 	if err != nil {
-		msg := translator.Translate(session.Lang, "someError", nil, nil)
+		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
 		app.SendMessage(msg, nil)
 		return -1, err
 	}

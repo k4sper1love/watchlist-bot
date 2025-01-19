@@ -114,7 +114,7 @@ func parseFilmFromYoutube(dest *apiModels.Film, session *models.Session, video *
 	part6 := translator.Translate(session.Lang, "dateOfRelease", nil, nil)
 
 	dest.Description = fmt.Sprintf(
-		"👤 %s: %s\n⏳ %s: %s\n👁️‍🗨️ %s: %d\n❤️ %s: %d / %d\n💬 %s: %d\n📆 %s: %s",
+		"👨‍💼 %s: %s\n⏳ %s: %s\n👁️‍🗨️ %s: %d\n❤️ %s: %d / %d\n💬 %s: %d\n📆 %s: %s",
 		part1, video.Snippet.ChannelTitle,
 		part2, parsedDuration,
 		part3, externalData.ViewCount,

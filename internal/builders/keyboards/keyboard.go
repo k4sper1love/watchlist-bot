@@ -143,6 +143,18 @@ func (k *Keyboard) AddBack(callbackData string) *Keyboard {
 	return k.AddButtonsWithRowSize(len(buttons), buttons...)
 }
 
+func (k *Keyboard) AddUpdate(callbackData string) *Keyboard {
+	return k.AddButton("✏️", "update", callbackData, "", true)
+}
+
+func (k *Keyboard) AddDelete(callbackData string) *Keyboard {
+	return k.AddButton("🗑️", "delete", callbackData, "", true)
+}
+
+func (k *Keyboard) AddManage(callbackData string) *Keyboard {
+	return k.AddButton("⚙️", "manage", callbackData, "", true)
+}
+
 func (k *Keyboard) translate(languageCode string) *Keyboard {
 	for i, row := range k.Rows {
 		for j, btn := range row {

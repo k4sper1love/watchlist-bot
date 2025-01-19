@@ -9,10 +9,11 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
+	"log"
 )
 
 func HandleBroadcastCommand(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "requestBroadcastImage", nil, nil)
+	msg := "🏞️ " + translator.Translate(session.Lang, "requestBroadcastImage", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
 
@@ -48,6 +49,7 @@ func parseBroadcastImage(app models.App, session *models.Session) {
 
 	image, err := utils.ParseImageFromMessage(app.Bot, app.Upd)
 	if err != nil {
+		log.Println(err)
 		handleBroadcastImageError(app, session)
 		return
 	}
@@ -64,7 +66,7 @@ func parseBroadcastImage(app models.App, session *models.Session) {
 }
 
 func requestBroadcastMessage(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "requestBroadcastMessage", nil, nil)
+	msg := "💬 " + translator.Translate(session.Lang, "requestBroadcastMessage", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
 
@@ -83,6 +85,9 @@ func parseBroadcastMessage(app models.App, session *models.Session) {
 
 	session.AdminState.FeedbackMessage = msg
 
+	previewMsg := translator.Translate(session.Lang, "preview", nil, nil)
+	msg = fmt.Sprintf("👁️ <i>%s:</i>\n\n%s", previewMsg, msg)
+
 	if session.AdminState.FeedbackImageURL != "" {
 		app.SendImage(session.AdminState.FeedbackImageURL, msg, nil)
 	} else {
@@ -94,7 +99,7 @@ func parseBroadcastMessage(app models.App, session *models.Session) {
 
 func requestBroadcastConfirm(app models.App, session *models.Session) {
 	if session.AdminState.FeedbackMessage == "" && session.AdminState.FeedbackImageURL == "" {
-		emptyMsg := translator.Translate(session.Lang, "broadcastEmpty", nil, nil)
+		emptyMsg := "❗️" + translator.Translate(session.Lang, "broadcastEmpty", nil, nil)
 		app.SendMessage(emptyMsg, nil)
 		session.ClearAllStates()
 		HandleMenuCommand(app, session)
@@ -103,14 +108,14 @@ func requestBroadcastConfirm(app models.App, session *models.Session) {
 
 	count, err := postgres.GetUserCounts()
 	if err != nil {
-		msg := translator.Translate(session.Lang, "requestFailure", nil, nil)
+		msg := "🚨" + translator.Translate(session.Lang, "requestFailure", nil, nil)
 		app.SendMessage(msg, nil)
 		session.ClearAllStates()
 		HandleMenuCommand(app, session)
 		return
 	}
 
-	countMsg := translator.Translate(session.Lang, "recipientCount", nil, nil)
+	countMsg := "👥 " + translator.Translate(session.Lang, "recipientCount", nil, nil)
 	msg := fmt.Sprintf("<b>%s</b>: %d", countMsg, count)
 
 	keyboard := keyboards.BuildBroadcastConfirmKeyboard(session)
@@ -144,7 +149,7 @@ func parseBroadcastConfirm(app models.App, session *models.Session) {
 }
 
 func handleBroadcastImageError(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "getImageFailure", nil, nil)
+	msg := "🚨" + translator.Translate(session.Lang, "getImageFailure", nil, nil)
 	app.SendMessage(msg, nil)
 	requestBroadcastMessage(app, session)
 }

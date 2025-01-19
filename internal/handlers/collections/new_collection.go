@@ -13,7 +13,7 @@ import (
 func HandleNewCollectionCommand(app models.App, session *models.Session) {
 	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
-	msg := translator.Translate(session.Lang, "collectionRequestName", nil, nil)
+	msg := "❓" + translator.Translate(session.Lang, "collectionRequestName", nil, nil)
 
 	app.SendMessage(msg, keyboard)
 	session.SetState(states.ProcessNewCollectionAwaitingName)
@@ -41,7 +41,7 @@ func parseNewCollectionName(app models.App, session *models.Session) {
 
 	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
 
-	msg := translator.Translate(session.Lang, "collectionRequestDescription", nil, nil)
+	msg := "❓" + translator.Translate(session.Lang, "collectionRequestDescription", nil, nil)
 
 	app.SendMessage(msg, keyboard)
 
@@ -62,12 +62,12 @@ func parseNewCollectionDescription(app models.App, session *models.Session) {
 func createCollection(app models.App, session *models.Session) {
 	collection, err := watchlist.CreateCollection(app, session)
 	if err != nil {
-		msg := translator.Translate(session.Lang, "createCollectionFailure", nil, nil)
+		msg := "🚨 " + translator.Translate(session.Lang, "createCollectionFailure", nil, nil)
 		app.SendMessage(msg, nil)
 		return
 	}
 
-	msg := translator.Translate(session.Lang, "createCollectionSuccess", nil, nil)
+	msg := "📚 " + translator.Translate(session.Lang, "createCollectionSuccess", nil, nil)
 	app.SendMessage(msg, nil)
 
 	session.CollectionDetailState.ObjectID = collection.ID

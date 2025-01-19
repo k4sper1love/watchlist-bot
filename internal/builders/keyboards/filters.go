@@ -26,12 +26,12 @@ func (k *Keyboard) AddSearch(callback string) *Keyboard {
 }
 
 func (k *Keyboard) AddResetAllSorting(callback string) *Keyboard {
-	return k.AddButton("", "resetSorting", callback, "", true)
+	return k.AddButton("🔄", "resetSorting", callback, "", true)
 }
 
 func (k *Keyboard) AddResetSorting(sorting *models.Sorting) *Keyboard {
 	if sorting.IsSortingFieldEnabled(sorting.Field) {
-		return k.AddButton("", "reset", states.CallbackProcessReset, "", true)
+		return k.AddButton("🔄", "reset", states.CallbackProcessReset, "", true)
 	}
 
 	return k

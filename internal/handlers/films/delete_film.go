@@ -11,8 +11,8 @@ import (
 )
 
 func HandleDeleteFilmCommand(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "deleteFilmConfirm", map[string]interface{}{
-		"Film": session.FilmDetailState.Title,
+	msg := "⚠️ " + translator.Translate(session.Lang, "deleteFilmConfirm", map[string]interface{}{
+		"Film": session.FilmDetailState.Film.Title,
 	}, nil)
 
 	keyboard := keyboards.NewKeyboard().AddSurvey().Build(session.Lang)
@@ -35,8 +35,8 @@ func parseDeleteFilmConfirm(app models.App, session *models.Session) {
 	switch utils.IsAgree(app.Upd) {
 	case true:
 		if err := DeleteFilm(app, session); err != nil {
-			msg := translator.Translate(session.Lang, "deleteFilmFailure", map[string]interface{}{
-				"Film": session.FilmDetailState.Title,
+			msg := "🚨 " + translator.Translate(session.Lang, "deleteFilmFailure", map[string]interface{}{
+				"Film": session.FilmDetailState.Film.Title,
 			}, nil)
 
 			app.SendMessage(msg, nil)
@@ -44,15 +44,15 @@ func parseDeleteFilmConfirm(app models.App, session *models.Session) {
 			break
 		}
 
-		msg := translator.Translate(session.Lang, "deleteFilmSuccess", map[string]interface{}{
-			"Film": session.FilmDetailState.Title,
+		msg := "🗑 " + translator.Translate(session.Lang, "deleteFilmSuccess", map[string]interface{}{
+			"Film": session.FilmDetailState.Film.Title,
 		}, nil)
 
 		app.SendMessage(msg, nil)
 		HandleFilmsCommand(app, session)
 
 	case false:
-		msg := translator.Translate(session.Lang, "cancelAction", nil, nil)
+		msg := "🚫 " + translator.Translate(session.Lang, "cancelAction", nil, nil)
 		app.SendMessage(msg, nil)
 		HandleManageFilmCommand(app, session)
 	}

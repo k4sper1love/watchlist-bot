@@ -1,6 +1,7 @@
 package films
 
 import (
+	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
@@ -14,7 +15,8 @@ func HandleManageFilmCommand(app models.App, session *models.Session) {
 	film := session.FilmDetailState.Film
 
 	msg := messages.BuildFilmDetailMessage(session, &film)
-	msg += translator.Translate(session.Lang, "choiceAction", nil, nil)
+	choiceMsg := translator.Translate(session.Lang, "choiceAction", nil, nil)
+	msg += fmt.Sprintf("<b>%s</b>", choiceMsg)
 
 	keyboard := keyboards.BuildFilmManageKeyboard(session)
 
@@ -39,13 +41,13 @@ func HandleManageFilmButtons(app models.App, session *models.Session) {
 
 func handleRemoveFilmFromCollection(app models.App, session *models.Session) {
 	if err := watchlist.DeleteCollectionFilm(app, session); err != nil {
-		msg := translator.Translate(session.Lang, "removeFilmFailure", nil, nil)
+		msg := "🚨 " + translator.Translate(session.Lang, "removeFilmFailure", nil, nil)
 		app.SendMessage(msg, nil)
 		HandleManageFilmCommand(app, session)
 		return
 	}
 
-	msg := translator.Translate(session.Lang, "removeFilmSuccess", nil, nil)
+	msg := "🧹󠁝 " + translator.Translate(session.Lang, "removeFilmSuccess", nil, nil)
 	app.SendMessage(msg, nil)
 
 	HandleFilmsCommand(app, session)

@@ -8,6 +8,13 @@ import (
 	"os"
 )
 
+var SupportedTypes = []string{
+	"image/jpeg",
+	"image/png",
+	"image/gif",
+	"application/octet-stream",
+}
+
 func processImageFromMessage(bot *tgbotapi.BotAPI, update *tgbotapi.Update) ([]byte, error) {
 	if update.Message == nil || update.Message.Photo == nil {
 		return nil, fmt.Errorf("not found photo")
@@ -92,8 +99,7 @@ func ParseImageFromURL(imageURL string) ([]byte, error) {
 }
 
 func isSupportedImageType(contentType string) bool {
-	supportedTypes := []string{"image/jpeg", "image/png", "image/gif"}
-	for _, t := range supportedTypes {
+	for _, t := range SupportedTypes {
 		if contentType == t {
 			return true
 		}

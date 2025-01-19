@@ -72,7 +72,7 @@ func HandleUserDetailProcess(app models.App, session *models.Session) {
 func handleUserUnban(app models.App, session *models.Session) {
 	err := postgres.UnbanUser(session.AdminState.UserID)
 	if err != nil {
-		msg := translator.Translate(session.Lang, "someError", nil, nil)
+		msg := "❗" + translator.Translate(session.Lang, "someError", nil, nil)
 		app.SendMessage(msg, nil)
 	} else {
 		msg := messages.BuildUnbanMessage(session)
@@ -87,13 +87,13 @@ func handleUserUnban(app models.App, session *models.Session) {
 
 func handleUserBan(app models.App, session *models.Session) {
 	if session.AdminState.UserRole.HasAccess(roles.Helper) {
-		msg := translator.Translate(session.Lang, "needRemoveRole", nil, nil)
+		msg := "❗" + translator.Translate(session.Lang, "needRemoveRole", nil, nil)
 		app.SendMessage(msg, nil)
 		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 		return
 	}
 
-	msg := translator.Translate(session.Lang, "requestBanReason", nil, nil)
+	msg := "❓" + translator.Translate(session.Lang, "requestBanReason", nil, nil)
 	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
@@ -110,7 +110,7 @@ func processUserBan(app models.App, session *models.Session) {
 
 	err := postgres.BanUser(session.AdminState.UserID)
 	if err != nil {
-		msg := translator.Translate(session.Lang, "someError", nil, nil)
+		msg := "❗" + translator.Translate(session.Lang, "someError", nil, nil)
 		app.SendMessage(msg, nil)
 	} else {
 		msg := messages.BuildBanMessage(session, reason)
@@ -129,7 +129,7 @@ func handleUserRole(app models.App, session *models.Session) {
 	part1 := translator.Translate(session.Lang, "currentRole", nil, nil)
 	part2 := translator.Translate(session.Lang, session.AdminState.UserRole.String(), nil, nil)
 	part3 := translator.Translate(session.Lang, "choiceRole", nil, nil)
-	msg := fmt.Sprintf("%s: %s\n\n%s", part1, part2, part3)
+	msg := fmt.Sprintf("<b>%s</b>: %s\n\n%s", part1, part2, part3)
 
 	keyboard := keyboards.BuildAdminUserRoleKeyboard(session)
 
@@ -138,7 +138,7 @@ func handleUserRole(app models.App, session *models.Session) {
 
 func processUserRole(app models.App, session *models.Session) {
 	if (session.AdminState.UserRole == roles.SuperAdmin && !session.Role.HasAccess(roles.Root)) || session.AdminState.UserRole.HasAccess(roles.Root) {
-		msg := translator.Translate(session.Lang, "noAccess", nil, nil)
+		msg := "❗" + translator.Translate(session.Lang, "noAccess", nil, nil)
 		app.SendMessage(msg, nil)
 		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 		return
@@ -168,7 +168,7 @@ func processUserRole(app models.App, session *models.Session) {
 
 	_, err := postgres.SetUserRole(session.AdminState.UserID, role)
 	if err != nil {
-		msg = translator.Translate(session.Lang, "someError", nil, nil)
+		msg = "❗" + translator.Translate(session.Lang, "someError", nil, nil)
 	} else {
 		msg = messages.BuildChangeRoleNotificationMessage(session, role)
 		app.SendMessageByID(session.AdminState.UserID, msg, nil)

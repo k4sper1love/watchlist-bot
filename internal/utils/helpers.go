@@ -147,16 +147,39 @@ func ExtractKinopoiskQuery(rawUrl string) (string, string, error) {
 }
 
 func SplitTextByLength(text string, maxLength int) (string, string) {
+	runes := []rune(text)
+
+	if len(runes) <= maxLength {
+		return text, ""
+	}
+
 	splitPoint := maxLength
 
-	if idx := strings.LastIndex(text[:splitPoint], " "); idx != 1 {
+	if idx := LastIndexRune(runes, splitPoint, ' '); idx != -1 {
 		splitPoint = idx
 	}
 
-	firstPart := text[:splitPoint] + "..."
-	secondPart := text[splitPoint:]
+	if idx := LastIndexRune(runes, splitPoint, '\n'); idx != -1 && idx > splitPoint {
+		splitPoint = idx
+	}
+
+	firstPart := string(runes[:splitPoint])
+	secondPart := string(runes[splitPoint:])
+
+	if len(secondPart) > 0 {
+		firstPart += "..."
+	}
 
 	return firstPart, secondPart
+}
+
+func LastIndexRune(runes []rune, maxLength int, target rune) int {
+	for i := maxLength - 1; i >= 0; i-- {
+		if runes[i] == target {
+			return i
+		}
+	}
+	return -1
 }
 
 func CalculateNewElementPageAndIndex(totalRecords, pageSize int) (int, int) {
@@ -247,11 +270,18 @@ func BoolToEmoji(value bool) string {
 	return "✖️"
 }
 
-func BoolToEmojiColored(value bool) string {
+func ViewedToEmojiColored(value bool) string {
 	if value {
 		return "✅"
 	}
 	return "👀"
+}
+
+func BoolToEmojiColored(value bool) string {
+	if value {
+		return "✅"
+	}
+	return "❌"
 }
 
 func BoolToString(value bool) string {
@@ -266,6 +296,13 @@ func BoolToStar(value bool) string {
 		return "⭐"
 	}
 	return "☆"
+}
+
+func BoolToStarOrEmpty(value bool) string {
+	if value {
+		return "⭐"
+	}
+	return ""
 }
 
 func SortDirectionToEmoji(value string) string {

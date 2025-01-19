@@ -44,7 +44,7 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 			session.CollectionsState.CurrentPage++
 			HandleCollectionsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -53,7 +53,7 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 			session.CollectionsState.CurrentPage--
 			HandleCollectionsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -62,7 +62,7 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 			session.CollectionsState.CurrentPage = session.CollectionsState.LastPage
 			HandleCollectionsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -71,7 +71,7 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 			session.CollectionsState.CurrentPage = 1
 			HandleCollectionsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -114,7 +114,7 @@ func HandleCollectionSelect(app models.App, session *models.Session) {
 	id, err := strconv.Atoi(idStr)
 
 	if err != nil {
-		msg := translator.Translate(session.Lang, "getCollectionFailure", nil, nil)
+		msg := "🚨 " + translator.Translate(session.Lang, "getCollectionFailure", nil, nil)
 		app.SendMessage(msg, nil)
 		log.Printf("error parsing collection ID: %v", err)
 		return
@@ -129,7 +129,7 @@ func HandleCollectionSelect(app models.App, session *models.Session) {
 }
 
 func handleCollectionsFindByName(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "collectionRequestName", nil, nil)
+	msg := "❓" + translator.Translate(session.Lang, "collectionRequestName", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
@@ -149,7 +149,7 @@ func parseCollectionsFindName(app models.App, session *models.Session) {
 }
 
 func handleFavoriteCollection(app models.App, session *models.Session) {
-	session.CollectionDetailState.IsFavorite = !session.CollectionDetailState.Collection.IsFavorite
+	session.CollectionDetailState.Collection.IsFavorite = !session.CollectionDetailState.Collection.IsFavorite
 
 	updateCollection(app, session)
 

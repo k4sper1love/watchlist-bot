@@ -23,7 +23,7 @@ var updateFilmButtons = []Button{
 
 var updateFilmsAfterViewedButtons = []Button{
 	{"", "userRating", states.CallbackUpdateFilmSelectUserRating, "", true},
-	{"", "Review", states.CallbackUpdateFilmSelectReview, "", true},
+	{"", "review", states.CallbackUpdateFilmSelectReview, "", true},
 }
 
 func BuildFilmsKeyboard(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
@@ -54,7 +54,7 @@ func BuildFilmsKeyboard(session *models.Session, currentPage, lastPage int) *tgb
 	case states.ContextCollection:
 		keyboard.AddCollectionFilmFromCollection()
 		keyboard.AddFavorite(session.CollectionDetailState.Collection.IsFavorite, states.CallbackCollectionsFavorite)
-		keyboard.AddCollectionsManage()
+		keyboard.AddManage(states.CallbackCollectionsManage)
 		keyboard.AddBack(states.CallbackFilmsBack)
 	}
 
@@ -80,6 +80,25 @@ func BuildFindFilmsKeyboard(session *models.Session, currentPage, lastPage int) 
 	return keyboard.Build(session.Lang)
 }
 
+func BuildFindNewFilmKeyboard(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
+	keyboard := NewKeyboard()
+
+	keyboard.AddFindNewFilmSelect(session)
+
+	keyboard.AddNavigation(
+		currentPage,
+		lastPage,
+		states.CallbackFindNewFilmPrevPage,
+		states.CallbackFindNewFilmNextPage,
+		states.CallbackFindNewFilmFirstPage,
+		states.CallbackFindNewFilmLastPage,
+	)
+
+	keyboard.AddBack(states.CallbackFindNewFilmBack)
+
+	return keyboard.Build(session.Lang)
+}
+
 func BuildFilmDetailKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	index := session.FilmDetailState.Index
 	itemID := utils.GetItemID(index, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
@@ -97,7 +116,7 @@ func BuildFilmDetailKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMa
 		keyboard.AddButton("✔️", "viewed", states.CallbackFilmDetailViewed, "", true)
 	}
 
-	keyboard.AddFilmManage()
+	keyboard.AddManage(states.CallbackFilmsManage)
 
 	if session.Context == states.ContextFilm {
 		keyboard.AddCollectionFilmFromFilm()
@@ -120,13 +139,13 @@ func BuildFilmDetailKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMa
 func BuildFilmManageKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
-	keyboard.AddFilmUpdate()
-
 	if session.Context == states.ContextCollection {
 		keyboard.AddFilmRemoveFromCollection()
 	}
 
-	keyboard.AddFilmDelete()
+	keyboard.AddUpdate(states.CallbackManageFilmSelectUpdate)
+
+	keyboard.AddDelete(states.CallbackManageFilmSelectDelete)
 
 	keyboard.AddBack(states.CallbackManageFilmSelectBack)
 
@@ -139,6 +158,8 @@ func BuildFilmNewKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarku
 	keyboard.AddNewFilmManually()
 
 	keyboard.AddNewFilmFromURL()
+
+	keyboard.AddNewFilmFind()
 
 	keyboard.AddBack(states.CallbackNewFilmSelectBack)
 
@@ -218,6 +239,20 @@ func (k *Keyboard) AddFilmSelect(session *models.Session) *Keyboard {
 	return k
 }
 
+func (k *Keyboard) AddFindNewFilmSelect(session *models.Session) *Keyboard {
+	var buttons []Button
+
+	for i, film := range session.FilmsState.Films {
+		itemID := utils.GetItemID(i, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
+
+		buttons = append(buttons, Button{"", fmt.Sprintf("%s %s", utils.NumberToEmoji(itemID), film.Title), fmt.Sprintf("select_find_new_film_%d", i), "", false})
+	}
+
+	k.AddButtonsWithRowSize(2, buttons...)
+
+	return k
+}
+
 func (k *Keyboard) AddFilmFind() *Keyboard {
 	return k.AddButton("🔎", "findFilmByTitle", states.CallbackFilmsFind, "", true)
 }
@@ -249,7 +284,7 @@ func (k *Keyboard) AddFilmManage() *Keyboard {
 }
 
 func (k *Keyboard) AddFilmRemoveFromCollection() *Keyboard {
-	return k.AddButton("❌", "removeFilmFromCollection", states.CallbackManageFilmSelectRemoveFromCollection, "", true)
+	return k.AddButton("🧹󠁝", "removeFromCollection", states.CallbackManageFilmSelectRemoveFromCollection, "", true)
 }
 
 func (k *Keyboard) AddNewFilmManually() *Keyboard {
@@ -260,19 +295,23 @@ func (k *Keyboard) AddNewFilmFromURL() *Keyboard {
 	return k.AddButton("", "fromURL", states.CallbackNewFilmSelectFromURL, "", true)
 }
 
+func (k *Keyboard) AddNewFilmFind() *Keyboard {
+	return k.AddButton("", "findFilm", states.CallbackNewFilmSelectFind, "", true)
+}
+
 func (k *Keyboard) AddAgain(callback string) *Keyboard {
 	return k.AddButton("↻", "again", callback, "", true)
 }
 
 func (k *Keyboard) AddResetAllFilmsFilters() *Keyboard {
-	return k.AddButton("", "resetFilters", states.CallbackFiltersFilmsSelectAllReset, "", true)
+	return k.AddButton("🔄", "resetFilters", states.CallbackFiltersFilmsSelectAllReset, "", true)
 }
 
 func (k *Keyboard) AddResetFilmsFilter(session *models.Session, filterType string) *Keyboard {
 	filter := session.GetFilmsFiltersByContext()
 
 	if filter.IsFilterEnabled(filterType) {
-		return k.AddButton("", "reset", states.CallbackProcessReset, "", true)
+		return k.AddButton("🔄", "reset", states.CallbackProcessReset, "", true)
 	}
 
 	return k

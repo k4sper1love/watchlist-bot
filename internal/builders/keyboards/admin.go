@@ -220,15 +220,15 @@ func (k *Keyboard) AddFeedbackSelect(session *models.Session, feedbacks []models
 }
 
 func (k *Keyboard) AddUserManageRole() *Keyboard {
-	return k.AddButton("🎭", "manageUserRole", states.CallbackAdminUserDetailRole, "", true)
+	return k.AddButton("🔄", "manageUserRole", states.CallbackAdminUserDetailRole, "", true)
 }
 
 func (k *Keyboard) AddUnbanUser() *Keyboard {
-	return k.AddButton("🟢", "unban", states.CallbackAdminUserDetailUnban, "", true)
+	return k.AddButton("✅", "unban", states.CallbackAdminUserDetailUnban, "", true)
 }
 
 func (k *Keyboard) AddBanUser() *Keyboard {
-	return k.AddButton("🔴️", "ban", states.CallbackAdminUserDetailBan, "", true)
+	return k.AddButton("❌", "ban", states.CallbackAdminUserDetailBan, "", true)
 }
 
 func (k *Keyboard) AddViewUserFeedback() *Keyboard {
@@ -244,7 +244,7 @@ func (k *Keyboard) AddLowerRank() *Keyboard {
 }
 
 func (k *Keyboard) AddRemoveAdminRole() *Keyboard {
-	return k.AddButton("❌", "removeAdminRole", states.CallbackAdminDetailRemoveRole, "", true)
+	return k.AddButton("⚠️", "removeAdminRole", states.CallbackAdminDetailRemoveRole, "", true)
 }
 
 func (k *Keyboard) AddFeedbackDelete() *Keyboard {

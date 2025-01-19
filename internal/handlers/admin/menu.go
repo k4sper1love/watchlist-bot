@@ -14,7 +14,7 @@ import (
 func HandleMenuCommand(app models.App, session *models.Session) {
 	part1 := translator.Translate(session.Lang, "adminPanel", nil, nil)
 	part2 := translator.Translate(session.Lang, "choiceAction", nil, nil)
-	msg := fmt.Sprintf("🛠️ <b>%s:</b>\n\n%s", part1, part2)
+	msg := fmt.Sprintf("🛠️ <b>%s</b>\n\n%s", part1, part2)
 
 	keyboard := keyboards.BuildAdminMenuKeyboard(session)
 

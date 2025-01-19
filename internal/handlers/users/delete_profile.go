@@ -11,7 +11,7 @@ import (
 )
 
 func HandleDeleteProfileCommand(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "deleteProfileConfirm", map[string]interface{}{
+	msg := "⚠️ " + translator.Translate(session.Lang, "deleteProfileConfirm", map[string]interface{}{
 		"Username": session.User.Username,
 	}, nil)
 
@@ -37,7 +37,7 @@ func parseDeleteProfileConfirm(app models.App, session *models.Session) {
 	switch utils.IsAgree(app.Upd) {
 	case true:
 		if err := watchlist.DeleteUser(app, session); err != nil {
-			msg := translator.Translate(session.Lang, "deleteProfileFailure", map[string]interface{}{
+			msg := "🚨 " + translator.Translate(session.Lang, "deleteProfileFailure", map[string]interface{}{
 				"Username": session.User.Username,
 			}, nil)
 
@@ -46,7 +46,7 @@ func parseDeleteProfileConfirm(app models.App, session *models.Session) {
 			return
 		}
 
-		msg := translator.Translate(session.Lang, "deleteProfileSuccess", map[string]interface{}{
+		msg := "🗑️ " + translator.Translate(session.Lang, "deleteProfileSuccess", map[string]interface{}{
 			"Username": session.User.Username,
 		}, nil)
 
@@ -55,7 +55,7 @@ func parseDeleteProfileConfirm(app models.App, session *models.Session) {
 		general.HandleMenuCommand(app, session)
 
 	case false:
-		msg := translator.Translate(session.Lang, "cancelAction", nil, nil)
+		msg := "🚫 " + translator.Translate(session.Lang, "cancelAction", nil, nil)
 		app.SendMessage(msg, nil)
 		HandleProfileCommand(app, session)
 	}

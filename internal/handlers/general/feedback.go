@@ -9,6 +9,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
+	"unicode/utf8"
 )
 
 func HandleFeedbackCommand(app models.App, session *models.Session) {
@@ -22,29 +23,16 @@ func HandleFeedbackCommand(app models.App, session *models.Session) {
 func HandleFeedbackButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Upd)
 
-	var category string
 	switch callback {
 	case states.CallbackFeedbackCategorySuggestions:
-		category = "offers"
+		session.FeedbackState.Category = "offers"
 	case states.CallbackFeedbackCategoryBugs:
-		category = "mistakes"
+		session.FeedbackState.Category = "mistakes"
 	case states.CallbackFeedbackCategoryOther:
-		category = "otherIssues"
+		session.FeedbackState.Category = "otherIssues"
 	}
 
-	session.FeedbackState.Category = category
-
-	part1 := translator.Translate(session.Lang, "feedbackCurrentCategory", nil, nil)
-	part2 := translator.Translate(session.Lang, category, nil, nil)
-	part3 := translator.Translate(session.Lang, "feedbackTextRequest", nil, nil)
-
-	msg := fmt.Sprintf("📄 <b>%s:</b> %s\n\n%s", part1, part2, part3)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
-	session.SetState(states.ProcessFeedbackAwaitingMessage)
+	handleFeedbackMessage(app, session)
 }
 
 func HandleFeedbackProcess(app models.App, session *models.Session) {
@@ -59,12 +47,39 @@ func HandleFeedbackProcess(app models.App, session *models.Session) {
 	}
 }
 
+func handleFeedbackMessage(app models.App, session *models.Session) {
+	part1 := translator.Translate(session.Lang, "feedbackCurrentCategory", nil, nil)
+	part2 := translator.Translate(session.Lang, session.FeedbackState.Category, nil, nil)
+	part3 := translator.Translate(session.Lang, "feedbackTextRequest", nil, nil)
+
+	msg := fmt.Sprintf("📄 <b>%s:</b> %s\n\n%s", part1, part2, part3)
+
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
+
+	app.SendMessage(msg, keyboard)
+
+	session.SetState(states.ProcessFeedbackAwaitingMessage)
+}
+
 func parseFeedbackMessage(app models.App, session *models.Session) {
 	keyboard := keyboards.NewKeyboard().AddBack("").Build(session.Lang)
 
-	session.FeedbackState.Message = utils.ParseMessageString(app.Upd)
+	text := utils.ParseMessageString(app.Upd)
 
-	err := postgres.SaveFeedbackToDatabase(session.TelegramID, session.FeedbackState.Category, session.FeedbackState.Message)
+	if utf8.RuneCountInString(text) > 3000 {
+		part := translator.Translate(session.Lang, "maxLengthInSymbols", map[string]interface{}{
+			"Length": 3000,
+		}, nil)
+		msg := fmt.Sprintf("⚠️ %s", part)
+		app.SendMessage(msg, nil)
+
+		handleFeedbackMessage(app, session)
+		return
+	}
+
+	session.FeedbackState.Message = text
+
+	err := postgres.SaveFeedbackToDatabase(session.TelegramID, session.TelegramUsername, session.FeedbackState.Category, session.FeedbackState.Message)
 	if err != nil {
 		part1 := translator.Translate(session.Lang, "feedbackFailure", nil, nil)
 		part2 := translator.Translate(session.Lang, "tryLater", nil, nil)

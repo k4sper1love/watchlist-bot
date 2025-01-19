@@ -1,6 +1,7 @@
 package films
 
 import (
+	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
@@ -10,7 +11,8 @@ import (
 )
 
 func HandleSortingFilmsCommand(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "choiceSorting", nil, nil)
+	choiceMsg := translator.Translate(session.Lang, "choiceSorting", nil, nil)
+	msg := fmt.Sprintf("<b>%s</b>", choiceMsg)
 
 	keyboard := keyboards.BuildFilmsSortingKeyboard(session)
 
@@ -72,7 +74,7 @@ func HandleSortingFilmsProcess(app models.App, session *models.Session) {
 func handleSortingFilmsAllReset(app models.App, session *models.Session) {
 	session.GetFilmsSortingByContext().ResetSorting()
 
-	msg := translator.Translate(session.Lang, "sortingResetSuccess", nil, nil)
+	msg := "🔄 " + translator.Translate(session.Lang, "sortingResetSuccess", nil, nil)
 
 	app.SendMessage(msg, nil)
 
@@ -104,7 +106,11 @@ func parseSortingFilmsDirection(app models.App, session *models.Session) {
 	}
 	sorting.Sort = sorting.Direction + sorting.Field
 
-	msg := translator.Translate(session.Lang, "sortingApplied", nil, nil)
+	fieldMsg := translator.Translate(session.Lang, sorting.Field, nil, nil)
+	directionEmoji := utils.SortDirectionToEmoji(sorting.Direction)
+	msg := directionEmoji + " " + translator.Translate(session.Lang, "sortingApplied", map[string]interface{}{
+		"Field": fieldMsg,
+	}, nil)
 	app.SendMessage(msg, nil)
 
 	session.ClearAllStates()
@@ -114,7 +120,7 @@ func parseSortingFilmsDirection(app models.App, session *models.Session) {
 }
 
 func handleSortingFilmsReset(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "sortingResetSuccess", nil, nil)
+	msg := "🔄 " + translator.Translate(session.Lang, "sortingResetSuccess", nil, nil)
 	app.SendMessage(msg, nil)
 
 	session.ClearAllStates()

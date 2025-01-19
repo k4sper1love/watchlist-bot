@@ -1,6 +1,7 @@
 package users
 
 import (
+	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
@@ -17,7 +18,8 @@ var updateProfileButtons = []keyboards.Button{
 
 func HandleUpdateProfileCommand(app models.App, session *models.Session) {
 	msg := messages.BuildProfileMessage(session)
-	msg += translator.Translate(session.Lang, "updateChoiceField", nil, nil)
+	choiceMsg := translator.Translate(session.Lang, "choiceField", nil, nil)
+	msg += fmt.Sprintf("<b>%s</b>", choiceMsg)
 
 	keyboard := keyboards.NewKeyboard().
 		AddButtons(updateProfileButtons...).
@@ -55,7 +57,7 @@ func HandleUpdateProfileProcess(app models.App, session *models.Session) {
 }
 
 func handleUpdateProfileUsername(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "updateProfileUsername", nil, nil)
+	msg := "❓" + translator.Translate(session.Lang, "updateProfileUsername", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().
 		AddCancel().
@@ -73,7 +75,7 @@ func parseUpdateProfileUsername(app models.App, session *models.Session) {
 }
 
 func handleUpdateProfileEmail(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "updateProfileEmail", nil, nil)
+	msg := "❓" + translator.Translate(session.Lang, "updateProfileEmail", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().
 		AddCancel().
@@ -93,7 +95,7 @@ func parseUpdateProfileEmail(app models.App, session *models.Session) {
 func updateProfile(app models.App, session *models.Session) {
 	user, err := watchlist.UpdateUser(app, session)
 	if err != nil {
-		msg := translator.Translate(session.Lang, "updateProfileFailure", map[string]interface{}{
+		msg := "🚨 " + translator.Translate(session.Lang, "updateProfileFailure", map[string]interface{}{
 			"Username": session.User.Username,
 		}, nil)
 
@@ -102,7 +104,7 @@ func updateProfile(app models.App, session *models.Session) {
 	}
 	session.User = *user
 
-	msg := translator.Translate(session.Lang, "updateProfileSuccess", map[string]interface{}{
+	msg := "✏️ " + translator.Translate(session.Lang, "updateProfileSuccess", map[string]interface{}{
 		"Username": session.User.Username,
 	}, nil)
 

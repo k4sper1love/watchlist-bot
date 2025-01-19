@@ -50,7 +50,7 @@ func HandleFilmsButtons(app models.App,
 			session.FilmsState.CurrentPage++
 			HandleFilmsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -59,7 +59,7 @@ func HandleFilmsButtons(app models.App,
 			session.FilmsState.CurrentPage--
 			HandleFilmsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -68,7 +68,7 @@ func HandleFilmsButtons(app models.App,
 			session.FilmsState.CurrentPage = session.FilmsState.LastPage
 			HandleFilmsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -77,7 +77,7 @@ func HandleFilmsButtons(app models.App,
 			session.FilmsState.CurrentPage = 1
 			HandleFilmsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -119,7 +119,7 @@ func handleFilmSelect(app models.App, session *models.Session) {
 	indexStr := strings.TrimPrefix(callback, "select_film_")
 	index, err := strconv.Atoi(indexStr)
 	if err != nil {
-		msg := translator.Translate(session.Lang, "getFilmFailure", nil, nil)
+		msg := "🚨 " + translator.Translate(session.Lang, "getFilmFailure", nil, nil)
 		app.SendMessage(msg, nil)
 		log.Printf("error parsing film index: %v", err)
 		return
@@ -131,7 +131,7 @@ func handleFilmSelect(app models.App, session *models.Session) {
 }
 
 func handleFilmsFindByTitle(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "filmRequestTitle", nil, nil)
+	msg := "❓ " + translator.Translate(session.Lang, "filmRequestTitle", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
@@ -159,14 +159,14 @@ func UpdateFilmsList(app models.App, session *models.Session, next bool) error {
 		if currentPage < lastPage {
 			session.FilmsState.CurrentPage++
 		} else {
-			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
 			return fmt.Errorf(msg)
 		}
 	case false:
 		if currentPage > 1 {
 			session.FilmsState.CurrentPage--
 		} else {
-			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			return fmt.Errorf(msg)
 		}
 	}

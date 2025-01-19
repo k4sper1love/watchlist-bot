@@ -11,8 +11,8 @@ import (
 )
 
 func HandleOptionsFilmToCollectionCommand(app models.App, session *models.Session) {
-	msg := messages.BuildCollectionDetailMessage(session, &session.CollectionDetailState.Collection)
-	msg += translator.Translate(session.Lang, "choiceAction", nil, nil)
+	msg := messages.BuildCollectionHeader(session)
+	msg += "<b>" + translator.Translate(session.Lang, "choiceAction", nil, nil) + "</b>"
 
 	keyboard := keyboards.BuildOptionsFilmToCollectionKeyboard(session)
 

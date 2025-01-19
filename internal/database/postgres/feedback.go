@@ -4,11 +4,12 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 )
 
-func SaveFeedbackToDatabase(telegramID int, category, feedback string) error {
+func SaveFeedbackToDatabase(telegramID int, telegramUsername string, category, feedback string) error {
 	feedbackEntry := models.Feedback{
-		TelegramID: telegramID,
-		Category:   category,
-		Message:    feedback,
+		TelegramID:       telegramID,
+		TelegramUsername: telegramUsername,
+		Category:         category,
+		Message:          feedback,
 	}
 
 	return GetDB().Create(&feedbackEntry).Error

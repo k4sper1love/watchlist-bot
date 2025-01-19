@@ -19,10 +19,10 @@ var menuButtons = []Button{
 }
 
 var settingsButtons = []Button{
-	{"🈳", "settingsLanguage", states.CallbackSettingsLanguage, "", true},
-	{"🔢", "settingsCollectionsPageSize", states.CallbackSettingsCollectionsPageSize, "", true},
-	{"🔢", "settingsFilmsPageSize", states.CallbackSettingsFilmsPageSize, "", true},
-	{"🔢", "settingsObjectsPageSize", states.CallbackSettingsObjectsPageSize, "", true},
+	{"🈳", "language", states.CallbackSettingsLanguage, "", true},
+	{"🔢", "collectionsPageSize", states.CallbackSettingsCollectionsPageSize, "", true},
+	{"🔢", "filmsPageSize", states.CallbackSettingsFilmsPageSize, "", true},
+	{"🔢", "objectsPageSize", states.CallbackSettingsObjectsPageSize, "", true},
 }
 
 var feedbackCategoryButtons = []Button{
@@ -63,12 +63,24 @@ func BuildFeedbackKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMark
 	return keyboard.Build(session.Lang)
 }
 
+func BuildProfileKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	keyboard := NewKeyboard()
+
+	keyboard.AddProfileUpdate()
+
+	keyboard.AddDelete(states.CallbackProfileSelectDelete)
+
+	keyboard.AddBack("")
+
+	return keyboard.Build(session.Lang)
+}
+
 func (k *Keyboard) AddProfileUpdate() *Keyboard {
 	return k.AddButton("✏️", "edit", states.CallbackProfileSelectUpdate, "", true)
 }
 
 func (k *Keyboard) AddProfileDelete() *Keyboard {
-	return k.AddButton("⚠️", "delete", states.CallbackProfileSelectDelete, "", true)
+	return k.AddButton("🗑️", "delete", states.CallbackProfileSelectDelete, "", true)
 }
 
 func (k *Keyboard) AddLanguageSelect(languages []string, callback string) *Keyboard {

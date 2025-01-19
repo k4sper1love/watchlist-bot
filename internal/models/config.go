@@ -5,9 +5,11 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 	"log"
 	"log/slog"
 	"os"
+	"unicode/utf8"
 )
 
 const (
@@ -56,12 +58,22 @@ func (app App) GetChatID() int64 {
 }
 
 func (app App) chunkTextAndSend(text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
-	for len(text) > maxMessageLength {
+	iterationLimit := 100
+	for utf8.RuneCountInString(text) > maxMessageLength && iterationLimit > 0 {
 		firstPart, secondPart := utils.SplitTextByLength(text, maxMessageLength)
-		app.createAndSendMessage(firstPart, keyboard)
+		if len(firstPart) == 0 {
+			errorMsg := translator.Translate("ru", "chunkTextError", nil, nil)
+			log.Println(errorMsg)
+			app.SendMessage(errorMsg, nil)
+			return
+		}
+		app.createAndSendMessage(firstPart, nil)
 		text = secondPart
+		iterationLimit--
 	}
-	app.createAndSendMessage(text, keyboard)
+	if len(text) > 0 {
+		app.createAndSendMessage(text, keyboard)
+	}
 }
 
 func (app App) createAndSendMessage(text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
@@ -80,15 +92,17 @@ func (app App) SendMessage(text string, keyboard *tgbotapi.InlineKeyboardMarkup)
 func (app App) sendImageInternal(imagePath, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	msg := tgbotapi.NewPhotoUpload(app.GetChatID(), imagePath)
 	msg.ParseMode = "HTML"
-	if text != "" && len(text) < maxCaptionLength {
+	runeLen := utf8.RuneCountInString(text)
+	if text != "" && runeLen < maxCaptionLength {
 		msg.Caption = text
 	}
-	if keyboard != nil && len(text) < maxCaptionLength {
+	if keyboard != nil && runeLen < maxCaptionLength {
 		msg.ReplyMarkup = keyboard
 	}
+
 	app.send(msg)
 
-	if len(text) > maxCaptionLength {
+	if runeLen > maxCaptionLength {
 		app.chunkTextAndSend(text, keyboard)
 	}
 }

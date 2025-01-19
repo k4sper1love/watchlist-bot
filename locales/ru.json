@@ -2,6 +2,36 @@
   "choiceLanguage": {
     "other": "Пожалуйста, выберите язык для общения с ботом. Вы сможете поменять его в настройках"
   },
+  "update": {
+    "other": "Обновить"
+  },
+  "manage": {
+    "other": "Управление"
+  },
+  "updateFilmSuccess": {
+    "other": "Фильм успешно обновлен"
+  },
+  "maxLengthInSymbols": {
+    "other": "Максимальная длина: {{.Length}} символов"
+  },
+  "chuckTextError": {
+    "other": "Ошибка разбиения текста. Сообщение слишком длинное и не может быть отправлено"
+  },
+  "choiceField": {
+    "other": "Выберите поле"
+  },
+  "deleteFeedbackSuccess": {
+    "other": "Сообщение <code>{{.ID}}</code> было успешно удалено"
+  },
+  "preview": {
+    "other": "Предпросмотр"
+  },
+  "access": {
+    "other": "Доступ"
+  },
+  "findFilm": {
+    "other": "Найти фильм (kinopoisk.ru)"
+  },
   "status": {
     "other": "Статус"
   },
@@ -18,7 +48,7 @@
     "other": "В избранном"
   },
   "invalidInput": {
-    "other": "Некорректный ввод."
+    "other": "Некорректный ввод"
   },
   "requestRangeInFormat": {
     "other": "Пожалуйста, укажите точное значение или диапазон в формате:"
@@ -33,7 +63,7 @@
     "other": "Частичный диапазон (например)"
   },
   "rangeLimits": {
-    "other": "Допустимый диапазон для этого поля: от <code>{{.Min}}</code> до <code>{{.Max}}</code>."
+    "other": "Допустимый диапазон для этого поля: от <code>{{.Min}}</code> до <code>{{.Max}}</code>"
   },
   "isFavorite": {
     "other": "Избранное"
@@ -45,7 +75,7 @@
     "other": "Просмотрено"
   },
   "filterInstructionSwitch": {
-    "other": "Выберите значение для фильтра <b>\"{{.Filter}}\"</b>"
+    "other": "Выберите значение фильтра <b>{{.Filter}}</b>"
   },
   "true": {
     "other": "Да"
@@ -60,16 +90,16 @@
     "other": "Просмотрено"
   },
   "user_rating": {
-    "other": "Оценка пользователя"
+    "other": "Оценка"
   },
   "hasURL": {
     "other": "Ссылка"
   },
   "filterInstructionRange": {
-    "other":"<b>Введите значение или диапазон</b> (например, <code>7.5</code> или <code>5-10</code>)."
+    "other":"<b>Введите значение или диапазон</b> (например, <code>7.5</code> или <code>5-10</code>)"
   },
   "filterInstructionPartialRange": {
-    "other": "Частичные диапазоны (<code>5-</code> или <code>-7.5</code>) автоматически подставят недостающую границу."
+    "other": "Частичные диапазоны (<code>5-</code> или <code>-7.5</code>) автоматически подставят недостающую границу"
   },
   "notFoundMessages": {
     "other": "Не найдено сообщений"
@@ -102,7 +132,7 @@
     "other": "Введите точное значение или диапазон, используя <code>-</code>"
   },
   "filterApplied": {
-    "other": "Фильтр применен успешно!"
+    "other": "Фильтр <b>{{.Filter}}</b> применен"
   },
   "resetFilters": {
     "other": "Сбросить фильтры"
@@ -120,14 +150,14 @@
     "other": "Рейтинг должен быть больше или равен минимальному рейтингу"
   },
   "filterResetSuccess": {
-    "one": "Фильтр успешно сброшен!",
-    "other": "Фильтры успешно сброшены!"
+    "one": "Фильтр <b>{{.Filter}}</b> сброшен",
+    "other": "Все фильтры сброшены"
   },
   "sortingResetSuccess": {
-    "other": "Параметры сортировки успешно сброшены!"
+    "other": "Сортировка сброшена"
   },
   "selectedSortField": {
-    "other": "Вы выбрали сортировку по <b>{{.Field}}</b>"
+    "other": "Сортировка по <b>{{.Field}}</b>"
   },
   "requestDirection": {
     "other": "Выберите направление"
@@ -139,7 +169,7 @@
     "other": "По убыванию"
   },
   "sortingApplied": {
-    "other": "Сортировка применена успешно!"
+    "other": "Сортировка по <b>{{.Field}}</b> применена"
   },
   "resetSorting": {
     "other": "Сбросить сортировку"
@@ -183,8 +213,8 @@
   "filmURL": {
     "other": "Ссылка на фильм"
   },
-  "removeFilmFromCollection": {
-    "other": "Убрать фильм из коллекции"
+  "removeFromCollection": {
+    "other": "Убрать из коллекции"
   },
   "removeFilmFailure": {
     "other": "Не удалось убрать фильм из коллекции"
@@ -208,10 +238,10 @@
     "other": "Доступ к боту запрещен"
   },
   "banUser": {
-    "other": "Пользователь \"{{.ID}}\" был заблокирован"
+    "other": "Пользователь <code>{{.ID}}</code> был заблокирован"
   },
   "unbanUser": {
-    "other": "Пользователь \"{{.ID}}\" был разблокирован"
+    "other": "Пользователь <code>{{.ID}}</code> был разблокирован"
   },
   "admins": {
     "other": "Администраторы"
@@ -271,7 +301,7 @@
     "other": "Неизвестный"
   },
   "requestBroadcastImage": {
-    "other": "Отправьте ссылку или изображение для рассылки"
+    "other": "Отправьте изображение или ссылку на него для рассылки"
   },
   "send": {
     "other": "Отправить"
@@ -280,7 +310,7 @@
     "other": "Невозможно отправить пустую рассылку"
   },
   "feedbackDetails": {
-    "other": "Детали фидбека"
+    "other": "Данные фидбека"
   },
   "currentRole": {
     "other": "Текущая роль"
@@ -412,13 +442,13 @@
     "other": "Дата регистрации"
   },
   "deleteProfileConfirm": {
-    "other": "Вы уверены, что хотите удалить аккаунт \"{{.Username}}\""
+    "other": "Вы уверены, что хотите удалить аккаунт <code>{{.Username}}</code>?"
   },
   "deleteProfileFailure": {
-    "other": "Не удалось удалить аккаунт \"{{.Username}}\""
+    "other": "Не удалось удалить аккаунт <code>{{.Username}}</code>"
   },
   "deleteProfileSuccess": {
-    "other": "Аккаунт \"{{.Username}}\" успешно удален!"
+    "other": "Аккаунт <code>{{.Username}}</code> успешно удален!"
   },
   "cancelAction": {
     "other": "Действие отменено"
@@ -427,61 +457,55 @@
     "other": "Выберите, какое поле вы хотите изменить?"
   },
   "updateProfileUsername": {
-    "other": "Введите новый username"
+    "other": "Введите новое имя"
   },
   "updateProfileEmail": {
-    "other": "Введите новый адрес электронной почты"
+    "other": "Введите новый email"
   },
   "updateProfileFailure": {
-    "other": "Не удалось обновить аккаунт \"{{.Username}}\""
+    "other": "Не удалось обновить аккаунт <code>{{.Username}}</code>"
   },
   "updateProfileSuccess": {
-    "other": "Аккаунт \"{{.Username}}\" успешно обновлен!"
+    "other": "Аккаунт <code>{{.Username}}</code> успешно обновлен"
   },
   "settingsChoice": {
-    "other": "Выберите, какой параметр вы хотите изменить"
+    "other": "Выберите, какой параметр изменить"
   },
-  "settingsLanguage": {
-    "other": "Изменить язык"
+  "collectionsPageSize": {
+    "other": "Размер страницы для коллекций"
   },
-  "settingsCollectionsPageSize": {
-    "other": "Изменить количество коллекций на странице"
+  "filmsPageSize": {
+    "other": "Размер страницы для фильмов"
   },
-  "settingsFilmsPageSize": {
-    "other": "Изменить количество фильмов на странице"
-  },
-  "settingsObjectsPageSize": {
-    "other": "Изменить количество объектов на странице"
+  "objectsPageSize": {
+    "other": "Размер страницы для объектов"
   },
   "parseLanguagesFailure": {
-    "other": "Ошибка при получении списка доступных языков"
+    "other": "Ошибка при получении доступных языков"
   },
   "currentLanguage": {
     "other": "Текущий язык"
   },
-  "settingsLanguageChoice": {
-    "other": "Выберите желаемый язык"
+  "languageChoice": {
+    "other": "Выберите язык"
   },
   "settingsLanguageSuccess": {
-    "other": "Язык успешно изменен на {{.Language}}"
-  },
-  "currentCollectionsPageSize": {
-    "other": "Размер страницы для коллекций"
+    "other": "Язык успешно изменен на <code>{{.Language}}</code>"
   },
   "settingsPageSizeChoice": {
-    "other": "Выберите желаемый размер (от 1 и выше)"
+    "other": "Введите новый размер (от 1 до 100)"
+  },
+  "newPageSize": {
+    "other": "Новый размер страницы"
+  },
+  "currentPageSize": {
+    "other": "Текущий размер страницы"
   },
   "settingsCollectionsPageSizeSuccess": {
     "other": "Новый размер страницы для списка коллекций"
   },
-  "currentFilmsPageSize": {
-    "other": "Размер страницы для фильмов"
-  },
   "settingsFilmsPageSizeSuccess": {
     "other": "Новый размер страницы для списка фильмов"
-  },
-  "currentObjectsPageSize": {
-    "other": "Размер страницы для объектов"
   },
   "settingsObjectsPageSizeSuccess": {
     "other": "Новый размер страницы для списка объектов"
@@ -499,13 +523,13 @@
     "other": "Вы выбрали категорию"
   },
   "feedbackTextRequest": {
-    "other": "Пожалуйста, напишите ваш фидбек"
+    "other": "Пожалуйста, напишите ваше сообщение"
   },
   "feedbackFailure": {
-    "other": "Ошибка сохранения фидбека"
+    "other": "Ошибка при отправке сообщения"
   },
   "feedbackSuccess": {
-    "other": "Спасибо за ваш фидбек! Мы ценим ваше мнение"
+    "other": "Спасибо за ваше сообщение! Мы ценим ваше мнение"
   },
   "tryLater": {
     "other": "Попробуйте позже"
@@ -568,7 +592,7 @@
     "other": "Просмотрено"
   },
   "userRating": {
-    "other": "Оценка пользователя"
+    "other": "Оценка"
   },
   "review": {
     "other": "Рецензия"
@@ -637,10 +661,10 @@
     "other": "Не удалось создать фильм"
   },
   "createFilmSuccess": {
-    "other": "Новый фильм успешно создан"
+    "other": "Фильм успешно создан"
   },
   "createCollectionFilmSuccess": {
-    "other": "Новый фильм в коллекции \"{{.Collection}}\" успешно создан"
+    "other": "Фильм в коллекции <code>{{.Collection}}</code> успешно создан"
   },
   "lastPageAlert": {
     "other": "Вы уже на последней странице"
@@ -649,13 +673,13 @@
     "other": "Вы уже на первой странице"
   },
   "deleteFilmConfirm": {
-    "other": "Вы уверены, что хотите удалить фильм \"{{.Film}}\""
+    "other": "Вы уверены, что хотите удалить фильм <code>{{.Film}}</code>?"
   },
   "deleteFilmFailure": {
-    "other": "Не удалось удалить фильм \"{{.Film}}\""
+    "other": "Не удалось удалить фильм <code>{{.Film}}</code>"
   },
   "deleteFilmSuccess": {
-    "other": "Фильм \"{{.Film}}\" удален успешно"
+    "other": "Фильм <code>{{.Film}}</code> успешно удален"
   },
   "collectionRequestName": {
     "other": "Введите название коллекции"
@@ -673,34 +697,34 @@
     "other": "Не удалось создать коллекцию"
   },
   "createCollectionSuccess": {
-    "other": "Новая коллекция успешно создана!"
+    "other": "Коллекция успешно создана"
   },
   "deleteCollectionConfirm": {
-    "other": "Вы уверены, что хотите удалить коллекцию \"{{.Collection}}\""
+    "other": "Вы уверены, что хотите удалить коллекцию <code>{{.Collection}}</code>?"
   },
   "deleteCollectionFailure": {
-    "other": "Не удалось удалить коллекцию \"{{.Collection}}\""
+    "other": "Не удалось удалить коллекцию <code>{{.Collection}}</code>"
   },
   "deleteCollectionSuccess": {
-    "other": "Коллекция \"{{.Collection}}\" успешно удалена"
+    "other": "Коллекция <code>{{.Collection}}</code> успешно удалена"
   },
   "getCollectionFailure": {
     "other": "Ошибка при получении коллекции"
   },
   "filmToCollectionSuccess": {
-    "other": "Фильм \"{{.Film}}\" успешно добавлен в коллекцию \"{{.Collection}}\""
+    "other": "Фильм <code>{{.Film}}</code> успешно добавлен в коллекцию <code>{{.Collection}}</code>"
   },
   "filmsNotFound": {
     "other": "Фильмы не найдены"
   },
-  "choiceFilmToCollection": {
-    "other": "Выберите, какой фильм добавить в коллекцию?"
+  "choiceFilm": {
+    "other": "Выберите фильм"
   },
   "collectionsNotFound": {
     "other": "Коллекции не найдены"
   },
-  "choiceCollectionToFilm": {
-    "other": "Выберите, в какую коллекцию добавить фильм?"
+  "choiceCollection": {
+    "other": "Выберите коллекцию"
   },
   "adminOptionUserCount": {
     "other": "Узнать количество пользователей"
@@ -740,9 +764,6 @@
   },
   "deleteFeedbackFailure": {
     "other": "Не удалось удалить фидбек"
-  },
-  "deleteFeedbackSuccess": {
-    "other": "Фидбек успешно удален"
   },
   "emptyUserList": {
     "other": "Список пользователей пуст"
@@ -910,7 +931,7 @@
     "other": "Комментарии"
   },
   "dateOfRelease": {
-    "other": "Дата публикации"
+    "other": "Опубликовано"
   },
   "year": {
     "other": "Год"

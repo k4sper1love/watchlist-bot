@@ -13,22 +13,31 @@ func BuildFilmsMessage(session *models.Session, metadata *filters.Metadata) stri
 	var header string
 	switch session.Context {
 	case states.ContextFilm:
-		header = "🎥 "
+		header = ""
 	case states.ContextCollection:
-		header = buildCollectionHeader(session)
+		header = BuildCollectionHeader(session)
 	default:
 		return translator.Translate(session.Lang, "unknownContext", nil, nil)
 	}
 
-	return header + buildFilmsList(session, metadata, false)
+	return header + buildFilmsList(session, metadata, false, true)
 }
 
 func BuildFindFilmsMessage(session *models.Session, metadata *filters.Metadata) string {
-	return "🎥 " + buildFilmsList(session, metadata, true)
+	return buildFilmsList(session, metadata, true, true)
 }
 
-func buildFilmsList(session *models.Session, metadata *filters.Metadata, isFind bool) string {
+func BuildFindNewFilmMessage(session *models.Session, metadata *filters.Metadata) string {
+	return buildFilmsList(session, metadata, true, false)
+}
+
+func buildFilmsList(session *models.Session, metadata *filters.Metadata, isFind bool, needViewed bool) string {
 	films := session.FilmsState.Films
+
+	if metadata.TotalRecords == 0 {
+		msg := "❗️" + translator.Translate(session.Lang, "filmsNotFound", nil, nil)
+		return msg
+	}
 
 	totalFilmsMsgKey := "totalFilms"
 	if isFind {
@@ -36,12 +45,7 @@ func buildFilmsList(session *models.Session, metadata *filters.Metadata, isFind 
 	}
 
 	totalFilmsMsg := translator.Translate(session.Lang, totalFilmsMsgKey, nil, nil)
-	msg := fmt.Sprintf("<b>%s:</b> %d\n\n", totalFilmsMsg, metadata.TotalRecords)
-
-	if metadata.TotalRecords == 0 {
-		msg += translator.Translate(session.Lang, "filmsNotFound", nil, nil)
-		return msg
-	}
+	msg := fmt.Sprintf("🎥 <b>%s:</b> %d\n\n", totalFilmsMsg, metadata.TotalRecords)
 
 	for i, film := range films {
 		itemID := utils.GetItemID(i, metadata.CurrentPage, metadata.PageSize)
@@ -54,32 +58,29 @@ func buildFilmsList(session *models.Session, metadata *filters.Metadata, isFind 
 
 		msg += fmt.Sprintf(" <i>ID: %d</i>", film.ID)
 
-		msg += "\n" + BuildFilmGeneralMessage(session, &film)
+		msg += "\n" + BuildFilmGeneralMessage(session, &film, needViewed)
 	}
 
 	pageMsg := translator.Translate(session.Lang, "pageCounter", map[string]interface{}{
 		"CurrentPage": metadata.CurrentPage,
 		"LastPage":    metadata.LastPage,
 	}, nil)
-	msg += fmt.Sprintf("<b>📄 %s</b>\n", pageMsg)
+	msg += fmt.Sprintf("<b>📄 %s</b>", pageMsg)
 
-	msg += translator.Translate(session.Lang, "choiceFilmForDetails", nil, nil)
 	return msg
 }
 
-func buildCollectionHeader(session *models.Session) string {
+func BuildCollectionHeader(session *models.Session) string {
 	collection := session.CollectionDetailState.Collection
 
-	collectionMsg := translator.Translate(session.Lang, "collection", nil, nil)
-	msg := fmt.Sprintf("<b>%s:</b> \"%s\"", collectionMsg, collection.Name)
+	msg := fmt.Sprintf("<b>%s</b>", collection.Name)
 
 	if collection.IsFavorite {
 		msg += " ⭐"
 	}
 
 	if collection.Description != "" {
-		descriptionMsg := translator.Translate(session.Lang, "description", nil, nil)
-		msg += fmt.Sprintf("\n<b>%s:</b> %s", descriptionMsg, collection.Description)
+		msg += fmt.Sprintf("\n<i>%s</i>", collection.Description)
 	}
 
 	msg += "\n\n"
@@ -93,7 +94,7 @@ func BuildFilterRangeMessage(session *models.Session, filterType string) string 
 	part1 := translator.Translate(session.Lang, "filterInstructionRange", nil, nil)
 	part2 := translator.Translate(session.Lang, "filterInstructionPartialRange", nil, nil)
 
-	msg := fmt.Sprintf("%s\n\n<i>%s</i>", part1, part2)
+	msg := fmt.Sprintf("↕️ %s\n\n<i>%s</i>", part1, part2)
 
 	if filter.IsFilterEnabled(filterType) {
 		currentValueMsg := translator.Translate(session.Lang, "currentValue", nil, nil)
@@ -108,7 +109,7 @@ func BuildFilterSwitchMessage(session *models.Session, filterType string) string
 	filter := session.GetFilmsFiltersByContext()
 
 	filterMsg := translator.Translate(session.Lang, filterType, nil, nil)
-	msg := translator.Translate(session.Lang, "filterInstructionSwitch", map[string]interface{}{
+	msg := "🔀 " + translator.Translate(session.Lang, "filterInstructionSwitch", map[string]interface{}{
 		"Filter": filterMsg,
 	}, nil)
 
@@ -126,8 +127,8 @@ func BuildInvalidFilterRangeInputMessage(session *models.Session, config models.
 	exampleRange := translator.Translate(session.Lang, "exampleRange", nil, nil)
 	examplePartialRange := translator.Translate(session.Lang, "examplePartialRange", nil, nil)
 	rangeLimits := translator.Translate(session.Lang, "rangeLimits", map[string]interface{}{
-		"Min": fmt.Sprintf("%.2f", config.MinValue),
-		"Max": fmt.Sprintf("%.2f", config.MaxValue),
+		"Min": fmt.Sprintf("%.f", config.MinValue),
+		"Max": fmt.Sprintf("%.f", config.MaxValue),
 	}, nil)
 
 	msg := "❌ " + translator.Translate(session.Lang, "invalidInput", nil, nil)

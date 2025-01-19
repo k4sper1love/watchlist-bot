@@ -19,11 +19,7 @@ func HandleProfileCommand(app models.App, session *models.Session) {
 
 	msg := messages.BuildProfileMessage(session)
 
-	keyboard := keyboards.NewKeyboard().
-		AddProfileUpdate().
-		AddProfileDelete().
-		AddBack("").
-		Build(session.Lang)
+	keyboard := keyboards.BuildProfileKeyboard(session)
 
 	app.SendMessage(msg, keyboard)
 }

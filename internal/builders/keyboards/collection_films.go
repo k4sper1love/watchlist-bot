@@ -6,6 +6,7 @@ import (
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
 func BuildOptionsFilmToCollectionKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
@@ -84,7 +85,12 @@ func (k *Keyboard) AddExistingFilmToCollection() *Keyboard {
 
 func (k *Keyboard) AddCollectionFilmSelectFilm(films []apiModels.Film) *Keyboard {
 	for _, film := range films {
-		k.AddButton("", fmt.Sprintf("%s (%d)", film.Title, film.ID), fmt.Sprintf("select_cf_film_%d", film.ID), "", false)
+		k.AddButton("",
+			fmt.Sprintf("%s %s (%d)", utils.BoolToStarOrEmpty(film.IsFavorite), film.Title, film.ID),
+			fmt.Sprintf("select_cf_film_%d", film.ID),
+			"",
+			false,
+		)
 	}
 
 	return k
@@ -92,7 +98,12 @@ func (k *Keyboard) AddCollectionFilmSelectFilm(films []apiModels.Film) *Keyboard
 
 func (k *Keyboard) AddCollectionFilmSelectCollection(collections []apiModels.Collection) *Keyboard {
 	for _, collection := range collections {
-		k.AddButton("", fmt.Sprintf("%s (%d)", collection.Name, collection.ID), fmt.Sprintf("select_cf_collection_%d", collection.ID), "", false)
+		k.AddButton(
+			"",
+			fmt.Sprintf("%s %s (%d)", utils.BoolToStarOrEmpty(collection.IsFavorite), collection.Name, collection.ID),
+			fmt.Sprintf("select_cf_collection_%d", collection.ID),
+			"",
+			false)
 	}
 
 	return k

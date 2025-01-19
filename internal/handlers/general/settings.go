@@ -15,7 +15,7 @@ func HandleSettingsCommand(app models.App, session *models.Session) {
 	part1 := translator.Translate(session.Lang, "settings", nil, nil)
 	part2 := translator.Translate(session.Lang, "settingsChoice", nil, nil)
 
-	msg := fmt.Sprintf("⚙️ <b>%s:</b>\n\n%s", part1, part2)
+	msg := fmt.Sprintf("⚙️ <b>%s</b>\n\n%s", part1, part2)
 
 	keyboard := keyboards.BuildSettingsKeyboard(session)
 
@@ -68,7 +68,7 @@ func handleLanguage(app models.App, session *models.Session) {
 
 	languages, err := utils.ParseSupportedLanguages(localesDir)
 	if err != nil {
-		msg := translator.Translate(session.Lang, "parseLanguageFailure", nil, nil)
+		msg := "❗️" + translator.Translate(session.Lang, "parseLanguageFailure", nil, nil)
 		app.SendMessage(msg, nil)
 		session.ClearAllStates()
 		HandleMenuCommand(app, session)
@@ -76,11 +76,12 @@ func handleLanguage(app models.App, session *models.Session) {
 	}
 
 	part1 := translator.Translate(session.Lang, "currentLanguage", nil, nil)
-	part2 := translator.Translate(session.Lang, "settingsLanguageChoice", nil, nil)
+	part2 := strings.ToUpper(session.Lang)
+	part3 := translator.Translate(session.Lang, "languageChoice", nil, nil)
 
-	msg := fmt.Sprintf("%s: %s\n%s", part1, session.Lang, part2)
+	msg := fmt.Sprintf("🈳 <b>%s:</b> <code>%s</code>\n\n%s", part1, part2, part3)
 
-	keyboard := keyboards.NewKeyboard().AddLanguageSelect(languages, "select_lang").AddBack(states.CallbackSettingsBack).Build("")
+	keyboard := keyboards.NewKeyboard().AddLanguageSelect(languages, "select_lang").AddBack(states.CallbackSettingsBack).Build(session.Lang)
 
 	app.SendMessage(msg, keyboard)
 }
@@ -92,8 +93,8 @@ func handleLanguageSelect(app models.App, session *models.Session) {
 
 	session.Lang = lang
 
-	msg := translator.Translate(session.Lang, "settingsLanguageSuccess", map[string]interface{}{
-		"Language": lang,
+	msg := "🔄 " + translator.Translate(session.Lang, "settingsLanguageSuccess", map[string]interface{}{
+		"Language": strings.ToUpper(lang),
 	}, nil)
 
 	app.SendMessage(msg, nil)
@@ -102,10 +103,10 @@ func handleLanguageSelect(app models.App, session *models.Session) {
 }
 
 func handleCollectionsPageSize(app models.App, session *models.Session) {
-	part1 := translator.Translate(session.Lang, "currentCollectionsPageSize", nil, nil)
+	part1 := translator.Translate(session.Lang, "currentPageSize", nil, nil)
 	part2 := translator.Translate(session.Lang, "settingsPageSizeChoice", nil, nil)
 
-	msg := fmt.Sprintf("%s:%d\n%s", part1, session.CollectionsState.PageSize, part2)
+	msg := fmt.Sprintf("🔢 <b>%s</b>: <code>%d</code>\n\n%s", part1, session.CollectionsState.PageSize, part2)
 
 	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
@@ -116,9 +117,8 @@ func handleCollectionsPageSize(app models.App, session *models.Session) {
 
 func parseCollectionsPageSize(app models.App, session *models.Session) {
 	pageSize, err := strconv.Atoi(utils.ParseMessageString(app.Upd))
-	if err != nil || pageSize < 1 {
-		msg := translator.Translate(session.Lang, "settingsPageSizeChoice", nil, nil)
-		app.SendMessage(msg, nil)
+	if err != nil || pageSize < 1 || pageSize > 100 {
+		handleCollectionsPageSize(app, session)
 		return
 	}
 

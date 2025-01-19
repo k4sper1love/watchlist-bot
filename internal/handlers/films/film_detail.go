@@ -71,7 +71,7 @@ func HandleFilmsDetailButtons(app models.App, session *models.Session) {
 }
 
 func handleFavoriteFilm(app models.App, session *models.Session) {
-	session.FilmDetailState.IsFavorite = !session.FilmDetailState.Film.IsFavorite
+	session.FilmDetailState.Film.IsFavorite = !session.FilmDetailState.Film.IsFavorite
 
 	finishUpdateFilmProcess(app, session, HandleFilmsDetailCommand)
 }

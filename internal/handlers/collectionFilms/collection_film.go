@@ -1,7 +1,6 @@
 package collectionFilms
 
 import (
-	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/films"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
@@ -24,22 +23,24 @@ func HandleCollectionFilmsButtons(app models.App, session *models.Session) {
 func addFilmToCollection(app models.App, session *models.Session) {
 	collectionFilm, err := watchlist.AddCollectionFilm(app, session)
 	if err != nil {
-		msg := translator.Translate(session.Lang, "createFilmFailure", nil, nil)
+		msg := "🚨 " + translator.Translate(session.Lang, "createFilmFailure", nil, nil)
 		app.SendMessage(msg, nil)
 		films.HandleFilmsCommand(app, session)
 		return
 	}
 
-	msg := translator.Translate(session.Lang, "filmToCollectionSuccess", map[string]interface{}{
+	msg := "➕ " + translator.Translate(session.Lang, "filmToCollectionSuccess", map[string]interface{}{
 		"Film":       collectionFilm.Film.Title,
 		"Collection": collectionFilm.Collection.Name,
 	}, nil)
 
-	msg += messages.BuildFilmDetailMessage(session, &collectionFilm.Film)
-
-	imageURL := collectionFilm.Film.ImageURL
-	app.SendImage(imageURL, msg, nil)
+	app.SendMessage(msg, nil)
 
 	session.ClearAllStates()
-	films.HandleFilmsCommand(app, session)
+
+	if session.Context == states.ContextFilm {
+		films.HandleFilmsDetailCommand(app, session)
+	} else if session.Context == states.ContextCollection {
+		films.HandleFilmsCommand(app, session)
+	}
 }

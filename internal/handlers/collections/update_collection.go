@@ -1,6 +1,7 @@
 package collections
 
 import (
+	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
@@ -11,8 +12,9 @@ import (
 )
 
 func HandleUpdateCollectionCommand(app models.App, session *models.Session) {
-	msg := messages.BuildCollectionDetailMessage(session, &session.CollectionDetailState.Collection) + "\n"
-	msg += translator.Translate(session.Lang, "updateChoiceField", nil, nil)
+	msg := messages.BuildCollectionHeader(session)
+	choiceMsg := translator.Translate(session.Lang, "choiceAction", nil, nil)
+	msg += fmt.Sprintf("<b>%s</b>", choiceMsg)
 
 	keyboard := keyboards.BuildCollectionUpdateKeyboard(session)
 
@@ -49,7 +51,7 @@ func HandleUpdateCollectionProcess(app models.App, session *models.Session) {
 }
 
 func handleUpdateCollectionName(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "collectionRequestName", nil, nil)
+	msg := "❓" + translator.Translate(session.Lang, "collectionRequestName", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
@@ -65,7 +67,7 @@ func parseUpdateCollectionName(app models.App, session *models.Session) {
 }
 
 func handleUpdateCollectionDescription(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "collectionRequestDescription", nil, nil)
+	msg := "❓" + translator.Translate(session.Lang, "collectionRequestDescription", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
@@ -81,16 +83,18 @@ func parseUpdateCollectionDescription(app models.App, session *models.Session) {
 }
 
 func updateCollection(app models.App, session *models.Session) {
+	session.CollectionDetailState.IsFavorite = session.CollectionDetailState.Collection.IsFavorite
+
 	collection, err := watchlist.UpdateCollection(app, session)
 	if err != nil {
-		msg := translator.Translate(session.Lang, "updateCollectionFailure", nil, nil)
+		msg := "🚨" + translator.Translate(session.Lang, "updateCollectionFailure", nil, nil)
 		app.SendMessage(msg, nil)
 		return
 	}
 
 	session.CollectionDetailState.Collection = *collection
 
-	msg := translator.Translate(session.Lang, "updateCollectionSuccess", nil, nil)
+	msg := "✏️ " + translator.Translate(session.Lang, "updateCollectionSuccess", nil, nil)
 	app.SendMessage(msg, nil)
 }
 

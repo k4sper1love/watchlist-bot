@@ -12,11 +12,10 @@ import (
 func HandleViewedFilmCommand(app models.App, session *models.Session) {
 	session.FilmDetailState.IsViewed = true
 
-	part1 := translator.Translate(session.Lang, "viewedFilmViewed", nil, nil)
-	part2 := translator.Translate(session.Lang, "viewedFilmRequestRating", nil, nil)
-	part3 := translator.Translate(session.Lang, "viewedFilmCanCancel", nil, nil)
+	part1 := translator.Translate(session.Lang, "viewedFilmRequestRating", nil, nil)
+	part2 := translator.Translate(session.Lang, "viewedFilmCanCancel", nil, nil)
 
-	msg := fmt.Sprintf("✅ %s\n%s\n\n<i>%s</i>", part1, part2, part3)
+	msg := fmt.Sprintf("✔️ <b>%s</b>\n\n<i>%s</i>", part1, part2)
 
 	keyboard := keyboards.BuildFilmViewedKeyboard(session)
 
@@ -50,7 +49,7 @@ func parseViewedFilmRating(app models.App, session *models.Session) {
 	part1 := translator.Translate(session.Lang, "viewedFilmRequestReview", nil, nil)
 	part2 := translator.Translate(session.Lang, "viewedFilmCanCancel", nil, nil)
 
-	msg := fmt.Sprintf("✅ %s\n\n<i>%s</i>", part1, part2)
+	msg := fmt.Sprintf("✔️ <b>%s</b>\n\n<i>%s</i>", part1, part2)
 
 	keyboard := keyboards.BuildFilmViewedKeyboard(session)
 

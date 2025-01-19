@@ -15,7 +15,7 @@ import (
 func HandleFeedbackDetailCommand(app models.App, session *models.Session) {
 	feedback, err := postgres.GetFeedbackByID(session.AdminState.FeedbackID)
 	if err != nil {
-		msg := translator.Translate(session.Lang, "someError", nil, nil)
+		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
 		app.SendMessage(msg, nil)
 		session.ClearAllStates()
 		HandleMenuCommand(app, session)
@@ -53,13 +53,16 @@ func handleFeedbackDetailDelete(app models.App, session *models.Session) {
 		return
 	}
 
-	msg := translator.Translate(session.Lang, "success", nil, nil)
+	msg := "🗑️ " + translator.Translate(session.Lang, "deleteFeedbackSuccess", map[string]interface{}{
+		"ID": feedback.ID,
+	}, nil)
 	app.SendMessage(msg, nil)
+
 	HandleFeedbacksCommand(app, session)
 }
 
 func handleFeedbackDetailError(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "someError", nil, nil)
+	msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
 	app.SendMessage(msg, nil)
 	HandleFeedbackDetailCommand(app, session)
 }
