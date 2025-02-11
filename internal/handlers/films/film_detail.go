@@ -11,17 +11,18 @@ import (
 )
 
 func HandleFilmsDetailCommand(app models.App, session *models.Session) {
-	index := session.FilmDetailState.Index
-	films := session.FilmsState.Films
-	film := films[index]
+	state := session.FilmDetailState
 
-	session.FilmDetailState.Film = film
+	if state.HasIndex() {
+		films := session.FilmsState.Films
+		session.FilmDetailState.Film = films[state.Index]
+	}
 
-	msg := messages.BuildFilmDetailMessage(session, &film)
+	msg := messages.BuildFilmDetailMessage(session)
 
 	keyboard := keyboards.BuildFilmDetailKeyboard(session)
 
-	imageURL := film.ImageURL
+	imageURL := state.Film.ImageURL
 
 	app.SendImage(imageURL, msg, keyboard)
 }

@@ -28,6 +28,12 @@ func BuildAddFilmToCollectionKeyboard(session *models.Session) *tgbotapi.InlineK
 
 	keyboard := NewKeyboard()
 
+	if session.FilmsState.Title == "" {
+		keyboard.AddSearch(states.CallbackAddFilmToCollectionFind)
+	} else {
+		keyboard.AddReset(states.CallbackAddFilmToCollectionReset)
+	}
+
 	keyboard.AddCollectionFilmSelectFilm(films)
 
 	keyboard.AddNavigation(
@@ -44,12 +50,30 @@ func BuildAddFilmToCollectionKeyboard(session *models.Session) *tgbotapi.InlineK
 	return keyboard.Build(session.Lang)
 }
 
+func BuildAddFilmToCollectionNotFoundKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	keyboard := NewKeyboard()
+
+	if session.FilmsState.Title != "" {
+		keyboard.AddAgain(states.CallbackAddFilmToCollectionAgain)
+	} else {
+		keyboard.AddBack(states.CallbackAddFilmToCollectionBack)
+	}
+
+	return keyboard.Build(session.Lang)
+}
+
 func BuildAddCollectionToFilmKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	collections := session.CollectionsState.Collections
 	currentPage := session.CollectionFilmsState.CurrentPage
 	lastPage := session.CollectionFilmsState.LastPage
 
 	keyboard := NewKeyboard()
+
+	if session.CollectionsState.Name == "" {
+		keyboard.AddSearch(states.CallbackAddCollectionToFilmFind)
+	} else {
+		keyboard.AddReset(states.CallbackAddCollectionToFilmReset)
+	}
 
 	keyboard.AddCollectionFilmSelectCollection(collections)
 
@@ -63,6 +87,18 @@ func BuildAddCollectionToFilmKeyboard(session *models.Session) *tgbotapi.InlineK
 	)
 
 	keyboard.AddBack(states.CallbackAddCollectionToFilmBack)
+
+	return keyboard.Build(session.Lang)
+}
+
+func BuildAddCollectionToFilmNotFoundKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	keyboard := NewKeyboard()
+
+	if session.CollectionsState.Name != "" {
+		keyboard.AddAgain(states.CallbackAddCollectionToFilmAgain)
+	} else {
+		keyboard.AddBack(states.CallbackAddCollectionToFilmBack)
+	}
 
 	return keyboard.Build(session.Lang)
 }

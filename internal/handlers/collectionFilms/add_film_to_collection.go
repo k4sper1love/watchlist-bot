@@ -23,7 +23,7 @@ func HandleAddFilmToCollectionCommand(app models.App, session *models.Session) {
 
 	if len(films) == 0 {
 		msg := "❗️" + translator.Translate(session.Lang, "filmsNotFound", nil, nil)
-		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAddFilmToCollectionBack).Build(session.Lang)
+		keyboard := keyboards.BuildAddFilmToCollectionNotFoundKeyboard(session)
 		app.SendMessage(msg, keyboard)
 		return
 	}
@@ -39,8 +39,20 @@ func HandleAddFilmToCollectionButtons(app models.App, session *models.Session) {
 	switch {
 	case callback == states.CallbackAddFilmToCollectionBack:
 		HandleOptionsFilmToCollectionCommand(app, session)
+
 	case strings.HasPrefix(callback, "select_cf_film_"):
 		HandleAddFilmToCollectionSelect(app, session)
+
+	case callback == states.CallbackAddFilmToCollectionFind:
+		handleAddFilmToCollectionFind(app, session)
+
+	case callback == states.CallbackAddFilmToCollectionAgain:
+		session.FilmsState.Title = ""
+		handleAddFilmToCollectionFind(app, session)
+
+	case callback == states.CallbackAddFilmToCollectionReset:
+		session.FilmsState.Title = ""
+		HandleAddFilmToCollectionCommand(app, session)
 
 	case callback == states.CallbackAddFilmToCollectionNextPage:
 		if session.CollectionFilmsState.CurrentPage < session.CollectionFilmsState.LastPage {
@@ -80,6 +92,19 @@ func HandleAddFilmToCollectionButtons(app models.App, session *models.Session) {
 	}
 }
 
+func HandleAddFilmToCollectionProcess(app models.App, session *models.Session) {
+	if utils.IsCancel(app.Upd) {
+		session.ClearAllStates()
+		HandleAddFilmToCollectionCommand(app, session)
+		return
+	}
+
+	switch session.State {
+	case states.ProcessAddFilmToCollectionAwaitingTitle:
+		parseAddFilmToCollectionTitle(app, session)
+	}
+}
+
 func HandleAddFilmToCollectionSelect(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Upd)
 	idStr := strings.TrimPrefix(callback, "select_cf_film_")
@@ -95,6 +120,27 @@ func HandleAddFilmToCollectionSelect(app models.App, session *models.Session) {
 	session.FilmDetailState.Film.ID = id
 
 	addFilmToCollection(app, session)
+}
+
+func handleAddFilmToCollectionFind(app models.App, session *models.Session) {
+	msg := "❓ " + translator.Translate(session.Lang, "filmRequestTitle", nil, nil)
+
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
+
+	app.SendMessage(msg, keyboard)
+
+	session.SetState(states.ProcessAddFilmToCollectionAwaitingTitle)
+}
+
+func parseAddFilmToCollectionTitle(app models.App, session *models.Session) {
+	title := utils.ParseMessageString(app.Upd)
+
+	session.FilmsState.Title = title
+	session.CollectionFilmsState.CurrentPage = 1
+
+	session.ClearState()
+
+	HandleAddFilmToCollectionCommand(app, session)
 }
 
 func GetFilmsExcludeCollection(app models.App, session *models.Session) ([]apiModels.Film, error) {

@@ -6,6 +6,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -13,6 +14,22 @@ import (
 
 func GetItemID(index, currentPage, pageSize int) int {
 	return (index + 1) + ((currentPage - 1) * pageSize)
+}
+
+func IsBotMessage(update *tgbotapi.Update) bool {
+	if update.Message != nil && update.Message.From.IsBot {
+		return true
+	}
+	return false
+}
+
+func ParseMessageID(update *tgbotapi.Update) int {
+	if update.Message != nil {
+		return update.Message.MessageID
+	} else if update.CallbackQuery != nil {
+		return update.CallbackQuery.Message.MessageID
+	}
+	return -1
 }
 
 func ParseTelegramID(update *tgbotapi.Update) int {
@@ -326,4 +343,14 @@ func NumberToEmoji(number int) string {
 		number /= 10
 	}
 	return result
+}
+
+func GetLogFilePath(userID int) (string, error) {
+	logFile := filepath.Join("logs", fmt.Sprintf("user_%d.log", userID))
+
+	if _, err := os.Stat(logFile); os.IsNotExist(err) {
+		return "", err
+	}
+
+	return logFile, nil
 }

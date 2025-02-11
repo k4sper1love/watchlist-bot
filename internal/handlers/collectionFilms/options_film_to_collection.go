@@ -29,6 +29,7 @@ func HandleOptionsFilmToCollectionButtons(app models.App, session *models.Sessio
 
 	case states.CallbackOptionsFilmToCollectionExisting:
 		session.CollectionFilmsState.CurrentPage = 1
+		session.FilmsState.Title = ""
 		HandleAddFilmToCollectionCommand(app, session)
 	}
 }

@@ -2,6 +2,7 @@ package films
 
 import (
 	"fmt"
+	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
@@ -12,15 +13,13 @@ import (
 )
 
 func HandleUpdateFilmCommand(app models.App, session *models.Session) {
-	film := session.FilmDetailState.Film
-
-	msg := messages.BuildFilmDetailMessage(session, &film)
+	msg := messages.BuildFilmDetailMessage(session)
 	choiceMsg := translator.Translate(session.Lang, "updateChoiceField", nil, nil)
 	msg += fmt.Sprintf("<b>%s</b>", choiceMsg)
 
 	keyboard := keyboards.BuildFilmUpdateKeyboard(session)
 
-	app.SendImage(film.ImageURL, msg, keyboard)
+	app.SendImage(session.FilmDetailState.Film.ImageURL, msg, keyboard)
 }
 
 func HandleUpdateFilmButtons(app models.App, session *models.Session) {
@@ -301,15 +300,15 @@ func parseUpdateFilmReview(app models.App, session *models.Session) {
 
 	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
-func updateFilm(app models.App, session *models.Session) error {
+func updateFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
 	film, err := watchlist.UpdateFilm(app, session)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	session.FilmDetailState.Film = *film
 
-	return nil
+	return film, nil
 }
 
 func finishUpdateFilmProcess(app models.App, session *models.Session, backFunc func(models.App, *models.Session)) {
@@ -333,15 +332,18 @@ func finishUpdateFilmProcess(app models.App, session *models.Session, backFunc f
 	}
 
 	var msg string
-	if err := updateFilm(app, session); err != nil {
+	updatedFilm, err := updateFilm(app, session)
+	if err != nil || updatedFilm == nil {
 		msg = "🚨" + translator.Translate(session.Lang, "updateFilmFailure", nil, nil)
 	} else {
 		msg = "✏️ " + translator.Translate(session.Lang, "updateFilmSuccess", nil, nil)
+		session.FilmDetailState.Film = *updatedFilm
+		session.FilmDetailState.ClearIndex()
 	}
 
-	if err := UpdateFilmInList(app, session); err != nil {
-		msg = "🚨" + translator.Translate(session.Lang, "updateFilmFailure", nil, nil)
-	}
+	//if err := UpdateFilmInList(app, session); err != nil {
+	//	msg = "🚨" + translator.Translate(session.Lang, "updateFilmFailure", nil, nil)
+	//}
 
 	app.SendMessage(msg, nil)
 

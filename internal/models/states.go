@@ -142,6 +142,14 @@ func (s *FilmDetailState) Clear() {
 	s.URL = ""
 }
 
+func (s *FilmDetailState) HasIndex() bool {
+	return s.Index != -1
+}
+
+func (s *FilmDetailState) ClearIndex() {
+	s.Index = -1
+}
+
 func (s *CollectionDetailState) Clear() {
 	s.IsFavorite = false
 	s.Name = ""

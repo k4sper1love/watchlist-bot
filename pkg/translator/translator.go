@@ -3,9 +3,11 @@ package translator
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
 	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"sync"
@@ -26,7 +28,7 @@ func InitTranslator(localeDir string) error {
 	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
 
 	if err := loadLocales(bundle, localeDir); err != nil {
-		log.Fatalf("Failed to load locale files: %v", err)
+		sl.Log.Error("failed to load locale files", slog.Any("error", err))
 		return err
 	}
 

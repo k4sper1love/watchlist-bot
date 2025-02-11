@@ -129,13 +129,11 @@ func parseSortingCollectionsButtons(sorting *models.Sorting, lang string) []Butt
 
 	buttons = addSortingButton(buttons, sorting, lang, "is_favorite", states.CallbackSortingCollectionsSelectIsFavorite)
 
-	buttons = addSortingButton(buttons, sorting, lang, "id", states.CallbackSortingCollectionsSelectID)
-
-	buttons = addSortingButton(buttons, sorting, lang, "name", states.CallbackSortingCollectionsSelectName)
-
-	buttons = addSortingButton(buttons, sorting, lang, "created_at", states.CallbackSortingCollectionsSelectCreatedAt)
+	buttons = addSortingButton(buttons, sorting, lang, "title", states.CallbackSortingCollectionsSelectName)
 
 	buttons = addSortingButton(buttons, sorting, lang, "total_films", states.CallbackSortingCollectionsSelectTotalFilms)
+
+	buttons = addSortingButton(buttons, sorting, lang, "created_at", states.CallbackSortingCollectionsSelectCreatedAt)
 
 	return buttons
 }

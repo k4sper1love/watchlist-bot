@@ -118,6 +118,11 @@ func BuildFeedbackListKeyboard(session *models.Session, feedbacks []models.Feedb
 func BuildAdminUserDetailKeyboard(session *models.Session, user *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
+	if session.Role.HasAccess(roles.Root) ||
+		session.Role.HasAccess(roles.SuperAdmin) && !user.Role.HasAccess(roles.SuperAdmin) {
+		keyboard.AddLogs()
+	}
+
 	if user.IsBanned && !user.Role.HasAccess(roles.Root) {
 		keyboard.AddUnbanUser()
 	} else if !user.Role.HasAccess(roles.Root) {
@@ -209,7 +214,7 @@ func (k *Keyboard) AddFeedbackSelect(session *models.Session, feedbacks []models
 	for i, feedback := range feedbacks {
 		itemID := utils.GetItemID(i, session.AdminState.CurrentPage, session.AdminState.PageSize)
 
-		text := fmt.Sprintf("%s ID: %d", utils.NumberToEmoji(itemID), feedback.ID)
+		text := fmt.Sprintf("%s", utils.NumberToEmoji(itemID))
 
 		buttons = append(buttons, Button{"", text, fmt.Sprintf("select_admin_feedback_%d", feedback.ID), "", false})
 	}
@@ -217,6 +222,10 @@ func (k *Keyboard) AddFeedbackSelect(session *models.Session, feedbacks []models
 	k.AddButtonsWithRowSize(2, buttons...)
 
 	return k
+}
+
+func (k *Keyboard) AddLogs() *Keyboard {
+	return k.AddButton("💾", "logs", states.CallbackAdminUserDetailLogs, "", true)
 }
 
 func (k *Keyboard) AddUserManageRole() *Keyboard {

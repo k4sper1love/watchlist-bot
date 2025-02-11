@@ -144,6 +144,7 @@ func parseFilmsFindTitle(app models.App, session *models.Session) {
 	title := utils.ParseMessageString(app.Upd)
 
 	session.FilmsState.Title = title
+	session.FilmsState.CurrentPage = 1
 
 	session.ClearState()
 

@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
@@ -10,7 +11,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log"
+	"log/slog"
 	"strconv"
 	"strings"
 )
@@ -93,9 +94,9 @@ func handleAdminsSelect(app models.App, session *models.Session) {
 	idStr := strings.TrimPrefix(callback, "select_admin_")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
+		sl.Log.Warn("failed to parse admin ID", slog.Any("error", err), slog.String("callback", callback))
 		msg := translator.Translate(session.Lang, "someError", nil, nil)
 		app.SendMessage(msg, nil)
-		log.Printf("error parsing admin ID: %v", err)
 		return
 	}
 

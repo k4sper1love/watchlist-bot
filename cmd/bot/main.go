@@ -2,31 +2,15 @@ package main
 
 import (
 	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
-	"github.com/k4sper1love/watchlist-bot/config"
-	"github.com/k4sper1love/watchlist-bot/internal/bot"
-	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log"
+	"github.com/k4sper1love/watchlist-bot/internal/watchlist"
+	"os"
 )
 
 func main() {
-	app, err := config.LoadApp()
-	if err != nil {
-		log.Fatal(err)
+	if err := watchlist.Run(); err != nil {
+		sl.Log.Error("application terminated due to an error")
+		os.Exit(1)
 	}
 
-	sl.SetupLogger(app.Vars.Environment)
-
-	if err = postgres.OpenDB(app.Vars); err != nil {
-		log.Fatal(err)
-	}
-
-	err = translator.InitTranslator("./locales")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if err = bot.Run(app); err != nil {
-		log.Fatal(err)
-	}
+	sl.Log.Info("application stopped without error")
 }

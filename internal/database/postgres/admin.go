@@ -2,8 +2,10 @@ package postgres
 
 import (
 	"errors"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
+	"log/slog"
 )
 
 func GetUserCounts() (int64, error) {
@@ -11,6 +13,7 @@ func GetUserCounts() (int64, error) {
 
 	err := GetDB().Model(&models.Session{}).Count(&count).Error
 	if err != nil {
+		sl.Log.Warn("failed to get user counts", slog.Any("error", err))
 		return 0, err
 	}
 
@@ -22,6 +25,7 @@ func GetAdminCounts() (int64, error) {
 
 	err := GetDB().Model(&models.Session{}).Where("role > 0").Count(&count).Error
 	if err != nil {
+		sl.Log.Warn("failed to get admin counts", slog.Any("error", err))
 		return 0, err
 	}
 
@@ -33,6 +37,7 @@ func GetAllTelegramID() ([]int, error) {
 
 	err := GetDB().Model(&models.Session{}).Pluck("telegram_id", &telegramIDs).Error
 	if err != nil {
+		sl.Log.Warn("failed to get all telegram IDs", slog.Any("error", err))
 		return nil, err
 	}
 
@@ -41,45 +46,80 @@ func GetAllTelegramID() ([]int, error) {
 
 func GetAllUsers() ([]models.Session, error) {
 	var sessions []models.Session
-	err := GetDB().Order("created_at DESC").Find(&sessions).Error
-	return sessions, err
+
+	if err := GetDB().Order("created_at DESC").Find(&sessions).Error; err != nil {
+		sl.Log.Warn("failed to get all users", slog.Any("error", err))
+		return nil, err
+	}
+
+	return sessions, nil
 }
 
 func GetAllUsersWithPagination(page, pageSize int) ([]models.Session, error) {
 	var sessions []models.Session
-
 	offset := (page - 1) * pageSize
 
-	err := GetDB().Order("created_at DESC").
+	if err := GetDB().Order("created_at DESC").
 		Limit(pageSize).
 		Offset(offset).
-		Find(&sessions).Error
+		Find(&sessions).Error; err != nil {
+		sl.Log.Warn("failed to get all users with pagination", slog.Any("error", err))
+		return nil, err
+	}
 
-	return sessions, err
+	return sessions, nil
 }
 
 func GetAllAdminsWithPagination(page, pageSize int) ([]models.Session, error) {
 	var sessions []models.Session
-
 	offset := (page - 1) * pageSize
 
-	err := GetDB().
+	if err := GetDB().
 		Model(&models.Session{}).
 		Where("role > 0").
 		Order("created_at DESC").
 		Limit(pageSize).
 		Offset(offset).
-		Find(&sessions).Error
+		Find(&sessions).Error; err != nil {
+		sl.Log.Warn("failed to get all admins with pagination", slog.Any("error", err))
+		return nil, err
+	}
 
-	return sessions, err
+	return sessions, nil
 }
 
 func BanUser(telegramID int) error {
-	return GetDB().Model(&models.Session{}).Where("telegram_id = ?", telegramID).Update("is_banned", true).Error
+	if err := GetDB().
+		Model(&models.Session{}).
+		Where("telegram_id = ?", telegramID).
+		Update("is_banned", true).
+		Error; err != nil {
+		sl.Log.Warn(
+			"failed to ban user",
+			slog.Any("error", err),
+			slog.Int("telegram_id", telegramID),
+		)
+		return err
+	}
+
+	return nil
 }
 
 func UnbanUser(telegramID int) error {
-	return GetDB().Model(&models.Session{}).Where("telegram_id = ?", telegramID).Update("is_banned", false).Error
+	if err := GetDB().
+		Model(&models.Session{}).
+		Where("telegram_id = ?", telegramID).
+		Update("is_banned", false).
+		Error; err != nil {
+		sl.Log.Warn(
+			"failed to unban user",
+			slog.Any("error", err),
+			slog.Int("telegram_id", telegramID),
+		)
+		return err
+	}
+
+	return nil
 }
 
 func IsUserBanned(telegramID int) (bool, error) {
@@ -87,6 +127,11 @@ func IsUserBanned(telegramID int) (bool, error) {
 
 	err := GetDB().Model(&models.Session{}).Where("telegram_id = ?", telegramID).First(&session).Error
 	if err != nil {
+		sl.Log.Warn(
+			"failed to check user ban",
+			slog.Any("error", err),
+			slog.Int("telegram_id", telegramID),
+		)
 		return false, err
 	}
 
@@ -94,13 +139,18 @@ func IsUserBanned(telegramID int) (bool, error) {
 }
 
 func SetUserRole(telegramID int, role roles.Role) (bool, error) {
-	err := GetDB().
+	if err := GetDB().
 		Model(&models.Session{}).
 		Where("telegram_id = ?", telegramID).
-		Update("role", role).Error
-
-	if err != nil {
-		return false, err
+		Update("role", role).
+		Error; err != nil {
+		sl.Log.Warn(
+			"failed to set user role",
+			slog.Any("error", err),
+			slog.Int("telegram_id", telegramID),
+			slog.String("role", role.String()),
+		)
+		return false, nil
 	}
 
 	return true, nil
@@ -111,6 +161,11 @@ func GetUserByTelegramID(telegramID int) (*models.Session, error) {
 
 	err := GetDB().Model(&models.Session{}).Where("telegram_id = ?", telegramID).First(&session).Error
 	if err != nil {
+		sl.Log.Warn(
+			"failed to get user by telegram ID",
+			slog.Any("error", err),
+			slog.Int("telegram_id", telegramID),
+		)
 		return nil, err
 	}
 
@@ -120,8 +175,16 @@ func GetUserByTelegramID(telegramID int) (*models.Session, error) {
 func GetUserByTelegramUsername(username string) (*models.Session, error) {
 	var session models.Session
 
-	err := GetDB().Model(&models.Session{}).Where("telegram_username = ?", username).First(&session).Error
-	if err != nil {
+	if err := GetDB().
+		Model(&models.Session{}).
+		Where("telegram_username = ?", username).
+		First(&session).
+		Error; err != nil {
+		sl.Log.Warn(
+			"failed to get user by telegram username",
+			slog.Any("error", err),
+			slog.String("username", username),
+		)
 		return nil, err
 	}
 
@@ -131,8 +194,8 @@ func GetUserByTelegramUsername(username string) (*models.Session, error) {
 func GetUserByAPIUserID(id int) (*models.Session, error) {
 	var sessions []models.Session
 
-	err := GetDB().Find(&sessions).Error
-	if err != nil {
+	if err := GetDB().Find(&sessions).Error; err != nil {
+		sl.Log.Warn("failed to get user by API user ID", slog.Any("error", err), slog.Int("user_id", id))
 		return nil, err
 	}
 
@@ -148,8 +211,16 @@ func GetUserByAPIUserID(id int) (*models.Session, error) {
 func GetAdminByTelegramID(telegramID int) (*models.Session, error) {
 	var session models.Session
 
-	err := GetDB().Model(&models.Session{}).Where("telegram_id = ? AND role > 0", telegramID).First(&session).Error
-	if err != nil {
+	if err := GetDB().
+		Model(&models.Session{}).
+		Where("telegram_id = ? AND role > 0", telegramID).
+		First(&session).
+		Error; err != nil {
+		sl.Log.Warn(
+			"failed to get admin by telegram ID",
+			slog.Any("error", err),
+			slog.Int("telegram_id", telegramID),
+		)
 		return nil, err
 	}
 
@@ -159,8 +230,16 @@ func GetAdminByTelegramID(telegramID int) (*models.Session, error) {
 func GetAdminByTelegramUsername(username string) (*models.Session, error) {
 	var session models.Session
 
-	err := GetDB().Model(&models.Session{}).Where("telegram_username = ? AND role > 0", username).First(&session).Error
-	if err != nil {
+	if err := GetDB().
+		Model(&models.Session{}).
+		Where("telegram_username = ? AND role > 0", username).
+		First(&session).
+		Error; err != nil {
+		sl.Log.Warn(
+			"failed to get admin by telegram username",
+			slog.Any("error", err),
+			slog.String("username", username),
+		)
 		return nil, err
 	}
 

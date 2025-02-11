@@ -13,6 +13,7 @@ func HandleCollectionFilmsButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Upd) {
 	case states.CallbackCollectionFilmsFromFilm:
 		session.CollectionFilmsState.CurrentPage = 1
+		session.CollectionsState.Name = ""
 		HandleAddCollectionToFilmCommand(app, session)
 
 	case states.CallbackCollectionFilmsFromCollection:

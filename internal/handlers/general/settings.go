@@ -124,8 +124,9 @@ func parseCollectionsPageSize(app models.App, session *models.Session) {
 
 	session.CollectionsState.PageSize = pageSize
 
-	successMsg := translator.Translate(session.Lang, "settingsCollectionPageSizeSuccess", nil, nil)
-	msg := fmt.Sprintf("%s:%d", successMsg, pageSize)
+	msg := "🔄 " + translator.Translate(session.Lang, "settingsPageSizeSuccess", map[string]interface{}{
+		"Size": pageSize,
+	}, nil)
 
 	app.SendMessage(msg, nil)
 
@@ -135,10 +136,10 @@ func parseCollectionsPageSize(app models.App, session *models.Session) {
 }
 
 func handleFilmsPageSize(app models.App, session *models.Session) {
-	part1 := translator.Translate(session.Lang, "currentFilmsPageSize", nil, nil)
+	part1 := translator.Translate(session.Lang, "currentPageSize", nil, nil)
 	part2 := translator.Translate(session.Lang, "settingsPageSizeChoice", nil, nil)
 
-	msg := fmt.Sprintf("%s: %d\n%s", part1, session.FilmsState.PageSize, part2)
+	msg := fmt.Sprintf("🔢 <b>%s</b>: <code>%d</code>\n\n%s", part1, session.CollectionsState.PageSize, part2)
 
 	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
@@ -150,15 +151,15 @@ func handleFilmsPageSize(app models.App, session *models.Session) {
 func parseFilmsPageSize(app models.App, session *models.Session) {
 	pageSize, err := strconv.Atoi(utils.ParseMessageString(app.Upd))
 	if err != nil || pageSize < 1 {
-		msg := translator.Translate(session.Lang, "settingsPageSizeChoice", nil, nil)
-		app.SendMessage(msg, nil)
+		handleCollectionsPageSize(app, session)
 		return
 	}
 
 	session.FilmsState.PageSize = pageSize
 
-	successMsg := translator.Translate(session.Lang, "settingsFilmsPageSizeSuccess", nil, nil)
-	msg := fmt.Sprintf("%s: %d", successMsg, pageSize)
+	msg := "🔄 " + translator.Translate(session.Lang, "settingsPageSizeSuccess", map[string]interface{}{
+		"Size": pageSize,
+	}, nil)
 
 	app.SendMessage(msg, nil)
 
@@ -168,10 +169,10 @@ func parseFilmsPageSize(app models.App, session *models.Session) {
 }
 
 func handleObjectsPageSize(app models.App, session *models.Session) {
-	part1 := translator.Translate(session.Lang, "currentObjectsPageSize", nil, nil)
+	part1 := translator.Translate(session.Lang, "currentPageSize", nil, nil)
 	part2 := translator.Translate(session.Lang, "settingsPageSizeChoice", nil, nil)
 
-	msg := fmt.Sprintf("%s: %d\n%s", part1, session.CollectionFilmsState.PageSize, part2)
+	msg := fmt.Sprintf("🔢 <b>%s</b>: <code>%d</code>\n\n%s", part1, session.CollectionsState.PageSize, part2)
 
 	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
@@ -183,15 +184,15 @@ func handleObjectsPageSize(app models.App, session *models.Session) {
 func parseObjectsPageSize(app models.App, session *models.Session) {
 	pageSize, err := strconv.Atoi(utils.ParseMessageString(app.Upd))
 	if err != nil || pageSize < 1 {
-		msg := translator.Translate(session.Lang, "settingsPageSizeChoice", nil, nil)
-		app.SendMessage(msg, nil)
+		handleCollectionsPageSize(app, session)
 		return
 	}
 
 	session.CollectionFilmsState.PageSize = pageSize
 
-	successMsg := translator.Translate(session.Lang, "settingsObjectsPageSizeSuccess", nil, nil)
-	msg := fmt.Sprintf("%s: %d", successMsg, pageSize)
+	msg := "🔄 " + translator.Translate(session.Lang, "settingsPageSizeSuccess", map[string]interface{}{
+		"Size": pageSize,
+	}, nil)
 
 	app.SendMessage(msg, nil)
 

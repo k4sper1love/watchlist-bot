@@ -100,9 +100,8 @@ func BuildFindNewFilmKeyboard(session *models.Session, currentPage, lastPage int
 }
 
 func BuildFilmDetailKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	index := session.FilmDetailState.Index
-	itemID := utils.GetItemID(index, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
-	film := session.FilmDetailState.Film
+	state := session.FilmDetailState
+	film := state.Film
 
 	keyboard := NewKeyboard()
 
@@ -122,14 +121,18 @@ func BuildFilmDetailKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMa
 		keyboard.AddCollectionFilmFromFilm()
 	}
 
-	keyboard.AddNavigation(
-		itemID,
-		session.FilmsState.TotalRecords,
-		states.CallbackFilmDetailPrevPage,
-		states.CallbackFilmDetailNextPage,
-		"",
-		"",
-	)
+	if state.HasIndex() {
+		itemID := utils.GetItemID(state.Index, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
+
+		keyboard.AddNavigation(
+			itemID,
+			session.FilmsState.TotalRecords,
+			states.CallbackFilmDetailPrevPage,
+			states.CallbackFilmDetailNextPage,
+			"",
+			"",
+		)
+	}
 
 	keyboard.AddBack(states.CallbackFilmDetailBack)
 
@@ -331,15 +334,15 @@ func (k *Keyboard) AddFavorite(isFavorite bool, callback string) *Keyboard {
 func parseFiltersFilmsButtons(filter *models.FiltersFilm, lang string) []Button {
 	var buttons []Button
 
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "rating", states.CallbackFiltersFilmsSelectRating, false)
-
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "userRating", states.CallbackFiltersFilmsSelectUserRating, false)
-
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "year", states.CallbackFiltersFilmsSelectYear, false)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "isFavorite", states.CallbackFiltersFilmsSelectIsFavorite, true)
 
 	buttons = addFiltersFilmsButton(buttons, filter, lang, "isViewed", states.CallbackFiltersFilmsSelectIsViewed, true)
 
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "isFavorite", states.CallbackFiltersFilmsSelectIsFavorite, true)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "year", states.CallbackFiltersFilmsSelectYear, false)
+
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "rating", states.CallbackFiltersFilmsSelectRating, false)
+
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "userRating", states.CallbackFiltersFilmsSelectUserRating, false)
 
 	buttons = addFiltersFilmsButton(buttons, filter, lang, "hasURL", states.CallbackFiltersFilmsSelectHasURL, true)
 
@@ -349,17 +352,15 @@ func parseFiltersFilmsButtons(filter *models.FiltersFilm, lang string) []Button 
 func parseSortingFilmsButtons(sorting *models.Sorting, lang string) []Button {
 	var buttons []Button
 
-	buttons = addSortingButton(buttons, sorting, lang, "id", states.CallbackSortingFilmsSelectID)
-
-	buttons = addSortingButton(buttons, sorting, lang, "title", states.CallbackSortingFilmsSelectTitle)
-
-	buttons = addSortingButton(buttons, sorting, lang, "rating", states.CallbackSortingFilmsSelectRating)
-
-	buttons = addSortingButton(buttons, sorting, lang, "year", states.CallbackSortingFilmsSelectYear)
+	buttons = addSortingButton(buttons, sorting, lang, "is_favorite", states.CallbackSortingFilmsSelectIsFavorite)
 
 	buttons = addSortingButton(buttons, sorting, lang, "is_viewed", states.CallbackSortingFilmsSelectIsViewed)
 
-	buttons = addSortingButton(buttons, sorting, lang, "is_favorite", states.CallbackSortingFilmsSelectIsFavorite)
+	buttons = addSortingButton(buttons, sorting, lang, "title", states.CallbackSortingFilmsSelectTitle)
+
+	buttons = addSortingButton(buttons, sorting, lang, "year", states.CallbackSortingFilmsSelectYear)
+
+	buttons = addSortingButton(buttons, sorting, lang, "rating", states.CallbackSortingFilmsSelectRating)
 
 	buttons = addSortingButton(buttons, sorting, lang, "user_rating", states.CallbackSortingFilmsSelectUserRating)
 
