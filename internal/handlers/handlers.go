@@ -21,7 +21,7 @@ import (
 )
 
 func HandleUpdates(app models.App) {
-	sl.Log.Info("received update", slog.Int("telegram_id", utils.ParseTelegramID(app.Upd)))
+	sl.Log.Info("received update", slog.Int("from", utils.ParseTelegramID(app.Upd)))
 	logUpdate(app)
 
 	session, err := postgres.GetSessionByTelegramID(app)
@@ -324,5 +324,5 @@ func logUpdate(app models.App) {
 		inputDetails += fmt.Sprintf("(callback) %s", utils.ParseCallback(app.Upd))
 	}
 
-	app.SetUserPrefix(id).Printf(inputDetails)
+	app.UserLogger(id).Printf(inputDetails)
 }

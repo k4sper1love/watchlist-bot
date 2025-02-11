@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"log/slog"
 	"os"
 	"strconv"
 )
@@ -16,7 +17,7 @@ func LoadApp() (*models.App, error) {
 
 	rootID, err := strconv.Atoi(os.Getenv("ROOT_TELEGRAM_ID"))
 	if err != nil {
-		sl.Log.Error("failed to parse root_telegram_id")
+		sl.Log.Error("failed to parse root_telegram_id", slog.Any("error", err))
 		return nil, err
 	}
 
@@ -32,12 +33,10 @@ func LoadApp() (*models.App, error) {
 		YoutubeAPIToken:   os.Getenv("YOUTUBE_API_TOKEN"),
 		IMDBAPIToken:      os.Getenv("IMDB_API_TOKEN"),
 	}
-	sl.Log.Debug("vars successfully set")
 
 	app := &models.App{
 		Vars: vars,
 	}
-	sl.Log.Debug("app successfully created")
 
 	return app, nil
 }

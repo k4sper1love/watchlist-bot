@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/k4sper1love/watchlist-api/pkg/filters"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"net/url"
 )
@@ -17,6 +18,7 @@ import (
 func GetFilmFromKinopoisk(app models.App, url string) (*apiModels.Film, error) {
 	queryKey, id, err := utils.ExtractKinopoiskQuery(url)
 	if err != nil {
+		sl.Log.Error("failed to extract kinopoisk query", slog.Any("error", err), slog.String("url", url))
 		return nil, err
 	}
 
@@ -33,11 +35,12 @@ func GetFilmFromKinopoisk(app models.App, url string) (*apiModels.Film, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("failed response. Status is %s", resp.Status)
+		return nil, client.LogResponseError(reqUrl, resp.StatusCode, resp.Status)
 	}
 
 	film, err := parseFilmFromKinopoisk(resp.Body)
 	if err != nil {
+		sl.Log.Error("failed to parse film from Kinopoisk", slog.Any("error", err), slog.String("url", url))
 		return nil, err
 	}
 
@@ -46,8 +49,7 @@ func GetFilmFromKinopoisk(app models.App, url string) (*apiModels.Film, error) {
 
 func GetFilmsFromKinopoisk(app models.App, session *models.Session) ([]apiModels.Film, *filters.Metadata, error) {
 	headers := map[string]string{
-		"X-API-KEY":  app.Vars.KinopoiskAPIToken,
-		"User-Agent": "PostmanRuntime/7.31.1",
+		"X-API-KEY": app.Vars.KinopoiskAPIToken,
 	}
 
 	state := session.FilmsState
@@ -62,15 +64,14 @@ func GetFilmsFromKinopoisk(app models.App, session *models.Session) ([]apiModels
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, nil, fmt.Errorf("failed response. Status is %s", resp.Status)
+		return nil, nil, client.LogResponseError(reqUrl, resp.StatusCode, resp.Status)
 	}
 
 	films, metadata, err := parseFilmsFromKinopoisk(resp.Body)
 	if err != nil {
+		sl.Log.Error("failed to parse films from Kinopoisk", slog.Any("error", err), slog.String("url", reqUrl))
 		return nil, nil, err
 	}
-
-	log.Println(films)
 
 	return films, metadata, nil
 }
@@ -83,7 +84,7 @@ func parseFilmFromKinopoisk(data io.Reader) (*apiModels.Film, error) {
 
 	docs, ok := response["docs"].([]interface{})
 	if !ok || len(docs) == 0 {
-		return nil, fmt.Errorf("no films found in response")
+		return nil, fmt.Errorf("not found film in response")
 	}
 
 	filmData, ok := docs[0].(map[string]interface{})
@@ -91,9 +92,7 @@ func parseFilmFromKinopoisk(data io.Reader) (*apiModels.Film, error) {
 		return nil, fmt.Errorf("invalid film data format")
 	}
 
-	film := parseFilmDataKinopoisk(filmData)
-
-	return film, nil
+	return parseFilmDataKinopoisk(filmData)
 }
 
 func parseFilmsFromKinopoisk(data io.Reader) ([]apiModels.Film, *filters.Metadata, error) {
@@ -104,7 +103,7 @@ func parseFilmsFromKinopoisk(data io.Reader) ([]apiModels.Film, *filters.Metadat
 
 	docs, ok := response["docs"].([]interface{})
 	if !ok || len(docs) == 0 {
-		return nil, nil, fmt.Errorf("no films found in response")
+		return nil, nil, fmt.Errorf("not found films in response")
 	}
 
 	var films []apiModels.Film
@@ -113,64 +112,101 @@ func parseFilmsFromKinopoisk(data io.Reader) ([]apiModels.Film, *filters.Metadat
 		if !ok {
 			continue
 		}
-		film := parseFilmDataKinopoisk(filmData)
+
+		film, err := parseFilmDataKinopoisk(filmData)
+		if err != nil {
+			return nil, nil, err
+		}
+
 		film.URL = fmt.Sprintf("https://www.kinopoisk.ru/film/%d/", film.ID)
 		films = append(films, *film)
 	}
 
 	var metadata filters.Metadata
+
 	if total, ok := response["total"].(float64); ok {
 		metadata.TotalRecords = int(total)
+	} else {
+		return nil, nil, fmt.Errorf("failed to parse total")
 	}
+
 	if limit, ok := response["limit"].(float64); ok {
 		metadata.PageSize = int(limit)
+	} else {
+		return nil, nil, fmt.Errorf("failed to parse limit")
 	}
+
 	if page, ok := response["page"].(float64); ok {
 		metadata.CurrentPage = int(page)
+	} else {
+		return nil, nil, fmt.Errorf("failed to parse page")
 	}
+
 	if pages, ok := response["pages"].(float64); ok {
 		metadata.LastPage = int(pages)
+	} else {
+		return nil, nil, fmt.Errorf("failed to parse pages")
 	}
 
 	return films, &metadata, nil
 }
 
-func parseFilmDataKinopoisk(data map[string]interface{}) *apiModels.Film {
+func parseFilmDataKinopoisk(data map[string]interface{}) (*apiModels.Film, error) {
 	var film apiModels.Film
 
 	if id, ok := data["id"].(float64); ok {
 		film.ID = int(id)
+	} else {
+		return nil, fmt.Errorf("failed to parse id")
 	}
 
 	if title, ok := data["name"].(string); ok {
 		film.Title = title
+	} else {
+		return nil, fmt.Errorf("failed to parse title")
 	}
 
 	if year, ok := data["year"].(float64); ok {
 		film.Year = int(year)
+	} else {
+		return nil, fmt.Errorf("failed to parse year")
 	}
 
 	if genres, ok := data["genres"].([]interface{}); ok && len(genres) > 0 {
 		if firstGenre, ok := genres[0].(map[string]interface{}); ok {
 			film.Genre, _ = firstGenre["name"].(string)
+		} else {
+			return nil, fmt.Errorf("failed to parse genre")
 		}
+	} else {
+		return nil, fmt.Errorf("failed to parse genres")
 	}
 
 	if description, ok := data["description"].(string); ok {
 		film.Description = description
+	} else {
+		return nil, fmt.Errorf("failed to parse description")
 	}
 
 	if rating, ok := data["rating"].(map[string]interface{}); ok {
 		if kpRating, ok := rating["kp"].(float64); ok {
 			film.Rating = kpRating
+		} else {
+			return nil, fmt.Errorf("failed to parse rating")
 		}
+	} else {
+		return nil, fmt.Errorf("failed to parse rating")
 	}
 
 	if image, ok := data["poster"].(map[string]interface{}); ok {
 		if imageURL, ok := image["url"].(string); ok {
 			film.ImageURL = imageURL
+		} else {
+			return nil, fmt.Errorf("failed to parse image url")
 		}
+	} else {
+		return nil, fmt.Errorf("failed to parse poster")
 	}
 
-	return &film
+	return &film, nil
 }

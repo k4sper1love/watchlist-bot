@@ -11,6 +11,4 @@ func main() {
 		sl.Log.Error("application terminated due to an error")
 		os.Exit(1)
 	}
-
-	sl.Log.Info("application stopped without error")
 }

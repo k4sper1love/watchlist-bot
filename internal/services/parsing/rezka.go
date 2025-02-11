@@ -1,8 +1,8 @@
 package parsing
 
 import (
-	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"io"
@@ -15,17 +15,17 @@ import (
 func GetFilmFromRezka(url string) (*apiModels.Film, error) {
 	resp, err := client.SendRequestWithOptions(url, http.MethodGet, nil, nil)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("failed response. Status is %s", resp.Status)
+		return nil, client.LogResponseError(url, resp.StatusCode, resp.Status)
 	}
 
 	var film apiModels.Film
 	if err := parseFilmFromRezka(&film, resp.Body); err != nil {
+		sl.Log.Error("failed to parse film from Rezka")
 		return nil, err
 	}
 
