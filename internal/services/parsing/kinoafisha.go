@@ -4,26 +4,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"io"
-	"log/slog"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
 func GetFilmFromKinoafisha(url string) (*apiModels.Film, error) {
-	body, err := getDataFromKinoafisha(url)
-	defer body.Close()
+	resp, err := getDataFromKinoafisha(url)
 	if err != nil {
 		return nil, err
 	}
+	defer utils.CloseBody(resp.Body)
 
 	var film apiModels.Film
-	if err = parseFilmFromKinoafisha(&film, body); err != nil {
-		sl.Log.Error("failed to parse film from Kinoafisha", slog.Any("error", err), slog.String("url", url))
+	if err = parseFilmFromKinoafisha(&film, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -31,32 +30,29 @@ func GetFilmFromKinoafisha(url string) (*apiModels.Film, error) {
 }
 
 func GetSeriesFromKinoafisha(url string) (*apiModels.Film, error) {
-	body, err := getDataFromKinoafisha(url)
-	defer body.Close()
+	resp, err := getDataFromKinoafisha(url)
 	if err != nil {
 		return nil, err
 	}
+	defer utils.CloseBody(resp.Body)
 
 	var film apiModels.Film
-	if err = parseSeriesFromKinoafisha(&film, body); err != nil {
-		slog.Error("failed to parse series from Kinoafisha", slog.Any("error", err), slog.String("url", url))
+	if err = parseSeriesFromKinoafisha(&film, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
 	return &film, err
 }
 
-func getDataFromKinoafisha(url string) (io.ReadCloser, error) {
-	resp, err := client.SendRequestWithOptions(url, http.MethodGet, nil, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode != 200 {
-		return nil, client.LogResponseError(url, resp.StatusCode, resp.Status)
-	}
-
-	return resp.Body, nil
+func getDataFromKinoafisha(url string) (*http.Response, error) {
+	return client.Do(
+		&client.CustomRequest{
+			Method:             http.MethodGet,
+			URL:                url,
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 }
 
 func parseFilmFromKinoafisha(dest *apiModels.Film, data io.Reader) error {

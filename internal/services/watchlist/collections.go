@@ -6,6 +6,7 @@ import (
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"net/http"
 	"net/url"
 )
@@ -23,24 +24,23 @@ func GetCollectionsExcludeFilm(app models.App, session *models.Session) (*models
 }
 
 func getCollectionsRequest(app models.App, session *models.Session, filmID, excludeFilmID, currentPage, pageSize int) (*models.CollectionsResponse, error) {
-	headers := map[string]string{
-		"Authorization": session.AccessToken,
-	}
-
-	requestURL := buildGetCollectionsURL(app, session, filmID, excludeFilmID, currentPage, pageSize)
-
-	resp, err := client.SendRequestWithOptions(requestURL, http.MethodGet, nil, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.AccessToken,
+			Method:             http.MethodGet,
+			URL:                buildGetCollectionsURL(app, session, filmID, excludeFilmID, currentPage, pageSize),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("get_collections failed: %s", resp.Status)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	var collectionsResponse models.CollectionsResponse
-	if err := json.NewDecoder(resp.Body).Decode(&collectionsResponse); err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&collectionsResponse); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -48,69 +48,69 @@ func getCollectionsRequest(app models.App, session *models.Session, filmID, excl
 }
 
 func CreateCollection(app models.App, session *models.Session) (*apiModels.Collection, error) {
-	headers := map[string]string{
-		"Authorization": session.AccessToken,
-	}
-
-	resp, err := client.SendRequestWithOptions(app.Vars.Host+"/api/v1/collections", http.MethodPost, session.CollectionDetailState, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.AccessToken,
+			Method:             http.MethodPost,
+			URL:                fmt.Sprintf("%s/api/v1/collections", app.Vars.Host),
+			Body:               session.CollectionDetailState,
+			ExpectedStatusCode: http.StatusCreated,
+		},
+	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %w", err)
+		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusCreated {
-		return nil, fmt.Errorf("create_collection failed: %s", resp.Status)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	collection := &apiModels.Collection{}
-	if err := parseCollection(collection, resp.Body); err != nil {
-		return nil, fmt.Errorf("failed to parse collection: %w", err)
+	if err = parseCollection(collection, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		return nil, err
 	}
 
 	return collection, nil
 }
 
 func UpdateCollection(app models.App, session *models.Session) (*apiModels.Collection, error) {
-	headers := map[string]string{
-		"Authorization": session.AccessToken,
-	}
-
-	requestURL := fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID)
-
-	resp, err := client.SendRequestWithOptions(requestURL, http.MethodPut, session.CollectionDetailState, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.AccessToken,
+			Method:             http.MethodPut,
+			URL:                fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID),
+			Body:               session.CollectionDetailState,
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %w", err)
+		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("update_collection failed: %s", resp.Status)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	collection := &apiModels.Collection{}
-	if err := parseCollection(collection, resp.Body); err != nil {
-		return nil, fmt.Errorf("failed to parse collection: %w", err)
+	if err = parseCollection(collection, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		return nil, err
 	}
 
 	return collection, nil
 }
 
 func DeleteCollection(app models.App, session *models.Session) error {
-	headers := map[string]string{
-		"Authorization": session.AccessToken,
-	}
-
-	requestURL := fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID)
-
-	resp, err := client.SendRequestWithOptions(requestURL, http.MethodDelete, nil, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.AccessToken,
+			Method:             http.MethodDelete,
+			URL:                fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
-		return fmt.Errorf("failed to send request: %w", err)
+		return err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("delete_collection failed: %s", resp.Status)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	return nil
 }

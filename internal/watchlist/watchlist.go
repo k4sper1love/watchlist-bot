@@ -12,25 +12,24 @@ func Run() error {
 	sl.SetupLogger("dev")
 	sl.Log.Info("starting application")
 
-	sl.Log.Info("loading application config...")
 	app, err := config.LoadApp()
 	if err != nil {
 		return err
 	}
+	sl.Log.Info("application config loaded successfully")
 
 	sl.SetupLogger(app.Vars.Environment)
 
-	sl.Log.Info("opening database connection...")
 	if err = postgres.OpenDB(app.Vars); err != nil {
 		return err
 	}
+	sl.Log.Info("database connection established successfully")
 
-	sl.Log.Info("initializing translator...")
 	err = translator.InitTranslator("./locales")
 	if err != nil {
 		return err
 	}
+	sl.Log.Info("translator initialized successfully")
 
-	sl.Log.Info("starting bot...")
 	return bot.Run(app)
 }

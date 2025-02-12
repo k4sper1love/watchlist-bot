@@ -21,13 +21,11 @@ import (
 )
 
 func HandleUpdates(app models.App) {
-	sl.Log.Info("received update", slog.Int("from", utils.ParseTelegramID(app.Upd)))
 	logUpdate(app)
 
 	session, err := postgres.GetSessionByTelegramID(app)
 	if err != nil {
-		lang := utils.ParseLanguageCode(app.Upd)
-		msg := translator.Translate(lang, "sessionError", nil, nil)
+		msg := translator.Translate(utils.ParseLanguageCode(app.Upd), "sessionError", nil, nil)
 		app.SendMessage(msg, nil)
 		return
 	}
@@ -298,31 +296,38 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 		handleUserInput(app, session)
 	}
 
-	answerCallbackQuery(app, session)
+	answerCallbackQuery(app)
 }
 
-func answerCallbackQuery(app models.App, session *models.Session) {
+func answerCallbackQuery(app models.App) {
+	callback := app.Upd.CallbackQuery.ID
+
 	_, err := app.Bot.AnswerCallbackQuery(tgbotapi.CallbackConfig{
-		CallbackQueryID: app.Upd.CallbackQuery.ID,
+		CallbackQueryID: callback,
 		ShowAlert:       false,
 	})
 
 	if err != nil {
-		sl.Log.Error("failed to answer callback", slog.Any("error", err))
+		sl.Log.Error("failed to answer callback", slog.Any("error", err), slog.String("callback_id", callback))
 		return
 	}
 }
 
 func logUpdate(app models.App) {
-	id := utils.ParseTelegramID(app.Upd)
+	telegramID := utils.ParseTelegramID(app.Upd)
+	messageID := utils.ParseMessageID(app.Upd)
 
-	inputDetails := fmt.Sprintf("#%d ", utils.ParseMessageID(app.Upd))
-
+	input := fmt.Sprintf("#%d ", messageID)
 	if app.Upd.Message != nil {
-		inputDetails += fmt.Sprintf("(message) %s", utils.ParseMessageString(app.Upd))
+		utils.LogUpdateInfo(telegramID, messageID, "message")
+		input += fmt.Sprintf("(message) %s", utils.ParseMessageString(app.Upd))
 	} else if app.Upd.CallbackQuery != nil {
-		inputDetails += fmt.Sprintf("(callback) %s", utils.ParseCallback(app.Upd))
+		utils.LogUpdateInfo(telegramID, messageID, "callback")
+		input += fmt.Sprintf("(callback) %s", utils.ParseCallback(app.Upd))
+	} else {
+		utils.LogUpdateInfo(telegramID, messageID, "unknown")
+		input += "(unknown)"
 	}
 
-	app.UserLogger(id).Printf(inputDetails)
+	app.UserLogger(telegramID).Printf(input)
 }

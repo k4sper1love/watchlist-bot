@@ -23,7 +23,8 @@ func Auth(app models.App, session *models.Session) bool {
 		}
 	} else if !watchlist.IsTokenValid(app, session.AccessToken) {
 		if err := watchlist.RefreshAccessToken(app, session); err != nil {
-			if err := HandleAuthProcess(app, session); err != nil {
+			session.AccessToken = ""
+			if err = HandleAuthProcess(app, session); err != nil {
 				msg := translator.Translate(session.Lang, "authFailure", nil, nil)
 				app.SendMessage(msg, nil)
 				session.ClearAllStates()

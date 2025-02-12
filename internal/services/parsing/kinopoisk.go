@@ -18,29 +18,27 @@ import (
 func GetFilmFromKinopoisk(app models.App, url string) (*apiModels.Film, error) {
 	queryKey, id, err := utils.ExtractKinopoiskQuery(url)
 	if err != nil {
-		sl.Log.Error("failed to extract kinopoisk query", slog.Any("error", err), slog.String("url", url))
+		sl.Log.Error("failed to extract query", slog.Any("error", err), slog.String("url", url))
 		return nil, err
 	}
 
-	headers := map[string]string{
-		"X-API-KEY": app.Vars.KinopoiskAPIToken,
-	}
-
-	reqUrl := fmt.Sprintf("https://api.kinopoisk.dev/v1.4/movie?%s=%s", queryKey, id)
-
-	resp, err := client.SendRequestWithOptions(reqUrl, http.MethodGet, nil, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderExternalAPIKey,
+			HeaderValue:        app.Vars.KinopoiskAPIToken,
+			Method:             http.MethodGet,
+			URL:                fmt.Sprintf("https://api.kinopoisk.dev/v1.4/movie?%s=%s", queryKey, id),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return nil, client.LogResponseError(reqUrl, resp.StatusCode, resp.Status)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	film, err := parseFilmFromKinopoisk(resp.Body)
 	if err != nil {
-		sl.Log.Error("failed to parse film from Kinopoisk", slog.Any("error", err), slog.String("url", url))
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -48,28 +46,26 @@ func GetFilmFromKinopoisk(app models.App, url string) (*apiModels.Film, error) {
 }
 
 func GetFilmsFromKinopoisk(app models.App, session *models.Session) ([]apiModels.Film, *filters.Metadata, error) {
-	headers := map[string]string{
-		"X-API-KEY": app.Vars.KinopoiskAPIToken,
-	}
-
 	state := session.FilmsState
-
 	query := url.QueryEscape(state.Title)
-	reqUrl := fmt.Sprintf("https://api.kinopoisk.dev/v1.4/movie/search?page=%d&limit=%d&query=%s", state.CurrentPage, state.PageSize, query)
 
-	resp, err := client.SendRequestWithOptions(reqUrl, http.MethodGet, nil, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderExternalAPIKey,
+			HeaderValue:        app.Vars.KinopoiskAPIToken,
+			Method:             http.MethodGet,
+			URL:                fmt.Sprintf("https://api.kinopoisk.dev/v1.4/movie/search?page=%d&limit=%d&query=%s", state.CurrentPage, state.PageSize, query),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
 		return nil, nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, nil, client.LogResponseError(reqUrl, resp.StatusCode, resp.Status)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	films, metadata, err := parseFilmsFromKinopoisk(resp.Body)
 	if err != nil {
-		sl.Log.Error("failed to parse films from Kinopoisk", slog.Any("error", err), slog.String("url", reqUrl))
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return nil, nil, err
 	}
 
@@ -103,7 +99,7 @@ func parseFilmsFromKinopoisk(data io.Reader) ([]apiModels.Film, *filters.Metadat
 
 	docs, ok := response["docs"].([]interface{})
 	if !ok || len(docs) == 0 {
-		return nil, nil, fmt.Errorf("not found films in response")
+		return []apiModels.Film{}, &filters.Metadata{}, nil
 	}
 
 	var films []apiModels.Film

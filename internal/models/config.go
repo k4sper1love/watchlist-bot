@@ -3,11 +3,9 @@ package models
 import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/logger"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log/slog"
 	"os"
 	"unicode/utf8"
 )
@@ -38,11 +36,12 @@ type Vars struct {
 }
 
 type LogConfig struct {
+	ChatID    int64
+	MessageID int
 	NeedPin   bool
 	ImageURL  string
 	Text      string
 	File      string
-	MessageID int
 }
 
 func (app App) UserLogger(userID int) *logger.Wrapper {
@@ -64,41 +63,38 @@ func (app App) BotLogger() *logger.Wrapper {
 
 func (app App) send(msg tgbotapi.Chattable, config LogConfig) {
 	if msg == nil {
-		sl.Log.Error("error sending the message", slog.Any("error", fmt.Errorf("message is empty")))
+		utils.LogMessageError(fmt.Errorf("message is empty"), app.GetChatID(), -1)
 		return
 	}
 
 	sentMsg, err := app.Bot.Send(msg)
 	if err != nil {
-		sl.Log.Error("error sending the message", slog.Any("error", err))
+		utils.LogMessageError(err, app.GetChatID(), -1)
 		return
 	}
+	config.ChatID = sentMsg.Chat.ID
 	config.MessageID = sentMsg.MessageID
 
 	if config.NeedPin {
 		pinConfig := tgbotapi.PinChatMessageConfig{
-			ChatID:    sentMsg.Chat.ID,
-			MessageID: sentMsg.MessageID,
+			ChatID:    config.ChatID,
+			MessageID: config.MessageID,
 		}
 
 		_, err = app.Bot.PinChatMessage(pinConfig)
 		if err != nil {
-			sl.Log.Error("error pinning the message", slog.Any("error", err))
+			utils.LogMessageError(fmt.Errorf("failed to pin message: %v", err), config.ChatID, config.MessageID)
 		}
 	}
 
-	app.LogMessage(config)
-
-	sl.Log.Info(
-		"bot sent reply",
-		slog.Int64("to", sentMsg.Chat.ID),
-		slog.Int("message_id", sentMsg.MessageID),
-	)
+	app.logMessage(config)
 }
 
-func (app App) LogMessage(config LogConfig) {
+func (app App) logMessage(config LogConfig) {
+	utils.LogMessageInfo(config.ChatID, config.MessageID, config.Text != "", config.ImageURL != "", config.NeedPin)
+
 	if app.FileLogger == nil {
-		sl.Log.Error("error logging the message", slog.Any("error", fmt.Errorf("file logger is empty")))
+		utils.LogMessageError(fmt.Errorf("failed to log message: file logger is empty"), config.ChatID, config.MessageID)
 		return
 	}
 
@@ -133,9 +129,9 @@ func (app App) chunkTextAndSend(text string, keyboard *tgbotapi.InlineKeyboardMa
 	for utf8.RuneCountInString(text) > maxMessageLength && iterationLimit > 0 {
 		firstPart, secondPart := utils.SplitTextByLength(text, maxMessageLength)
 		if len(firstPart) == 0 {
-			sl.Log.Error("failed to chunk text", slog.Any("error", fmt.Errorf("first part is empty")))
-			errorMsg := translator.Translate("ru", "chunkTextError", nil, nil)
-			app.SendMessage(errorMsg, nil)
+			utils.LogMessageError(fmt.Errorf("failed to chuck text: first part is empty"), app.GetChatID(), -1)
+			msg := translator.Translate("ru", "chunkTextError", nil, nil)
+			app.SendMessage(msg, nil)
 			return
 		}
 		app.createAndSendMessage(firstPart, nil)
@@ -182,12 +178,12 @@ func (app App) sendImageInternal(config LogConfig, imagePath string, keyboard *t
 func (app App) SendImage(imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	imagePath, err := utils.DownloadImage(imageURL)
 	if err != nil {
-		app.handleDownloadImageError(err)
+		app.handleDownloadImageError(err, imageURL)
 		return
 	}
 	defer func() {
 		if err = os.Remove(imagePath); err != nil {
-			sl.Log.Warn("failed to remove temp image", slog.Any("error", err))
+			utils.LogRemoveFileWarn(err, imageURL)
 		}
 	}()
 
@@ -208,12 +204,12 @@ func (app App) SendBroadcastMessage(telegramIDs []int, text string, keyboard *tg
 func (app App) SendBroadcastImage(telegramIDs []int, imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	imagePath, err := utils.DownloadImage(imageURL)
 	if err != nil {
-		app.handleDownloadImageError(err)
+		app.handleDownloadImageError(err, imageURL)
 		return
 	}
 	defer func() {
-		if err := os.Remove(imagePath); err != nil {
-			sl.Log.Warn("failed to remove temp file", slog.Any("error", err))
+		if err = os.Remove(imagePath); err != nil {
+			utils.LogRemoveFileWarn(err, imageURL)
 		}
 	}()
 
@@ -242,12 +238,12 @@ func (app App) SendMessageByID(id int, text string, keyboard *tgbotapi.InlineKey
 func (app App) SendImageByID(id int, imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	imagePath, err := utils.DownloadImage(imageURL)
 	if err != nil {
-		app.handleDownloadImageError(err)
+		app.handleDownloadImageError(err, imageURL)
 		return
 	}
 	defer func() {
-		if err := os.Remove(imagePath); err != nil {
-			sl.Log.Warn("failed to remove temp image", slog.Any("error", err))
+		if err = os.Remove(imagePath); err != nil {
+			utils.LogRemoveFileWarn(err, imageURL)
 		}
 	}()
 
@@ -278,10 +274,11 @@ func (app App) SendFile(filepath string, text string, keyboard *tgbotapi.InlineK
 	app.send(msg, LogConfig{File: filepath, Text: text})
 }
 
-func (app App) handleDownloadImageError(err error) {
-	sl.Log.Error("failed to download image", slog.Any("error", err))
-	lang := utils.ParseLanguageCode(app.Upd)
-	msg := translator.Translate(lang, "someError", nil, nil)
+func (app App) handleDownloadImageError(err error, imageURL string) {
+	utils.LogDownloadFileError(err, imageURL)
+
+	msg := translator.Translate(utils.ParseLanguageCode(app.Upd), "someError", nil, nil)
 	app.SendMessage(msg, nil)
+
 	return
 }

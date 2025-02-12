@@ -3,66 +3,65 @@ package watchlist
 import (
 	"bytes"
 	"fmt"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"io"
-	"log"
+	"log/slog"
 	"mime/multipart"
 	"net/http"
 )
 
 func UploadImage(app models.App, data []byte) (string, error) {
-	request, err := prepareFileRequest(app, data)
+	body, headerValue, err := prepareImageParams(data)
 	if err != nil {
-		log.Printf("Error at 15: preparing file request: %v\n", err)
+		sl.Log.Error("failed to prepare image params", slog.Any("error", err))
 		return "", err
 	}
 
-	resp, err := client.SendRequest(request)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderContentType,
+			HeaderValue:        headerValue,
+			Method:             http.MethodPost,
+			URL:                fmt.Sprintf("%s/upload", app.Vars.Host),
+			Body:               body,
+			ExpectedStatusCode: http.StatusCreated,
+		},
+	)
 	if err != nil {
-		log.Printf("Error at 21: sending request: %v\n", err)
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer utils.CloseBody(resp.Body)
 
-	if resp.StatusCode != http.StatusCreated {
-		respBody, _ := io.ReadAll(resp.Body)
-		log.Printf("Error: server returned status %v. Response: %s\n", resp.StatusCode, string(respBody))
-		return "", fmt.Errorf("unexpected status code: %v", resp.StatusCode)
+	imageURL, err := parseImageURL(resp.Body)
+	if err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		return "", err
 	}
 
-	return parseImageURL(resp.Body)
+	return imageURL, nil
 }
 
-func prepareFileRequest(app models.App, data []byte) (*http.Request, error) {
-	var body bytes.Buffer
-	writer := multipart.NewWriter(&body)
+func prepareImageParams(data []byte) (*bytes.Buffer, string, error) {
+	var body *bytes.Buffer
+	writer := multipart.NewWriter(body)
 
 	part, err := writer.CreateFormFile("image", "image.jpg")
 	if err != nil {
-		log.Printf("Error at 35: creating form file: %v\n", err)
-		return nil, err
+		return nil, "", fmt.Errorf("failed to create form file: %v", err)
 	}
 
 	_, err = io.Copy(part, bytes.NewReader(data))
 	if err != nil {
-		log.Printf("Error at 41: copying image to form part: %v\n", err)
-		return nil, err
+		return nil, "", fmt.Errorf("failed to copy image: %v", err)
 	}
 
 	err = writer.Close()
 	if err != nil {
-		log.Printf("Error at 47: closing writer: %v\n", err)
-		return nil, err
+		return nil, "", fmt.Errorf("failed to close writer: %v", err)
 	}
 
-	request, err := http.NewRequest(http.MethodPost, app.Vars.Host+"/upload", &body)
-	if err != nil {
-		log.Printf("Error at 53: creating HTTP request: %v\n", err)
-		return nil, err
-	}
-
-	request.Header.Set("Content-Type", writer.FormDataContentType())
-
-	return request, nil
+	return body, writer.FormDataContentType(), nil
 }

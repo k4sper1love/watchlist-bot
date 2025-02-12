@@ -1,31 +1,32 @@
 package parsing
 
 import (
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
 func GetFilmFromRezka(url string) (*apiModels.Film, error) {
-	resp, err := client.SendRequestWithOptions(url, http.MethodGet, nil, nil)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			Method:             http.MethodGet,
+			URL:                url,
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return nil, client.LogResponseError(url, resp.StatusCode, resp.Status)
-	}
 
 	var film apiModels.Film
-	if err := parseFilmFromRezka(&film, resp.Body); err != nil {
-		sl.Log.Error("failed to parse film from Rezka")
+	if err = parseFilmFromRezka(&film, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -35,7 +36,7 @@ func GetFilmFromRezka(url string) (*apiModels.Film, error) {
 func parseFilmFromRezka(dest *apiModels.Film, data io.Reader) error {
 	doc, err := goquery.NewDocumentFromReader(data)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	dest.Title = strings.TrimSpace(doc.Find(".b-post__title").Text())
@@ -44,7 +45,7 @@ func parseFilmFromRezka(dest *apiModels.Film, data io.Reader) error {
 	year = strings.Replace(year, " года", "", 1)
 	dest.Year, err = strconv.Atoi(year)
 	if err != nil {
-		return nil
+		return fmt.Errorf("failed to parse year: %v", err)
 	}
 
 	doc.Find(".b-post__info tr").Each(func(i int, s *goquery.Selection) {
@@ -52,6 +53,7 @@ func parseFilmFromRezka(dest *apiModels.Film, data io.Reader) error {
 		if strings.Contains(label, "Жанр") {
 			genres := strings.TrimSpace(s.Find("td").Last().Text())
 			dest.Genre = strings.Split(genres, ",")[0]
+			return
 		}
 	})
 
@@ -61,11 +63,10 @@ func parseFilmFromRezka(dest *apiModels.Film, data io.Reader) error {
 
 	dest.Rating, err = strconv.ParseFloat(rating, 64)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse rating: %v", err)
 	}
 
 	dest.ImageURL = strings.TrimSpace(doc.Find(".b-sidecover a").AttrOr("href", ""))
 
-	log.Printf("Fetched film: %+v\n", dest)
 	return nil
 }

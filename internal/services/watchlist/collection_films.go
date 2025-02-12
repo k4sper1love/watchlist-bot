@@ -6,29 +6,29 @@ import (
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"net/http"
 	"net/url"
 )
 
 func GetCollectionFilms(app models.App, session *models.Session) (*models.CollectionFilmsResponse, error) {
-	headers := map[string]string{
-		"Authorization": session.AccessToken,
-	}
-
-	requestURL := buildGetCollectionFilmsURL(app, session)
-
-	resp, err := client.SendRequestWithOptions(requestURL, http.MethodGet, nil, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.AccessToken,
+			Method:             http.MethodGet,
+			URL:                buildGetCollectionFilmsURL(app, session),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("get_collection_films failed: %s", resp.Status)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	var collectionFilmsResponse models.CollectionFilmsResponse
-	if err := json.NewDecoder(resp.Body).Decode(&collectionFilmsResponse); err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&collectionFilmsResponse); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -36,71 +36,68 @@ func GetCollectionFilms(app models.App, session *models.Session) (*models.Collec
 }
 
 func CreateCollectionFilm(app models.App, session *models.Session) (*apiModels.CollectionFilm, error) {
-	headers := map[string]string{
-		"Authorization": session.AccessToken,
-	}
-
-	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films", app.Vars.Host, session.CollectionDetailState.Collection.ID)
-
-	resp, err := client.SendRequestWithOptions(requestURL, http.MethodPost, session.FilmDetailState, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.AccessToken,
+			Method:             http.MethodPost,
+			URL:                fmt.Sprintf("%s/api/v1/collections/%d/films", app.Vars.Host, session.CollectionDetailState.Collection.ID),
+			Body:               session.FilmDetailState,
+			ExpectedStatusCode: http.StatusCreated,
+		},
+	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %w", err)
+		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusCreated {
-		return nil, fmt.Errorf("create_collection_film failed: %d", resp.StatusCode)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	collectionFilm := &apiModels.CollectionFilm{}
-	if err := parseCollectionFilm(collectionFilm, resp.Body); err != nil {
-		return nil, fmt.Errorf("failed to parse collection film: %w", err)
+	if err = parseCollectionFilm(collectionFilm, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		return nil, err
 	}
 
 	return collectionFilm, nil
 }
 
 func AddCollectionFilm(app models.App, session *models.Session) (*apiModels.CollectionFilm, error) {
-	headers := map[string]string{
-		"Authorization": session.AccessToken,
-	}
-
-	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID)
-
-	resp, err := client.SendRequestWithOptions(requestURL, http.MethodPost, nil, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.AccessToken,
+			Method:             http.MethodPost,
+			URL:                fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID),
+			ExpectedStatusCode: http.StatusCreated,
+		},
+	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %w", err)
+		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusCreated {
-		return nil, fmt.Errorf("add_collection_film failed: %d", resp.StatusCode)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	collectionFilm := &apiModels.CollectionFilm{}
-	if err := parseCollectionFilm(collectionFilm, resp.Body); err != nil {
-		return nil, fmt.Errorf("failed to parse collection film: %w", err)
+	if err = parseCollectionFilm(collectionFilm, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		return nil, err
 	}
 
 	return collectionFilm, nil
 }
 
 func DeleteCollectionFilm(app models.App, session *models.Session) error {
-	headers := map[string]string{
-		"Authorization": session.AccessToken,
-	}
-
-	requestURL := fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID)
-
-	resp, err := client.SendRequestWithOptions(requestURL, http.MethodDelete, nil, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.AccessToken,
+			Method:             http.MethodDelete,
+			URL:                fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
-		return fmt.Errorf("failed to send request: %w", err)
+		return err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("delete_collection_film failed: %s", resp.Status)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	return nil
 }

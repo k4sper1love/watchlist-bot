@@ -4,6 +4,8 @@ import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
+	"io"
+	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -224,7 +226,7 @@ func ExtractYoutubeVideoID(rawUrl string) (string, error) {
 	videoID := query.Get("v")
 
 	if videoID == "" {
-		return "", fmt.Errorf("couldn't extract video ID")
+		return "", fmt.Errorf("could not extract video ID")
 	}
 
 	return videoID, nil
@@ -353,4 +355,26 @@ func GetLogFilePath(userID int) (string, error) {
 	}
 
 	return logFile, nil
+}
+
+func ParseHeaders(request *http.Request, keys ...string) map[string]string {
+	var headers map[string]string
+
+	for _, key := range keys {
+		headers[key] = request.Header.Get(key)
+	}
+
+	return headers
+}
+
+func CloseBody(Body io.ReadCloser) {
+	if err := Body.Close(); err != nil {
+		LogBodyCloseWarn(err)
+	}
+}
+
+func CloseFile(file *os.File) {
+	if err := file.Close(); err != nil {
+		LogFileCloseWarn(err)
+	}
 }

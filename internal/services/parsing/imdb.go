@@ -7,6 +7,7 @@ import (
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"io"
 	"log/slog"
 	"net/http"
@@ -21,21 +22,21 @@ func GetFilmFromIMDB(app models.App, url string) (*apiModels.Film, error) {
 		return nil, err
 	}
 
-	reqUrl := fmt.Sprintf("http://www.omdbapi.com/?apikey=%s&i=%s&plot=full", app.Vars.IMDBAPIToken, id)
-
-	resp, err := client.SendRequestWithOptions(reqUrl, http.MethodGet, nil, nil)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			Method:             http.MethodGet,
+			URL:                fmt.Sprintf("http://www.omdbapi.com/?apikey=%s&i=%s&plot=full", app.Vars.IMDBAPIToken, id),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return nil, client.LogResponseError(reqUrl, resp.StatusCode, resp.Status)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	var film apiModels.Film
-	if err := parseFilmFromIMDB(&film, resp.Body); err != nil {
-		sl.Log.Error("failed to parse film from IMDB", slog.Any("error", err), slog.String("url", reqUrl))
+	if err = parseFilmFromIMDB(&film, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
