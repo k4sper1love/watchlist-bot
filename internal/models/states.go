@@ -98,6 +98,7 @@ type AdminState struct {
 	TotalRecords     int        `json:"-"`
 	FeedbackMessage  string     `json:"-"`
 	FeedbackImageURL string     `json:"-"`
+	NeedFeedbackPin  bool       `json:"-"`
 }
 
 func (s *FilmsState) Clear() {
@@ -114,6 +115,7 @@ func (s *CollectionsState) Clear() {
 func (s *AdminState) Clear() {
 	s.FeedbackMessage = ""
 	s.FeedbackImageURL = ""
+	s.NeedFeedbackPin = false
 }
 
 func (s *ProfileState) Clear() {

@@ -34,7 +34,7 @@ type Vars struct {
 	IMDBAPIToken    string
 }
 
-type LogConfig struct {
+type MessageConfig struct {
 	ChatID    int64
 	MessageID int
 	NeedPin   bool
@@ -60,7 +60,7 @@ func (app App) BotLogger() *logger.Wrapper {
 	return app.FileLogger
 }
 
-func (app App) send(msg tgbotapi.Chattable, config LogConfig) {
+func (app App) send(msg tgbotapi.Chattable, config MessageConfig) {
 	if msg == nil {
 		utils.LogMessageError(fmt.Errorf("message is empty"), app.GetChatID(), -1)
 		return
@@ -89,7 +89,7 @@ func (app App) send(msg tgbotapi.Chattable, config LogConfig) {
 	app.logMessage(config)
 }
 
-func (app App) logMessage(config LogConfig) {
+func (app App) logMessage(config MessageConfig) {
 	utils.LogMessageInfo(config.ChatID, config.MessageID, config.Text != "", config.ImageURL != "", config.NeedPin)
 
 	if app.FileLogger == nil {
@@ -149,14 +149,14 @@ func (app App) createAndSendMessage(text string, keyboard *tgbotapi.InlineKeyboa
 		msg.ReplyMarkup = keyboard
 	}
 
-	app.send(msg, LogConfig{Text: text})
+	app.send(msg, MessageConfig{Text: text})
 }
 
 func (app App) SendMessage(text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	app.chunkTextAndSend(text, keyboard)
 }
 
-func (app App) sendImageInternal(config LogConfig, imagePath string, keyboard *tgbotapi.InlineKeyboardMarkup) {
+func (app App) sendImageInternal(config MessageConfig, imagePath string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	msg := tgbotapi.NewPhotoUpload(app.GetChatID(), imagePath)
 	msg.ParseMode = "HTML"
 	runeLen := utf8.RuneCountInString(config.Text)
@@ -167,7 +167,7 @@ func (app App) sendImageInternal(config LogConfig, imagePath string, keyboard *t
 		msg.ReplyMarkup = keyboard
 	}
 
-	app.send(msg, LogConfig{NeedPin: config.NeedPin, Text: msg.Caption, ImageURL: config.ImageURL})
+	app.send(msg, MessageConfig{NeedPin: config.NeedPin, Text: msg.Caption, ImageURL: config.ImageURL})
 
 	if runeLen > maxCaptionLength {
 		app.chunkTextAndSend(config.Text, keyboard)
@@ -186,21 +186,21 @@ func (app App) SendImage(imageURL, text string, keyboard *tgbotapi.InlineKeyboar
 		}
 	}()
 
-	app.sendImageInternal(LogConfig{Text: text, ImageURL: imageURL}, imagePath, keyboard)
+	app.sendImageInternal(MessageConfig{Text: text, ImageURL: imageURL}, imagePath, keyboard)
 }
 
-func (app App) SendBroadcastMessage(telegramIDs []int, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
+func (app App) SendBroadcastMessage(telegramIDs []int, text string, needPin bool, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	for _, telegramID := range telegramIDs {
 		msg := tgbotapi.NewMessage(int64(telegramID), text)
 		if keyboard != nil {
 			msg.ReplyMarkup = keyboard
 		}
 		app.FileLogger = logger.GetLogger(telegramID)
-		app.send(msg, LogConfig{NeedPin: true, Text: text})
+		app.send(msg, MessageConfig{NeedPin: needPin, Text: text})
 	}
 }
 
-func (app App) SendBroadcastImage(telegramIDs []int, imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
+func (app App) SendBroadcastImage(telegramIDs []int, imageURL, text string, needPin bool, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	imagePath, err := utils.DownloadImage(imageURL)
 	if err != nil {
 		app.handleDownloadImageError(err, imageURL)
@@ -215,7 +215,7 @@ func (app App) SendBroadcastImage(telegramIDs []int, imageURL, text string, keyb
 	for _, telegramID := range telegramIDs {
 		app.FileLogger = logger.GetLogger(telegramID)
 		app.Upd = &tgbotapi.Update{Message: &tgbotapi.Message{Chat: &tgbotapi.Chat{ID: int64(telegramID)}}}
-		app.sendImageInternal(LogConfig{NeedPin: true, Text: text, ImageURL: imageURL}, imagePath, keyboard)
+		app.sendImageInternal(MessageConfig{NeedPin: needPin, Text: text, ImageURL: imageURL}, imagePath, keyboard)
 	}
 }
 
@@ -270,7 +270,7 @@ func (app App) SendFile(filepath string, text string, keyboard *tgbotapi.InlineK
 		msg.ReplyMarkup = keyboard
 	}
 
-	app.send(msg, LogConfig{File: filepath, Text: text})
+	app.send(msg, MessageConfig{File: filepath, Text: text})
 }
 
 func (app App) handleDownloadImageError(err error, imageURL string) {

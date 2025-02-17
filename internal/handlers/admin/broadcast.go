@@ -9,7 +9,6 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log"
 )
 
 func HandleBroadcastCommand(app models.App, session *models.Session) {
@@ -36,6 +35,9 @@ func HandleBroadcastProcess(app models.App, session *models.Session) {
 	case states.ProcessAdminBroadcastAwaitingText:
 		parseBroadcastMessage(app, session)
 
+	case states.ProcessAdminBroadcastAwaitingPin:
+		parseBroadcastPin(app, session)
+
 	case states.ProcessAdminBroadcastAwaitingConfirm:
 		parseBroadcastConfirm(app, session)
 	}
@@ -49,7 +51,6 @@ func parseBroadcastImage(app models.App, session *models.Session) {
 
 	image, err := utils.ParseImageFromMessage(app.Bot, app.Upd)
 	if err != nil {
-		log.Println(err)
 		handleBroadcastImageError(app, session)
 		return
 	}
@@ -77,7 +78,7 @@ func requestBroadcastMessage(app models.App, session *models.Session) {
 
 func parseBroadcastMessage(app models.App, session *models.Session) {
 	if utils.IsSkip(app.Upd) {
-		requestBroadcastConfirm(app, session)
+		requestBroadcastPin(app, session)
 		return
 	}
 
@@ -85,8 +86,30 @@ func parseBroadcastMessage(app models.App, session *models.Session) {
 
 	session.AdminState.FeedbackMessage = msg
 
+	requestBroadcastPin(app, session)
+}
+
+func requestBroadcastPin(app models.App, session *models.Session) {
+	msg := "📌 " + translator.Translate(session.Lang, "requestBroadcastPin", nil, nil)
+
+	keyboard := keyboards.NewKeyboard().AddSurvey().AddCancel().Build(session.Lang)
+
+	app.SendMessage(msg, keyboard)
+
+	session.SetState(states.ProcessAdminBroadcastAwaitingPin)
+}
+
+func parseBroadcastPin(app models.App, session *models.Session) {
+	if utils.IsAgree(app.Upd) {
+		session.AdminState.NeedFeedbackPin = true
+	}
+
+	previewBroadcast(app, session)
+}
+
+func previewBroadcast(app models.App, session *models.Session) {
 	previewMsg := translator.Translate(session.Lang, "preview", nil, nil)
-	msg = fmt.Sprintf("👁️ <i>%s:</i>\n\n%s", previewMsg, msg)
+	msg := fmt.Sprintf("👁️ <i>%s:</i>\n\n%s", previewMsg, session.AdminState.FeedbackMessage)
 
 	if session.AdminState.FeedbackImageURL != "" {
 		app.SendImage(session.AdminState.FeedbackImageURL, msg, nil)
@@ -118,6 +141,10 @@ func requestBroadcastConfirm(app models.App, session *models.Session) {
 	countMsg := "👥 " + translator.Translate(session.Lang, "recipientCount", nil, nil)
 	msg := fmt.Sprintf("<b>%s</b>: %d", countMsg, count)
 
+	if session.AdminState.NeedFeedbackPin {
+		msg += "\n\n📌 " + translator.Translate(session.Lang, "messageWillBePin", nil, nil)
+	}
+
 	keyboard := keyboards.BuildBroadcastConfirmKeyboard(session)
 
 	app.SendMessage(msg, keyboard)
@@ -138,9 +165,9 @@ func parseBroadcastConfirm(app models.App, session *models.Session) {
 		}
 
 		if session.AdminState.FeedbackImageURL != "" {
-			app.SendBroadcastImage(telegramIDs, session.AdminState.FeedbackImageURL, session.AdminState.FeedbackMessage, nil)
+			app.SendBroadcastImage(telegramIDs, session.AdminState.FeedbackImageURL, session.AdminState.FeedbackMessage, session.AdminState.NeedFeedbackPin, nil)
 		} else {
-			app.SendBroadcastMessage(telegramIDs, session.AdminState.FeedbackMessage, nil)
+			app.SendBroadcastMessage(telegramIDs, session.AdminState.FeedbackMessage, session.AdminState.NeedFeedbackPin, nil)
 		}
 	}
 

@@ -118,8 +118,9 @@ const (
 	// admin broadcast states
 	CallbackAdminBroadcastBack           = "admin_broadcast_back"
 	CallbackAdminBroadcastSend           = "admin_broadcast_send"
-	ProcessAdminBroadcastAwaitingText    = "admin_broadcast_awaiting_text"
 	ProcessAdminBroadcastAwaitingImage   = "admin_broadcast_awaiting_image"
+	ProcessAdminBroadcastAwaitingText    = "admin_broadcast_awaiting_text"
+	ProcessAdminBroadcastAwaitingPin     = "admin_broadcast_awaiting_pin"
 	ProcessAdminBroadcastAwaitingConfirm = "admin_broadcast_awaiting_confirm"
 
 	// profile states
