@@ -20,6 +20,7 @@ var menuButtons = []Button{
 
 var settingsButtons = []Button{
 	{"🈳", "language", states.CallbackSettingsLanguage, "", true},
+	{"🌐", "kinopoiskToken", states.CallbackSettingsKinopoiskToken, "", true},
 	{"🔢", "collectionsPageSize", states.CallbackSettingsCollectionsPageSize, "", true},
 	{"🔢", "filmsPageSize", states.CallbackSettingsFilmsPageSize, "", true},
 	{"🔢", "objectsPageSize", states.CallbackSettingsObjectsPageSize, "", true},

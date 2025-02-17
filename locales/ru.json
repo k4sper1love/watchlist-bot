@@ -2,6 +2,30 @@
   "choiceLanguage": {
     "other": "Пожалуйста, выберите язык для общения с ботом. Вы сможете поменять его в настройках"
   },
+  "kinopoiskToken": {
+    "other": "Kinopoisk токен"
+  },
+  "currentToken": {
+    "other": "Текущий токен"
+  },
+  "changeToken": {
+    "other": "Сменить токен"
+  },
+  "tokenLimit": {
+    "other": "Вы достигли суточного лимита для работы с Kinopoisk"
+  },
+ "tokenFailure":{
+   "other": "Неправильный Kinopoisk токен"
+ },
+  "tokenRequestInfo": {
+    "other": "Получите токен в @kinopoiskdev_bot для работы с Kinopoisk"
+  },
+  "tokenRequest": {
+    "other": "Введите полученный токен"
+  },
+  "tokenSuccess": {
+    "other": "Токен успешно установлен"
+  },
   "logsNotFound": {
     "other": "Файл с логами не найден"
   },

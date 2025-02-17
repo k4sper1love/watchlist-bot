@@ -14,6 +14,8 @@ import (
 )
 
 func GetFilmFromKinoafisha(url string) (*apiModels.Film, error) {
+	url = fmt.Sprintf("https://www.kinoafisha.info/movies/%s", parseKinoafishaID(url))
+
 	resp, err := getDataFromKinoafisha(url)
 	if err != nil {
 		return nil, err
@@ -30,6 +32,8 @@ func GetFilmFromKinoafisha(url string) (*apiModels.Film, error) {
 }
 
 func GetSeriesFromKinoafisha(url string) (*apiModels.Film, error) {
+	url = fmt.Sprintf("https://www.kinoafisha.info/series/%s", parseKinoafishaID(url))
+
 	resp, err := getDataFromKinoafisha(url)
 	if err != nil {
 		return nil, err
@@ -61,30 +65,24 @@ func parseFilmFromKinoafisha(dest *apiModels.Film, data io.Reader) error {
 		return err
 	}
 
-	title := doc.Find(".trailer_title").Text()
-	title = strings.Split(title, ",")[0]
-	dest.Title = strings.TrimSpace(title)
+	dest.Title = client.GetTextOrDefault(doc, ".newFilmInfo_title", "Unknown")
+	dest.Title = strings.Split(dest.Title, ",")[0]
 
-	year := strings.TrimSpace(doc.Find(".trailer_year").Text())
-	year = strings.Split(year, "/")[0]
-	dest.Year, err = strconv.Atoi(strings.TrimSpace(year))
-	if err != nil {
-		return fmt.Errorf("failed to parse year: %v", err)
+	dest.Year = getKinoafishaYear(doc)
+
+	dest.Genre = client.GetTextOrDefault(doc, ".newFilmInfo_genreItem", "")
+	dest.Description = client.GetTextOrDefault(doc, ".more_content p", "")
+
+	ratingStr := client.GetTextOrDefault(doc, ".rating_imdb ", "0")
+	parts := strings.Split(ratingStr, ":")
+	if len(parts) > 1 {
+		ratingStr = parts[1]
+	} else {
+		ratingStr = "0"
 	}
+	dest.Rating, _ = strconv.ParseFloat(strings.TrimSpace(ratingStr), 64)
 
-	genre := doc.Find(".filmInfo_genreItem").First().Text()
-	dest.Genre = strings.TrimSpace(genre)
-
-	description := doc.Find(".filmDesc_editor").First().Text()
-	dest.Description = strings.TrimSpace(description)
-
-	rating := doc.Find(".rating_num").Text()
-	dest.Rating, err = strconv.ParseFloat(strings.TrimSpace(rating), 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse rating: %v", err)
-	}
-
-	dest.ImageURL = doc.Find(".filmInfo_posterLink").First().AttrOr("href", "")
+	dest.ImageURL = getKinoafishaImageURL(doc)
 
 	return nil
 }
@@ -92,39 +90,61 @@ func parseFilmFromKinoafisha(dest *apiModels.Film, data io.Reader) error {
 func parseSeriesFromKinoafisha(dest *apiModels.Film, data io.Reader) error {
 	doc, err := goquery.NewDocumentFromReader(data)
 	if err != nil {
-		return nil
+		return err
 	}
 
-	title := doc.Find(".newFilmInfo_title").Text()
-	title = strings.Split(title, "(")[0]
-	dest.Title = strings.TrimSpace(title)
+	doc.Find(".newFilmInfo_breadcrumbs .breadcrumbs_item").Each(func(i int, s *goquery.Selection) {
+		if i == 2 {
+			dest.Title = strings.TrimSpace(s.Text())
+		}
+	})
 
-	year := strings.TrimSpace(doc.Find(".newFilmInfo_infoData").First().Text())
-	dest.Year, err = strconv.Atoi(strings.TrimSpace(year))
-	if err != nil {
-		return fmt.Errorf("failed to parse year: %v", err)
-	}
+	dest.Year = getKinoafishaYear(doc)
 
-	genre := doc.Find(".newFilmInfo_genreItem ").First().Text()
-	dest.Genre = strings.TrimSpace(genre)
+	dest.Genre = client.GetTextOrDefault(doc, ".newFilmInfo_genreItem", "")
+	dest.Description = client.GetTextOrDefault(doc, ".more_content p", "")
 
-	description := doc.Find(".newFilmInfo_descEditor").First().Text()
-	dest.Description = strings.TrimSpace(description)
+	ratingStr := client.GetTextOrDefault(doc, ".ratingBlockCard_externalVal", "0")
+	dest.Rating, _ = strconv.ParseFloat(strings.TrimSpace(ratingStr), 64)
 
-	rating := doc.Find(".ratingBlockCard_externalVal").First().Text()
-	dest.Rating, err = strconv.ParseFloat(strings.TrimSpace(rating), 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse rating: %v", err)
-	}
+	dest.ImageURL = getKinoafishaImageURL(doc)
 
+	return nil
+}
+
+func getKinoafishaImageURL(doc *goquery.Document) string {
 	imageData := doc.Find(".newFilmInfo_posterSlide").AttrOr("data-fullscreengallery-item", "")
 	imageData = strings.Replace(imageData, "\\", "", -1)
 
 	var jsonData map[string]string
-	if err = json.Unmarshal([]byte(imageData), &jsonData); err != nil {
-		return fmt.Errorf("failed to parse image data: %v", err)
+	if err := json.Unmarshal([]byte(imageData), &jsonData); err == nil {
+		return strings.TrimSpace(jsonData["image"])
 	}
-	dest.ImageURL = strings.TrimSpace(jsonData["image"])
 
-	return nil
+	return ""
+}
+
+func getKinoafishaYear(doc *goquery.Document) int {
+	var year int
+	doc.Find(".newFilmInfo_infoItem").Each(func(i int, s *goquery.Selection) {
+		name := s.Find(".newFilmInfo_infoName").Text()
+		if strings.Contains(name, "Год выпуска") {
+			yearStr := s.Find(".newFilmInfo_infoData").Text()
+			yearStr = strings.TrimSpace(yearStr)
+			year, _ = strconv.Atoi(yearStr)
+		}
+	})
+
+	return year
+}
+
+func parseKinoafishaID(url string) string {
+	shortUrl := strings.TrimPrefix(url, "https://www.kinoafisha.info/")
+	parts := strings.Split(shortUrl, "/")
+
+	if len(parts) > 0 {
+		return parts[1]
+	}
+
+	return ""
 }

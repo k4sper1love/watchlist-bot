@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"log"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -44,6 +47,8 @@ func SendRequestWithOptions(requestURL, method string, body any, headers map[str
 
 	AddRequestHeaders(req, headers)
 
+	log.Println(req.Header)
+
 	resp, err := SendRequest(req)
 	if err != nil {
 		return nil, err
@@ -77,10 +82,15 @@ func prepareRequest(requestURL, method string, data any) (*http.Request, error) 
 }
 
 func Do(request *CustomRequest) (*http.Response, error) {
-	headers := map[string]string{
-		request.HeaderType: request.HeaderValue,
+	var headers map[string]string
+
+	if request.HeaderType != "" {
+		headers = map[string]string{
+			request.HeaderType: request.HeaderValue,
+		}
 	}
 
+	log.Println(request.URL, request.Body, headers)
 	resp, err := SendRequestWithOptions(request.URL, request.Method, request.Body, headers)
 	if err != nil {
 		return nil, err
@@ -92,4 +102,20 @@ func Do(request *CustomRequest) (*http.Response, error) {
 	}
 
 	return resp, nil
+}
+
+func ParseErrorStatusCode(err error) int {
+	errStr := err.Error()
+
+	if strings.HasPrefix(errStr, "failed response") {
+		parts := strings.Split(errStr, "code")
+		codeStr := strings.TrimSpace(parts[len(parts)-1])
+		code, err := strconv.Atoi(codeStr)
+		if err != nil {
+			return -1
+		}
+		return code
+	}
+
+	return -1
 }

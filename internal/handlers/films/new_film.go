@@ -4,8 +4,10 @@ import (
 	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"github.com/k4sper1love/watchlist-bot/internal/services/parsing"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
@@ -33,6 +35,9 @@ func HandleNewFilmButtons(app models.App, session *models.Session) {
 
 	case states.CallbackNewFilmSelectFind:
 		handleNewFilmFind(app, session)
+
+	case states.CallbackNewFilmSelectChangeKinopoiskToken:
+		requestKinopoiskToken(app, session)
 	}
 }
 
@@ -81,10 +86,18 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 
 	case states.ProcessNewFilmAwaitingReview:
 		parseNewFilmReview(app, session)
+
+	case states.ProcessNewFilmAwaitingKinopoiskToken:
+		parseKinopoiskToken(app, session)
 	}
 }
 
 func handleNewFilmFind(app models.App, session *models.Session) {
+	if session.KinopoiskAPIToken == "" {
+		requestKinopoiskToken(app, session)
+		return
+	}
+
 	msg := "❓" + translator.Translate(session.Lang, "filmRequestTitle", nil, nil)
 
 	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
@@ -120,9 +133,19 @@ func handleNewFilmFromURL(app models.App, session *models.Session) {
 
 func parseNewFilmFromURL(app models.App, session *models.Session) {
 	url := utils.ParseMessageString(app.Upd)
+	isKinopoisk := parsing.IsKinopoisk(url)
+
+	if isKinopoisk && session.KinopoiskAPIToken == "" {
+		requestKinopoiskToken(app, session)
+		return
+	}
 
 	film, err := parsing.GetFilmByURL(app, session, url)
 	if err != nil {
+		if isKinopoisk {
+			handleKinopoiskError(app, session, err)
+			return
+		}
 		msg := "🚨 " + translator.Translate(session.Lang, "getFilmFailure", nil, nil)
 		app.SendMessage(msg, nil)
 		session.ClearAllStates()
@@ -415,4 +438,46 @@ func parseAndUploadImageFromURL(app models.App, url string) (string, error) {
 	}
 
 	return watchlist.UploadImage(app, image)
+}
+
+func requestKinopoiskToken(app models.App, session *models.Session) {
+	msg := messages.BuildKinopoiskTokenMessage(session)
+
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
+
+	app.SendMessage(msg, keyboard)
+
+	session.SetState(states.ProcessNewFilmAwaitingKinopoiskToken)
+}
+
+func parseKinopoiskToken(app models.App, session *models.Session) {
+	token := utils.ParseMessageString(app.Upd)
+
+	session.KinopoiskAPIToken = token
+
+	msg := messages.BuildKinopoiskTokenSuccessMessage(session)
+	app.SendMessage(msg, nil)
+
+	HandleNewFilmCommand(app, session)
+}
+
+func handleKinopoiskError(app models.App, session *models.Session, err error) {
+	session.ClearAllStates()
+
+	msg := "🚨 "
+	switch client.ParseErrorStatusCode(err) {
+	case 401:
+		msg += translator.Translate(session.Lang, "tokenFailure", nil, nil)
+	case 403:
+		msg += translator.Translate(session.Lang, "tokenLimit", nil, nil)
+	default:
+		msg += translator.Translate(session.Lang, "getFilmFailure", nil, nil)
+		app.SendMessage(msg, nil)
+		HandleNewFilmCommand(app, session)
+		return
+	}
+
+	keyboard := keyboards.NewKeyboard().AddChangeToken().AddBack(states.CallbackFilmsNew).Build(session.Lang)
+
+	app.SendMessage(msg, keyboard)
 }

@@ -331,6 +331,10 @@ func (k *Keyboard) AddFavorite(isFavorite bool, callback string) *Keyboard {
 	return k.AddButton(utils.BoolToStar(!isFavorite), messageCode, callback, "", true)
 }
 
+func (k *Keyboard) AddChangeToken() *Keyboard {
+	return k.AddButton("🔄", "changeToken", states.CallbackNewFilmSelectChangeKinopoiskToken, "", true)
+}
+
 func parseFiltersFilmsButtons(filter *models.FiltersFilm, lang string) []Button {
 	var buttons []Button
 

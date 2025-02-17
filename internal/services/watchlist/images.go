@@ -14,26 +14,21 @@ import (
 )
 
 func UploadImage(app models.App, data []byte) (string, error) {
-	body, headerValue, err := prepareImageParams(data)
+	req, err := prepareImageRequest(app, data)
 	if err != nil {
-		sl.Log.Error("failed to prepare image params", slog.Any("error", err))
+		sl.Log.Error("failed to prepare request", slog.Any("error", err))
 		return "", err
 	}
 
-	resp, err := client.Do(
-		&client.CustomRequest{
-			HeaderType:         client.HeaderContentType,
-			HeaderValue:        headerValue,
-			Method:             http.MethodPost,
-			URL:                fmt.Sprintf("%s/upload", app.Vars.Host),
-			Body:               body,
-			ExpectedStatusCode: http.StatusCreated,
-		},
-	)
+	resp, err := client.SendRequest(req)
 	if err != nil {
 		return "", err
 	}
 	defer utils.CloseBody(resp.Body)
+
+	if resp.StatusCode != 201 {
+		return "", utils.LogResponseError(req.URL.String(), req.Method, resp.StatusCode, resp.Status)
+	}
 
 	imageURL, err := parseImageURL(resp.Body)
 	if err != nil {
@@ -44,24 +39,31 @@ func UploadImage(app models.App, data []byte) (string, error) {
 	return imageURL, nil
 }
 
-func prepareImageParams(data []byte) (*bytes.Buffer, string, error) {
-	var body *bytes.Buffer
+func prepareImageRequest(app models.App, data []byte) (*http.Request, error) {
+	body := new(bytes.Buffer)
 	writer := multipart.NewWriter(body)
 
 	part, err := writer.CreateFormFile("image", "image.jpg")
 	if err != nil {
-		return nil, "", fmt.Errorf("failed to create form file: %v", err)
+		return nil, fmt.Errorf("failed to create form file: %v", err)
 	}
 
 	_, err = io.Copy(part, bytes.NewReader(data))
 	if err != nil {
-		return nil, "", fmt.Errorf("failed to copy image: %v", err)
+		return nil, fmt.Errorf("failed to copy image: %v", err)
 	}
 
 	err = writer.Close()
 	if err != nil {
-		return nil, "", fmt.Errorf("failed to close writer: %v", err)
+		return nil, fmt.Errorf("failed to close writer: %v", err)
 	}
 
-	return body, writer.FormDataContentType(), nil
+	request, err := http.NewRequest(http.MethodPost, app.Vars.Host+"/upload", body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %v", err)
+	}
+
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+
+	return request, nil
 }
