@@ -15,13 +15,10 @@ import (
 )
 
 func HandleFindNewFilmCommand(app models.App, session *models.Session) {
-	metadata, err := getFilmsFromKinopoisk(app, session)
+	metadata, err := getFilmsFromKinopoisk(session)
 	if err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
-		app.SendMessage(msg, nil)
-		session.ClearAllStates()
 		session.FilmsState.CurrentPage = 1
-		HandleFilmsCommand(app, session)
+		handleKinopoiskError(app, session, err)
 		return
 	}
 
@@ -29,6 +26,8 @@ func HandleFindNewFilmCommand(app models.App, session *models.Session) {
 		msg := "❗️" + translator.Translate(session.Lang, "filmsNotFound", nil, nil)
 		keyboard := keyboards.NewKeyboard().AddAgain(states.CallbackFindNewFilmAgain).AddBack(states.CallbackFindNewFilmBack).Build(session.Lang)
 		app.SendMessage(msg, keyboard)
+		session.ClearAllStates()
+		session.FilmsState.CurrentPage = 1
 		return
 	}
 
@@ -139,8 +138,8 @@ func handleFindNewFilmAdd(app models.App, session *models.Session) {
 	requestNewFilmComment(app, session)
 }
 
-func getFilmsFromKinopoisk(app models.App, session *models.Session) (*filters.Metadata, error) {
-	films, metadata, err := parsing.GetFilmsFromKinopoisk(app, session)
+func getFilmsFromKinopoisk(session *models.Session) (*filters.Metadata, error) {
+	films, metadata, err := parsing.GetFilmsFromKinopoisk(session)
 	if err != nil {
 		return nil, err
 	}

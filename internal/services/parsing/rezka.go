@@ -1,7 +1,6 @@
 package parsing
 
 import (
-	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
@@ -39,14 +38,11 @@ func parseFilmFromRezka(dest *apiModels.Film, data io.Reader) error {
 		return err
 	}
 
-	dest.Title = strings.TrimSpace(doc.Find(".b-post__title").Text())
+	dest.Title = client.GetTextOrDefault(doc, ".b-post__title", "Unknown")
 
-	year := strings.TrimSpace(doc.Find("a[href*='/year/']").Text())
-	year = strings.Replace(year, " года", "", 1)
-	dest.Year, err = strconv.Atoi(year)
-	if err != nil {
-		return fmt.Errorf("failed to parse year: %v", err)
-	}
+	yearStr := client.GetTextOrDefault(doc, "a[href*='/year/']", "0")
+	yearStr = strings.Replace(yearStr, " года", "", 1)
+	dest.Year, _ = strconv.Atoi(yearStr)
 
 	doc.Find(".b-post__info tr").Each(func(i int, s *goquery.Selection) {
 		label := strings.TrimSpace(s.Find("td.l").Text())
@@ -57,16 +53,12 @@ func parseFilmFromRezka(dest *apiModels.Film, data io.Reader) error {
 		}
 	})
 
-	dest.Description = strings.TrimSpace(doc.Find(".b-post__description_text").Text())
+	dest.Description = client.GetTextOrDefault(doc, ".b-post__description_text", "")
 
-	rating := strings.TrimSpace(doc.Find(".imbd .bold").Text())
+	ratingStr := client.GetTextOrDefault(doc, ".b-post__info_rates.imdb .bold", "0")
+	dest.Rating, _ = strconv.ParseFloat(ratingStr, 64)
 
-	dest.Rating, err = strconv.ParseFloat(rating, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse rating: %v", err)
-	}
-
-	dest.ImageURL = strings.TrimSpace(doc.Find(".b-sidecover a").AttrOr("href", ""))
+	dest.ImageURL = doc.Find(".b-sidecover a").AttrOr("href", "")
 
 	return nil
 }

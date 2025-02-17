@@ -66,6 +66,24 @@ func BuildLanguageMessage() (string, error) {
 	return res, nil
 }
 
+func BuildKinopoiskTokenMessage(session *models.Session) string {
+	msg := "⚠️ " + translator.Translate(session.Lang, "tokenRequestInfo", nil, nil)
+
+	if session.KinopoiskAPIToken != "" {
+		part := translator.Translate(session.Lang, "currentToken", nil, nil)
+		msg += fmt.Sprintf("\n\n%s: <code>%s</code>", part, session.KinopoiskAPIToken)
+	}
+
+	part := translator.Translate(session.Lang, "tokenRequest", nil, nil)
+	msg += fmt.Sprintf("\n\n<b>%s</b>", part)
+
+	return msg
+}
+
+func BuildKinopoiskTokenSuccessMessage(session *models.Session) string {
+	return "✅ " + translator.Translate(session.Lang, "tokenSuccess", nil, nil)
+}
+
 func toBold(text string) string {
 	return fmt.Sprintf("<b>%s</b>", text)
 }

@@ -3,6 +3,7 @@ package general
 import (
 	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
@@ -32,6 +33,9 @@ func HandleSettingsButton(app models.App, session *models.Session) {
 	case callback == states.CallbackSettingsLanguage:
 		handleLanguage(app, session)
 
+	case callback == states.CallbackSettingsKinopoiskToken:
+		handleKinopoiskToken(app, session)
+
 	case callback == states.CallbackSettingsCollectionsPageSize:
 		handleCollectionsPageSize(app, session)
 
@@ -54,6 +58,8 @@ func HandleSettingsProcess(app models.App, session *models.Session) {
 	}
 
 	switch session.State {
+	case states.ProcessSettingsAwaitingKinopoiskToken:
+		parseKinopoiskToken(app, session)
 	case states.ProcessSettingsCollectionsAwaitingPageSize:
 		parseCollectionsPageSize(app, session)
 	case states.ProcessSettingsFilmsAwaitingPageSize:
@@ -98,6 +104,29 @@ func handleLanguageSelect(app models.App, session *models.Session) {
 	}, nil)
 
 	app.SendMessage(msg, nil)
+
+	HandleSettingsCommand(app, session)
+}
+
+func handleKinopoiskToken(app models.App, session *models.Session) {
+	msg := messages.BuildKinopoiskTokenMessage(session)
+
+	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
+
+	app.SendMessage(msg, keyboard)
+
+	session.SetState(states.ProcessSettingsAwaitingKinopoiskToken)
+}
+
+func parseKinopoiskToken(app models.App, session *models.Session) {
+	token := utils.ParseMessageString(app.Upd)
+
+	session.KinopoiskAPIToken = token
+
+	msg := messages.BuildKinopoiskTokenSuccessMessage(session)
+	app.SendMessage(msg, nil)
+
+	session.ClearState()
 
 	HandleSettingsCommand(app, session)
 }

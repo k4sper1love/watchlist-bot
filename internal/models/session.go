@@ -17,6 +17,7 @@ type Session struct {
 	User                  apiModels.User `json:"user" gorm:"serializer:json"`
 	AccessToken           string         `json:"access_token"`
 	RefreshToken          string         `json:"refresh_token"`
+	KinopoiskAPIToken     string         `json:"kinopoisk_api_token"`
 	State                 string
 	Context               string
 	AdminState            *AdminState            `gorm:"foreignKey:SessionID"`

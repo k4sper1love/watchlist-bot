@@ -11,7 +11,6 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -49,56 +48,18 @@ func parseFilmFromIMDB(dest *apiModels.Film, data io.Reader) error {
 		return err
 	}
 
-	if title, ok := response["Title"].(string); ok {
-		dest.Title = title
-	} else {
-		return fmt.Errorf("failed to parse title")
-	}
-
-	if yearStr, ok := response["Year"].(string); ok {
-		year, err := strconv.Atoi(yearStr)
-		if err != nil {
-			return fmt.Errorf("failed to parse year: %v", err)
-		}
-		dest.Year = year
-	} else {
-		return fmt.Errorf("failed to parse year")
-	}
-
-	if genres, ok := response["Genre"].(string); ok {
-		dest.Genre = strings.Split(genres, ",")[0]
-	} else {
-		return fmt.Errorf("failed to parse genre")
-	}
-
-	if description, ok := response["Plot"].(string); ok {
-		dest.Description = description
-	} else {
-		return fmt.Errorf("failed to parse description")
-	}
-
-	if ratingStr, ok := response["imdbRating"].(string); ok {
-		rating, err := strconv.ParseFloat(ratingStr, 64)
-		if err != nil {
-			return fmt.Errorf("failed to parse imdbRating: %v", err)
-		}
-		dest.Rating = rating
-	} else {
-		return fmt.Errorf("failed to parse imdbRating")
-	}
-
-	if url, ok := response["Poster"].(string); ok {
-		dest.ImageURL = url
-	} else {
-		return fmt.Errorf("failed to parse imageURL")
-	}
+	dest.Title = client.GetStringFromMap(response, "Title", "Unknown")
+	dest.Year = client.GetIntFromStringMap(response, "Year", 0)
+	dest.Genre = getFirstGenreFromString(response, "Genre", "")
+	dest.Description = client.GetStringFromMap(response, "Plot", "")
+	dest.Rating = client.GetFloatFromStringMap(response, "imdbRating", 0.0)
+	dest.ImageURL = client.GetStringFromMap(response, "Poster", "")
 
 	return nil
 }
 
 func parseIDFromIMDB(url string) (string, error) {
 	shortURL := strings.TrimPrefix(url, "https://www.imdb.com/")
-
 	parts := strings.Split(shortURL, "/")
 
 	if len(parts) > 0 {
@@ -107,3 +68,12 @@ func parseIDFromIMDB(url string) (string, error) {
 
 	return "", fmt.Errorf("id not found")
 }
+
+func getFirstGenreFromString(data map[string]interface{}, key string, defaultValue string) string {
+	if value, ok := data[key].(string); ok {
+		genres := strings.Split(value, ",")
+		if len(genres) > 0 {
+			return strings.TrimSpace(genres[0])
+		}
+	}
+	return defaultValue

@@ -21,7 +21,7 @@ func GetFilmByURL(app models.App, session *models.Session, url string) (*apiMode
 		return GetFilmFromIMDB(app, url)
 
 	case strings.Contains(url, supportedServices[1]):
-		return GetFilmFromKinopoisk(app, url)
+		return GetFilmFromKinopoisk(session, url)
 
 	case strings.Contains(url, supportedServices[2]):
 		return GetFilmFromRezka(url)
@@ -42,4 +42,8 @@ func GetFilmByURL(app models.App, session *models.Session, url string) (*apiMode
 
 func GetSupportedServicesInline() string {
 	return strings.Join(supportedServices, ", ")
+}
+
+func IsKinopoisk(url string) bool {
+	return strings.Contains(url, supportedServices[1])
 }

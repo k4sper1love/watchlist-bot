@@ -57,14 +57,12 @@ func GetFilmFromYoutube(app models.App, session *models.Session, url string) (*a
 
 	externalData, err := getExternalVideoData(videoID)
 	if err != nil {
-		return nil, err
+		sl.Log.Warn("failed to get external video data", slog.Any("error", err), slog.String("videoID", videoID))
+		externalData = &ExternalVideoData{}
 	}
 
 	var film apiModels.Film
-	if err = parseVideoFromYoutube(&film, session, video, externalData); err != nil {
-		utils.LogParseJSONError(err, http.MethodGet, url)
-		return nil, err
-	}
+	parseVideoFromYoutube(&film, session, video, externalData)
 
 	return &film, err
 }
@@ -91,28 +89,28 @@ func getExternalVideoData(videoID string) (*ExternalVideoData, error) {
 	return &data, err
 }
 
-func parseVideoFromYoutube(dest *apiModels.Film, session *models.Session, video *youtube.Video, externalData *ExternalVideoData) error {
-	var err error
-
+func parseVideoFromYoutube(dest *apiModels.Film, session *models.Session, video *youtube.Video, externalData *ExternalVideoData) {
 	dest.Title = video.Snippet.Title
 	dest.Genre = "YouTube Video"
-	dest.ImageURL = video.Snippet.Thumbnails.Maxres.Url
 
-	dest.Year, err = strconv.Atoi(video.Snippet.PublishedAt[:4])
-	if err != nil {
-		return fmt.Errorf("failed to parse year: %v", err)
+	if video.Snippet.Thumbnails.Maxres != nil {
+		dest.ImageURL = video.Snippet.Thumbnails.Maxres.Url
+	} else if video.Snippet.Thumbnails.High != nil {
+		dest.ImageURL = video.Snippet.Thumbnails.High.Url
+	} else {
+		dest.ImageURL = ""
 	}
 
-	dest.Rating, err = utils.Round(externalData.Rating * 2)
-	if err != nil {
-		return fmt.Errorf("failed to parse rating: %v", err)
+	if len(video.Snippet.PublishedAt) >= 4 {
+		dest.Year, _ = strconv.Atoi(video.Snippet.PublishedAt[:4])
+	} else {
+		dest.Year = 0
 	}
+
+	dest.Rating, _ = utils.Round(externalData.Rating * 2)
 
 	duration := video.ContentDetails.Duration
-	parsedDuration, err := utils.ParseISO8601Duration(duration)
-	if err != nil {
-		return fmt.Errorf("failed to parse duration: %v", err)
-	}
+	parsedDuration, _ := utils.ParseISO8601Duration(duration)
 
 	part1 := translator.Translate(session.Lang, "author", nil, nil)
 	part2 := translator.Translate(session.Lang, "duration", nil, nil)
@@ -130,6 +128,4 @@ func parseVideoFromYoutube(dest *apiModels.Film, session *models.Session, video 
 		part5, video.Statistics.CommentCount,
 		part6, utils.FormatTextDate(video.Snippet.PublishedAt),
 	)
-
-	return nil
 }
