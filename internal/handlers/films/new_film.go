@@ -2,6 +2,7 @@ package films
 
 import (
 	"fmt"
+	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
@@ -97,10 +98,10 @@ func parseNewFilmFind(app models.App, session *models.Session) {
 	title := utils.ParseMessageString(app.Upd)
 
 	session.FilmsState.Title = title
+	session.FilmsState.CurrentPage = 1
 
 	session.ClearState()
 
-	session.FilmsState.CurrentPage = 1
 	HandleFindNewFilmCommand(app, session)
 }
 
@@ -342,7 +343,8 @@ func parseNewFilmReview(app models.App, session *models.Session) {
 }
 
 func finishNewFilmProcess(app models.App, session *models.Session) {
-	if err := CreateNewFilm(app, session); err != nil {
+	film, err := CreateNewFilm(app, session)
+	if err != nil {
 		msg := "🚨 " + translator.Translate(session.Lang, "createFilmFailure", nil, nil)
 		app.SendMessage(msg, nil)
 		session.ClearAllStates()
@@ -352,23 +354,13 @@ func finishNewFilmProcess(app models.App, session *models.Session) {
 
 	session.ClearAllStates()
 
-	totalRecords := session.FilmsState.TotalRecords
-	pageSize := session.FilmsState.PageSize
-
-	newPage, newIndex := utils.CalculateNewElementPageAndIndex(totalRecords, pageSize)
-
-	session.FilmsState.CurrentPage = newPage
-	session.FilmDetailState.Index = newIndex
-
-	if _, err := GetFilms(app, session); err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "updateFilmListFailure", nil, nil)
-		app.SendMessage(msg, nil)
-	}
+	session.FilmDetailState.Film = *film
+	session.FilmDetailState.ClearIndex()
 
 	HandleFilmsDetailCommand(app, session)
 }
 
-func CreateNewFilm(app models.App, session *models.Session) error {
+func CreateNewFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
 	switch session.Context {
 	case states.ContextFilm:
 		return createNewUserFilm(app, session)
@@ -377,26 +369,26 @@ func CreateNewFilm(app models.App, session *models.Session) error {
 		return createNewCollectionFilm(app, session)
 
 	default:
-		return fmt.Errorf("unsupported session context: %v", session.Context)
+		return nil, fmt.Errorf("unsupported session context: %v", session.Context)
 	}
 }
 
-func createNewUserFilm(app models.App, session *models.Session) error {
-	_, err := watchlist.CreateFilm(app, session)
+func createNewUserFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
+	film, err := watchlist.CreateFilm(app, session)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	msg := "🎬 " + translator.Translate(session.Lang, "createFilmSuccess", nil, nil)
 	app.SendMessage(msg, nil)
 
-	return nil
+	return film, nil
 }
 
-func createNewCollectionFilm(app models.App, session *models.Session) error {
+func createNewCollectionFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
 	collectionFilm, err := watchlist.CreateCollectionFilm(app, session)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	msg := "🎬 " + translator.Translate(session.Lang, "createCollectionFilmSuccess", map[string]interface{}{
@@ -404,7 +396,7 @@ func createNewCollectionFilm(app models.App, session *models.Session) error {
 	}, nil)
 	app.SendMessage(msg, nil)
 
-	return nil
+	return &collectionFilm.Film, nil
 }
 
 func parseAndUploadImageFromMessage(app models.App) (string, error) {

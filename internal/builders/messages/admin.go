@@ -138,7 +138,9 @@ func BuildFeedbackListMessage(session *models.Session, feedbacks []models.Feedba
 		}
 
 		createdMsg := translator.Translate(session.Lang, "created", nil, nil)
-		msg += fmt.Sprintf("%s: %s\n\n", createdMsg, feedback.CreatedAt.Format("02.01.2006 15:04"))
+		msg += fmt.Sprintf("%s: %s", createdMsg, feedback.CreatedAt.Format("02.01.2006 15:04"))
+
+		msg += fmt.Sprintf(" <i>(%d)</i>\n\n", feedback.ID)
 	}
 
 	pageMsg := translator.Translate(session.Lang, "pageCounter", map[string]interface{}{
@@ -171,7 +173,9 @@ func BuildFeedbackDetailMessage(session *models.Session, feedback *models.Feedba
 	msg += fmt.Sprintf("<b>%s:</b>\n<pre>%s</pre>\n\n", feedbackMsg, feedback.Message)
 
 	createdMsg := translator.Translate(session.Lang, "created", nil, nil)
-	msg += fmt.Sprintf("<b>%s:</b> %s\n", createdMsg, feedback.CreatedAt.Format("02.01.2006 15:04"))
+	msg += fmt.Sprintf("<b>%s:</b> %s", createdMsg, feedback.CreatedAt.Format("02.01.2006 15:04"))
+
+	msg += fmt.Sprintf(" <i>(%d)</i>\n", feedback.ID)
 
 	return msg
 }

@@ -48,11 +48,11 @@ func HandleFeedbackProcess(app models.App, session *models.Session) {
 }
 
 func handleFeedbackMessage(app models.App, session *models.Session) {
-	part1 := translator.Translate(session.Lang, "feedbackCurrentCategory", nil, nil)
+	part1 := translator.Translate(session.Lang, "category", nil, nil)
 	part2 := translator.Translate(session.Lang, session.FeedbackState.Category, nil, nil)
 	part3 := translator.Translate(session.Lang, "feedbackTextRequest", nil, nil)
 
-	msg := fmt.Sprintf("📄 <b>%s:</b> %s\n\n%s", part1, part2, part3)
+	msg := fmt.Sprintf("📄 <b>%s:</b> <code>%s</code>\n\n%s", part1, part2, part3)
 
 	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
 
@@ -79,11 +79,11 @@ func parseFeedbackMessage(app models.App, session *models.Session) {
 
 	session.FeedbackState.Message = text
 
-	err := postgres.SaveFeedbackToDatabase(session.TelegramID, session.TelegramUsername, session.FeedbackState.Category, session.FeedbackState.Message)
+	err := postgres.SaveFeedback(session.TelegramID, session.TelegramUsername, session.FeedbackState.Category, session.FeedbackState.Message)
 	if err != nil {
 		part1 := translator.Translate(session.Lang, "feedbackFailure", nil, nil)
 		part2 := translator.Translate(session.Lang, "tryLater", nil, nil)
-		msg := fmt.Sprintf("❌%s\n%s", part1, part2)
+		msg := fmt.Sprintf("🚨 %s\n%s", part1, part2)
 		app.SendMessage(msg, keyboard)
 		return
 	}

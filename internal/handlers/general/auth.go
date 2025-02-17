@@ -23,7 +23,7 @@ func HandleAuthProcess(app models.App, session *models.Session) error {
 	err := watchlist.Login(app, session)
 	if err == nil {
 		//msg := translator.Translate(session.Lang, "loginSuccess", map[string]interface{}{
-		//	"Username": session.User.Username,
+		//  "Username": session.User.Username,
 		//}, nil)
 		//
 		//app.SendMessage(msg, nil)
@@ -32,7 +32,7 @@ func HandleAuthProcess(app models.App, session *models.Session) error {
 
 	err = watchlist.Register(app, session)
 	if err == nil {
-		msg := translator.Translate(session.Lang, "registrationSuccess", map[string]interface{}{
+		msg := "✅ " + translator.Translate(session.Lang, "registrationSuccess", map[string]interface{}{
 			"Username": session.User.Username,
 		}, nil)
 
@@ -44,7 +44,7 @@ func HandleAuthProcess(app models.App, session *models.Session) error {
 }
 
 func HandleLogoutCommand(app models.App, session *models.Session) {
-	msg := translator.Translate(session.Lang, "logoutConfirm", map[string]interface{}{
+	msg := "⚠️ " + translator.Translate(session.Lang, "logoutConfirm", map[string]interface{}{
 		"Username": session.User.Username,
 	}, nil)
 
@@ -64,26 +64,26 @@ func HandleLogoutProcess(app models.App, session *models.Session) {
 func parseLogoutConfirm(app models.App, session *models.Session) {
 	switch utils.IsAgree(app.Upd) {
 	case true:
+		username := session.User.Username
+
 		if err := watchlist.Logout(app, session); err != nil {
-			msg := translator.Translate(session.Lang, "logoutFailure", map[string]interface{}{
-				"Username": session.User.Username,
+			msg := "🚨 " + translator.Translate(session.Lang, "logoutFailure", map[string]interface{}{
+				"Username": username,
 			}, nil)
 
 			app.SendMessage(msg, nil)
 			break
 		}
 
-		msg := translator.Translate(session.Lang, "logoutSuccess", map[string]interface{}{
-			"Username": session.User.Username,
+		msg := "🚪 " + translator.Translate(session.Lang, "logoutSuccess", map[string]interface{}{
+			"Username": username,
 		}, nil)
 
 		app.SendMessage(msg, nil)
 		session.Logout()
 
 	case false:
-		msg := translator.Translate(session.Lang, "logoutCancel", map[string]interface{}{
-			"Username": session.User.Username,
-		}, nil)
+		msg := "🚫 " + translator.Translate(session.Lang, "cancelAction", nil, nil)
 		app.SendMessage(msg, nil)
 	}
 

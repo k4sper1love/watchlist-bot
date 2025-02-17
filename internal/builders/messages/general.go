@@ -35,7 +35,7 @@ func BuildFeedbackMessage(session *models.Session) string {
 	part2 := translator.Translate(session.Lang, "feedbackMessageBody", nil, nil)
 	part3 := translator.Translate(session.Lang, "feedbackCategoryChoice", nil, nil)
 
-	msg := fmt.Sprintf("📝 <b>%s</b>\n\n%s😊\n\n%s", part1, part2, part3)
+	msg := fmt.Sprintf("💬 <b>%s</b>\n\n<i>%s</i> 😊\n\n%s", part1, part2, part3)
 
 	return msg
 }

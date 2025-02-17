@@ -37,8 +37,14 @@ func HandleUserDetailButton(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Upd)
 
 	switch {
+	case callback == states.CallbackAdminUserDetail:
+		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
+
 	case callback == states.CallbackAdminUserDetailBack:
 		general.RequireRole(app, session, HandleUsersCommand, roles.Admin)
+
+	case callback == states.CallbackAdminUserDetailLogs:
+		general.RequireRole(app, session, handleUserLogs, roles.SuperAdmin)
 
 	case callback == states.CallbackAdminUserDetailUnban:
 		general.RequireRole(app, session, handleUserUnban, roles.Admin)
@@ -67,6 +73,24 @@ func HandleUserDetailProcess(app models.App, session *models.Session) {
 	case states.ProcessAdminUserDetailAwaitingReason:
 		processUserBan(app, session)
 	}
+}
+
+func handleUserLogs(app models.App, session *models.Session) {
+	path, err := utils.GetLogFilePath(session.AdminState.UserID)
+	if err != nil {
+		msg := "❗" + translator.Translate(session.Lang, "logsNotFound", nil, nil)
+		app.SendMessage(msg, nil)
+		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
+		return
+	}
+
+	msg := "💾 " + translator.Translate(session.Lang, "logsFound", map[string]interface{}{
+		"ID": session.AdminState.UserID,
+	}, nil)
+
+	keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminUserDetail).Build(session.Lang)
+
+	app.SendFile(path, msg, keyboard)
 }
 
 func handleUserUnban(app models.App, session *models.Session) {

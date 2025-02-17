@@ -17,7 +17,7 @@ var SupportedTypes = []string{
 
 func processImageFromMessage(bot *tgbotapi.BotAPI, update *tgbotapi.Update) ([]byte, error) {
 	if update.Message == nil || update.Message.Photo == nil {
-		return nil, fmt.Errorf("not found photo")
+		return nil, fmt.Errorf("photo not found")
 	}
 
 	photo := (*update.Message.Photo)[len(*update.Message.Photo)-1]
@@ -35,9 +35,9 @@ func processImageFromMessage(bot *tgbotapi.BotAPI, update *tgbotapi.Update) ([]b
 func processImageFromURL(imageURL string) ([]byte, error) {
 	resp, err := http.Get(imageURL)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch URL: %w", err)
+		return nil, fmt.Errorf("failed to fetch URL: %v", err)
 	}
-	defer resp.Body.Close()
+	defer CloseBody(resp.Body)
 
 	contentType := resp.Header.Get("Content-Type")
 	if !isSupportedImageType(contentType) {
@@ -46,7 +46,7 @@ func processImageFromURL(imageURL string) ([]byte, error) {
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
+		return nil, fmt.Errorf("failed to read response body: %v", err)
 	}
 
 	return data, nil
@@ -55,15 +55,15 @@ func processImageFromURL(imageURL string) ([]byte, error) {
 func DownloadImage(imageURL string) (string, error) {
 	resp, err := http.Get(imageURL)
 	if err != nil {
-		return "", fmt.Errorf("error uploading an image by URL:%v", err)
+		return "", fmt.Errorf("error uploading an image by URL: %v", err)
 	}
-	defer resp.Body.Close()
+	defer CloseBody(resp.Body)
 
 	file, err := os.CreateTemp("", "image_*.jpg")
 	if err != nil {
 		return "", fmt.Errorf("error creating a temporary file: %v", err)
 	}
-	defer file.Close()
+	defer CloseFile(file)
 
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {

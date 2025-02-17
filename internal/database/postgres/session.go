@@ -1,10 +1,12 @@
 package postgres
 
 import (
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 	"gorm.io/gorm"
+	"log/slog"
 )
 
 func GetSessionByTelegramID(app models.App) (*models.Session, error) {
@@ -29,11 +31,15 @@ func GetSessionByTelegramID(app models.App) (*models.Session, error) {
 		Preload("CollectionFilmsState").
 		Preload("AdminState").
 		FirstOrInit(&session, models.Session{TelegramID: telegramID}).Error; err != nil {
+		sl.Log.Warn(
+			"failed to get session by telegram ID",
+			slog.Any("error", err),
+			slog.Int("telegram_id", telegramID),
+		)
 		return nil, err
 	}
 
 	session = initializeSessionDefaults(session, lang, username, app.Vars.RootID)
-
 	return &session, nil
 }
 

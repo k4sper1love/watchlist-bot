@@ -12,15 +12,13 @@ import (
 )
 
 func HandleManageFilmCommand(app models.App, session *models.Session) {
-	film := session.FilmDetailState.Film
-
-	msg := messages.BuildFilmDetailMessage(session, &film)
+	msg := messages.BuildFilmDetailMessage(session)
 	choiceMsg := translator.Translate(session.Lang, "choiceAction", nil, nil)
 	msg += fmt.Sprintf("<b>%s</b>", choiceMsg)
 
 	keyboard := keyboards.BuildFilmManageKeyboard(session)
 
-	app.SendImage(film.ImageURL, msg, keyboard)
+	app.SendImage(session.FilmDetailState.Film.ImageURL, msg, keyboard)
 }
 
 func HandleManageFilmButtons(app models.App, session *models.Session) {

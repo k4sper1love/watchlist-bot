@@ -6,6 +6,7 @@ import (
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"net/http"
 	"net/url"
 )
@@ -23,24 +24,23 @@ func GetFilmsExcludeCollection(app models.App, session *models.Session) (*models
 //}
 
 func getFilmsRequest(app models.App, session *models.Session, collectionID, currentPage, pageSize int) (*models.FilmsResponse, error) {
-	headers := map[string]string{
-		"Authorization": session.AccessToken,
-	}
-
-	requestURL := buildGetFilmsURL(app, session, collectionID, currentPage, pageSize)
-
-	resp, err := client.SendRequestWithOptions(requestURL, http.MethodGet, nil, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.AccessToken,
+			Method:             http.MethodGet,
+			URL:                buildGetFilmsURL(app, session, collectionID, currentPage, pageSize),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("get_films failed: %s", resp.Status)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	var filmsResponse models.FilmsResponse
-	if err := json.NewDecoder(resp.Body).Decode(&filmsResponse); err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&filmsResponse); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -48,96 +48,93 @@ func getFilmsRequest(app models.App, session *models.Session, collectionID, curr
 }
 
 func GetFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
-	headers := map[string]string{
-		"Authorization": session.AccessToken,
-	}
-
-	requestURL := fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID)
-
-	resp, err := client.SendRequestWithOptions(requestURL, http.MethodGet, nil, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.AccessToken,
+			Method:             http.MethodGet,
+			URL:                fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %w", err)
+		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("get_film failed: %d", resp.StatusCode)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	film := &apiModels.Film{}
-	if err := parseFilm(film, resp.Body); err != nil {
-		return nil, fmt.Errorf("failed to parse film: %w", err)
+	if err = parseFilm(film, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		return nil, err
 	}
 
 	return film, nil
 }
 
 func UpdateFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
-	headers := map[string]string{
-		"Authorization": session.AccessToken,
-	}
-
-	requestURL := fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID)
-
-	resp, err := client.SendRequestWithOptions(requestURL, http.MethodPut, session.FilmDetailState, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.AccessToken,
+			Method:             http.MethodPut,
+			URL:                fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID),
+			Body:               session.FilmDetailState,
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %w", err)
+		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("update_film failed: %d", resp.StatusCode)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	film := &apiModels.Film{}
-	if err := parseFilm(film, resp.Body); err != nil {
-		return nil, fmt.Errorf("failed to parse film: %w", err)
+	if err = parseFilm(film, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		return nil, err
 	}
 
 	return film, nil
 }
 
 func CreateFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
-	headers := map[string]string{
-		"Authorization": session.AccessToken,
-	}
-
-	requestURL := fmt.Sprintf("%s/api/v1/films", app.Vars.Host)
-
-	resp, err := client.SendRequestWithOptions(requestURL, http.MethodPost, session.FilmDetailState, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.AccessToken,
+			Method:             http.MethodPost,
+			URL:                fmt.Sprintf("%s/api/v1/films", app.Vars.Host),
+			Body:               session.FilmDetailState,
+			ExpectedStatusCode: http.StatusCreated,
+		},
+	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %w", err)
+		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusCreated {
-		return nil, fmt.Errorf("create_film failed: %d", resp.StatusCode)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	film := &apiModels.Film{}
-	if err := parseFilm(film, resp.Body); err != nil {
-		return nil, fmt.Errorf("failed to parse film: %w", err)
+	if err = parseFilm(film, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		return nil, err
 	}
 
 	return film, nil
 }
 
 func DeleteFilm(app models.App, session *models.Session) error {
-	headers := map[string]string{
-		"Authorization": session.AccessToken,
-	}
-
-	requestURL := fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID)
-
-	resp, err := client.SendRequestWithOptions(requestURL, http.MethodDelete, nil, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.AccessToken,
+			Method:             http.MethodDelete,
+			URL:                fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
-		return fmt.Errorf("failed to send request: %w", err)
+		return err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("delete_film failed: %s", resp.Status)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	return nil
 }

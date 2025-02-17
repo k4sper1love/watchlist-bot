@@ -2,6 +2,15 @@
   "choiceLanguage": {
     "other": "Пожалуйста, выберите язык для общения с ботом. Вы сможете поменять его в настройках"
   },
+  "logsNotFound": {
+    "other": "Файл с логами не найден"
+  },
+  "logsFound": {
+    "other": "Найден файл с логами для <code>{{.ID}}</code>"
+  },
+  "logs": {
+    "other": "Логи"
+  },
   "update": {
     "other": "Обновить"
   },
@@ -12,7 +21,7 @@
     "other": "Фильм успешно обновлен"
   },
   "maxLengthInSymbols": {
-    "other": "Максимальная длина: {{.Length}} символов"
+    "other": "<b>Максимальная длина:</b> {{.Length}} символов"
   },
   "chuckTextError": {
     "other": "Ошибка разбиения текста. Сообщение слишком длинное и не может быть отправлено"
@@ -175,6 +184,7 @@
     "other": "Сбросить сортировку"
   },
   "raisedTo": {
+
     "other": "Вы были повышены до роли \"{{.Role}}\""
   },
   "lowerTo": {
@@ -294,9 +304,9 @@
   "foundUsers": {
     "other": "Найдено пользователей"
   },
- "role": {
-   "other": "Роль"
- },
+  "role": {
+    "other": "Роль"
+  },
   "unknown": {
     "other": "Неизвестный"
   },
@@ -315,9 +325,9 @@
   "currentRole": {
     "other": "Текущая роль"
   },
- "choiceUserForDetails":{
-   "other": "Выберите пользователя"
- },
+  "choiceUserForDetails":{
+    "other": "Выберите пользователя"
+  },
   "language": {
     "other": "Язык"
   },
@@ -370,6 +380,7 @@
     "other": "Добро пожаловать в Watchlist Bot, {{.Name}}!"
   },
   "welcomeMessageBody": {
+
     "other": "На данный момент бот находится в разработке (версия {{.Version}}), но основные функции уже доступны."
   },
   "welcomeMessageCallToAction": {
@@ -501,6 +512,9 @@
   "currentPageSize": {
     "other": "Текущий размер страницы"
   },
+  "settingsPageSizeSuccess": {
+    "other": "Установлен размер страницы: <code>{{.Size}}</code>"
+  },
   "settingsCollectionsPageSizeSuccess": {
     "other": "Новый размер страницы для списка коллекций"
   },
@@ -523,34 +537,35 @@
     "other": "Вы выбрали категорию"
   },
   "feedbackTextRequest": {
-    "other": "Пожалуйста, напишите ваше сообщение"
+    "other": "Напишите ваше сообщение"
   },
   "feedbackFailure": {
     "other": "Ошибка при отправке сообщения"
   },
   "feedbackSuccess": {
-    "other": "Спасибо за ваше сообщение! Мы ценим ваше мнение"
+
+    "other": "Спасибо за ваше сообщение!"
   },
   "tryLater": {
     "other": "Попробуйте позже"
   },
   "loginSuccess": {
-    "other": "Успешный вход в аккаунт \"{{.Username}}\"!"
+    "other": "Выполнен вход в аккаунт <code>{{.Username}}</code>!"
   },
   "registrationSuccess": {
-    "other": "Успешная регистрация аккаунта \"{{.Username}}\"!"
+    "other": "Аккаунт <code>{{.Username}}</code> зарегистрирован!"
   },
   "logoutConfirm": {
-    "other": "Вы точно хотите выйти из аккаунта \"{{.Username}}\"?"
+    "other": "Вы уверены, что хотите выйти из аккаунта <code>{{.Username}}</code>?"
   },
   "logoutFailure": {
-    "other": "Неудачный выход из аккаунта \"{{.Username}}\""
+    "other": "Неудачный выход из аккаунта <code>{{.Username}}</code>"
   },
   "logoutSuccess": {
-    "other": "Успешно вышли из аккаунта \"{{.Username}}\""
+    "other": "Вы вышли из аккаунта <code>{{.Username}}</code>"
   },
   "logoutCancel": {
-    "other": "Отмена выхода из аккаунта \"{{.Username}}\""
+    "other": "Отмена выхода из аккаунта <code>{{.Username}}</code>"
   },
   "unknownState": {
     "other": "Неизвестное состояние. Введите /reset для сброса."
@@ -699,6 +714,7 @@
   "createCollectionSuccess": {
     "other": "Коллекция успешно создана"
   },
+
   "deleteCollectionConfirm": {
     "other": "Вы уверены, что хотите удалить коллекцию <code>{{.Collection}}</code>?"
   },
@@ -894,6 +910,7 @@
   "updateCollection": {
     "other": "Обновить коллекцию"
   },
+
   "deleteCollection": {
     "other": "Удалить коллекцию"
   },
@@ -910,7 +927,7 @@
     "other": "Выбрать из моих фильмов"
   },
   "unknownCommand": {
-    "other": "Неизвестная комманда. Введите /menu"
+    "other": "Неизвестная команда. Введите /menu"
   },
   "sendImageFailure": {
     "other": "Ошибка при отправке изображения"

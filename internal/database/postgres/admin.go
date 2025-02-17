@@ -41,45 +41,67 @@ func GetAllTelegramID() ([]int, error) {
 
 func GetAllUsers() ([]models.Session, error) {
 	var sessions []models.Session
-	err := GetDB().Order("created_at DESC").Find(&sessions).Error
-	return sessions, err
+
+	if err := GetDB().Order("created_at DESC").Find(&sessions).Error; err != nil {
+		return nil, err
+	}
+
+	return sessions, nil
 }
 
 func GetAllUsersWithPagination(page, pageSize int) ([]models.Session, error) {
 	var sessions []models.Session
-
 	offset := (page - 1) * pageSize
 
-	err := GetDB().Order("created_at DESC").
+	if err := GetDB().Order("created_at DESC").
 		Limit(pageSize).
 		Offset(offset).
-		Find(&sessions).Error
+		Find(&sessions).Error; err != nil {
+		return nil, err
+	}
 
-	return sessions, err
+	return sessions, nil
 }
 
 func GetAllAdminsWithPagination(page, pageSize int) ([]models.Session, error) {
 	var sessions []models.Session
-
 	offset := (page - 1) * pageSize
 
-	err := GetDB().
+	if err := GetDB().
 		Model(&models.Session{}).
 		Where("role > 0").
 		Order("created_at DESC").
 		Limit(pageSize).
 		Offset(offset).
-		Find(&sessions).Error
+		Find(&sessions).Error; err != nil {
+		return nil, err
+	}
 
-	return sessions, err
+	return sessions, nil
 }
 
 func BanUser(telegramID int) error {
-	return GetDB().Model(&models.Session{}).Where("telegram_id = ?", telegramID).Update("is_banned", true).Error
+	if err := GetDB().
+		Model(&models.Session{}).
+		Where("telegram_id = ?", telegramID).
+		Update("is_banned", true).
+		Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func UnbanUser(telegramID int) error {
-	return GetDB().Model(&models.Session{}).Where("telegram_id = ?", telegramID).Update("is_banned", false).Error
+	if err := GetDB().
+		Model(&models.Session{}).
+		Where("telegram_id = ?", telegramID).
+		Update("is_banned", false).
+		Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func IsUserBanned(telegramID int) (bool, error) {
@@ -94,13 +116,12 @@ func IsUserBanned(telegramID int) (bool, error) {
 }
 
 func SetUserRole(telegramID int, role roles.Role) (bool, error) {
-	err := GetDB().
+	if err := GetDB().
 		Model(&models.Session{}).
 		Where("telegram_id = ?", telegramID).
-		Update("role", role).Error
-
-	if err != nil {
-		return false, err
+		Update("role", role).
+		Error; err != nil {
+		return false, nil
 	}
 
 	return true, nil
@@ -120,8 +141,11 @@ func GetUserByTelegramID(telegramID int) (*models.Session, error) {
 func GetUserByTelegramUsername(username string) (*models.Session, error) {
 	var session models.Session
 
-	err := GetDB().Model(&models.Session{}).Where("telegram_username = ?", username).First(&session).Error
-	if err != nil {
+	if err := GetDB().
+		Model(&models.Session{}).
+		Where("telegram_username = ?", username).
+		First(&session).
+		Error; err != nil {
 		return nil, err
 	}
 
@@ -131,8 +155,7 @@ func GetUserByTelegramUsername(username string) (*models.Session, error) {
 func GetUserByAPIUserID(id int) (*models.Session, error) {
 	var sessions []models.Session
 
-	err := GetDB().Find(&sessions).Error
-	if err != nil {
+	if err := GetDB().Find(&sessions).Error; err != nil {
 		return nil, err
 	}
 
@@ -148,8 +171,11 @@ func GetUserByAPIUserID(id int) (*models.Session, error) {
 func GetAdminByTelegramID(telegramID int) (*models.Session, error) {
 	var session models.Session
 
-	err := GetDB().Model(&models.Session{}).Where("telegram_id = ? AND role > 0", telegramID).First(&session).Error
-	if err != nil {
+	if err := GetDB().
+		Model(&models.Session{}).
+		Where("telegram_id = ? AND role > 0", telegramID).
+		First(&session).
+		Error; err != nil {
 		return nil, err
 	}
 
@@ -159,8 +185,11 @@ func GetAdminByTelegramID(telegramID int) (*models.Session, error) {
 func GetAdminByTelegramUsername(username string) (*models.Session, error) {
 	var session models.Session
 
-	err := GetDB().Model(&models.Session{}).Where("telegram_username = ? AND role > 0", username).First(&session).Error
-	if err != nil {
+	if err := GetDB().
+		Model(&models.Session{}).
+		Where("telegram_username = ? AND role > 0", username).
+		First(&session).
+		Error; err != nil {
 		return nil, err
 	}
 

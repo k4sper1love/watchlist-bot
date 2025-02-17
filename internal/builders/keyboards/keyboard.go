@@ -93,16 +93,16 @@ func (k *Keyboard) AddNavigation(currentPage, lastPage int, prevData, nextData, 
 
 	if currentPage > 1 {
 		if firstData != "" {
-			buttons = append(buttons, Button{Emoji: "⏮", Text: "", CallbackData: firstData, NeedTranslate: true})
+			buttons = append(buttons, Button{Emoji: "⏮", Text: "", CallbackData: firstData, NeedTranslate: false})
 		}
-		buttons = append(buttons, Button{Emoji: "⬅", Text: "backward", CallbackData: prevData, NeedTranslate: true})
+		buttons = append(buttons, Button{Emoji: "⬅", Text: "", CallbackData: prevData, NeedTranslate: false})
 	}
 
 	if currentPage < lastPage {
 		if nextData != "" {
-			buttons = append(buttons, Button{Emoji: "➡", Text: "forward", CallbackData: nextData, NeedTranslate: true})
+			buttons = append(buttons, Button{Emoji: "➡", Text: "", CallbackData: nextData, NeedTranslate: false})
 		}
-		buttons = append(buttons, Button{Emoji: "⏭", Text: "", CallbackData: lastData, NeedTranslate: true})
+		buttons = append(buttons, Button{Emoji: "⏭", Text: "", CallbackData: lastData, NeedTranslate: false})
 	}
 
 	if len(buttons) > 0 {

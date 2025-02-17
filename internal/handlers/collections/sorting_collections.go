@@ -33,9 +33,6 @@ func HandleSortingCollectionsButtons(app models.App, session *models.Session) {
 	case states.CallbackSortingCollectionsSelectIsFavorite:
 		session.CollectionsState.Sorting.Field = "is_favorite"
 
-	case states.CallbackSortingCollectionsSelectID:
-		session.CollectionsState.Sorting.Field = "id"
-
 	case states.CallbackSortingCollectionsSelectName:
 		session.CollectionsState.Sorting.Field = "name"
 

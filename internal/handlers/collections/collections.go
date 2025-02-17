@@ -142,6 +142,7 @@ func parseCollectionsFindName(app models.App, session *models.Session) {
 	name := utils.ParseMessageString(app.Upd)
 
 	session.CollectionsState.Name = name
+	session.CollectionsState.CurrentPage = 1
 
 	session.ClearState()
 

@@ -2,10 +2,10 @@ package translator
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"sync"
@@ -26,7 +26,6 @@ func InitTranslator(localeDir string) error {
 	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
 
 	if err := loadLocales(bundle, localeDir); err != nil {
-		log.Fatalf("Failed to load locale files: %v", err)
 		return err
 	}
 
@@ -37,17 +36,18 @@ func InitTranslator(localeDir string) error {
 func loadLocales(bundle *i18n.Bundle, dir string) error {
 	files, err := os.ReadDir(dir)
 	if err != nil {
-		return fmt.Errorf("failed to read directory: %w", err)
+		sl.Log.Error("failed to read directory", slog.Any("error", err), slog.String("dir", dir))
+		return err
 	}
 
 	for _, file := range files {
 		if filepath.Ext(file.Name()) == ".json" {
 			filePath := filepath.Join(dir, file.Name())
-			log.Printf("Loading translation file: %s", filePath)
+			sl.Log.Info("loading translation file", slog.String("file", filePath))
 
-			_, err := bundle.LoadMessageFile(filePath)
+			_, err = bundle.LoadMessageFile(filePath)
 			if err != nil {
-				log.Printf("Failed to load translation file %s: %v", filePath, err)
+				sl.Log.Warn("failed to load translation file", slog.Any("error", err), slog.String("file", filePath))
 				continue
 			}
 		}
@@ -76,10 +76,9 @@ func Translate(languageCode string, messageID string, templateData map[string]in
 	})
 
 	if err != nil || msg == "" {
-		log.Printf("Translation missing for '%s' in language '%s', falling back to 'en'", messageID, languageCode)
+		sl.Log.Warn("translation missing, falling back to 'en'", slog.String("lang", languageCode), slog.String("message", messageID))
 
 		fallbackLocalizer := getLocalizer("en")
-
 		msg, err = fallbackLocalizer.Localize(&i18n.LocalizeConfig{
 			MessageID:    messageID,
 			TemplateData: templateData,
@@ -87,7 +86,7 @@ func Translate(languageCode string, messageID string, templateData map[string]in
 		})
 
 		if err != nil || msg == "" {
-			log.Printf("Translation missing for '%s' in fallback language 'en'", messageID)
+			sl.Log.Warn("translation missing in fallback language", slog.String("lang", "en"), slog.String("message", messageID))
 			return messageID
 		}
 	}

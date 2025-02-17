@@ -11,7 +11,9 @@ import (
 	"unicode/utf8"
 )
 
-func BuildFilmDetailMessage(session *models.Session, film *apiModels.Film) string {
+func BuildFilmDetailMessage(session *models.Session) string {
+	film := session.FilmDetailState.Film
+
 	var msg strings.Builder
 
 	msg.WriteString(fmt.Sprintf("<b>%s</b>", film.Title))
@@ -64,11 +66,11 @@ func BuildFilmDetailMessage(session *models.Session, film *apiModels.Film) strin
 	return msg.String()
 }
 
-func BuildFilmDetailWithNumberMessage(session *models.Session, itemID int, film *apiModels.Film) string {
+func BuildFilmDetailWithNumberMessage(session *models.Session, itemID int) string {
 	numberEmoji := utils.NumberToEmoji(itemID)
 
 	msg := fmt.Sprintf("%s", numberEmoji)
-	return msg + BuildFilmDetailMessage(session, film)
+	return msg + BuildFilmDetailMessage(session)
 }
 
 func BuildFilmGeneralMessage(session *models.Session, film *apiModels.Film, needViewed bool) string {

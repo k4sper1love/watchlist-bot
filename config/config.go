@@ -3,19 +3,21 @@ package config
 import (
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
-	"log"
+	"log/slog"
 	"os"
 	"strconv"
 )
 
 func LoadApp() (*models.App, error) {
 	if err := godotenv.Load(); err != nil {
-		log.Println("no .env file found")
+		sl.Log.Warn("not found .env file")
 	}
 
 	rootID, err := strconv.Atoi(os.Getenv("ROOT_TELEGRAM_ID"))
 	if err != nil {
+		sl.Log.Error("failed to parse root_telegram_id", slog.Any("error", err))
 		return nil, err
 	}
 
@@ -47,5 +49,4 @@ func configureDSN() string {
 		os.Getenv("POSTGRES_PORT"),
 		os.Getenv("POSTGRES_DB"),
 	)
-
 }

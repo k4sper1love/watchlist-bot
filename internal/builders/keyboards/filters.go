@@ -25,6 +25,10 @@ func (k *Keyboard) AddSearch(callback string) *Keyboard {
 	return k.AddButton("🔎", "search", callback, "", true)
 }
 
+func (k *Keyboard) AddReset(callback string) *Keyboard {
+	return k.AddButton("🔄", "reset", callback, "", true)
+}
+
 func (k *Keyboard) AddResetAllSorting(callback string) *Keyboard {
 	return k.AddButton("🔄", "resetSorting", callback, "", true)
 }

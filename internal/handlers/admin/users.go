@@ -108,7 +108,7 @@ func handleUserSelect(app models.App, session *models.Session) {
 
 	session.AdminState.UserID = id
 
-	HandleUserDetailCommand(app, session)
+	general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 }
 
 func handleUserFindCommand(app models.App, session *models.Session) {
@@ -173,7 +173,7 @@ func processUserFindSelect(app models.App, session *models.Session) {
 	}
 
 	session.ClearState()
-	HandleUserDetailCommand(app, session)
+	general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 }
 
 func parseUsers(session *models.Session) ([]models.Session, error) {

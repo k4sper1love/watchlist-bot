@@ -29,9 +29,6 @@ func HandleSortingFilmsButtons(app models.App, session *models.Session) {
 		handleSortingFilmsAllReset(app, session)
 		return
 
-	case states.CallbackSortingFilmsSelectID:
-		session.GetFilmsSortingByContext().Field = "id"
-
 	case states.CallbackSortingFilmsSelectTitle:
 		session.GetFilmsSortingByContext().Field = "title"
 

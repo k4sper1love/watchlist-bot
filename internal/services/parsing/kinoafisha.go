@@ -6,6 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"io"
 	"net/http"
 	"strconv"
@@ -13,14 +14,15 @@ import (
 )
 
 func GetFilmFromKinoafisha(url string) (*apiModels.Film, error) {
-	body, err := getDataFromKinoafisha(url)
+	resp, err := getDataFromKinoafisha(url)
 	if err != nil {
 		return nil, err
 	}
-	defer body.Close()
+	defer utils.CloseBody(resp.Body)
 
 	var film apiModels.Film
-	if err := parseFilmFromKinoafisha(&film, body); err != nil {
+	if err = parseFilmFromKinoafisha(&film, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -28,31 +30,29 @@ func GetFilmFromKinoafisha(url string) (*apiModels.Film, error) {
 }
 
 func GetSeriesFromKinoafisha(url string) (*apiModels.Film, error) {
-	body, err := getDataFromKinoafisha(url)
+	resp, err := getDataFromKinoafisha(url)
 	if err != nil {
 		return nil, err
 	}
+	defer utils.CloseBody(resp.Body)
 
 	var film apiModels.Film
-	if err := parseSeriesFromKinoafisha(&film, body); err != nil {
+	if err = parseSeriesFromKinoafisha(&film, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
 	return &film, err
 }
 
-func getDataFromKinoafisha(url string) (io.ReadCloser, error) {
-	resp, err := client.SendRequestWithOptions(url, http.MethodGet, nil, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode != 200 {
-		resp.Body.Close()
-		return nil, fmt.Errorf("failed response. Status is %s", resp.Status)
-	}
-
-	return resp.Body, nil
+func getDataFromKinoafisha(url string) (*http.Response, error) {
+	return client.Do(
+		&client.CustomRequest{
+			Method:             http.MethodGet,
+			URL:                url,
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 }
 
 func parseFilmFromKinoafisha(dest *apiModels.Film, data io.Reader) error {
@@ -69,7 +69,7 @@ func parseFilmFromKinoafisha(dest *apiModels.Film, data io.Reader) error {
 	year = strings.Split(year, "/")[0]
 	dest.Year, err = strconv.Atoi(strings.TrimSpace(year))
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse year: %v", err)
 	}
 
 	genre := doc.Find(".filmInfo_genreItem").First().Text()
@@ -81,7 +81,7 @@ func parseFilmFromKinoafisha(dest *apiModels.Film, data io.Reader) error {
 	rating := doc.Find(".rating_num").Text()
 	dest.Rating, err = strconv.ParseFloat(strings.TrimSpace(rating), 64)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse rating: %v", err)
 	}
 
 	dest.ImageURL = doc.Find(".filmInfo_posterLink").First().AttrOr("href", "")
@@ -102,7 +102,7 @@ func parseSeriesFromKinoafisha(dest *apiModels.Film, data io.Reader) error {
 	year := strings.TrimSpace(doc.Find(".newFilmInfo_infoData").First().Text())
 	dest.Year, err = strconv.Atoi(strings.TrimSpace(year))
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse year: %v", err)
 	}
 
 	genre := doc.Find(".newFilmInfo_genreItem ").First().Text()
@@ -114,15 +114,15 @@ func parseSeriesFromKinoafisha(dest *apiModels.Film, data io.Reader) error {
 	rating := doc.Find(".ratingBlockCard_externalVal").First().Text()
 	dest.Rating, err = strconv.ParseFloat(strings.TrimSpace(rating), 64)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse rating: %v", err)
 	}
 
 	imageData := doc.Find(".newFilmInfo_posterSlide").AttrOr("data-fullscreengallery-item", "")
 	imageData = strings.Replace(imageData, "\\", "", -1)
 
 	var jsonData map[string]string
-	if err := json.Unmarshal([]byte(imageData), &jsonData); err != nil {
-		dest.ImageURL = ""
+	if err = json.Unmarshal([]byte(imageData), &jsonData); err != nil {
+		return fmt.Errorf("failed to parse image data: %v", err)
 	}
 	dest.ImageURL = strings.TrimSpace(jsonData["image"])
 

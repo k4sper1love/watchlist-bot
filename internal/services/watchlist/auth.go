@@ -7,7 +7,7 @@ import (
 	"github.com/k4sper1love/watchlist-api/pkg/tokens"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
-	"io"
+	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"log/slog"
 	"net/http"
 	"time"
@@ -18,59 +18,37 @@ const (
 )
 
 func Register(app models.App, session *models.Session) error {
-	token, err := tokens.GenerateToken(app.Vars.Secret, session.TelegramID, verificationTokenExpiration)
-	if err != nil {
-		return err
-	}
-
-	headers := map[string]string{
-		"Verification": token,
-	}
-
-	resp, err := client.SendRequestWithOptions(app.Vars.Host+"/api/v1/auth/register/telegram", http.MethodPost, "", headers)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusCreated {
-		return fmt.Errorf("registration failed: %s", resp.Status)
-	}
-
-	if err := parseAuth(session, resp.Body); err != nil {
-		return err
-	}
-
-	return nil
+	return sendAuthRequest(app, session, fmt.Sprintf("%s/api/v1/auth/register/telegram", app.Vars.Host), http.StatusCreated)
 }
 
 func Login(app models.App, session *models.Session) error {
+	return sendAuthRequest(app, session, fmt.Sprintf("%s/api/v1/auth/login/telegram", app.Vars.Host), http.StatusOK)
+}
+
+func sendAuthRequest(app models.App, session *models.Session, requestURL string, expectedStatusCode int) error {
 	token, err := tokens.GenerateToken(app.Vars.Secret, session.TelegramID, verificationTokenExpiration)
 	if err != nil {
+		sl.Log.Error("failed to generate verification token", slog.Any("error", err), slog.Int("telegram_id", session.TelegramID))
 		return err
 	}
 
-	headers := map[string]string{
-		"Verification": token,
-	}
-
-	resp, err := client.SendRequestWithOptions(app.Vars.Host+"/api/v1/auth/login/telegram", http.MethodPost, "", headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderVerification,
+			HeaderValue:        token,
+			Method:             http.MethodPost,
+			URL:                requestURL,
+			Body:               nil,
+			ExpectedStatusCode: expectedStatusCode,
+		},
+	)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer utils.CloseBody(resp.Body)
 
-	if resp.StatusCode != http.StatusOK {
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			sl.Log.Error("failed to read response body", slog.Any("err", err))
-			return err
-		}
-		sl.Log.Error("login failed", slog.Any("body", string(body)))
-		return fmt.Errorf("login failed: %s", resp.Status)
-	}
-
-	if err := parseAuth(session, resp.Body); err != nil {
+	if err = parseAuth(session, resp.Body); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return err
 	}
 
@@ -78,60 +56,63 @@ func Login(app models.App, session *models.Session) error {
 }
 
 func IsTokenValid(app models.App, token string) bool {
-	headers := map[string]string{
-		"Authorization": token,
-	}
-
-	resp, err := client.SendRequestWithOptions(app.Vars.Host+"/api/v1/auth/check-token", http.MethodGet, nil, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        token,
+			Method:             http.MethodGet,
+			URL:                fmt.Sprintf("%s/api/v1/auth/check", app.Vars.Host),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
 		return false
 	}
-	defer resp.Body.Close()
+	defer utils.CloseBody(resp.Body)
 
-	return resp.StatusCode == http.StatusOK
+	return true
 }
 
 func RefreshAccessToken(app models.App, session *models.Session) error {
-	headers := map[string]string{
-		"Authorization": session.RefreshToken,
-	}
-
-	resp, err := client.SendRequestWithOptions(app.Vars.Host+"/api/v1/auth/refresh", http.MethodPost, nil, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.RefreshToken,
+			Method:             http.MethodPost,
+			URL:                fmt.Sprintf("%s/api/v1/auth/refresh", app.Vars.Host),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("refresh token failed: %s", resp.Status)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	var responseMap map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
+		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return err
 	}
 
 	session.AccessToken = responseMap["access_token"].(string)
-
 	return nil
 }
 
 func Logout(app models.App, session *models.Session) error {
-	headers := map[string]string{
-		"Authorization": session.RefreshToken,
-	}
-
-	resp, err := client.SendRequestWithOptions(app.Vars.Host+"/api/v1/auth/logout", http.MethodPost, nil, headers)
+	resp, err := client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderAuthorization,
+			HeaderValue:        session.RefreshToken,
+			Method:             http.MethodPost,
+			URL:                fmt.Sprintf("%s/api/v1/auth/logout", app.Vars.Host),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("logout failed: %s", resp.Status)
-	}
+	defer utils.CloseBody(resp.Body)
 
 	session.ClearUser()
-
 	return nil
 }
