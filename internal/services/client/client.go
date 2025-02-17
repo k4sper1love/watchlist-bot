@@ -47,8 +47,6 @@ func SendRequestWithOptions(requestURL, method string, body any, headers map[str
 
 	AddRequestHeaders(req, headers)
 
-	log.Println(req.Header)
-
 	resp, err := SendRequest(req)
 	if err != nil {
 		return nil, err
@@ -90,7 +88,6 @@ func Do(request *CustomRequest) (*http.Response, error) {
 		}
 	}
 
-	log.Println(request.URL, request.Body, headers)
 	resp, err := SendRequestWithOptions(request.URL, request.Method, request.Body, headers)
 	if err != nil {
 		return nil, err

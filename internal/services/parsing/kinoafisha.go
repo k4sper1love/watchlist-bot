@@ -15,7 +15,7 @@ import (
 
 func GetFilmFromKinoafisha(url string) (*apiModels.Film, error) {
 	url = fmt.Sprintf("https://www.kinoafisha.info/movies/%s", parseKinoafishaID(url))
-
+  
 	resp, err := getDataFromKinoafisha(url)
 	if err != nil {
 		return nil, err

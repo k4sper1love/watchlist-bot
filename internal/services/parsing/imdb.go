@@ -77,4 +77,3 @@ func getFirstGenreFromString(data map[string]interface{}, key string, defaultVal
 		}
 	}
 	return defaultValue
-}
