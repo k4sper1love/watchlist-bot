@@ -40,8 +40,8 @@ func HandleManageFilmButtons(app models.App, session *models.Session) {
 func handleRemoveFilmFromCollection(app models.App, session *models.Session) {
 	if err := watchlist.DeleteCollectionFilm(app, session); err != nil {
 		msg := "🚨 " + translator.Translate(session.Lang, "removeFilmFailure", nil, nil)
-		app.SendMessage(msg, nil)
-		HandleManageFilmCommand(app, session)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackFilmsManage).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
 		return
 	}
 

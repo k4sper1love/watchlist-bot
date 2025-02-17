@@ -101,7 +101,8 @@ func updateCollection(app models.App, session *models.Session) {
 	collection, err := watchlist.UpdateCollection(app, session)
 	if err != nil {
 		msg := "🚨" + translator.Translate(session.Lang, "updateCollectionFailure", nil, nil)
-		app.SendMessage(msg, nil)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackManageCollectionSelectUpdate).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
 		return
 	}
 

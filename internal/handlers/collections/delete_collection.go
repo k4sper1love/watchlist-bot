@@ -37,9 +37,8 @@ func parseDeleteCollectionConfirm(app models.App, session *models.Session) {
 			msg := "🚨 " + translator.Translate(session.Lang, "deleteCollectionFailure", map[string]interface{}{
 				"Collection": session.CollectionDetailState.Collection.Name,
 			}, nil)
-
-			app.SendMessage(msg, nil)
-			HandleManageCollectionCommand(app, session)
+			keyboard := keyboards.NewKeyboard().AddBack(states.CallbackCollectionsManage).Build(session.Lang)
+			app.SendMessage(msg, keyboard)
 			break
 		}
 

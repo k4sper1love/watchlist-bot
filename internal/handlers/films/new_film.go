@@ -472,9 +472,9 @@ func finishNewFilmProcess(app models.App, session *models.Session) {
 	film, err := CreateNewFilm(app, session)
 	if err != nil {
 		msg := "🚨 " + translator.Translate(session.Lang, "createFilmFailure", nil, nil)
-		app.SendMessage(msg, nil)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackFilmsNew).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
 		session.ClearAllStates()
-		HandleNewFilmCommand(app, session)
 		return
 	}
 
@@ -575,8 +575,8 @@ func handleKinopoiskError(app models.App, session *models.Session, err error) {
 		msg += translator.Translate(session.Lang, "tokenLimit", nil, nil)
 	default:
 		msg += translator.Translate(session.Lang, "getFilmFailure", nil, nil)
-		app.SendMessage(msg, nil)
-		HandleNewFilmCommand(app, session)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackFilmsNew).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
 		return
 	}
 

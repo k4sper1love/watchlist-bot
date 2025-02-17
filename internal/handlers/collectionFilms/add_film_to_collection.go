@@ -2,6 +2,7 @@ package collectionFilms
 
 import (
 	"fmt"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
@@ -9,7 +10,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log"
+	"log/slog"
 	"strconv"
 	"strings"
 )
@@ -112,8 +113,9 @@ func HandleAddFilmToCollectionSelect(app models.App, session *models.Session) {
 
 	if err != nil {
 		msg := "🚨 " + translator.Translate(session.Lang, "getFilmFailure", nil, nil)
-		app.SendMessage(msg, nil)
-		log.Printf("error parsing film ID: %v", err)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackOptionsFilmToCollectionExisting).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
+		sl.Log.Error("failed to parse film ID", slog.Any("error", err), slog.String("callback", callback))
 		return
 	}
 

@@ -40,9 +40,8 @@ func parseDeleteProfileConfirm(app models.App, session *models.Session) {
 			msg := "🚨 " + translator.Translate(session.Lang, "deleteProfileFailure", map[string]interface{}{
 				"Username": session.User.Username,
 			}, nil)
-
-			app.SendMessage(msg, nil)
-			HandleProfileCommand(app, session)
+			keyboard := keyboards.NewKeyboard().AddBack(states.CallbackMenuSelectProfile).Build(session.Lang)
+			app.SendMessage(msg, keyboard)
 			return
 		}
 

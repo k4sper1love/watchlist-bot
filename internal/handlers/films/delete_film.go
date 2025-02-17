@@ -38,9 +38,8 @@ func parseDeleteFilmConfirm(app models.App, session *models.Session) {
 			msg := "🚨 " + translator.Translate(session.Lang, "deleteFilmFailure", map[string]interface{}{
 				"Film": session.FilmDetailState.Film.Title,
 			}, nil)
-
-			app.SendMessage(msg, nil)
-			HandleManageFilmCommand(app, session)
+			keyboard := keyboards.NewKeyboard().AddBack(states.CallbackFilmsManage).Build(session.Lang)
+			app.SendMessage(msg, keyboard)
 			break
 		}
 

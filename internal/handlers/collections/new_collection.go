@@ -80,7 +80,8 @@ func createCollection(app models.App, session *models.Session) {
 	collection, err := watchlist.CreateCollection(app, session)
 	if err != nil {
 		msg := "🚨 " + translator.Translate(session.Lang, "createCollectionFailure", nil, nil)
-		app.SendMessage(msg, nil)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackCollectionsNew).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
 		return
 	}
 

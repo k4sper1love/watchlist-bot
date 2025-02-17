@@ -3,6 +3,7 @@ package films
 import (
 	"fmt"
 	"github.com/k4sper1love/watchlist-api/pkg/filters"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
@@ -11,7 +12,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log"
+	"log/slog"
 	"strconv"
 	"strings"
 )
@@ -21,7 +22,9 @@ func HandleFilmsCommand(app models.App, session *models.Session) {
 
 	metadata, err := GetFilms(app, session)
 	if err != nil {
-		app.SendMessage(err.Error(), nil)
+		msg := "🚨 " + translator.Translate(session.Lang, "getFilmsFailure", nil, nil)
+		keyboard := keyboards.NewKeyboard().AddBack("").Build(session.Lang)
+		app.SendMessage(msg, keyboard)
 		return
 	}
 
@@ -120,8 +123,9 @@ func handleFilmSelect(app models.App, session *models.Session) {
 	index, err := strconv.Atoi(indexStr)
 	if err != nil {
 		msg := "🚨 " + translator.Translate(session.Lang, "getFilmFailure", nil, nil)
-		app.SendMessage(msg, nil)
-		log.Printf("error parsing film index: %v", err)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackMenuSelectCollections).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
+		sl.Log.Error("failed to parse film index", slog.Any("error", err), slog.String("callback", callback))
 		return
 	}
 

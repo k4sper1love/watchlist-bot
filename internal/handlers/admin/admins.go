@@ -19,9 +19,9 @@ import (
 func HandleAdminsCommand(app models.App, session *models.Session) {
 	admins, err := parseAdmins(session)
 	if err != nil {
-		msg := translator.Translate(session.Lang, "someError", nil, nil)
-		app.SendMessage(msg, nil)
-		general.RequireRole(app, session, HandleMenuCommand, roles.Admin)
+		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackMenuSelectAdmin).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
 		return
 	}
 
@@ -46,7 +46,7 @@ func HandleAdminsButtons(app models.App, session *models.Session) {
 			session.AdminState.CurrentPage++
 			HandleAdminsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -55,7 +55,7 @@ func HandleAdminsButtons(app models.App, session *models.Session) {
 			session.AdminState.CurrentPage--
 			HandleAdminsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -64,7 +64,7 @@ func HandleAdminsButtons(app models.App, session *models.Session) {
 			session.AdminState.CurrentPage = session.AdminState.LastPage
 			HandleAdminsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -73,7 +73,7 @@ func HandleAdminsButtons(app models.App, session *models.Session) {
 			session.AdminState.CurrentPage = 1
 			HandleAdminsCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -94,9 +94,10 @@ func handleAdminsSelect(app models.App, session *models.Session) {
 	idStr := strings.TrimPrefix(callback, "select_admin_")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
+		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackMenuSelectAdmin).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
 		sl.Log.Warn("failed to parse admin ID", slog.Any("error", err), slog.String("callback", callback))
-		msg := translator.Translate(session.Lang, "someError", nil, nil)
-		app.SendMessage(msg, nil)
 		return
 	}
 
@@ -127,7 +128,7 @@ func processAdminFindSelect(app models.App, session *models.Session) {
 		param = strings.TrimPrefix(param, "@")
 		user, err := postgres.GetAdminByTelegramUsername(param)
 		if err != nil || user == nil {
-			msg := translator.Translate(session.Lang, "notFound", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "notFound", nil, nil)
 			app.SendMessage(msg, nil)
 			handleAdminFindCommand(app, session)
 			return
@@ -136,15 +137,15 @@ func processAdminFindSelect(app models.App, session *models.Session) {
 	} else {
 		telegramID, err := strconv.Atoi(param)
 		if err != nil {
-			msg := translator.Translate(session.Lang, "someError", nil, nil)
-			app.SendMessage(msg, nil)
-			handleAdminFindCommand(app, session)
+			msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
+			keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminListSelectFind).Build(session.Lang)
+			app.SendMessage(msg, keyboard)
 			return
 		}
 
 		user, err := postgres.GetAdminByTelegramID(telegramID)
 		if err != nil || user == nil {
-			msg := translator.Translate(session.Lang, "notFound", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "notFound", nil, nil)
 			app.SendMessage(msg, nil)
 			handleAdminFindCommand(app, session)
 			return

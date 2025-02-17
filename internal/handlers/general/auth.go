@@ -70,8 +70,8 @@ func parseLogoutConfirm(app models.App, session *models.Session) {
 			msg := "🚨 " + translator.Translate(session.Lang, "logoutFailure", map[string]interface{}{
 				"Username": username,
 			}, nil)
-
-			app.SendMessage(msg, nil)
+			keyboard := keyboards.NewKeyboard().AddBack("").Build(session.Lang)
+			app.SendMessage(msg, keyboard)
 			break
 		}
 

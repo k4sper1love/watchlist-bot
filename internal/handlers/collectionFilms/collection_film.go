@@ -1,6 +1,7 @@
 package collectionFilms
 
 import (
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/films"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
@@ -25,8 +26,8 @@ func addFilmToCollection(app models.App, session *models.Session) {
 	collectionFilm, err := watchlist.AddCollectionFilm(app, session)
 	if err != nil {
 		msg := "🚨 " + translator.Translate(session.Lang, "createFilmFailure", nil, nil)
-		app.SendMessage(msg, nil)
-		films.HandleFilmsCommand(app, session)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackMenuSelectFilms).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
 		return
 	}
 

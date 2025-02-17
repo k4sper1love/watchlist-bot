@@ -2,6 +2,7 @@ package collections
 
 import (
 	"github.com/k4sper1love/watchlist-api/pkg/filters"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
@@ -12,7 +13,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log"
+	"log/slog"
 	"strconv"
 	"strings"
 )
@@ -22,7 +23,9 @@ func HandleCollectionsCommand(app models.App, session *models.Session) {
 
 	metadata, err := GetCollections(app, session)
 	if err != nil {
-		app.SendMessage(err.Error(), nil)
+		msg := "🚨 " + translator.Translate(session.Lang, "getCollectionsFailure", nil, nil)
+		keyboard := keyboards.NewKeyboard().AddBack("").Build(session.Lang)
+		app.SendMessage(msg, keyboard)
 		return
 	}
 
@@ -115,8 +118,9 @@ func HandleCollectionSelect(app models.App, session *models.Session) {
 
 	if err != nil {
 		msg := "🚨 " + translator.Translate(session.Lang, "getCollectionFailure", nil, nil)
-		app.SendMessage(msg, nil)
-		log.Printf("error parsing collection ID: %v", err)
+		keyboard := keyboards.NewKeyboard().AddBack("").Build(session.Lang)
+		app.SendMessage(msg, keyboard)
+		sl.Log.Error("failed to parse collection ID", slog.Any("error", err), slog.String("callback", callback))
 		return
 	}
 

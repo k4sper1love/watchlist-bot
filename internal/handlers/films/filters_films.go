@@ -143,7 +143,7 @@ func parseFiltersFilmsRange(app models.App, session *models.Session, filterType 
 		}
 
 	case "year":
-		config := models.FilterRangeConfig{MinValue: 1900, MaxValue: 2050}
+		config := models.FilterRangeConfig{MinValue: 1888, MaxValue: 2100}
 		input, err = validateFiltersRange(input, config)
 		if err != nil {
 			handleFiltersInvalidRangeInput(app, session, filterType, config)
@@ -152,9 +152,9 @@ func parseFiltersFilmsRange(app models.App, session *models.Session, filterType 
 
 	default:
 		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
-		app.SendMessage(msg, nil)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackFilmsFilters).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
 		session.ClearState()
-		HandleFiltersFilmsCommand(app, session)
 		return
 	}
 

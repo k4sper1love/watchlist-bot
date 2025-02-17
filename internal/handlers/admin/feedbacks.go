@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
@@ -10,7 +11,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log"
+	"log/slog"
 	"strconv"
 	"strings"
 )
@@ -18,9 +19,9 @@ import (
 func HandleFeedbacksCommand(app models.App, session *models.Session) {
 	feedbacks, err := parseFeedbacks(session)
 	if err != nil {
-		msg := "⚠️ " + translator.Translate(session.Lang, "someError", nil, nil)
-		app.SendMessage(msg, nil)
-		general.RequireRole(app, session, HandleMenuCommand, roles.Admin)
+		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackMenuSelectAdmin).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
 		return
 	}
 
@@ -42,7 +43,7 @@ func HandleFeedbacksButtons(app models.App, session *models.Session) {
 			session.AdminState.CurrentPage++
 			HandleFeedbacksCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -51,7 +52,7 @@ func HandleFeedbacksButtons(app models.App, session *models.Session) {
 			session.AdminState.CurrentPage--
 			HandleFeedbacksCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -60,7 +61,7 @@ func HandleFeedbacksButtons(app models.App, session *models.Session) {
 			session.AdminState.CurrentPage = session.AdminState.LastPage
 			HandleFeedbacksCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -69,7 +70,7 @@ func HandleFeedbacksButtons(app models.App, session *models.Session) {
 			session.AdminState.CurrentPage = 1
 			HandleFeedbacksCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -79,18 +80,15 @@ func HandleFeedbacksButtons(app models.App, session *models.Session) {
 
 }
 
-func HandleFeedbacksProcess(app models.App, session *models.Session) {
-
-}
-
 func handleFeedbackSelect(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Upd)
 	idStr := strings.TrimPrefix(callback, "select_admin_feedback_")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		msg := "⚠️ " + translator.Translate(session.Lang, "someError", nil, nil)
-		app.SendMessage(msg, nil)
-		log.Printf("error parsing user ID: %v", err)
+		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectFeedback).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
+		sl.Log.Error("failed to parse user ID", slog.Any("error", err), slog.String("callback", callback))
 		return
 	}
 

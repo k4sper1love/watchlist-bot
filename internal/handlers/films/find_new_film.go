@@ -2,6 +2,7 @@ package films
 
 import (
 	"github.com/k4sper1love/watchlist-api/pkg/filters"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
@@ -9,7 +10,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/services/parsing"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log"
+	"log/slog"
 	"strconv"
 	"strings"
 )
@@ -99,8 +100,9 @@ func handleFindNewFilmSelect(app models.App, session *models.Session) {
 	index, err := strconv.Atoi(indexStr)
 	if err != nil {
 		msg := "🚨️ " + translator.Translate(session.Lang, "getFilmFailure", nil, nil)
-		app.SendMessage(msg, nil)
-		log.Printf("error parsing find_new_film index: %v", err)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackFindNewFilmBack).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
+		sl.Log.Error("failed to parse find_new_film index", slog.Any("error", err), slog.String("callback", callback))
 		return
 	}
 
@@ -127,8 +129,9 @@ func handleFindNewFilmAdd(app models.App, session *models.Session) {
 
 	_, err := GetFilms(app, session)
 	if err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
-		app.SendMessage(msg, nil)
+		msg := "🚨 " + translator.Translate(session.Lang, "getFilmsFailure", nil, nil)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackFindNewFilmBack).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
 		session.ClearAllStates()
 		session.FilmsState.CurrentPage = 1
 		HandleFilmsCommand(app, session)

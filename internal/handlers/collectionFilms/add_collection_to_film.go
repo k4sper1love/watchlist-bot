@@ -2,6 +2,7 @@ package collectionFilms
 
 import (
 	"fmt"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/films"
@@ -10,7 +11,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log"
+	"log/slog"
 	"strconv"
 	"strings"
 )
@@ -60,7 +61,7 @@ func HandleAddCollectionToFilmButtons(app models.App, session *models.Session) {
 			session.CollectionFilmsState.CurrentPage++
 			HandleAddCollectionToFilmCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -69,7 +70,7 @@ func HandleAddCollectionToFilmButtons(app models.App, session *models.Session) {
 			session.CollectionFilmsState.CurrentPage--
 			HandleAddCollectionToFilmCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -78,7 +79,7 @@ func HandleAddCollectionToFilmButtons(app models.App, session *models.Session) {
 			session.CollectionFilmsState.CurrentPage = session.CollectionFilmsState.LastPage
 			HandleAddCollectionToFilmCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 
@@ -87,7 +88,7 @@ func HandleAddCollectionToFilmButtons(app models.App, session *models.Session) {
 			session.CollectionFilmsState.CurrentPage = 1
 			HandleAddCollectionToFilmCommand(app, session)
 		} else {
-			msg := translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
 			app.SendMessage(msg, nil)
 		}
 	}
@@ -112,9 +113,10 @@ func HandleAddCollectionToFilmSelect(app models.App, session *models.Session) {
 	id, err := strconv.Atoi(idStr)
 
 	if err != nil {
-		msg := "🚨" + translator.Translate(session.Lang, "getCollectionFailure", nil, nil)
-		app.SendMessage(msg, nil)
-		log.Printf("error parsing collection ID: %v", err)
+		msg := "🚨 " + translator.Translate(session.Lang, "getCollectionFailure", nil, nil)
+		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackCollectionFilmsFromFilm).Build(session.Lang)
+		app.SendMessage(msg, keyboard)
+		sl.Log.Error("failed to parse collection ID", slog.Any("error", err), slog.String("callback", callback))
 		return
 	}
 

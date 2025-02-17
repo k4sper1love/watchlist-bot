@@ -65,8 +65,7 @@ func handleLanguageError(app models.App, session *models.Session) {
 	part2 := translator.Translate(session.Lang, "setDefaultLanguage", nil, nil)
 
 	msg := fmt.Sprintf("%s\n\n%s", part1, part2)
+	keyboard := keyboards.NewKeyboard().AddBack("").Build(session.Lang)
+	app.SendMessage(msg, keyboard)
 
-	app.SendMessage(msg, nil)
-
-	HandleMenuCommand(app, session)
 }

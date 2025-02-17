@@ -130,10 +130,10 @@ func parseBroadcastConfirm(app models.App, session *models.Session) {
 	case states.CallbackAdminBroadcastSend:
 		telegramIDs, err := postgres.GetAllTelegramID()
 		if err != nil {
-			msg := translator.Translate(session.Lang, "requestFailure", nil, nil)
-			app.SendMessage(msg, nil)
+			msg := "🚨 " + translator.Translate(session.Lang, "requestFailure", nil, nil)
+			keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectBroadcast).Build(session.Lang)
+			app.SendMessage(msg, keyboard)
 			session.ClearAllStates()
-			HandleMenuCommand(app, session)
 			return
 		}
 
