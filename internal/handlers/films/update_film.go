@@ -6,6 +6,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/validator"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
@@ -116,7 +117,11 @@ func handleUpdateFilmURL(app models.App, session *models.Session) {
 
 func parseUpdateFilmURL(app models.App, session *models.Session) {
 	url := utils.ParseMessageString(app.Upd)
-
+	if ok := utils.ValidURL(url); !ok {
+		validator.HandleInvalidInputURL(app, session)
+		handleUpdateFilmURL(app, session)
+		return
+	}
 	session.FilmDetailState.URL = url
 
 	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
@@ -167,7 +172,13 @@ func handleUpdateFilmTitle(app models.App, session *models.Session) {
 }
 
 func parseUpdateFilmTitle(app models.App, session *models.Session) {
-	session.FilmDetailState.Title = utils.ParseMessageString(app.Upd)
+	title := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(title, 3, 100); !ok {
+		validator.HandleInvalidInputLength(app, session, 3, 100)
+		handleUpdateFilmTitle(app, session)
+		return
+	}
+	session.FilmDetailState.Title = title
 
 	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
@@ -183,7 +194,13 @@ func handleUpdateFilmDescription(app models.App, session *models.Session) {
 }
 
 func parseUpdateFilmDescription(app models.App, session *models.Session) {
-	session.FilmDetailState.Description = utils.ParseMessageString(app.Upd)
+	description := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(description, 0, 1000); !ok {
+		validator.HandleInvalidInputLength(app, session, 0, 1000)
+		handleUpdateFilmDescription(app, session)
+		return
+	}
+	session.FilmDetailState.Description = description
 
 	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
@@ -199,7 +216,13 @@ func handleUpdateFilmGenre(app models.App, session *models.Session) {
 }
 
 func parseUpdateFilmGenre(app models.App, session *models.Session) {
-	session.FilmDetailState.Genre = utils.ParseMessageString(app.Upd)
+	genre := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(genre, 0, 100); !ok {
+		validator.HandleInvalidInputLength(app, session, 0, 100)
+		handleUpdateFilmGenre(app, session)
+		return
+	}
+	session.FilmDetailState.Genre = genre
 
 	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
@@ -215,7 +238,13 @@ func handleUpdateFilmRating(app models.App, session *models.Session) {
 }
 
 func parseUpdateFilmRating(app models.App, session *models.Session) {
-	session.FilmDetailState.Rating = utils.ParseMessageFloat(app.Upd)
+	rating := utils.ParseMessageFloat(app.Upd)
+	if ok := utils.ValidNumberRange(rating, 1, 10); !ok {
+		validator.HandleInvalidInputRange(app, session, 1, 10)
+		handleUpdateFilmRating(app, session)
+		return
+	}
+	session.FilmDetailState.Rating = rating
 
 	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
@@ -231,7 +260,13 @@ func handleUpdateFilmYear(app models.App, session *models.Session) {
 }
 
 func parseUpdateFilmYear(app models.App, session *models.Session) {
-	session.FilmDetailState.Year = utils.ParseMessageInt(app.Upd)
+	year := utils.ParseMessageInt(app.Upd)
+	if ok := utils.ValidNumberRange(year, 1888, 2100); !ok {
+		validator.HandleInvalidInputRange(app, session, 1888, 2100)
+		handleUpdateFilmYear(app, session)
+		return
+	}
+	session.FilmDetailState.Year = year
 
 	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
@@ -247,7 +282,13 @@ func handleUpdateFilmComment(app models.App, session *models.Session) {
 }
 
 func parseUpdateFilmComment(app models.App, session *models.Session) {
-	session.FilmDetailState.Comment = utils.ParseMessageString(app.Upd)
+	comment := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(comment, 0, 500); !ok {
+		validator.HandleInvalidInputLength(app, session, 0, 500)
+		handleUpdateFilmComment(app, session)
+		return
+	}
+	session.FilmDetailState.Comment = comment
 
 	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
@@ -280,7 +321,13 @@ func handleUpdateFilmUserRating(app models.App, session *models.Session) {
 }
 
 func parseUpdateFilmUserRating(app models.App, session *models.Session) {
-	session.FilmDetailState.UserRating = utils.ParseMessageFloat(app.Upd)
+	userRating := utils.ParseMessageFloat(app.Upd)
+	if ok := utils.ValidNumberRange(userRating, 1, 10); !ok {
+		validator.HandleInvalidInputRange(app, session, 1, 10)
+		handleUpdateFilmUserRating(app, session)
+		return
+	}
+	session.FilmDetailState.UserRating = userRating
 
 	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
@@ -296,7 +343,13 @@ func handleUpdateFilmReview(app models.App, session *models.Session) {
 }
 
 func parseUpdateFilmReview(app models.App, session *models.Session) {
-	session.FilmDetailState.Review = utils.ParseMessageString(app.Upd)
+	review := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(review, 0, 500); !ok {
+		validator.HandleInvalidInputLength(app, session, 0, 500)
+		handleUpdateFilmReview(app, session)
+		return
+	}
+	session.FilmDetailState.Review = review
 
 	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }

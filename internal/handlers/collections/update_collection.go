@@ -5,6 +5,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/validator"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
@@ -61,7 +62,13 @@ func handleUpdateCollectionName(app models.App, session *models.Session) {
 }
 
 func parseUpdateCollectionName(app models.App, session *models.Session) {
-	session.CollectionDetailState.Name = utils.ParseMessageString(app.Upd)
+	name := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(name, 3, 100); !ok {
+		validator.HandleInvalidInputLength(app, session, 3, 100)
+		handleUpdateCollectionName(app, session)
+		return
+	}
+	session.CollectionDetailState.Name = name
 
 	finishUpdateCollectionProcess(app, session)
 }
@@ -77,7 +84,13 @@ func handleUpdateCollectionDescription(app models.App, session *models.Session) 
 }
 
 func parseUpdateCollectionDescription(app models.App, session *models.Session) {
-	session.CollectionDetailState.Description = utils.ParseMessageString(app.Upd)
+	description := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(description, 0, 500); !ok {
+		validator.HandleInvalidInputLength(app, session, 0, 500)
+		handleUpdateCollectionDescription(app, session)
+		return
+	}
+	session.CollectionDetailState.Description = description
 
 	finishUpdateCollectionProcess(app, session)
 }

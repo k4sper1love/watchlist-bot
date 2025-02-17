@@ -2,6 +2,15 @@
   "choiceLanguage": {
     "other": "Пожалуйста, выберите язык для общения с ботом. Вы сможете поменять его в настройках"
   },
+  "invalidInputLength": {
+    "other": "Длина должна быть в диапазоне <b>[{{.Min}}, {{.Max}}]</b> символов"
+  },
+  "invalidInputRange": {
+    "other": "Значение должно быть в диапазоне <b>[{{.Min}}, {{.Max}}]</b>"
+  },
+  "invalidInputURL": {
+    "other": "Неверный URL"
+  },
   "kinopoiskToken": {
     "other": "Kinopoisk токен"
   },

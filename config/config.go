@@ -22,16 +22,15 @@ func LoadApp() (*models.App, error) {
 	}
 
 	vars := &models.Vars{
-		Version:           os.Getenv("VERSION"),
-		BotToken:          os.Getenv("BOT_TOKEN"),
-		Environment:       os.Getenv("ENVIRONMENT"),
-		DSN:               configureDSN(),
-		Host:              os.Getenv("API_HOST"),
-		Secret:            os.Getenv("API_SECRET"),
-		RootID:            rootID,
-		KinopoiskAPIToken: os.Getenv("KINOPOISK_API_TOKEN"),
-		YoutubeAPIToken:   os.Getenv("YOUTUBE_API_TOKEN"),
-		IMDBAPIToken:      os.Getenv("IMDB_API_TOKEN"),
+		Version:         os.Getenv("VERSION"),
+		BotToken:        os.Getenv("BOT_TOKEN"),
+		Environment:     os.Getenv("ENVIRONMENT"),
+		DSN:             configureDSN(),
+		Host:            os.Getenv("API_HOST"),
+		Secret:          os.Getenv("API_SECRET"),
+		RootID:          rootID,
+		YoutubeAPIToken: os.Getenv("YOUTUBE_API_TOKEN"),
+		IMDBAPIToken:    os.Getenv("IMDB_API_TOKEN"),
 	}
 
 	app := &models.App{

@@ -63,5 +63,7 @@ func prepareImageRequest(app models.App, data []byte) (*http.Request, error) {
 		return nil, fmt.Errorf("failed to create request: %v", err)
 	}
 
-	return body, writer.FormDataContentType(), nil
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+
+	return request, nil
 }

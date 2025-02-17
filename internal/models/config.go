@@ -23,16 +23,15 @@ type App struct {
 }
 
 type Vars struct {
-	Version           string
-	BotToken          string
-	Environment       string
-	DSN               string
-	Host              string
-	Secret            string
-	RootID            int
-	KinopoiskAPIToken string
-	YoutubeAPIToken   string
-	IMDBAPIToken      string
+	Version         string
+	BotToken        string
+	Environment     string
+	DSN             string
+	Host            string
+	Secret          string
+	RootID          int
+	YoutubeAPIToken string
+	IMDBAPIToken    string
 }
 
 type LogConfig struct {

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"

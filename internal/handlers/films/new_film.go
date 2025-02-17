@@ -6,6 +6,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/validator"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"github.com/k4sper1love/watchlist-bot/internal/services/parsing"
@@ -179,8 +180,18 @@ func handleNewFilmManually(app models.App, session *models.Session) {
 }
 
 func parseNewFilmTitle(app models.App, session *models.Session) {
+	title := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(title, 3, 100); !ok {
+		validator.HandleInvalidInputLength(app, session, 3, 100)
+		handleNewFilmManually(app, session)
+		return
+	}
 	session.FilmDetailState.Title = utils.ParseMessageString(app.Upd)
 
+	requestNewFilmYear(app, session)
+}
+
+func requestNewFilmYear(app models.App, session *models.Session) {
 	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
 
 	msg := "❓" + translator.Translate(session.Lang, "filmRequestYear", nil, nil)
@@ -193,10 +204,22 @@ func parseNewFilmTitle(app models.App, session *models.Session) {
 func parseNewFilmYear(app models.App, session *models.Session) {
 	if utils.IsSkip(app.Upd) {
 		session.FilmDetailState.Year = 0
-	} else {
-		session.FilmDetailState.Year = utils.ParseMessageInt(app.Upd)
+		requestNewFilmGenre(app, session)
+		return
 	}
 
+	year := utils.ParseMessageInt(app.Upd)
+	if ok := utils.ValidNumberRange(year, 1888, 2100); !ok {
+		validator.HandleInvalidInputRange(app, session, 1888, 2100)
+		requestNewFilmYear(app, session)
+		return
+	}
+	session.FilmDetailState.Year = year
+
+	requestNewFilmGenre(app, session)
+}
+
+func requestNewFilmGenre(app models.App, session *models.Session) {
 	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
 
 	msg := "❓" + translator.Translate(session.Lang, "filmRequestGenre", nil, nil)
@@ -209,10 +232,22 @@ func parseNewFilmYear(app models.App, session *models.Session) {
 func parseNewFilmGenre(app models.App, session *models.Session) {
 	if utils.IsSkip(app.Upd) {
 		session.FilmDetailState.Genre = ""
-	} else {
-		session.FilmDetailState.Genre = utils.ParseMessageString(app.Upd)
+		requestNewFilmDescription(app, session)
+		return
 	}
 
+	genre := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(genre, 0, 100); !ok {
+		validator.HandleInvalidInputLength(app, session, 0, 100)
+		requestNewFilmGenre(app, session)
+		return
+	}
+	session.FilmDetailState.Genre = genre
+
+	requestNewFilmDescription(app, session)
+}
+
+func requestNewFilmDescription(app models.App, session *models.Session) {
 	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
 
 	msg := "❓" + translator.Translate(session.Lang, "filmRequestDescription", nil, nil)
@@ -225,10 +260,22 @@ func parseNewFilmGenre(app models.App, session *models.Session) {
 func parseNewFilmDescription(app models.App, session *models.Session) {
 	if utils.IsSkip(app.Upd) {
 		session.FilmDetailState.Description = ""
-	} else {
-		session.FilmDetailState.Description = utils.ParseMessageString(app.Upd)
+		requestNewFilmRating(app, session)
+		return
 	}
 
+	description := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(description, 0, 1000); !ok {
+		validator.HandleInvalidInputLength(app, session, 0, 1000)
+		requestNewFilmDescription(app, session)
+		return
+	}
+	session.FilmDetailState.Description = description
+
+	requestNewFilmRating(app, session)
+}
+
+func requestNewFilmRating(app models.App, session *models.Session) {
 	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
 
 	msg := "❓" + translator.Translate(session.Lang, "filmRequestRating", nil, nil)
@@ -241,10 +288,22 @@ func parseNewFilmDescription(app models.App, session *models.Session) {
 func parseNewFilmRating(app models.App, session *models.Session) {
 	if utils.IsSkip(app.Upd) {
 		session.FilmDetailState.Rating = 0
-	} else {
-		session.FilmDetailState.Rating = utils.ParseMessageFloat(app.Upd)
+		requestNewFilmImage(app, session)
+		return
 	}
 
+	rating := utils.ParseMessageFloat(app.Upd)
+	if ok := utils.ValidNumberRange(rating, 1, 10); !ok {
+		validator.HandleInvalidInputRange(app, session, 1, 10)
+		requestNewFilmRating(app, session)
+		return
+	}
+	session.FilmDetailState.Rating = rating
+
+	requestNewFilmImage(app, session)
+}
+
+func requestNewFilmImage(app models.App, session *models.Session) {
 	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
 
 	msg := "❓" + translator.Translate(session.Lang, "filmRequestImage", nil, nil)
@@ -286,9 +345,17 @@ func requestNewFilmURL(app models.App, session *models.Session) {
 func parseNewFilmURL(app models.App, session *models.Session) {
 	if utils.IsSkip(app.Upd) {
 		session.FilmDetailState.URL = ""
-	} else {
-		session.FilmDetailState.URL = utils.ParseMessageString(app.Upd)
+		requestNewFilmComment(app, session)
+		return
 	}
+
+	u := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidURL(u); !ok {
+		validator.HandleInvalidInputURL(app, session)
+		requestNewFilmURL(app, session)
+		return
+	}
+	session.FilmDetailState.URL = u
 
 	requestNewFilmComment(app, session)
 }
@@ -306,10 +373,22 @@ func requestNewFilmComment(app models.App, session *models.Session) {
 func parseNewFilmComment(app models.App, session *models.Session) {
 	if utils.IsSkip(app.Upd) {
 		session.FilmDetailState.Comment = ""
-	} else {
-		session.FilmDetailState.Comment = utils.ParseMessageString(app.Upd)
+		requestNewFilmViewed(app, session)
+		return
 	}
 
+	comment := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(comment, 0, 500); !ok {
+		validator.HandleInvalidInputLength(app, session, 0, 500)
+		requestNewFilmComment(app, session)
+		return
+	}
+	session.FilmDetailState.Comment = comment
+
+	requestNewFilmViewed(app, session)
+}
+
+func requestNewFilmViewed(app models.App, session *models.Session) {
 	keyboard := keyboards.NewKeyboard().AddSurvey().AddCancel().Build(session.Lang)
 
 	msg := "❓" + translator.Translate(session.Lang, "filmRequestViewed", nil, nil)
@@ -323,29 +402,45 @@ func parseNewFilmViewed(app models.App, session *models.Session) {
 	switch utils.IsAgree(app.Upd) {
 	case true:
 		session.FilmDetailState.IsViewed = true
-		keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
-
-		msg := "❓" + translator.Translate(session.Lang, "filmRequestUserRating", nil, nil)
-
-		app.SendMessage(msg, keyboard)
-		session.SetState(states.ProcessNewFilmAwaitingUserRating)
+		requestNewFilmUserRating(app, session)
 
 	case false:
 		session.FilmDetailState.IsViewed = false
 		session.FilmDetailState.UserRating = 0
 		session.FilmDetailState.Review = ""
-
 		finishNewFilmProcess(app, session)
 	}
+}
+
+func requestNewFilmUserRating(app models.App, session *models.Session) {
+	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
+
+	msg := "❓" + translator.Translate(session.Lang, "filmRequestUserRating", nil, nil)
+
+	app.SendMessage(msg, keyboard)
+
+	session.SetState(states.ProcessNewFilmAwaitingUserRating)
 }
 
 func parseNewFilmUserRating(app models.App, session *models.Session) {
 	if utils.IsSkip(app.Upd) {
 		session.FilmDetailState.UserRating = 0
-	} else {
-		session.FilmDetailState.UserRating = utils.ParseMessageFloat(app.Upd)
+		requestNewFilmReview(app, session)
+		return
 	}
 
+	userRating := utils.ParseMessageFloat(app.Upd)
+	if ok := utils.ValidNumberRange(userRating, 1, 10); !ok {
+		validator.HandleInvalidInputRange(app, session, 1, 10)
+		requestNewFilmUserRating(app, session)
+		return
+	}
+	session.FilmDetailState.UserRating = userRating
+
+	requestNewFilmReview(app, session)
+}
+
+func requestNewFilmReview(app models.App, session *models.Session) {
 	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
 
 	msg := "❓" + translator.Translate(session.Lang, "filmRequestReview", nil, nil)
@@ -358,9 +453,17 @@ func parseNewFilmUserRating(app models.App, session *models.Session) {
 func parseNewFilmReview(app models.App, session *models.Session) {
 	if utils.IsSkip(app.Upd) {
 		session.FilmDetailState.Review = ""
-	} else {
-		session.FilmDetailState.Review = utils.ParseMessageString(app.Upd)
+		finishNewFilmProcess(app, session)
+		return
 	}
+
+	review := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(review, 0, 500); !ok {
+		validator.HandleInvalidInputLength(app, session, 0, 500)
+		requestNewFilmReview(app, session)
+		return
+	}
+	session.FilmDetailState.Review = review
 
 	finishNewFilmProcess(app, session)
 }

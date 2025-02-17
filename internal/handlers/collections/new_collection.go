@@ -4,6 +4,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/films"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/validator"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
@@ -37,8 +38,18 @@ func HandleNewCollectionProcess(app models.App, session *models.Session) {
 }
 
 func parseNewCollectionName(app models.App, session *models.Session) {
-	session.CollectionDetailState.Name = utils.ParseMessageString(app.Upd)
+	name := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(name, 3, 100); !ok {
+		validator.HandleInvalidInputLength(app, session, 3, 100)
+		HandleNewCollectionCommand(app, session)
+		return
+	}
+	session.CollectionDetailState.Name = name
 
+	requestNewCollectionDescription(app, session)
+}
+
+func requestNewCollectionDescription(app models.App, session *models.Session) {
 	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
 
 	msg := "❓" + translator.Translate(session.Lang, "collectionRequestDescription", nil, nil)
@@ -51,12 +62,18 @@ func parseNewCollectionName(app models.App, session *models.Session) {
 func parseNewCollectionDescription(app models.App, session *models.Session) {
 	if utils.IsSkip(app.Upd) {
 		session.CollectionDetailState.Description = ""
-	} else {
-		session.CollectionDetailState.Description = utils.ParseMessageString(app.Upd)
+		createCollection(app, session)
+		return
 	}
+	description := utils.ParseMessageString(app.Upd)
+	if ok := utils.ValidStringLength(description, 0, 500); !ok {
+		validator.HandleInvalidInputLength(app, session, 0, 500)
+		requestNewCollectionDescription(app, session)
+		return
+	}
+	session.CollectionDetailState.Description = description
 
 	createCollection(app, session)
-	session.ClearAllStates()
 }
 
 func createCollection(app models.App, session *models.Session) {
@@ -74,4 +91,6 @@ func createCollection(app models.App, session *models.Session) {
 
 	session.SetContext(states.ContextCollection)
 	films.HandleFilmsCommand(app, session)
+
+	session.ClearAllStates()
 }
