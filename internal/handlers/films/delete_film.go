@@ -32,7 +32,7 @@ func HandleDeleteFilmProcess(app models.App, session *models.Session) {
 func parseDeleteFilmConfirm(app models.App, session *models.Session) {
 	session.ClearAllStates()
 
-	switch utils.IsAgree(app.Upd) {
+	switch utils.IsAgree(app.Update) {
 	case true:
 		if err := DeleteFilm(app, session); err != nil {
 			msg := "🚨 " + translator.Translate(session.Lang, "deleteFilmFailure", map[string]interface{}{

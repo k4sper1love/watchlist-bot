@@ -31,7 +31,7 @@ func HandleFilmsDetailButtons(app models.App, session *models.Session) {
 	currentIndex := session.FilmDetailState.Index
 	lastIndex := getFilmsLastIndex(session)
 
-	switch utils.ParseCallback(app.Upd) {
+	switch utils.ParseCallback(app.Update) {
 	case states.CallbackFilmDetailNextPage:
 		if currentIndex < lastIndex {
 			session.FilmDetailState.Index++

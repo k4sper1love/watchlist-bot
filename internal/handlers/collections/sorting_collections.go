@@ -21,7 +21,7 @@ func HandleSortingCollectionsCommand(app models.App, session *models.Session) {
 }
 
 func HandleSortingCollectionsButtons(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Upd) {
+	switch utils.ParseCallback(app.Update) {
 	case states.CallbackSortingCollectionsSelectBack:
 		HandleCollectionsCommand(app, session)
 		return
@@ -47,7 +47,7 @@ func HandleSortingCollectionsButtons(app models.App, session *models.Session) {
 }
 
 func HandleSortingCollectionsProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
 		HandleSortingCollectionsCommand(app, session)
 		return
@@ -84,15 +84,15 @@ func handleSortingCollectionsDirection(app models.App, session *models.Session) 
 func parseSortingCollectionsDirection(app models.App, session *models.Session) {
 	sorting := session.CollectionsState.Sorting
 
-	if utils.IsReset(app.Upd) {
+	if utils.IsReset(app.Update) {
 		sorting.Sort = ""
 		handleSortingCollectionsReset(app, session)
 		return
 	}
 
-	log.Println(utils.ParseCallback(app.Upd))
+	log.Println(utils.ParseCallback(app.Update))
 
-	if utils.ParseCallback(app.Upd) == states.CallbacktDecrease {
+	if utils.ParseCallback(app.Update) == states.CallbacktDecrease {
 		sorting.Direction = "-"
 	}
 

@@ -22,7 +22,7 @@ func HandleBroadcastCommand(app models.App, session *models.Session) {
 }
 
 func HandleBroadcastProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
 		HandleMenuCommand(app, session)
 		return
@@ -44,12 +44,12 @@ func HandleBroadcastProcess(app models.App, session *models.Session) {
 }
 
 func parseBroadcastImage(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		requestBroadcastMessage(app, session)
 		return
 	}
 
-	image, err := utils.ParseImageFromMessage(app.Bot, app.Upd)
+	image, err := utils.ParseImageFromMessage(app.Bot, app.Update)
 	if err != nil {
 		handleBroadcastImageError(app, session)
 		return
@@ -77,12 +77,12 @@ func requestBroadcastMessage(app models.App, session *models.Session) {
 }
 
 func parseBroadcastMessage(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		requestBroadcastPin(app, session)
 		return
 	}
 
-	msg := utils.ParseMessageString(app.Upd)
+	msg := utils.ParseMessageString(app.Update)
 
 	session.AdminState.FeedbackMessage = msg
 
@@ -100,7 +100,7 @@ func requestBroadcastPin(app models.App, session *models.Session) {
 }
 
 func parseBroadcastPin(app models.App, session *models.Session) {
-	if utils.IsAgree(app.Upd) {
+	if utils.IsAgree(app.Update) {
 		session.AdminState.NeedFeedbackPin = true
 	}
 
@@ -153,7 +153,7 @@ func requestBroadcastConfirm(app models.App, session *models.Session) {
 }
 
 func parseBroadcastConfirm(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Upd) {
+	switch utils.ParseCallback(app.Update) {
 	case states.CallbackAdminBroadcastSend:
 		telegramIDs, err := postgres.GetTelegramIDs()
 		if err != nil {
@@ -165,9 +165,9 @@ func parseBroadcastConfirm(app models.App, session *models.Session) {
 		}
 
 		if session.AdminState.FeedbackImageURL != "" {
-			app.SendBroadcastImage(telegramIDs, session.AdminState.FeedbackImageURL, session.AdminState.FeedbackMessage, session.AdminState.NeedFeedbackPin, nil)
+			app.SendBroadcastImage(telegramIDs, session.AdminState.NeedFeedbackPin, session.AdminState.FeedbackImageURL, session.AdminState.FeedbackMessage, nil)
 		} else {
-			app.SendBroadcastMessage(telegramIDs, session.AdminState.FeedbackMessage, session.AdminState.NeedFeedbackPin, nil)
+			app.SendBroadcastMessage(telegramIDs, session.AdminState.NeedFeedbackPin, session.AdminState.FeedbackMessage, nil)
 		}
 	}
 

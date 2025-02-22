@@ -22,7 +22,7 @@ func HandleManageCollectionCommand(app models.App, session *models.Session) {
 }
 
 func HandleManageCollectionButtons(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Upd) {
+	switch utils.ParseCallback(app.Update) {
 	case states.CallbackManageCollectionSelectBack:
 		session.SetContext(states.ContextCollection)
 		films.HandleFilmsCommand(app, session)

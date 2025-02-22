@@ -23,7 +23,7 @@ func HandleMenuCommand(app models.App, session *models.Session) {
 }
 
 func HandleMenuButton(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Upd) {
+	switch utils.ParseCallback(app.Update) {
 	case states.CallbackAdminSelectAdmins:
 		session.AdminState.CurrentPage = 1
 		general.RequireRole(app, session, HandleAdminsCommand, roles.SuperAdmin)

@@ -22,7 +22,7 @@ func HandleManageFilmCommand(app models.App, session *models.Session) {
 }
 
 func HandleManageFilmButtons(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Upd) {
+	switch utils.ParseCallback(app.Update) {
 	case states.CallbackManageFilmSelectBack:
 		HandleFilmsDetailCommand(app, session)
 

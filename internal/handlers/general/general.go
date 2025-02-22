@@ -51,7 +51,7 @@ func HandleLanguageCommand(app models.App, session *models.Session) {
 }
 
 func HandleLanguageButton(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 
 	lang := strings.TrimPrefix(callback, "select_start_lang_")
 

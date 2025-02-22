@@ -20,7 +20,7 @@ func HandleSortingFilmsCommand(app models.App, session *models.Session) {
 }
 
 func HandleSortingFilmsButtons(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Upd) {
+	switch utils.ParseCallback(app.Update) {
 	case states.CallbackSortingFilmsSelectBack:
 		HandleFilmsCommand(app, session)
 		return
@@ -55,7 +55,7 @@ func HandleSortingFilmsButtons(app models.App, session *models.Session) {
 }
 
 func HandleSortingFilmsProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
 		HandleSortingFilmsCommand(app, session)
 		return
@@ -92,13 +92,13 @@ func handleSortingFilmsDirection(app models.App, session *models.Session) {
 func parseSortingFilmsDirection(app models.App, session *models.Session) {
 	sorting := session.GetFilmsSortingByContext()
 
-	if utils.IsReset(app.Upd) {
+	if utils.IsReset(app.Update) {
 		sorting.Sort = ""
 		handleSortingFilmsReset(app, session)
 		return
 	}
 
-	if utils.ParseCallback(app.Upd) == states.CallbacktDecrease {
+	if utils.ParseCallback(app.Update) == states.CallbacktDecrease {
 		sorting.Direction = "-"
 	}
 	sorting.Sort = sorting.Direction + sorting.Field

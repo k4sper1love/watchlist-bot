@@ -6,23 +6,25 @@ import (
 	"gorm.io/gorm"
 )
 
-type ProfileState struct {
+type BaseState struct {
 	gorm.Model `json:"-"`
 	SessionID  uint `json:"-"`
-	Username   string
-	Email      string
+}
+
+type ProfileState struct {
+	BaseState
+	Username string
+	Email    string
 }
 
 type FeedbackState struct {
-	gorm.Model `json:"-"`
-	SessionID  uint `json:"-"`
-	Category   string
-	Message    string
+	BaseState
+	Category string
+	Message  string
 }
 
 type FilmsState struct {
-	gorm.Model        `json:"-"`
-	SessionID         uint             `json:"-"`
+	BaseState
 	Films             []apiModels.Film `json:"films" gorm:"serializer:json"`
 	LastPage          int              `json:"-"`
 	PageSize          int              `json:"-" gorm:"default:4"`
@@ -36,8 +38,7 @@ type FilmsState struct {
 }
 
 type FilmDetailState struct {
-	gorm.Model   `json:"-"`
-	SessionID    uint           `json:"-"`
+	BaseState
 	Index        int            `json:"-"`
 	Film         apiModels.Film `json:"film" gorm:"serializer:json"`
 	IsFavorite   bool           `json:"is_favorite"`
@@ -56,9 +57,7 @@ type FilmDetailState struct {
 }
 
 type CollectionsState struct {
-	gorm.Model  `json:"-"`
-	ID          uint                   `json:"-"`
-	SessionID   uint                   `json:"-"`
+	BaseState
 	Collections []apiModels.Collection `json:"collections" gorm:"serializer:json"`
 	LastPage    int                    `json:"-"`
 	PageSize    int                    `json:"-" gorm:"default:4"`
@@ -68,8 +67,7 @@ type CollectionsState struct {
 }
 
 type CollectionDetailState struct {
-	gorm.Model  `json:"-"`
-	SessionID   uint                 `json:"-"`
+	BaseState
 	ObjectID    int                  `json:"-"`
 	Collection  apiModels.Collection `json:"collection" gorm:"serializer:json"`
 	IsFavorite  bool                 `json:"is_favorite"`
@@ -78,16 +76,14 @@ type CollectionDetailState struct {
 }
 
 type CollectionFilmsState struct {
-	gorm.Model  `json:"-"`
-	SessionID   uint `json:"-"`
-	LastPage    int  `json:"-"`
-	PageSize    int  `json:"-" gorm:"default:4"`
-	CurrentPage int  `json:"-"`
+	BaseState
+	LastPage    int `json:"-"`
+	PageSize    int `json:"-" gorm:"default:4"`
+	CurrentPage int `json:"-"`
 }
 
 type AdminState struct {
-	gorm.Model       `json:"-"`
-	SessionID        uint       `json:"-"`
+	BaseState
 	UserID           int        `json:"-"`
 	UserLang         string     `json:"-"`
 	UserRole         roles.Role `json:"-"`
@@ -113,19 +109,16 @@ func (s *CollectionsState) Clear() {
 }
 
 func (s *AdminState) Clear() {
-	s.FeedbackMessage = ""
-	s.FeedbackImageURL = ""
+	s.FeedbackMessage, s.FeedbackImageURL = "", ""
 	s.NeedFeedbackPin = false
 }
 
 func (s *ProfileState) Clear() {
-	s.Username = ""
-	s.Email = ""
+	s.Username, s.Email = "", ""
 }
 
 func (s *FeedbackState) Clear() {
-	s.Category = ""
-	s.Message = ""
+	s.Category, s.Message = "", ""
 }
 
 func (s *FilmDetailState) Clear() {
@@ -154,8 +147,7 @@ func (s *FilmDetailState) ClearIndex() {
 
 func (s *CollectionDetailState) Clear() {
 	s.IsFavorite = false
-	s.Name = ""
-	s.Description = ""
+	s.Name, s.Description = "", ""
 }
 
 func (s *FilmDetailState) SetImageURL(url string) {

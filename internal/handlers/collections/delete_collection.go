@@ -31,7 +31,7 @@ func HandleDeleteCollectionProcess(app models.App, session *models.Session) {
 func parseDeleteCollectionConfirm(app models.App, session *models.Session) {
 	session.ClearState()
 
-	switch utils.IsAgree(app.Upd) {
+	switch utils.IsAgree(app.Update) {
 	case true:
 		if err := watchlist.DeleteCollection(app, session); err != nil {
 			msg := "🚨 " + translator.Translate(session.Lang, "deleteCollectionFailure", map[string]interface{}{

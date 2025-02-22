@@ -11,7 +11,7 @@ import (
 
 func GetSessionByTelegramID(app models.App) (*models.Session, error) {
 	var session models.Session
-	telegramID := utils.ParseTelegramID(app.Upd)
+	telegramID := utils.ParseTelegramID(app.Update)
 
 	if err := GetDatabase().
 		Preload("ProfileState").
@@ -46,11 +46,11 @@ func initializeSessionDefaults(app models.App, session *models.Session) {
 	}
 
 	if session.TelegramUsername == "" {
-		session.TelegramUsername = utils.ParseTelegramUsername(app.Upd)
+		session.TelegramUsername = utils.ParseTelegramUsername(app.Update)
 	}
 
 	if session.Lang == "" {
-		session.Lang = utils.ParseLanguageCode(app.Upd)
+		session.Lang = utils.ParseLanguageCode(app.Update)
 	}
 
 	if session.AdminState == nil {

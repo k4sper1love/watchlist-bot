@@ -34,7 +34,7 @@ func HandleUserDetailCommand(app models.App, session *models.Session) {
 }
 
 func HandleUserDetailButton(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 
 	switch {
 	case callback == states.CallbackAdminUserDetail:
@@ -63,7 +63,7 @@ func HandleUserDetailButton(app models.App, session *models.Session) {
 }
 
 func HandleUserDetailProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
 		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 		return
@@ -128,8 +128,8 @@ func handleUserBan(app models.App, session *models.Session) {
 func processUserBan(app models.App, session *models.Session) {
 	var reason string
 
-	if !utils.IsSkip(app.Upd) {
-		reason = utils.ParseMessageString(app.Upd)
+	if !utils.IsSkip(app.Update) {
+		reason = utils.ParseMessageString(app.Update)
 	}
 
 	err := postgres.SetUserBanStatus(session.AdminState.UserID, true)
@@ -170,7 +170,7 @@ func processUserRole(app models.App, session *models.Session) {
 
 	var role roles.Role
 
-	switch utils.ParseCallback(app.Upd) {
+	switch utils.ParseCallback(app.Update) {
 	case states.CallbackAdminUserRoleSelectBack:
 		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 		return

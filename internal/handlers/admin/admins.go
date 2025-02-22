@@ -33,7 +33,7 @@ func HandleAdminsCommand(app models.App, session *models.Session) {
 }
 
 func HandleAdminsButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 	switch {
 	case callback == states.CallbackAdminListBack:
 		general.RequireRole(app, session, HandleMenuCommand, roles.Helper)
@@ -90,7 +90,7 @@ func HandleAdminsProcess(app models.App, session *models.Session) {
 }
 
 func handleAdminsSelect(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 	idStr := strings.TrimPrefix(callback, "select_admin_")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -116,13 +116,13 @@ func handleAdminFindCommand(app models.App, session *models.Session) {
 }
 
 func processAdminFindSelect(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
 		HandleAdminsCommand(app, session)
 		return
 	}
 
-	param := utils.ParseMessageString(app.Upd)
+	param := utils.ParseMessageString(app.Update)
 
 	if strings.HasPrefix(param, "@") {
 		param = strings.TrimPrefix(param, "@")

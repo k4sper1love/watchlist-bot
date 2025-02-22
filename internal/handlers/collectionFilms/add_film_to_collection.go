@@ -36,7 +36,7 @@ func HandleAddFilmToCollectionCommand(app models.App, session *models.Session) {
 }
 
 func HandleAddFilmToCollectionButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 	switch {
 	case callback == states.CallbackAddFilmToCollectionBack:
 		HandleOptionsFilmToCollectionCommand(app, session)
@@ -94,7 +94,7 @@ func HandleAddFilmToCollectionButtons(app models.App, session *models.Session) {
 }
 
 func HandleAddFilmToCollectionProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
 		HandleAddFilmToCollectionCommand(app, session)
 		return
@@ -107,7 +107,7 @@ func HandleAddFilmToCollectionProcess(app models.App, session *models.Session) {
 }
 
 func HandleAddFilmToCollectionSelect(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 	idStr := strings.TrimPrefix(callback, "select_cf_film_")
 	id, err := strconv.Atoi(idStr)
 
@@ -135,7 +135,7 @@ func handleAddFilmToCollectionFind(app models.App, session *models.Session) {
 }
 
 func parseAddFilmToCollectionTitle(app models.App, session *models.Session) {
-	title := utils.ParseMessageString(app.Upd)
+	title := utils.ParseMessageString(app.Update)
 
 	session.FilmsState.Title = title
 	session.CollectionFilmsState.CurrentPage = 1

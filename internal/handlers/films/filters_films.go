@@ -24,7 +24,7 @@ func HandleFiltersFilmsCommand(app models.App, session *models.Session) {
 }
 
 func HandleFiltersFilmsButtons(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Upd) {
+	switch utils.ParseCallback(app.Update) {
 	case states.CallbackFiltersFilmsSelectBack:
 		HandleFilmsCommand(app, session)
 
@@ -52,7 +52,7 @@ func HandleFiltersFilmsButtons(app models.App, session *models.Session) {
 }
 
 func HandleFiltersFilmsProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
 		HandleFiltersFilmsCommand(app, session)
 		return
@@ -98,13 +98,13 @@ func handleFiltersFilmsSwitch(app models.App, session *models.Session, filterTyp
 func parseFiltersFilmsSwitch(app models.App, session *models.Session, filterType string) {
 	filter := session.GetFilmsFiltersByContext()
 
-	if utils.IsReset(app.Upd) {
+	if utils.IsReset(app.Update) {
 		filter.ResetFilter(filterType)
 		handleFiltersFilmsReset(app, session, filterType)
 		return
 	}
 
-	value := utils.IsAgree(app.Upd)
+	value := utils.IsAgree(app.Update)
 
 	filter.ApplySwitchValue(filterType, value)
 
@@ -124,13 +124,13 @@ func handleFiltersFilmsRange(app models.App, session *models.Session, filterType
 func parseFiltersFilmsRange(app models.App, session *models.Session, filterType string) {
 	filter := session.GetFilmsFiltersByContext()
 
-	if utils.IsReset(app.Upd) {
+	if utils.IsReset(app.Update) {
 		filter.ResetFilter(filterType)
 		handleFiltersFilmsReset(app, session, filterType)
 		return
 	}
 
-	input := utils.ParseMessageString(app.Upd)
+	input := utils.ParseMessageString(app.Update)
 
 	var err error
 	switch filterType {

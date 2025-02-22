@@ -32,7 +32,7 @@ func HandleAdminDetailCommand(app models.App, session *models.Session) {
 }
 
 func HandleAdminDetailButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 
 	switch {
 	case callback == states.CallbackAdminDetailBack:

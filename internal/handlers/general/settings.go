@@ -24,7 +24,7 @@ func HandleSettingsCommand(app models.App, session *models.Session) {
 }
 
 func HandleSettingsButton(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 
 	switch {
 	case callback == states.CallbackSettingsBack:
@@ -52,7 +52,7 @@ func HandleSettingsButton(app models.App, session *models.Session) {
 }
 
 func HandleSettingsProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearState()
 		HandleSettingsCommand(app, session)
 	}
@@ -93,7 +93,7 @@ func handleLanguage(app models.App, session *models.Session) {
 }
 
 func handleLanguageSelect(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 
 	lang := strings.TrimPrefix(callback, "select_lang_")
 
@@ -119,7 +119,7 @@ func handleKinopoiskToken(app models.App, session *models.Session) {
 }
 
 func parseKinopoiskToken(app models.App, session *models.Session) {
-	token := utils.ParseMessageString(app.Upd)
+	token := utils.ParseMessageString(app.Update)
 
 	session.KinopoiskAPIToken = token
 
@@ -145,7 +145,7 @@ func handleCollectionsPageSize(app models.App, session *models.Session) {
 }
 
 func parseCollectionsPageSize(app models.App, session *models.Session) {
-	pageSize, err := strconv.Atoi(utils.ParseMessageString(app.Upd))
+	pageSize, err := strconv.Atoi(utils.ParseMessageString(app.Update))
 	if err != nil || pageSize < 1 || pageSize > 100 {
 		handleCollectionsPageSize(app, session)
 		return
@@ -178,7 +178,7 @@ func handleFilmsPageSize(app models.App, session *models.Session) {
 }
 
 func parseFilmsPageSize(app models.App, session *models.Session) {
-	pageSize, err := strconv.Atoi(utils.ParseMessageString(app.Upd))
+	pageSize, err := strconv.Atoi(utils.ParseMessageString(app.Update))
 	if err != nil || pageSize < 1 {
 		handleCollectionsPageSize(app, session)
 		return
@@ -211,7 +211,7 @@ func handleObjectsPageSize(app models.App, session *models.Session) {
 }
 
 func parseObjectsPageSize(app models.App, session *models.Session) {
-	pageSize, err := strconv.Atoi(utils.ParseMessageString(app.Upd))
+	pageSize, err := strconv.Atoi(utils.ParseMessageString(app.Update))
 	if err != nil || pageSize < 1 {
 		handleCollectionsPageSize(app, session)
 		return

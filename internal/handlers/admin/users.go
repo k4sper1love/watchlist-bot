@@ -34,7 +34,7 @@ func HandleUsersCommand(app models.App, session *models.Session) {
 }
 
 func HandleUsersButton(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 	switch {
 	case callback == states.CallbackAdminManageUsersSelectBack:
 		general.RequireRole(app, session, HandleMenuCommand, roles.Helper)
@@ -84,7 +84,7 @@ func HandleUsersButton(app models.App, session *models.Session) {
 }
 
 func HandleUsersProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
 		HandleUsersCommand(app, session)
 		return
@@ -97,7 +97,7 @@ func HandleUsersProcess(app models.App, session *models.Session) {
 }
 
 func handleUserSelect(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 	idStr := strings.TrimPrefix(callback, "select_admin_user_")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -126,7 +126,7 @@ func handleUserFindCommand(app models.App, session *models.Session) {
 }
 
 func processUserFindSelect(app models.App, session *models.Session) {
-	param := utils.ParseMessageString(app.Upd)
+	param := utils.ParseMessageString(app.Update)
 
 	if strings.HasPrefix(param, "@") {
 		param = strings.TrimPrefix(param, "@")

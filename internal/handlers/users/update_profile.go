@@ -30,7 +30,7 @@ func HandleUpdateProfileCommand(app models.App, session *models.Session) {
 }
 
 func HandleUpdateProfileButtons(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Upd) {
+	switch utils.ParseCallback(app.Update) {
 	case states.CallbackUpdateProfileSelectBack:
 		HandleProfileCommand(app, session)
 	case states.CallbackUpdateProfileSelectUsername:
@@ -42,7 +42,7 @@ func HandleUpdateProfileButtons(app models.App, session *models.Session) {
 }
 
 func HandleUpdateProfileProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearState()
 		HandleUpdateProfileCommand(app, session)
 		return
@@ -69,7 +69,7 @@ func handleUpdateProfileUsername(app models.App, session *models.Session) {
 }
 
 func parseUpdateProfileUsername(app models.App, session *models.Session) {
-	session.ProfileState.Username = utils.ParseMessageString(app.Upd)
+	session.ProfileState.Username = utils.ParseMessageString(app.Update)
 
 	finishUpdateProfileProcess(app, session)
 }
@@ -87,7 +87,7 @@ func handleUpdateProfileEmail(app models.App, session *models.Session) {
 }
 
 func parseUpdateProfileEmail(app models.App, session *models.Session) {
-	session.ProfileState.Email = utils.ParseMessageString(app.Upd)
+	session.ProfileState.Email = utils.ParseMessageString(app.Update)
 
 	finishUpdateProfileProcess(app, session)
 }

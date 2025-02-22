@@ -37,7 +37,7 @@ func HandleCollectionsCommand(app models.App, session *models.Session) {
 }
 
 func HandleCollectionsButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 	switch {
 	case callback == states.CallbackCollectionsBack:
 		general.HandleMenuCommand(app, session)
@@ -99,7 +99,7 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 }
 
 func HandleCollectionProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
 		HandleCollectionsCommand(app, session)
 		return
@@ -112,7 +112,7 @@ func HandleCollectionProcess(app models.App, session *models.Session) {
 }
 
 func HandleCollectionSelect(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 	idStr := strings.TrimPrefix(callback, "select_collection_")
 	id, err := strconv.Atoi(idStr)
 
@@ -143,7 +143,7 @@ func handleCollectionsFindByName(app models.App, session *models.Session) {
 }
 
 func parseCollectionsFindName(app models.App, session *models.Session) {
-	name := utils.ParseMessageString(app.Upd)
+	name := utils.ParseMessageString(app.Update)
 
 	session.CollectionsState.Name = name
 	session.CollectionsState.CurrentPage = 1

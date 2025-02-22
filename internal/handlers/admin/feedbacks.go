@@ -33,7 +33,7 @@ func HandleFeedbacksCommand(app models.App, session *models.Session) {
 }
 
 func HandleFeedbacksButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 	switch {
 	case callback == states.CallbackAdminFeedbackListBack:
 		general.RequireRole(app, session, HandleMenuCommand, roles.Helper)
@@ -81,7 +81,7 @@ func HandleFeedbacksButtons(app models.App, session *models.Session) {
 }
 
 func handleFeedbackSelect(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 	idStr := strings.TrimPrefix(callback, "select_admin_feedback_")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {

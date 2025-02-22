@@ -25,12 +25,12 @@ func HandleUpdates(app models.App) {
 
 	session, err := postgres.GetSessionByTelegramID(app)
 	if err != nil {
-		msg := translator.Translate(utils.ParseLanguageCode(app.Upd), "sessionError", nil, nil)
+		msg := translator.Translate(utils.ParseLanguageCode(app.Update), "sessionError", nil, nil)
 		app.SendMessage(msg, nil)
 		return
 	}
 
-	if utils.ParseMessageCommand(app.Upd) == "reset" {
+	if utils.ParseMessageCommand(app.Update) == "reset" {
 		handleReset(app, session)
 		return
 	}
@@ -44,7 +44,7 @@ func HandleUpdates(app models.App) {
 
 func routeUpdate(app models.App, session *models.Session) {
 	switch {
-	case app.Upd.CallbackQuery != nil:
+	case app.Update.CallbackQuery != nil:
 		handleCallbackQuery(app, session)
 
 	case session.State == "":
@@ -62,8 +62,8 @@ func handleReset(app models.App, session *models.Session) {
 }
 
 func handleCommands(app models.App, session *models.Session) {
-	command := utils.ParseMessageCommand(app.Upd)
-	callbackData := utils.ParseCallback(app.Upd)
+	command := utils.ParseMessageCommand(app.Update)
+	callbackData := utils.ParseCallback(app.Update)
 
 	switch {
 	case command == "start":
@@ -186,7 +186,7 @@ func handleUserInput(app models.App, session *models.Session) {
 }
 
 func handleCallbackQuery(app models.App, session *models.Session) {
-	callbackData := utils.ParseCallback(app.Upd)
+	callbackData := utils.ParseCallback(app.Update)
 
 	switch {
 	case callbackData == states.CallbackMainMenu:
@@ -300,7 +300,7 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 }
 
 func answerCallbackQuery(app models.App) {
-	callback := app.Upd.CallbackQuery.ID
+	callback := app.Update.CallbackQuery.ID
 
 	_, err := app.Bot.AnswerCallbackQuery(tgbotapi.CallbackConfig{
 		CallbackQueryID: callback,
@@ -314,20 +314,20 @@ func answerCallbackQuery(app models.App) {
 }
 
 func logUpdate(app models.App) {
-	telegramID := utils.ParseTelegramID(app.Upd)
-	messageID := utils.ParseMessageID(app.Upd)
+	telegramID := utils.ParseTelegramID(app.Update)
+	messageID := utils.ParseMessageID(app.Update)
 
-	input := fmt.Sprintf("#%d ", messageID)
-	if app.Upd.Message != nil {
+	input := fmt.Sprintf(" #%d: ", messageID)
+	if app.Update.Message != nil {
 		utils.LogUpdateInfo(telegramID, messageID, "message")
-		input += fmt.Sprintf("(message) %s", utils.ParseMessageString(app.Upd))
-	} else if app.Upd.CallbackQuery != nil {
+		input += fmt.Sprintf("(message) %s", utils.ParseMessageString(app.Update))
+	} else if app.Update.CallbackQuery != nil {
 		utils.LogUpdateInfo(telegramID, messageID, "callback")
-		input += fmt.Sprintf("(callback) %s", utils.ParseCallback(app.Upd))
+		input += fmt.Sprintf("(callback) %s", utils.ParseCallback(app.Update))
 	} else {
 		utils.LogUpdateInfo(telegramID, messageID, "unknown")
 		input += "(unknown)"
 	}
 
-	app.UserLogger(telegramID).Printf(input)
+	app.LogAsUser(telegramID).Printf(input)
 }

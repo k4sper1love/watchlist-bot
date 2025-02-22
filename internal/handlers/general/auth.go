@@ -62,7 +62,7 @@ func HandleLogoutProcess(app models.App, session *models.Session) {
 }
 
 func parseLogoutConfirm(app models.App, session *models.Session) {
-	switch utils.IsAgree(app.Upd) {
+	switch utils.IsAgree(app.Update) {
 	case true:
 		username := session.User.Username
 

@@ -57,8 +57,8 @@ func updateAppContext(app *models.App, update *tgbotapi.Update) {
 	userID := utils.ParseTelegramID(update)
 
 	if userID != app.Bot.Self.ID {
-		app.FileLogger = logger.GetLogger(userID)
+		app.Logger = logger.GetLogger(userID)
 	}
 
-	app.Upd = update
+	app.Update = update
 }

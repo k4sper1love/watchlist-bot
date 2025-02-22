@@ -6,7 +6,6 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/logger"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"os"
 	"unicode/utf8"
 )
 
@@ -16,10 +15,10 @@ const (
 )
 
 type App struct {
-	Config     *Config
-	Bot        *tgbotapi.BotAPI
-	Upd        *tgbotapi.Update
-	FileLogger *logger.Wrapper
+	Config *Config
+	Bot    *tgbotapi.BotAPI
+	Update *tgbotapi.Update
+	Logger *logger.Wrapper
 }
 
 type Config struct {
@@ -43,21 +42,51 @@ type MessageConfig struct {
 	File      string
 }
 
-func (app App) UserLogger(userID int) *logger.Wrapper {
-	app.FileLogger.SetPrefix(fmt.Sprintf("USER %d: ", userID))
-	return app.FileLogger
+func (app App) GetChatID() int64 {
+	if app.Update.Message != nil {
+		return app.Update.Message.Chat.ID
+	} else if app.Update.CallbackQuery != nil {
+		return app.Update.CallbackQuery.Message.Chat.ID
+	}
+	return -1
 }
 
-func (app App) BotLogger() *logger.Wrapper {
-	prefix := fmt.Sprintf("BOT %s", app.Bot.Self.UserName)
-	if app.Config.Version != "" {
-		prefix += fmt.Sprintf(" (%s)", app.Config.Version)
+func (app App) logWithPrefix(prefix string) *logger.Wrapper {
+	app.Logger.SetPrefix(prefix)
+	return app.Logger
+}
+
+func (app App) LogAsBot() *logger.Wrapper {
+	return app.logWithPrefix(fmt.Sprintf("BOT %s (%s)", app.Bot.Self.UserName, app.Config.Version))
+}
+
+func (app App) LogAsUser(id int) *logger.Wrapper {
+	return app.logWithPrefix(fmt.Sprintf("USER %d", id))
+}
+
+func (app App) logMessage(config MessageConfig) {
+	utils.LogMessageInfo(config.ChatID, config.MessageID, config.Text != "", config.ImageURL != "", config.NeedPin)
+
+	if app.Logger == nil {
+		utils.LogMessageError(fmt.Errorf("logger is empty"), config.ChatID, config.MessageID)
+		return
 	}
-	prefix += ": "
 
-	app.FileLogger.SetPrefix(prefix)
+	logStr := fmt.Sprintf(" #%d: ", config.MessageID)
+	if config.NeedPin {
+		logStr += "\n[PINNED]"
+	}
+	if config.File != "" {
+		logStr += fmt.Sprintf("\n[file] %s", config.File)
+	}
+	if config.ImageURL != "" {
+		logStr += fmt.Sprintf("\n[image] %s", config.ImageURL)
+	}
+	if config.Text != "" {
+		logStr += fmt.Sprintf("\n%s", config.Text)
+	}
 
-	return app.FileLogger
+	app.LogAsBot().Printf(logStr)
 }
 
 func (app App) send(msg tgbotapi.Chattable, config MessageConfig) {
@@ -71,16 +100,15 @@ func (app App) send(msg tgbotapi.Chattable, config MessageConfig) {
 		utils.LogMessageError(err, app.GetChatID(), -1)
 		return
 	}
+
 	config.ChatID = sentMsg.Chat.ID
 	config.MessageID = sentMsg.MessageID
 
 	if config.NeedPin {
-		pinConfig := tgbotapi.PinChatMessageConfig{
+		_, err = app.Bot.PinChatMessage(tgbotapi.PinChatMessageConfig{
 			ChatID:    config.ChatID,
 			MessageID: config.MessageID,
-		}
-
-		_, err = app.Bot.PinChatMessage(pinConfig)
+		})
 		if err != nil {
 			utils.LogMessageError(fmt.Errorf("failed to pin message: %v", err), config.ChatID, config.MessageID)
 		}
@@ -89,89 +117,57 @@ func (app App) send(msg tgbotapi.Chattable, config MessageConfig) {
 	app.logMessage(config)
 }
 
-func (app App) logMessage(config MessageConfig) {
-	utils.LogMessageInfo(config.ChatID, config.MessageID, config.Text != "", config.ImageURL != "", config.NeedPin)
-
-	if app.FileLogger == nil {
-		utils.LogMessageError(fmt.Errorf("failed to log message: file logger is empty"), config.ChatID, config.MessageID)
-		return
-	}
-
-	response := fmt.Sprintf("#%d", config.MessageID)
-	if config.NeedPin {
-		response += "\n[PINNED]"
-	}
-	if config.File != "" {
-		response += fmt.Sprintf("\n[file] %s", config.File)
-	}
-	if config.ImageURL != "" {
-		response += fmt.Sprintf("\n[image] %s", config.ImageURL)
-	}
-	if config.Text != "" {
-		response += fmt.Sprintf("\n%s", config.Text)
-	}
-
-	app.BotLogger().Printf(response)
-}
-
-func (app App) GetChatID() int64 {
-	if app.Upd.Message != nil {
-		return app.Upd.Message.Chat.ID
-	} else if app.Upd.CallbackQuery != nil {
-		return app.Upd.CallbackQuery.Message.Chat.ID
-	}
-	return -1
-}
-
 func (app App) chunkTextAndSend(text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	iterationLimit := 100
 	for utf8.RuneCountInString(text) > maxMessageLength && iterationLimit > 0 {
 		firstPart, secondPart := utils.SplitTextByLength(text, maxMessageLength)
-		if len(firstPart) == 0 {
+		if firstPart == "" {
 			utils.LogMessageError(fmt.Errorf("failed to chuck text: first part is empty"), app.GetChatID(), -1)
-			msg := translator.Translate("ru", "chunkTextError", nil, nil)
+			msg := "🚨 " + translator.Translate("en", "chunkTextError", nil, nil)
 			app.SendMessage(msg, nil)
 			return
 		}
-		app.createAndSendMessage(firstPart, nil)
+		app.sendMessageInternal(MessageConfig{Text: firstPart}, nil)
 		text = secondPart
 		iterationLimit--
 	}
-	if len(text) > 0 {
-		app.createAndSendMessage(text, keyboard)
+	if text != "" {
+		app.sendMessageInternal(MessageConfig{Text: text}, keyboard)
 	}
 }
 
-func (app App) createAndSendMessage(text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
-	msg := tgbotapi.NewMessage(app.GetChatID(), text)
+func (app App) sendMessageInternal(config MessageConfig, keyboard *tgbotapi.InlineKeyboardMarkup) {
+	msg := tgbotapi.NewMessage(app.GetChatID(), config.Text)
 	msg.ParseMode = "HTML"
 	if keyboard != nil {
 		msg.ReplyMarkup = keyboard
 	}
-
-	app.send(msg, MessageConfig{Text: text})
-}
-
-func (app App) SendMessage(text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
-	app.chunkTextAndSend(text, keyboard)
+	app.send(msg, config)
 }
 
 func (app App) sendImageInternal(config MessageConfig, imagePath string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	msg := tgbotapi.NewPhotoUpload(app.GetChatID(), imagePath)
 	msg.ParseMode = "HTML"
 	runeLen := utf8.RuneCountInString(config.Text)
-	if config.Text != "" && runeLen < maxCaptionLength {
-		msg.Caption = config.Text
-	}
-	if keyboard != nil && runeLen < maxCaptionLength {
-		msg.ReplyMarkup = keyboard
-	}
 
-	app.send(msg, MessageConfig{NeedPin: config.NeedPin, Text: msg.Caption, ImageURL: config.ImageURL})
+	if runeLen <= maxCaptionLength {
+		msg.Caption = config.Text
+		if keyboard != nil {
+			msg.ReplyMarkup = keyboard
+		}
+	}
+	text := config.Text
+	config.Text = msg.Caption
+
+	app.send(msg, config)
 
 	if runeLen > maxCaptionLength {
-		app.chunkTextAndSend(config.Text, keyboard)
+		app.chunkTextAndSend(text, keyboard)
 	}
+}
+
+func (app App) SendMessage(text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
+	app.chunkTextAndSend(text, keyboard)
 }
 
 func (app App) SendImage(imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
@@ -180,58 +176,32 @@ func (app App) SendImage(imageURL, text string, keyboard *tgbotapi.InlineKeyboar
 		app.handleDownloadImageError(err, imageURL)
 		return
 	}
-	defer func() {
-		if err = os.Remove(imagePath); err != nil {
-			utils.LogRemoveFileWarn(err, imageURL)
-		}
-	}()
+	defer utils.RemoveFile(imagePath)
 
 	app.sendImageInternal(MessageConfig{Text: text, ImageURL: imageURL}, imagePath, keyboard)
 }
 
-func (app App) SendBroadcastMessage(telegramIDs []int, text string, needPin bool, keyboard *tgbotapi.InlineKeyboardMarkup) {
-	for _, telegramID := range telegramIDs {
-		msg := tgbotapi.NewMessage(int64(telegramID), text)
-		if keyboard != nil {
-			msg.ReplyMarkup = keyboard
-		}
-		app.FileLogger = logger.GetLogger(telegramID)
-		app.send(msg, MessageConfig{NeedPin: needPin, Text: text})
+func (app App) SendBroadcastMessage(ids []int, needPin bool, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
+	for _, id := range ids {
+		app.createTempApp(id).sendMessageInternal(MessageConfig{Text: text, NeedPin: needPin}, keyboard)
 	}
 }
 
-func (app App) SendBroadcastImage(telegramIDs []int, imageURL, text string, needPin bool, keyboard *tgbotapi.InlineKeyboardMarkup) {
+func (app App) SendBroadcastImage(ids []int, needPin bool, imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	imagePath, err := utils.DownloadImage(imageURL)
 	if err != nil {
 		app.handleDownloadImageError(err, imageURL)
 		return
 	}
-	defer func() {
-		if err = os.Remove(imagePath); err != nil {
-			utils.LogRemoveFileWarn(err, imageURL)
-		}
-	}()
+	defer utils.RemoveFile(imagePath)
 
-	for _, telegramID := range telegramIDs {
-		app.FileLogger = logger.GetLogger(telegramID)
-		app.Upd = &tgbotapi.Update{Message: &tgbotapi.Message{Chat: &tgbotapi.Chat{ID: int64(telegramID)}}}
-		app.sendImageInternal(MessageConfig{NeedPin: needPin, Text: text, ImageURL: imageURL}, imagePath, keyboard)
+	for _, id := range ids {
+		app.createTempApp(id).sendImageInternal(MessageConfig{NeedPin: needPin, Text: text, ImageURL: imageURL}, imagePath, keyboard)
 	}
 }
 
 func (app App) SendMessageByID(id int, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
-	tempApp := App{
-		Bot:    app.Bot,
-		Config: app.Config,
-		Upd: &tgbotapi.Update{
-			Message: &tgbotapi.Message{
-				Chat: &tgbotapi.Chat{ID: int64(id)},
-			},
-		},
-		FileLogger: logger.GetLogger(id),
-	}
-
-	tempApp.SendMessage(text, keyboard)
+	app.createTempApp(id).SendMessage(text, keyboard)
 }
 
 func (app App) SendImageByID(id int, imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
@@ -240,32 +210,15 @@ func (app App) SendImageByID(id int, imageURL, text string, keyboard *tgbotapi.I
 		app.handleDownloadImageError(err, imageURL)
 		return
 	}
-	defer func() {
-		if err = os.Remove(imagePath); err != nil {
-			utils.LogRemoveFileWarn(err, imageURL)
-		}
-	}()
+	defer utils.RemoveFile(imagePath)
 
-	tempApp := App{
-		Bot:    app.Bot,
-		Config: app.Config,
-		Upd: &tgbotapi.Update{
-			Message: &tgbotapi.Message{
-				Chat: &tgbotapi.Chat{ID: int64(id)},
-			},
-		},
-		FileLogger: logger.GetLogger(id),
-	}
-	tempApp.SendImage(imagePath, text, keyboard)
+	app.createTempApp(id).SendImage(imagePath, text, keyboard)
 }
 
 func (app App) SendFile(filepath string, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	msg := tgbotapi.NewDocumentUpload(app.GetChatID(), filepath)
 	msg.ParseMode = "HTML"
-
-	if text != "" {
-		msg.Caption = text
-	}
+	msg.Caption = text
 	if keyboard != nil {
 		msg.ReplyMarkup = keyboard
 	}
@@ -273,11 +226,25 @@ func (app App) SendFile(filepath string, text string, keyboard *tgbotapi.InlineK
 	app.send(msg, MessageConfig{File: filepath, Text: text})
 }
 
+func (app App) createTempApp(id int) *App {
+	return &App{
+		Bot:    app.Bot,
+		Config: app.Config,
+		Update: &tgbotapi.Update{
+			Message: &tgbotapi.Message{
+				Chat: &tgbotapi.Chat{
+					ID: int64(id)},
+			},
+		},
+		Logger: logger.GetLogger(id),
+	}
+}
+
 func (app App) handleDownloadImageError(err error, imageURL string) {
 	utils.LogDownloadFileError(err, imageURL)
 
-	msg := translator.Translate(utils.ParseLanguageCode(app.Upd), "someError", nil, nil)
-	app.SendMessage(msg, nil)
+	lang := utils.ParseLanguageCode(app.Update)
+	msg := "🚨 " + translator.Translate(lang, "getImageFailure", nil, nil)
 
-	return
+	app.SendMessage(msg, nil)
 }

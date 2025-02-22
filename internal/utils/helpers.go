@@ -380,6 +380,12 @@ func CloseFile(file *os.File) {
 	}
 }
 
+func RemoveFile(path string) {
+	if err := os.Remove(path); err != nil {
+		LogRemoveFileWarn(err, path)
+	}
+}
+
 func CalculateOffset(page, pageSize int) int {
 	return (page - 1) * pageSize
 }

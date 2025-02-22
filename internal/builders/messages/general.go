@@ -10,7 +10,7 @@ import (
 
 func BuildStartMessage(app models.App, session *models.Session) string {
 	part1 := translator.Translate(session.Lang, "welcomeMessageGreeting", map[string]interface{}{
-		"Name": utils.ParseTelegramName(app.Upd),
+		"Name": utils.ParseTelegramName(app.Update),
 	}, nil)
 
 	part2 := translator.Translate(session.Lang, "welcomeMessageBody", map[string]interface{}{

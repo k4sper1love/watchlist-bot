@@ -21,7 +21,7 @@ func HandleNewCollectionCommand(app models.App, session *models.Session) {
 }
 
 func HandleNewCollectionProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearState()
 		session.CollectionDetailState.Clear()
 		HandleCollectionsCommand(app, session)
@@ -38,7 +38,7 @@ func HandleNewCollectionProcess(app models.App, session *models.Session) {
 }
 
 func parseNewCollectionName(app models.App, session *models.Session) {
-	name := utils.ParseMessageString(app.Upd)
+	name := utils.ParseMessageString(app.Update)
 	if ok := utils.ValidStringLength(name, 3, 100); !ok {
 		validator.HandleInvalidInputLength(app, session, 3, 100)
 		HandleNewCollectionCommand(app, session)
@@ -60,12 +60,12 @@ func requestNewCollectionDescription(app models.App, session *models.Session) {
 }
 
 func parseNewCollectionDescription(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		session.CollectionDetailState.Description = ""
 		createCollection(app, session)
 		return
 	}
-	description := utils.ParseMessageString(app.Upd)
+	description := utils.ParseMessageString(app.Update)
 	if ok := utils.ValidStringLength(description, 0, 500); !ok {
 		validator.HandleInvalidInputLength(app, session, 0, 500)
 		requestNewCollectionDescription(app, session)

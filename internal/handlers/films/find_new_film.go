@@ -41,7 +41,7 @@ func HandleFindNewFilmCommand(app models.App, session *models.Session) {
 }
 
 func HandleFindNewFilmButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 
 	switch {
 	case callback == states.CallbackFindNewFilmBack:
@@ -95,7 +95,7 @@ func HandleFindNewFilmButtons(app models.App, session *models.Session) {
 }
 
 func handleFindNewFilmSelect(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 	indexStr := strings.TrimPrefix(callback, "select_find_new_film_")
 	index, err := strconv.Atoi(indexStr)
 	if err != nil {

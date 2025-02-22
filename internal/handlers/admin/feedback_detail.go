@@ -29,7 +29,7 @@ func HandleFeedbackDetailCommand(app models.App, session *models.Session) {
 }
 
 func HandleFeedbackDetailButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 
 	switch {
 	case callback == states.CallbackAdminFeedbackDetailBack:

@@ -24,7 +24,7 @@ func HandleNewFilmCommand(app models.App, session *models.Session) {
 }
 
 func HandleNewFilmButtons(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Upd) {
+	switch utils.ParseCallback(app.Update) {
 	case states.CallbackNewFilmSelectBack:
 		HandleFilmsCommand(app, session)
 
@@ -43,7 +43,7 @@ func HandleNewFilmButtons(app models.App, session *models.Session) {
 }
 
 func HandleNewFilmProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
 		HandleNewFilmCommand(app, session)
 		return
@@ -109,7 +109,7 @@ func handleNewFilmFind(app models.App, session *models.Session) {
 }
 
 func parseNewFilmFind(app models.App, session *models.Session) {
-	title := utils.ParseMessageString(app.Upd)
+	title := utils.ParseMessageString(app.Update)
 
 	session.FilmsState.Title = title
 	session.FilmsState.CurrentPage = 1
@@ -133,7 +133,7 @@ func handleNewFilmFromURL(app models.App, session *models.Session) {
 }
 
 func parseNewFilmFromURL(app models.App, session *models.Session) {
-	url := utils.ParseMessageString(app.Upd)
+	url := utils.ParseMessageString(app.Update)
 	isKinopoisk := parsing.IsKinopoisk(url)
 
 	if isKinopoisk && session.KinopoiskAPIToken == "" {
@@ -180,13 +180,13 @@ func handleNewFilmManually(app models.App, session *models.Session) {
 }
 
 func parseNewFilmTitle(app models.App, session *models.Session) {
-	title := utils.ParseMessageString(app.Upd)
+	title := utils.ParseMessageString(app.Update)
 	if ok := utils.ValidStringLength(title, 3, 100); !ok {
 		validator.HandleInvalidInputLength(app, session, 3, 100)
 		handleNewFilmManually(app, session)
 		return
 	}
-	session.FilmDetailState.Title = utils.ParseMessageString(app.Upd)
+	session.FilmDetailState.Title = utils.ParseMessageString(app.Update)
 
 	requestNewFilmYear(app, session)
 }
@@ -202,13 +202,13 @@ func requestNewFilmYear(app models.App, session *models.Session) {
 }
 
 func parseNewFilmYear(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		session.FilmDetailState.Year = 0
 		requestNewFilmGenre(app, session)
 		return
 	}
 
-	year := utils.ParseMessageInt(app.Upd)
+	year := utils.ParseMessageInt(app.Update)
 	if ok := utils.ValidNumberRange(year, 1888, 2100); !ok {
 		validator.HandleInvalidInputRange(app, session, 1888, 2100)
 		requestNewFilmYear(app, session)
@@ -230,13 +230,13 @@ func requestNewFilmGenre(app models.App, session *models.Session) {
 }
 
 func parseNewFilmGenre(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		session.FilmDetailState.Genre = ""
 		requestNewFilmDescription(app, session)
 		return
 	}
 
-	genre := utils.ParseMessageString(app.Upd)
+	genre := utils.ParseMessageString(app.Update)
 	if ok := utils.ValidStringLength(genre, 0, 100); !ok {
 		validator.HandleInvalidInputLength(app, session, 0, 100)
 		requestNewFilmGenre(app, session)
@@ -258,13 +258,13 @@ func requestNewFilmDescription(app models.App, session *models.Session) {
 }
 
 func parseNewFilmDescription(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		session.FilmDetailState.Description = ""
 		requestNewFilmRating(app, session)
 		return
 	}
 
-	description := utils.ParseMessageString(app.Upd)
+	description := utils.ParseMessageString(app.Update)
 	if ok := utils.ValidStringLength(description, 0, 1000); !ok {
 		validator.HandleInvalidInputLength(app, session, 0, 1000)
 		requestNewFilmDescription(app, session)
@@ -286,13 +286,13 @@ func requestNewFilmRating(app models.App, session *models.Session) {
 }
 
 func parseNewFilmRating(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		session.FilmDetailState.Rating = 0
 		requestNewFilmImage(app, session)
 		return
 	}
 
-	rating := utils.ParseMessageFloat(app.Upd)
+	rating := utils.ParseMessageFloat(app.Update)
 	if ok := utils.ValidNumberRange(rating, 1, 10); !ok {
 		validator.HandleInvalidInputRange(app, session, 1, 10)
 		requestNewFilmRating(app, session)
@@ -314,7 +314,7 @@ func requestNewFilmImage(app models.App, session *models.Session) {
 }
 
 func parseNewFilmImage(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		requestNewFilmURL(app, session)
 		return
 	}
@@ -343,13 +343,13 @@ func requestNewFilmURL(app models.App, session *models.Session) {
 }
 
 func parseNewFilmURL(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		session.FilmDetailState.URL = ""
 		requestNewFilmComment(app, session)
 		return
 	}
 
-	u := utils.ParseMessageString(app.Upd)
+	u := utils.ParseMessageString(app.Update)
 	if ok := utils.ValidURL(u); !ok {
 		validator.HandleInvalidInputURL(app, session)
 		requestNewFilmURL(app, session)
@@ -371,13 +371,13 @@ func requestNewFilmComment(app models.App, session *models.Session) {
 }
 
 func parseNewFilmComment(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		session.FilmDetailState.Comment = ""
 		requestNewFilmViewed(app, session)
 		return
 	}
 
-	comment := utils.ParseMessageString(app.Upd)
+	comment := utils.ParseMessageString(app.Update)
 	if ok := utils.ValidStringLength(comment, 0, 500); !ok {
 		validator.HandleInvalidInputLength(app, session, 0, 500)
 		requestNewFilmComment(app, session)
@@ -399,7 +399,7 @@ func requestNewFilmViewed(app models.App, session *models.Session) {
 }
 
 func parseNewFilmViewed(app models.App, session *models.Session) {
-	switch utils.IsAgree(app.Upd) {
+	switch utils.IsAgree(app.Update) {
 	case true:
 		session.FilmDetailState.IsViewed = true
 		requestNewFilmUserRating(app, session)
@@ -423,13 +423,13 @@ func requestNewFilmUserRating(app models.App, session *models.Session) {
 }
 
 func parseNewFilmUserRating(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		session.FilmDetailState.UserRating = 0
 		requestNewFilmReview(app, session)
 		return
 	}
 
-	userRating := utils.ParseMessageFloat(app.Upd)
+	userRating := utils.ParseMessageFloat(app.Update)
 	if ok := utils.ValidNumberRange(userRating, 1, 10); !ok {
 		validator.HandleInvalidInputRange(app, session, 1, 10)
 		requestNewFilmUserRating(app, session)
@@ -451,13 +451,13 @@ func requestNewFilmReview(app models.App, session *models.Session) {
 }
 
 func parseNewFilmReview(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		session.FilmDetailState.Review = ""
 		finishNewFilmProcess(app, session)
 		return
 	}
 
-	review := utils.ParseMessageString(app.Upd)
+	review := utils.ParseMessageString(app.Update)
 	if ok := utils.ValidStringLength(review, 0, 500); !ok {
 		validator.HandleInvalidInputLength(app, session, 0, 500)
 		requestNewFilmReview(app, session)
@@ -526,7 +526,7 @@ func createNewCollectionFilm(app models.App, session *models.Session) (*apiModel
 }
 
 func parseAndUploadImageFromMessage(app models.App) (string, error) {
-	image, err := utils.ParseImageFromMessage(app.Bot, app.Upd)
+	image, err := utils.ParseImageFromMessage(app.Bot, app.Update)
 	if err != nil {
 		return "", err
 	}
@@ -554,7 +554,7 @@ func requestKinopoiskToken(app models.App, session *models.Session) {
 }
 
 func parseKinopoiskToken(app models.App, session *models.Session) {
-	token := utils.ParseMessageString(app.Upd)
+	token := utils.ParseMessageString(app.Update)
 
 	session.KinopoiskAPIToken = token
 

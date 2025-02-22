@@ -20,7 +20,7 @@ func HandleOptionsFilmToCollectionCommand(app models.App, session *models.Sessio
 }
 
 func HandleOptionsFilmToCollectionButtons(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Upd) {
+	switch utils.ParseCallback(app.Update) {
 	case states.CallbackOptionsFilmToCollectionBack:
 		films.HandleFilmsCommand(app, session)
 

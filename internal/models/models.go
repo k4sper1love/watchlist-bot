@@ -45,31 +45,8 @@ func (f *Sorting) Clear() {
 	f.Direction = ""
 }
 
-func (f *FiltersFilm) IsFiltersEnabled() bool {
-	if f.Rating != "" {
-		return true
-	} else if f.UserRating != "" {
-		return true
-	} else if f.Year != "" {
-		return true
-	} else if f.IsViewed != nil {
-		return true
-	} else if f.IsFavorite != nil {
-		return true
-	} else if f.HasURL != nil {
-		return true
-	}
-
-	return false
-}
-
 func (f *FiltersFilm) ResetFilters() {
-	f.Rating = ""
-	f.UserRating = ""
-	f.Year = ""
-	f.IsViewed = nil
-	f.IsFavorite = nil
-	f.HasURL = nil
+	*f = FiltersFilm{FilterableID: f.FilterableID, FilterableType: f.FilterableType}
 }
 
 func (f *FiltersFilm) ResetFilter(filterType string) {
@@ -87,6 +64,10 @@ func (f *FiltersFilm) ResetFilter(filterType string) {
 	case "hasURL":
 		f.HasURL = nil
 	}
+}
+
+func (f *FiltersFilm) IsFiltersEnabled() bool {
+	return f.Rating != "" || f.UserRating != "" || f.Year != "" || f.IsViewed != nil || f.IsFavorite != nil || f.HasURL != nil
 }
 
 func (f *FiltersFilm) IsFilterEnabled(filterType string) bool {
@@ -149,14 +130,14 @@ func (f *FiltersFilm) ValueToString(filterType string) string {
 	}
 }
 
+func (f *Sorting) ResetSorting() {
+	f.Sort = ""
+}
+
 func (f *Sorting) IsSortingEnabled() bool {
 	return f.Sort != ""
 }
 
 func (f *Sorting) IsSortingFieldEnabled(field string) bool {
 	return field == strings.TrimPrefix(f.Sort, "-")
-}
-
-func (f *Sorting) ResetSorting() {
-	f.Sort = ""
 }

@@ -24,7 +24,7 @@ func HandleViewedFilmCommand(app models.App, session *models.Session) {
 }
 
 func HandleViewedFilmProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
 		HandleFilmsDetailCommand(app, session)
 		return
@@ -40,10 +40,10 @@ func HandleViewedFilmProcess(app models.App, session *models.Session) {
 }
 
 func parseViewedFilmRating(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		session.FilmDetailState.UserRating = 0
 	} else {
-		session.FilmDetailState.UserRating = utils.ParseMessageFloat(app.Upd)
+		session.FilmDetailState.UserRating = utils.ParseMessageFloat(app.Update)
 	}
 
 	part1 := translator.Translate(session.Lang, "viewedFilmRequestReview", nil, nil)
@@ -59,10 +59,10 @@ func parseViewedFilmRating(app models.App, session *models.Session) {
 }
 
 func parseViewedFilmReview(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
+	if utils.IsSkip(app.Update) {
 		session.FilmDetailState.Review = ""
 	} else {
-		session.FilmDetailState.Review = utils.ParseMessageString(app.Upd)
+		session.FilmDetailState.Review = utils.ParseMessageString(app.Update)
 	}
 
 	finishUpdateFilmProcess(app, session, HandleFilmsDetailCommand)

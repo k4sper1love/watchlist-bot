@@ -31,7 +31,7 @@ func HandleFindCollectionsCommand(app models.App, session *models.Session) {
 }
 
 func HandleFindCollectionsButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 
 	switch {
 	case callback == states.CallbackFindCollectionsBack:

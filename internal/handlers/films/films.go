@@ -39,7 +39,7 @@ func HandleFilmsButtons(app models.App,
 	session *models.Session,
 	backFunc func(models.App, *models.Session),
 ) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 
 	switch {
 	case callback == states.CallbackFilmsBack:
@@ -105,7 +105,7 @@ func HandleFilmsButtons(app models.App,
 }
 
 func HandleFilmsProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
 		HandleFilmsCommand(app, session)
 		return
@@ -118,7 +118,7 @@ func HandleFilmsProcess(app models.App, session *models.Session) {
 }
 
 func handleFilmSelect(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 	indexStr := strings.TrimPrefix(callback, "select_film_")
 	index, err := strconv.Atoi(indexStr)
 	if err != nil {
@@ -145,7 +145,7 @@ func handleFilmsFindByTitle(app models.App, session *models.Session) {
 }
 
 func parseFilmsFindTitle(app models.App, session *models.Session) {
-	title := utils.ParseMessageString(app.Upd)
+	title := utils.ParseMessageString(app.Update)
 
 	session.FilmsState.Title = title
 	session.FilmsState.CurrentPage = 1

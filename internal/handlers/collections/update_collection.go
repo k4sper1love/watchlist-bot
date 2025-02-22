@@ -23,7 +23,7 @@ func HandleUpdateCollectionCommand(app models.App, session *models.Session) {
 }
 
 func HandleUpdateCollectionButtons(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Upd) {
+	switch utils.ParseCallback(app.Update) {
 	case states.CallbackUpdateCollectionSelectBack:
 		HandleManageCollectionCommand(app, session)
 
@@ -36,7 +36,7 @@ func HandleUpdateCollectionButtons(app models.App, session *models.Session) {
 }
 
 func HandleUpdateCollectionProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearState()
 		session.CollectionDetailState.Clear()
 		HandleUpdateCollectionCommand(app, session)
@@ -62,7 +62,7 @@ func handleUpdateCollectionName(app models.App, session *models.Session) {
 }
 
 func parseUpdateCollectionName(app models.App, session *models.Session) {
-	name := utils.ParseMessageString(app.Upd)
+	name := utils.ParseMessageString(app.Update)
 	if ok := utils.ValidStringLength(name, 3, 100); !ok {
 		validator.HandleInvalidInputLength(app, session, 3, 100)
 		handleUpdateCollectionName(app, session)
@@ -84,7 +84,7 @@ func handleUpdateCollectionDescription(app models.App, session *models.Session) 
 }
 
 func parseUpdateCollectionDescription(app models.App, session *models.Session) {
-	description := utils.ParseMessageString(app.Upd)
+	description := utils.ParseMessageString(app.Update)
 	if ok := utils.ValidStringLength(description, 0, 500); !ok {
 		validator.HandleInvalidInputLength(app, session, 0, 500)
 		handleUpdateCollectionDescription(app, session)

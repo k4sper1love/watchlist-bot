@@ -21,7 +21,7 @@ func HandleFeedbackCommand(app models.App, session *models.Session) {
 }
 
 func HandleFeedbackButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 
 	switch callback {
 	case states.CallbackFeedbackCategorySuggestions:
@@ -36,7 +36,7 @@ func HandleFeedbackButtons(app models.App, session *models.Session) {
 }
 
 func HandleFeedbackProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearState()
 		HandleFeedbackCommand(app, session)
 	}
@@ -64,7 +64,7 @@ func handleFeedbackMessage(app models.App, session *models.Session) {
 func parseFeedbackMessage(app models.App, session *models.Session) {
 	keyboard := keyboards.NewKeyboard().AddBack("").Build(session.Lang)
 
-	text := utils.ParseMessageString(app.Upd)
+	text := utils.ParseMessageString(app.Update)
 
 	if utf8.RuneCountInString(text) > 3000 {
 		part := translator.Translate(session.Lang, "maxLengthInSymbols", map[string]interface{}{

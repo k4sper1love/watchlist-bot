@@ -62,8 +62,7 @@ func (s *Session) ClearAllStates() {
 }
 
 func (s *Session) Logout() {
-	s.AccessToken = ""
-	s.RefreshToken = ""
+	s.AccessToken, s.RefreshToken, s.KinopoiskAPIToken = "", "", ""
 	s.ClearUser()
 	s.ClearContext()
 	s.ClearAllStates()
@@ -73,10 +72,8 @@ func (s *Session) GetFilmsFiltersByContext() *FiltersFilm {
 	switch s.Context {
 	case states.ContextFilm:
 		return s.FilmsState.FilmFilters
-
 	case states.ContextCollection:
 		return s.FilmsState.CollectionFilters
-
 	default:
 		return &FiltersFilm{}
 	}
@@ -86,10 +83,8 @@ func (s *Session) GetFilmsSortingByContext() *Sorting {
 	switch s.Context {
 	case states.ContextFilm:
 		return s.FilmsState.FilmSorting
-
 	case states.ContextCollection:
 		return s.FilmsState.CollectionSorting
-
 	default:
 		return &Sorting{}
 	}
