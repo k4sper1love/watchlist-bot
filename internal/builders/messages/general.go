@@ -14,7 +14,7 @@ func BuildStartMessage(app models.App, session *models.Session) string {
 	}, nil)
 
 	part2 := translator.Translate(session.Lang, "welcomeMessageBody", map[string]interface{}{
-		"Version": app.Vars.Version,
+		"Version": app.Config.Version,
 	}, nil)
 
 	part3 := translator.Translate(session.Lang, "welcomeMessageCallToAction", nil, nil)

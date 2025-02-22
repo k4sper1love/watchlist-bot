@@ -22,6 +22,7 @@ func IsBotMessage(update *tgbotapi.Update) bool {
 	if update.Message != nil && update.Message.From.IsBot {
 		return true
 	}
+
 	return false
 }
 
@@ -377,4 +378,8 @@ func CloseFile(file *os.File) {
 	if err := file.Close(); err != nil {
 		LogFileCloseWarn(err)
 	}
+}
+
+func CalculateOffset(page, pageSize int) int {
+	return (page - 1) * pageSize
 }

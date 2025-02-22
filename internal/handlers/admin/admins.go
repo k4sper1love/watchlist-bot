@@ -126,7 +126,7 @@ func processAdminFindSelect(app models.App, session *models.Session) {
 
 	if strings.HasPrefix(param, "@") {
 		param = strings.TrimPrefix(param, "@")
-		user, err := postgres.GetAdminByTelegramUsername(param)
+		user, err := postgres.GetUserByField(postgres.TelegramUsernameField, param, true)
 		if err != nil || user == nil {
 			msg := "❗️" + translator.Translate(session.Lang, "notFound", nil, nil)
 			app.SendMessage(msg, nil)
@@ -143,7 +143,7 @@ func processAdminFindSelect(app models.App, session *models.Session) {
 			return
 		}
 
-		user, err := postgres.GetAdminByTelegramID(telegramID)
+		user, err := postgres.GetUserByField(postgres.TelegramIDField, telegramID, true)
 		if err != nil || user == nil {
 			msg := "❗️" + translator.Translate(session.Lang, "notFound", nil, nil)
 			app.SendMessage(msg, nil)
@@ -161,12 +161,12 @@ func parseAdmins(session *models.Session) ([]models.Session, error) {
 	currentPage := session.AdminState.CurrentPage
 	pageSize := session.AdminState.PageSize
 
-	admins, err := postgres.GetAllAdminsWithPagination(currentPage, pageSize)
+	admins, err := postgres.GetUsersWithPagination(currentPage, pageSize, true)
 	if err != nil {
 		return nil, err
 	}
 
-	totalCount, err := postgres.GetAdminCounts()
+	totalCount, err := postgres.GetUserCount(true)
 	if err != nil {
 		return nil, err
 	}

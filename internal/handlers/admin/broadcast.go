@@ -129,7 +129,7 @@ func requestBroadcastConfirm(app models.App, session *models.Session) {
 		return
 	}
 
-	count, err := postgres.GetUserCounts()
+	count, err := postgres.GetUserCount(false)
 	if err != nil {
 		msg := "🚨" + translator.Translate(session.Lang, "requestFailure", nil, nil)
 		app.SendMessage(msg, nil)
@@ -155,7 +155,7 @@ func requestBroadcastConfirm(app models.App, session *models.Session) {
 func parseBroadcastConfirm(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Upd) {
 	case states.CallbackAdminBroadcastSend:
-		telegramIDs, err := postgres.GetAllTelegramID()
+		telegramIDs, err := postgres.GetTelegramIDs()
 		if err != nil {
 			msg := "🚨 " + translator.Translate(session.Lang, "requestFailure", nil, nil)
 			keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectBroadcast).Build(session.Lang)

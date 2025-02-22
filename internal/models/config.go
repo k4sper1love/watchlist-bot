@@ -16,19 +16,19 @@ const (
 )
 
 type App struct {
-	Vars       *Vars
+	Config     *Config
 	Bot        *tgbotapi.BotAPI
 	Upd        *tgbotapi.Update
 	FileLogger *logger.Wrapper
 }
 
-type Vars struct {
+type Config struct {
 	Version         string
 	BotToken        string
 	Environment     string
-	DSN             string
-	Host            string
-	Secret          string
+	DatabaseURL     string
+	APIHost         string
+	APISecret       string
 	RootID          int
 	YoutubeAPIToken string
 	IMDBAPIToken    string
@@ -50,8 +50,8 @@ func (app App) UserLogger(userID int) *logger.Wrapper {
 
 func (app App) BotLogger() *logger.Wrapper {
 	prefix := fmt.Sprintf("BOT %s", app.Bot.Self.UserName)
-	if app.Vars.Version != "" {
-		prefix += fmt.Sprintf(" (%s)", app.Vars.Version)
+	if app.Config.Version != "" {
+		prefix += fmt.Sprintf(" (%s)", app.Config.Version)
 	}
 	prefix += ": "
 
@@ -221,8 +221,8 @@ func (app App) SendBroadcastImage(telegramIDs []int, imageURL, text string, need
 
 func (app App) SendMessageByID(id int, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	tempApp := App{
-		Bot:  app.Bot,
-		Vars: app.Vars,
+		Bot:    app.Bot,
+		Config: app.Config,
 		Upd: &tgbotapi.Update{
 			Message: &tgbotapi.Message{
 				Chat: &tgbotapi.Chat{ID: int64(id)},
@@ -247,8 +247,8 @@ func (app App) SendImageByID(id int, imageURL, text string, keyboard *tgbotapi.I
 	}()
 
 	tempApp := App{
-		Bot:  app.Bot,
-		Vars: app.Vars,
+		Bot:    app.Bot,
+		Config: app.Config,
 		Upd: &tgbotapi.Update{
 			Message: &tgbotapi.Message{
 				Chat: &tgbotapi.Chat{ID: int64(id)},

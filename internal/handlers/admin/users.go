@@ -130,7 +130,7 @@ func processUserFindSelect(app models.App, session *models.Session) {
 
 	if strings.HasPrefix(param, "@") {
 		param = strings.TrimPrefix(param, "@")
-		user, err := postgres.GetUserByTelegramUsername(param)
+		user, err := postgres.GetUserByField(postgres.TelegramUsernameField, param, false)
 		if err != nil || user == nil {
 			msg := "❗" + translator.Translate(session.Lang, "notFound", nil, nil)
 			app.SendMessage(msg, nil)
@@ -164,7 +164,7 @@ func processUserFindSelect(app models.App, session *models.Session) {
 			return
 		}
 
-		user, err := postgres.GetUserByTelegramID(telegramID)
+		user, err := postgres.GetUserByField(postgres.TelegramIDField, telegramID, false)
 		if err != nil || user == nil {
 			msg := "❗️" + translator.Translate(session.Lang, "notFound", nil, nil)
 			app.SendMessage(msg, nil)
@@ -182,12 +182,12 @@ func parseUsers(session *models.Session) ([]models.Session, error) {
 	currentPage := session.AdminState.CurrentPage
 	pageSize := session.AdminState.PageSize
 
-	users, err := postgres.GetAllUsersWithPagination(currentPage, pageSize)
+	users, err := postgres.GetUsersWithPagination(currentPage, pageSize, false)
 	if err != nil {
 		return nil, err
 	}
 
-	totalCount, err := postgres.GetUserCounts()
+	totalCount, err := postgres.GetUserCount(false)
 	if err != nil {
 		return nil, err
 	}

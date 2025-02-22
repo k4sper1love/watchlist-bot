@@ -36,7 +36,7 @@ func GetFilmFromYoutube(app models.App, session *models.Session, url string) (*a
 		return nil, err
 	}
 
-	service, err := youtube.NewService(context.Background(), option.WithAPIKey(app.Vars.YoutubeAPIToken))
+	service, err := youtube.NewService(context.Background(), option.WithAPIKey(app.Config.YoutubeAPIToken))
 	if err != nil {
 		sl.Log.Error("failed to create youtube service", slog.Any("error", err))
 		return nil, err

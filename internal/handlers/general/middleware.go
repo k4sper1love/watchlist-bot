@@ -56,7 +56,7 @@ func RequireRole(app models.App, session *models.Session, next func(models.App, 
 }
 
 func IsBanned(app models.App, session *models.Session) bool {
-	isBanned, _ := postgres.IsUserBanned(session.TelegramID)
+	isBanned := postgres.IsUserBanned(session.TelegramID)
 
 	if isBanned {
 		part1 := translator.Translate(session.Lang, "bannedHeader", nil, nil)

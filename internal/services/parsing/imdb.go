@@ -24,7 +24,7 @@ func GetFilmFromIMDB(app models.App, url string) (*apiModels.Film, error) {
 	resp, err := client.Do(
 		&client.CustomRequest{
 			Method:             http.MethodGet,
-			URL:                fmt.Sprintf("http://www.omdbapi.com/?apikey=%s&i=%s&plot=full", app.Vars.IMDBAPIToken, id),
+			URL:                fmt.Sprintf("http://www.omdbapi.com/?apikey=%s&i=%s&plot=full", app.Config.IMDBAPIToken, id),
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)

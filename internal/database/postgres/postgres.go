@@ -10,14 +10,18 @@ import (
 
 var db *gorm.DB
 
-func OpenDB(vars *models.Vars) error {
+func ConnectDatabase(config *models.Config) error {
 	var err error
-
-	db, err = gorm.Open(postgres.Open(vars.DSN), &gorm.Config{})
+	db, err = gorm.Open(postgres.Open(config.DatabaseURL), &gorm.Config{})
 	if err != nil {
 		sl.Log.Error("failed to open database connection", slog.Any("error", err))
 		return err
 	}
+
+	return autoMigrate()
+}
+
+func autoMigrate() error {
 	return db.AutoMigrate(
 		&models.Feedback{},
 		&models.Session{},
@@ -34,17 +38,17 @@ func OpenDB(vars *models.Vars) error {
 	)
 }
 
-func GetDB() *gorm.DB {
+func GetDatabase() *gorm.DB {
 	return db
 }
 
-func Save(values ...interface{}) {
-	for _, value := range values {
-		if err := db.Save(value).Error; err != nil {
+func SaveRecords(records ...interface{}) {
+	for _, record := range records {
+		if err := db.Save(record).Error; err != nil {
 			sl.Log.Warn(
-				"failed to save data",
+				"failed to save record",
 				slog.Any("error", err),
-				slog.Any("value", value),
+				slog.Any("record", record),
 			)
 		}
 	}

@@ -18,15 +18,15 @@ const (
 )
 
 func Register(app models.App, session *models.Session) error {
-	return sendAuthRequest(app, session, fmt.Sprintf("%s/api/v1/auth/register/telegram", app.Vars.Host), http.StatusCreated)
+	return sendAuthRequest(app, session, fmt.Sprintf("%s/api/v1/auth/register/telegram", app.Config.APIHost), http.StatusCreated)
 }
 
 func Login(app models.App, session *models.Session) error {
-	return sendAuthRequest(app, session, fmt.Sprintf("%s/api/v1/auth/login/telegram", app.Vars.Host), http.StatusOK)
+	return sendAuthRequest(app, session, fmt.Sprintf("%s/api/v1/auth/login/telegram", app.Config.APIHost), http.StatusOK)
 }
 
 func sendAuthRequest(app models.App, session *models.Session, requestURL string, expectedStatusCode int) error {
-	token, err := tokens.GenerateToken(app.Vars.Secret, session.TelegramID, verificationTokenExpiration)
+	token, err := tokens.GenerateToken(app.Config.APISecret, session.TelegramID, verificationTokenExpiration)
 	if err != nil {
 		sl.Log.Error("failed to generate verification token", slog.Any("error", err), slog.Int("telegram_id", session.TelegramID))
 		return err
@@ -61,7 +61,7 @@ func IsTokenValid(app models.App, token string) bool {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        token,
 			Method:             http.MethodGet,
-			URL:                fmt.Sprintf("%s/api/v1/auth/check", app.Vars.Host),
+			URL:                fmt.Sprintf("%s/api/v1/auth/check", app.Config.APIHost),
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)
@@ -79,7 +79,7 @@ func RefreshAccessToken(app models.App, session *models.Session) error {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.RefreshToken,
 			Method:             http.MethodPost,
-			URL:                fmt.Sprintf("%s/api/v1/auth/refresh", app.Vars.Host),
+			URL:                fmt.Sprintf("%s/api/v1/auth/refresh", app.Config.APIHost),
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)
@@ -104,7 +104,7 @@ func Logout(app models.App, session *models.Session) error {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.RefreshToken,
 			Method:             http.MethodPost,
-			URL:                fmt.Sprintf("%s/api/v1/auth/logout", app.Vars.Host),
+			URL:                fmt.Sprintf("%s/api/v1/auth/logout", app.Config.APIHost),
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)

@@ -15,7 +15,7 @@ func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodGet,
-			URL:                fmt.Sprintf("%s/api/v1/user", app.Vars.Host),
+			URL:                fmt.Sprintf("%s/api/v1/user", app.Config.APIHost),
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)
@@ -39,7 +39,7 @@ func UpdateUser(app models.App, session *models.Session) (*apiModels.User, error
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodPut,
-			URL:                fmt.Sprintf("%s/api/v1/user", app.Vars.Host),
+			URL:                fmt.Sprintf("%s/api/v1/user", app.Config.APIHost),
 			Body:               session.ProfileState,
 			ExpectedStatusCode: http.StatusOK,
 		},
@@ -64,7 +64,7 @@ func DeleteUser(app models.App, session *models.Session) error {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodDelete,
-			URL:                fmt.Sprintf("%s/api/v1/user", app.Vars.Host),
+			URL:                fmt.Sprintf("%s/api/v1/user", app.Config.APIHost),
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)

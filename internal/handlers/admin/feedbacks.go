@@ -101,12 +101,12 @@ func parseFeedbacks(session *models.Session) ([]models.Feedback, error) {
 	currentPage := session.AdminState.CurrentPage
 	pageSize := session.AdminState.PageSize
 
-	feedback, err := postgres.GetAllFeedbacksWithPagination(currentPage, pageSize)
+	feedback, err := postgres.GetFeedbacksWithPagination(currentPage, pageSize)
 	if err != nil {
 		return nil, err
 	}
 
-	totalCount, err := postgres.GetFeedbackCounts()
+	totalCount, err := postgres.GetFeedbackCount()
 	if err != nil {
 		return nil, err
 	}

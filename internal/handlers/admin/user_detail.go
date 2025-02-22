@@ -15,7 +15,7 @@ import (
 )
 
 func HandleUserDetailCommand(app models.App, session *models.Session) {
-	user, err := postgres.GetUserByTelegramID(session.AdminState.UserID)
+	user, err := postgres.GetUserByField("telegram_id", session.AdminState.UserID, false)
 	if err != nil {
 		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
 		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectUsers).Build(session.Lang)
@@ -94,7 +94,7 @@ func handleUserLogs(app models.App, session *models.Session) {
 }
 
 func handleUserUnban(app models.App, session *models.Session) {
-	err := postgres.UnbanUser(session.AdminState.UserID)
+	err := postgres.SetUserBanStatus(session.AdminState.UserID, false)
 	if err != nil {
 		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
 		app.SendMessage(msg, nil)
@@ -132,7 +132,7 @@ func processUserBan(app models.App, session *models.Session) {
 		reason = utils.ParseMessageString(app.Upd)
 	}
 
-	err := postgres.BanUser(session.AdminState.UserID)
+	err := postgres.SetUserBanStatus(session.AdminState.UserID, true)
 	if err != nil {
 		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
 		app.SendMessage(msg, nil)
@@ -190,7 +190,7 @@ func processUserRole(app models.App, session *models.Session) {
 
 	msg := " "
 
-	_, err := postgres.SetUserRole(session.AdminState.UserID, role)
+	err := postgres.SetUserRole(session.AdminState.UserID, role)
 	if err != nil {
 		msg = "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
 	} else {

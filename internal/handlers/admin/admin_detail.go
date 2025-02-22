@@ -13,7 +13,7 @@ import (
 )
 
 func HandleAdminDetailCommand(app models.App, session *models.Session) {
-	admin, err := postgres.GetUserByTelegramID(session.AdminState.UserID)
+	admin, err := postgres.GetUserByField(postgres.TelegramIDField, session.AdminState.UserID, true)
 	if err != nil {
 		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
 		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectUsers).Build(session.Lang)
@@ -67,8 +67,8 @@ func handleRaiseRole(app models.App, session *models.Session) {
 		return
 	}
 
-	success, err := postgres.SetUserRole(session.AdminState.UserID, session.AdminState.UserRole.NextRole())
-	if err != nil || !success {
+	err := postgres.SetUserRole(session.AdminState.UserID, session.AdminState.UserRole.NextRole())
+	if err != nil {
 		msg = "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
 	} else {
 		msg = messages.BuildRaiseRoleNotificationMessage(session)
@@ -106,8 +106,8 @@ func handleLowerRole(app models.App, session *models.Session) {
 		return
 	}
 
-	success, err := postgres.SetUserRole(session.AdminState.UserID, session.AdminState.UserRole.PrevRole())
-	if err != nil || !success {
+	err := postgres.SetUserRole(session.AdminState.UserID, session.AdminState.UserRole.PrevRole())
+	if err != nil {
 		msg = "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
 	} else {
 		msg = messages.BuildLowerRoleNotificationMessage(session)
@@ -124,7 +124,7 @@ func handleRemoveRole(app models.App, session *models.Session) {
 	msg := ""
 
 	if !session.AdminState.UserRole.HasAccess(session.Role) {
-		_, err := postgres.SetUserRole(session.AdminState.UserID, roles.User)
+		err := postgres.SetUserRole(session.AdminState.UserID, roles.User)
 		if err != nil {
 			msg = "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
 		} else {

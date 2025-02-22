@@ -53,7 +53,7 @@ func GetFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodGet,
-			URL:                fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID),
+			URL:                fmt.Sprintf("%s/api/v1/films/%d", app.Config.APIHost, session.FilmDetailState.Film.ID),
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)
@@ -77,7 +77,7 @@ func UpdateFilm(app models.App, session *models.Session) (*apiModels.Film, error
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodPut,
-			URL:                fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID),
+			URL:                fmt.Sprintf("%s/api/v1/films/%d", app.Config.APIHost, session.FilmDetailState.Film.ID),
 			Body:               session.FilmDetailState,
 			ExpectedStatusCode: http.StatusOK,
 		},
@@ -102,7 +102,7 @@ func CreateFilm(app models.App, session *models.Session) (*apiModels.Film, error
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodPost,
-			URL:                fmt.Sprintf("%s/api/v1/films", app.Vars.Host),
+			URL:                fmt.Sprintf("%s/api/v1/films", app.Config.APIHost),
 			Body:               session.FilmDetailState,
 			ExpectedStatusCode: http.StatusCreated,
 		},
@@ -127,7 +127,7 @@ func DeleteFilm(app models.App, session *models.Session) error {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodDelete,
-			URL:                fmt.Sprintf("%s/api/v1/films/%d", app.Vars.Host, session.FilmDetailState.Film.ID),
+			URL:                fmt.Sprintf("%s/api/v1/films/%d", app.Config.APIHost, session.FilmDetailState.Film.ID),
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)
@@ -140,7 +140,7 @@ func DeleteFilm(app models.App, session *models.Session) error {
 }
 
 func buildGetFilmsURL(app models.App, session *models.Session, collectionID, currentPage, pageSize int) string {
-	baseURL := fmt.Sprintf("%s/api/v1/films", app.Vars.Host)
+	baseURL := fmt.Sprintf("%s/api/v1/films", app.Config.APIHost)
 	queryParams := url.Values{}
 
 	if collectionID >= 0 {
