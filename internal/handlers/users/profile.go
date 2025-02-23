@@ -17,21 +17,14 @@ func HandleProfileCommand(app models.App, session *models.Session) {
 	}
 	session.User = *user
 
-	msg := messages.BuildProfileMessage(session)
-
-	keyboard := keyboards.BuildProfileKeyboard(session)
-
-	app.SendMessage(msg, keyboard)
+	app.SendMessage(messages.BuildProfileMessage(session), keyboards.BuildProfileKeyboard(session))
 }
 
 func HandleProfileButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Update)
-
-	switch {
-	case callback == states.CallbackProfileSelectUpdate:
+	switch utils.ParseCallback(app.Update) {
+	case states.CallbackProfileSelectUpdate:
 		HandleUpdateProfileCommand(app, session)
-
-	case callback == states.CallbackProfileSelectDelete:
+	case states.CallbackProfileSelectDelete:
 		HandleDeleteProfileCommand(app, session)
 	}
 }

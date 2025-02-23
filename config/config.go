@@ -25,6 +25,7 @@ func InitAppConfig() (*models.App, error) {
 		BotToken:        getEnvOrDefault("BOT_TOKEN", ""),
 		Environment:     getEnvOrDefault("ENVIRONMENT", "dev"),
 		DatabaseURL:     buildDatabaseURL(),
+		LocalesDir:      getEnvOrDefault("LOCALES_DIR", "./locales"),
 		APIHost:         getEnvOrDefault("API_HOST", "localhost"),
 		APISecret:       getEnvOrDefault("API_SECRET", ""),
 		RootID:          rootID,

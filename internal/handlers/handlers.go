@@ -25,8 +25,7 @@ func HandleUpdates(app models.App) {
 
 	session, err := postgres.GetSessionByTelegramID(app)
 	if err != nil {
-		msg := translator.Translate(utils.ParseLanguageCode(app.Update), "sessionError", nil, nil)
-		app.SendMessage(msg, nil)
+		app.SendMessage(translator.Translate(utils.ParseLanguageCode(app.Update), "sessionError", nil, nil), nil)
 		return
 	}
 
@@ -35,7 +34,7 @@ func HandleUpdates(app models.App) {
 		return
 	}
 
-	if ok := general.Auth(app, session); ok {
+	if general.Auth(app, session) {
 		routeUpdate(app, session)
 	}
 
@@ -46,10 +45,8 @@ func routeUpdate(app models.App, session *models.Session) {
 	switch {
 	case app.Update.CallbackQuery != nil:
 		handleCallbackQuery(app, session)
-
 	case session.State == "":
 		handleCommands(app, session)
-
 	default:
 		handleUserInput(app, session)
 	}
@@ -100,8 +97,7 @@ func handleCommands(app models.App, session *models.Session) {
 		general.RequireRole(app, session, admin.HandleMenuCommand, roles.Helper)
 
 	default:
-		msg := "❗" + translator.Translate(session.Lang, "unknownCommand", nil, nil)
-		app.SendMessage(msg, nil)
+		app.SendMessage("❗"+translator.Translate(session.Lang, "unknownCommand", nil, nil), nil)
 	}
 }
 
@@ -180,8 +176,7 @@ func handleUserInput(app models.App, session *models.Session) {
 		general.HandleSettingsProcess(app, session)
 
 	default:
-		msg := "❗" + translator.Translate(session.Lang, "unknownState", nil, nil)
-		app.SendMessage(msg, nil)
+		app.SendMessage("❗"+translator.Translate(session.Lang, "unknownState", nil, nil), nil)
 	}
 }
 
@@ -195,7 +190,7 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, "menu_select_"):
 		handleCommands(app, session)
 
-	case strings.HasPrefix(callbackData, "select_start_lang_"):
+	case strings.HasPrefix(callbackData, states.PrefixSelectStartLang):
 		general.HandleLanguageButton(app, session)
 
 	case strings.HasPrefix(callbackData, "settings_") || strings.HasPrefix(callbackData, "select_lang_"):
@@ -300,31 +295,29 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 }
 
 func answerCallbackQuery(app models.App) {
-	callback := app.Update.CallbackQuery.ID
-
 	_, err := app.Bot.AnswerCallbackQuery(tgbotapi.CallbackConfig{
-		CallbackQueryID: callback,
-		ShowAlert:       false,
+		CallbackQueryID: app.Update.CallbackQuery.ID,
 	})
-
 	if err != nil {
-		sl.Log.Error("failed to answer callback", slog.Any("error", err), slog.String("callback_id", callback))
-		return
+		sl.Log.Error("failed to answer callback", slog.Any("error", err), slog.String("callback_id", app.Update.CallbackQuery.ID))
 	}
 }
 
 func logUpdate(app models.App) {
 	telegramID := utils.ParseTelegramID(app.Update)
 	messageID := utils.ParseMessageID(app.Update)
-
 	input := fmt.Sprintf(" #%d: ", messageID)
-	if app.Update.Message != nil {
+
+	switch {
+	case app.Update.Message != nil:
 		utils.LogUpdateInfo(telegramID, messageID, "message")
 		input += fmt.Sprintf("(message) %s", utils.ParseMessageString(app.Update))
-	} else if app.Update.CallbackQuery != nil {
+
+	case app.Update.CallbackQuery != nil:
 		utils.LogUpdateInfo(telegramID, messageID, "callback")
 		input += fmt.Sprintf("(callback) %s", utils.ParseCallback(app.Update))
-	} else {
+
+	default:
 		utils.LogUpdateInfo(telegramID, messageID, "unknown")
 		input += "(unknown)"
 	}

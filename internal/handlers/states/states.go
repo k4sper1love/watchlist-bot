@@ -1,7 +1,7 @@
 package states
 
 const (
-	// context Keys
+	// context keys
 	ContextFilm       = "context_film"
 	ContextCollection = "context_collection"
 
@@ -16,6 +16,8 @@ const (
 	CallbackYes = "yes"
 	CallbackNo  = "no"
 
+	PrefixSelectStartLang = "select_start_lang_"
+
 	// main menu
 	CallbackMainMenu = "main_menu"
 
@@ -29,6 +31,7 @@ const (
 	CallbackMenuSelectAdmin       = "menu_select_admin"
 
 	// feedback states
+	PrefixFeedbackCategory              = "feedback_category_"
 	CallbackFeedbackCategorySuggestions = "feedback_category_suggestions"
 	CallbackFeedbackCategoryBugs        = "feedback_category_bugs"
 	CallbackFeedbackCategoryOther       = "feedback_category_other"
@@ -38,6 +41,7 @@ const (
 	ProcessLogoutAwaitingConfirm = "logout_awaiting_confirm"
 
 	// settings states
+	PrefixSelectLang                           = "select_lang_"
 	CallbackSettingsBack                       = "settings_back"
 	CallbackSettingsLanguage                   = "settings_language"
 	CallbackSettingsKinopoiskToken             = "settings_kinopoisk_token"
@@ -50,12 +54,6 @@ const (
 	ProcessSettingsObjectsAwaitingPageSize     = "settings_objects_awaiting_page_size"
 
 	// admin states
-	CallbackAdminSelectBackPanel        = "admin_select_back_panel"
-	CallbackAdminSelectUserCount        = "admin_select_user_count"
-	CallbackAdminSelectBroadcastMessage = "admin_select_broadcast_message"
-
-	// admin states
-	CallbackAdminSelectBack      = "admin_select_back"
 	CallbackAdminSelectAdmins    = "admin_select_admins"
 	CallbackAdminSelectUsers     = "admin_select_users"
 	CallbackAdminSelectBroadcast = "admin_select_broadcast"
@@ -116,7 +114,6 @@ const (
 	CallbackAdminUserRoleSelectSuper  = "admin_user_role_select_super"
 
 	// admin broadcast states
-	CallbackAdminBroadcastBack           = "admin_broadcast_back"
 	CallbackAdminBroadcastSend           = "admin_broadcast_send"
 	ProcessAdminBroadcastAwaitingImage   = "admin_broadcast_awaiting_image"
 	ProcessAdminBroadcastAwaitingText    = "admin_broadcast_awaiting_text"
@@ -148,6 +145,7 @@ const (
 	CallbackFilmsFirstPage = "films_first_page"
 	CallbackFilmsBack      = "films_back"
 	CallbackFilmsFind      = "films_find"
+
 	// find films states
 	CallbackFindFilmsBack         = "find_films_back"
 	CallbackFindFilmsNextPage     = "find_films_next_page"

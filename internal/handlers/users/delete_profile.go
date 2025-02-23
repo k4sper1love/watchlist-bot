@@ -2,25 +2,15 @@ package users
 
 import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
-	"github.com/k4sper1love/watchlist-bot/internal/handlers/general"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleDeleteProfileCommand(app models.App, session *models.Session) {
-	msg := "⚠️ " + translator.Translate(session.Lang, "deleteProfileConfirm", map[string]interface{}{
-		"Username": session.User.Username,
-	}, nil)
-
-	keyboard := keyboards.NewKeyboard().
-		AddSurvey().
-		Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildDeleteProfileMessage(session), keyboards.BuildKeyboardWithSurvey(session))
 	session.SetState(states.ProcessDeleteProfileAwaitingConfirm)
 }
 
@@ -32,30 +22,19 @@ func HandleDeleteProfileProcess(app models.App, session *models.Session) {
 }
 
 func parseDeleteProfileConfirm(app models.App, session *models.Session) {
-	session.ClearState()
-
-	switch utils.IsAgree(app.Update) {
-	case true:
-		if err := watchlist.DeleteUser(app, session); err != nil {
-			msg := "🚨 " + translator.Translate(session.Lang, "deleteProfileFailure", map[string]interface{}{
-				"Username": session.User.Username,
-			}, nil)
-			keyboard := keyboards.NewKeyboard().AddBack(states.CallbackMenuSelectProfile).Build(session.Lang)
-			app.SendMessage(msg, keyboard)
-			return
-		}
-
-		msg := "🗑️ " + translator.Translate(session.Lang, "deleteProfileSuccess", map[string]interface{}{
-			"Username": session.User.Username,
-		}, nil)
-
-		app.SendMessage(msg, nil)
-		session.Logout()
-		general.HandleMenuCommand(app, session)
-
-	case false:
-		msg := "🚫 " + translator.Translate(session.Lang, "cancelAction", nil, nil)
-		app.SendMessage(msg, nil)
+	if !utils.IsAgree(app.Update) {
+		app.SendMessage(messages.BuildCancelActionMessage(session), nil)
+		session.ClearState()
 		HandleProfileCommand(app, session)
+		return
 	}
+
+	if err := watchlist.DeleteUser(app, session); err != nil {
+		app.SendMessage(messages.BuildDeleteProfileFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectProfile))
+		session.ClearState()
+		return
+	}
+
+	app.SendMessage(messages.BuildDeleteProfileSuccessMessage(session), nil)
+	session.Logout()
 }

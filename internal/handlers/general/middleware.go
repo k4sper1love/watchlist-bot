@@ -1,80 +1,75 @@
 package general
 
 import (
-	"fmt"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
+	"log/slog"
 )
 
 func Auth(app models.App, session *models.Session) bool {
 	if IsBanned(app, session) {
 		return false
 	}
-
-	if !isAuth(session) {
-		if err := HandleAuthProcess(app, session); err != nil {
-			msg := translator.Translate(session.Lang, "authFailure", nil, nil)
-			app.SendMessage(msg, nil)
-			session.ClearAllStates()
-			return false
-		}
-	} else if !watchlist.IsTokenValid(app, session.AccessToken) {
-		if err := watchlist.RefreshAccessToken(app, session); err != nil {
-			session.AccessToken = ""
-			if err = HandleAuthProcess(app, session); err != nil {
-				msg := translator.Translate(session.Lang, "authFailure", nil, nil)
-				app.SendMessage(msg, nil)
-				session.ClearAllStates()
-				return false
-			}
-
-		}
+	if isAuthenticated(app, session) {
+		return true
+	}
+	if err := attemptLoginOrRegister(app, session); err == nil {
+		return true
 	}
 
-	return true
+	app.SendMessage(messages.BuildAuthFailureMessage(session), nil)
+	session.ClearAllStates()
+	return false
 }
 
 func RequireAuth(app models.App, session *models.Session, next func(app models.App, session *models.Session)) {
-	if ok := Auth(app, session); ok {
+	if Auth(app, session) {
 		next(app, session)
 	}
 }
 
 func RequireRole(app models.App, session *models.Session, next func(models.App, *models.Session), role roles.Role) {
-	if !session.Role.HasAccess(role) {
-		msg := translator.Translate(session.Lang, "permissionsNotEnough", nil, nil)
-		app.SendMessage(msg, nil)
-		session.ClearState()
-		HandleMenuCommand(app, session)
+	if session.Role.HasAccess(role) {
+		next(app, session)
 		return
 	}
 
-	next(app, session)
+	app.SendMessage(messages.BuildPermissionsNotEnoughMessage(session), keyboards.BuildKeyboardWithBack(session, ""))
+	session.ClearState()
 }
 
 func IsBanned(app models.App, session *models.Session) bool {
-	isBanned := postgres.IsUserBanned(session.TelegramID)
-
-	if isBanned {
-		part1 := translator.Translate(session.Lang, "bannedHeader", nil, nil)
-		part2 := translator.Translate(session.Lang, "bannedBody", nil, nil)
-
-		msg := fmt.Sprintf("❌ %s\n\n%s", part1, part2)
-
-		app.SendMessage(msg, nil)
-		return true
-	}
-
-	return false
-}
-
-func isAuth(session *models.Session) bool {
-	if session.AccessToken == "" {
+	if !postgres.IsUserBanned(session.TelegramID) {
 		return false
 	}
 
+	app.SendMessage(messages.BuildBannedMessage(session), nil)
 	return true
+}
+
+func isAuthenticated(app models.App, session *models.Session) bool {
+	if session.AccessToken == "" {
+		return false
+	}
+	if watchlist.IsTokenValid(app, session.AccessToken) {
+		return true
+	}
+	return session.RefreshToken != "" && watchlist.RefreshAccessToken(app, session) == nil
+}
+
+func attemptLoginOrRegister(app models.App, session *models.Session) error {
+	if err := watchlist.Login(app, session); err == nil {
+		return nil
+	}
+	if err := watchlist.Register(app, session); err != nil {
+		sl.Log.Error("failed to login/register", slog.Any("error", err), slog.Int("telegram_id", session.TelegramID))
+		return err
+	}
+	app.SendMessage(messages.BuildRegistrationSuccessMessage(session), nil)
+	return nil
 }

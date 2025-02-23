@@ -40,7 +40,7 @@ func BuildProfileMessage(session *models.Session) string {
 			"🔹 <b>%s:</b> <code>%d</code>\n"+
 			"🔹 <b>%s:</b> <code>%s</code>\n"+
 			"🔹 <b>%s:</b> <code>%s</code>\n"+
-			"🔹 <b>%s:</b> %s\n\n",
+			"🔹 <b>%s:</b> %s",
 		part1,
 		part2, role,
 		part3, session.TelegramID,
@@ -51,4 +51,47 @@ func BuildProfileMessage(session *models.Session) string {
 		part8, createdAt)
 
 	return msg
+}
+
+func BuildUpdateProfileMessage(session *models.Session) string {
+	msg := translator.Translate(session.Lang, "choiceField", nil, nil)
+	return fmt.Sprintf("%s\n\n<b>%s</b>", BuildProfileMessage(session), msg)
+}
+
+func BuildUpdateProfileUsernameMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "updateProfileUsername", nil, nil)
+}
+
+func BuildUpdateProfileEmailMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "updateProfileEmail", nil, nil)
+}
+
+func BuildUpdateProfileFailureMessage(session *models.Session) string {
+	return "🚨 " + translator.Translate(session.Lang, "updateProfileFailure", map[string]interface{}{
+		"Username": session.User.Username,
+	}, nil)
+}
+
+func BuildUpdateProfileSuccessMessage(session *models.Session) string {
+	return "✏️ " + translator.Translate(session.Lang, "updateProfileSuccess", map[string]interface{}{
+		"Username": session.User.Username,
+	}, nil)
+}
+
+func BuildDeleteProfileMessage(session *models.Session) string {
+	return "⚠️ " + translator.Translate(session.Lang, "deleteProfileConfirm", map[string]interface{}{
+		"Username": session.User.Username,
+	}, nil)
+}
+
+func BuildDeleteProfileFailureMessage(session *models.Session) string {
+	return "🚨 " + translator.Translate(session.Lang, "deleteProfileFailure", map[string]interface{}{
+		"Username": session.User.Username,
+	}, nil)
+}
+
+func BuildDeleteProfileSuccessMessage(session *models.Session) string {
+	return "🗑️ " + translator.Translate(session.Lang, "deleteProfileSuccess", map[string]interface{}{
+		"Username": session.User.Username,
+	}, nil)
 }

@@ -549,7 +549,7 @@
     "other": "Язык успешно изменен на <code>{{.Language}}</code>"
   },
   "settingsPageSizeChoice": {
-    "other": "Введите новый размер (от 1 до 100)"
+    "other": "Введите новый размер"
   },
   "newPageSize": {
     "other": "Новый размер страницы"
@@ -916,14 +916,14 @@
   "back": {
     "other": "Обратно"
   },
-  "offers": {
+  "suggestions": {
     "other": "Предложения"
   },
-  "mistakes": {
+  "bugs": {
     "other": "Ошибки"
   },
-  "otherIssues": {
-    "other": "Другие вопросы"
+  "other": {
+    "other": "Другое"
   },
   "edit": {
     "other": "Редактировать"

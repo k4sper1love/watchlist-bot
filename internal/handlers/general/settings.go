@@ -1,60 +1,47 @@
 package general
 
 import (
-	"fmt"
+	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
+	"log/slog"
 	"strconv"
 	"strings"
 )
 
 func HandleSettingsCommand(app models.App, session *models.Session) {
-	part1 := translator.Translate(session.Lang, "settings", nil, nil)
-	part2 := translator.Translate(session.Lang, "settingsChoice", nil, nil)
-
-	msg := fmt.Sprintf("⚙️ <b>%s</b>\n\n%s", part1, part2)
-
-	keyboard := keyboards.BuildSettingsKeyboard(session)
-
-	app.SendMessage(msg, keyboard)
+	app.SendMessage(messages.BuildSettingsMessage(session), keyboards.BuildSettingsKeyboard(session))
 }
 
 func HandleSettingsButton(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Update)
-
-	switch {
-	case callback == states.CallbackSettingsBack:
+	switch utils.ParseCallback(app.Update) {
+	case states.CallbackSettingsBack:
 		HandleSettingsCommand(app, session)
-
-	case callback == states.CallbackSettingsLanguage:
+	case states.CallbackSettingsLanguage:
 		handleLanguage(app, session)
-
-	case callback == states.CallbackSettingsKinopoiskToken:
+	case states.CallbackSettingsKinopoiskToken:
 		handleKinopoiskToken(app, session)
-
-	case callback == states.CallbackSettingsCollectionsPageSize:
+	case states.CallbackSettingsCollectionsPageSize:
 		handleCollectionsPageSize(app, session)
-
-	case callback == states.CallbackSettingsFilmsPageSize:
+	case states.CallbackSettingsFilmsPageSize:
 		handleFilmsPageSize(app, session)
-
-	case callback == states.CallbackSettingsObjectsPageSize:
+	case states.CallbackSettingsObjectsPageSize:
 		handleObjectsPageSize(app, session)
-
-	case strings.HasPrefix(callback, "select_lang_"):
-		handleLanguageSelect(app, session)
+	default:
+		if strings.HasPrefix(utils.ParseCallback(app.Update), states.PrefixSelectLang) {
+			handleLanguageSelect(app, session)
+		}
 	}
-
 }
 
 func HandleSettingsProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Update) {
 		session.ClearState()
 		HandleSettingsCommand(app, session)
+		return
 	}
 
 	switch session.State {
@@ -70,162 +57,89 @@ func HandleSettingsProcess(app models.App, session *models.Session) {
 }
 
 func handleLanguage(app models.App, session *models.Session) {
-	localesDir := "./locales"
-
-	languages, err := utils.ParseSupportedLanguages(localesDir)
+	languages, err := utils.ParseSupportedLanguages(app.Config.LocalesDir)
 	if err != nil {
-		msg := "❗️" + translator.Translate(session.Lang, "parseLanguageFailure", nil, nil)
-		app.SendMessage(msg, nil)
-		session.ClearAllStates()
-		HandleMenuCommand(app, session)
+		sl.Log.Error("failed to parse supported languages", slog.Any("error", err), slog.String("dir", app.Config.LocalesDir))
+		app.SendMessage(messages.BuildLanguagesFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectSettings))
 		return
 	}
-
-	part1 := translator.Translate(session.Lang, "currentLanguage", nil, nil)
-	part2 := strings.ToUpper(session.Lang)
-	part3 := translator.Translate(session.Lang, "languageChoice", nil, nil)
-
-	msg := fmt.Sprintf("🈳 <b>%s:</b> <code>%s</code>\n\n%s", part1, part2, part3)
-
-	keyboard := keyboards.NewKeyboard().AddLanguageSelect(languages, "select_lang").AddBack(states.CallbackSettingsBack).Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
+	app.SendMessage(messages.BuildSettingsLanguageMessage(session), keyboards.BuildSettingsLanguageSelectKeyboard(session, languages))
 }
 
 func handleLanguageSelect(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Update)
-
-	lang := strings.TrimPrefix(callback, "select_lang_")
-
-	session.Lang = lang
-
-	msg := "🔄 " + translator.Translate(session.Lang, "settingsLanguageSuccess", map[string]interface{}{
-		"Language": strings.ToUpper(lang),
-	}, nil)
-
-	app.SendMessage(msg, nil)
-
+	session.Lang = strings.TrimPrefix(utils.ParseCallback(app.Update), "select_lang_")
+	app.SendMessage(messages.BuildSettingsLanguageSuccessMessage(session), nil)
 	HandleSettingsCommand(app, session)
 }
 
 func handleKinopoiskToken(app models.App, session *models.Session) {
-	msg := messages.BuildKinopoiskTokenMessage(session)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildKinopoiskTokenMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessSettingsAwaitingKinopoiskToken)
 }
 
 func parseKinopoiskToken(app models.App, session *models.Session) {
-	token := utils.ParseMessageString(app.Update)
-
-	session.KinopoiskAPIToken = token
-
-	msg := messages.BuildKinopoiskTokenSuccessMessage(session)
-	app.SendMessage(msg, nil)
-
+	session.KinopoiskAPIToken = utils.ParseMessageString(app.Update)
+	app.SendMessage(messages.BuildKinopoiskTokenSuccessMessage(session), nil)
 	session.ClearState()
-
 	HandleSettingsCommand(app, session)
 }
 
 func handleCollectionsPageSize(app models.App, session *models.Session) {
-	part1 := translator.Translate(session.Lang, "currentPageSize", nil, nil)
-	part2 := translator.Translate(session.Lang, "settingsPageSizeChoice", nil, nil)
-
-	msg := fmt.Sprintf("🔢 <b>%s</b>: <code>%d</code>\n\n%s", part1, session.CollectionsState.PageSize, part2)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildSettingsPageSizeMessage(session, session.CollectionsState.PageSize), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessSettingsCollectionsAwaitingPageSize)
 }
 
 func parseCollectionsPageSize(app models.App, session *models.Session) {
-	pageSize, err := strconv.Atoi(utils.ParseMessageString(app.Update))
-	if err != nil || pageSize < 1 || pageSize > 100 {
+	pageSize, ok := parseAndValidatePageSize(app, session)
+	if !ok {
 		handleCollectionsPageSize(app, session)
 		return
 	}
-
 	session.CollectionsState.PageSize = pageSize
-
-	msg := "🔄 " + translator.Translate(session.Lang, "settingsPageSizeSuccess", map[string]interface{}{
-		"Size": pageSize,
-	}, nil)
-
-	app.SendMessage(msg, nil)
-
-	session.ClearState()
-
-	HandleSettingsCommand(app, session)
+	handlePageSizeSuccess(app, session, pageSize)
 }
 
 func handleFilmsPageSize(app models.App, session *models.Session) {
-	part1 := translator.Translate(session.Lang, "currentPageSize", nil, nil)
-	part2 := translator.Translate(session.Lang, "settingsPageSizeChoice", nil, nil)
-
-	msg := fmt.Sprintf("🔢 <b>%s</b>: <code>%d</code>\n\n%s", part1, session.CollectionsState.PageSize, part2)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildSettingsPageSizeMessage(session, session.FilmsState.PageSize), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessSettingsFilmsAwaitingPageSize)
 }
 
 func parseFilmsPageSize(app models.App, session *models.Session) {
-	pageSize, err := strconv.Atoi(utils.ParseMessageString(app.Update))
-	if err != nil || pageSize < 1 {
-		handleCollectionsPageSize(app, session)
+	pageSize, ok := parseAndValidatePageSize(app, session)
+	if !ok {
+		handleFilmsPageSize(app, session)
 		return
 	}
-
 	session.FilmsState.PageSize = pageSize
-
-	msg := "🔄 " + translator.Translate(session.Lang, "settingsPageSizeSuccess", map[string]interface{}{
-		"Size": pageSize,
-	}, nil)
-
-	app.SendMessage(msg, nil)
-
-	session.ClearState()
-
-	HandleSettingsCommand(app, session)
+	handlePageSizeSuccess(app, session, pageSize)
 }
 
 func handleObjectsPageSize(app models.App, session *models.Session) {
-	part1 := translator.Translate(session.Lang, "currentPageSize", nil, nil)
-	part2 := translator.Translate(session.Lang, "settingsPageSizeChoice", nil, nil)
-
-	msg := fmt.Sprintf("🔢 <b>%s</b>: <code>%d</code>\n\n%s", part1, session.CollectionsState.PageSize, part2)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildSettingsPageSizeMessage(session, session.CollectionFilmsState.PageSize), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessSettingsObjectsAwaitingPageSize)
 }
 
 func parseObjectsPageSize(app models.App, session *models.Session) {
-	pageSize, err := strconv.Atoi(utils.ParseMessageString(app.Update))
-	if err != nil || pageSize < 1 {
-		handleCollectionsPageSize(app, session)
+	pageSize, ok := parseAndValidatePageSize(app, session)
+	if !ok {
+		handleObjectsPageSize(app, session)
 		return
 	}
-
 	session.CollectionFilmsState.PageSize = pageSize
+	handlePageSizeSuccess(app, session, pageSize)
+}
 
-	msg := "🔄 " + translator.Translate(session.Lang, "settingsPageSizeSuccess", map[string]interface{}{
-		"Size": pageSize,
-	}, nil)
+func parseAndValidatePageSize(app models.App, session *models.Session) (int, bool) {
+	pageSize, _ := strconv.Atoi(utils.ParseMessageString(app.Update))
+	if pageSize < 1 || pageSize > 10 {
+		app.SendMessage(messages.BuildSettingsPageSizeFailureMessage(session, 1, 10), nil)
+		return 0, false
+	}
+	return pageSize, true
+}
 
-	app.SendMessage(msg, nil)
-
+func handlePageSizeSuccess(app models.App, session *models.Session, pageSize int) {
+	app.SendMessage(messages.BuildSettingsPageSizeSuccessMessage(session, pageSize), nil)
 	session.ClearState()
-
 	HandleSettingsCommand(app, session)
 }

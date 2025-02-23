@@ -1,32 +1,16 @@
 package users
 
 import (
-	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
-var updateProfileButtons = []keyboards.Button{
-	{"", "Имя", states.CallbackUpdateProfileSelectUsername, "", true},
-	{"", "Email", states.CallbackUpdateProfileSelectEmail, "", true},
-}
-
 func HandleUpdateProfileCommand(app models.App, session *models.Session) {
-	msg := messages.BuildProfileMessage(session)
-	choiceMsg := translator.Translate(session.Lang, "choiceField", nil, nil)
-	msg += fmt.Sprintf("<b>%s</b>", choiceMsg)
-
-	keyboard := keyboards.NewKeyboard().
-		AddButtons(updateProfileButtons...).
-		AddBack(states.CallbackUpdateProfileSelectBack).
-		Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
+	app.SendMessage(messages.BuildUpdateProfileMessage(session), keyboards.BuildUpdateProfileKeyboard(session))
 }
 
 func HandleUpdateProfileButtons(app models.App, session *models.Session) {
@@ -38,7 +22,6 @@ func HandleUpdateProfileButtons(app models.App, session *models.Session) {
 	case states.CallbackUpdateProfileSelectEmail:
 		handleUpdateProfileEmail(app, session)
 	}
-
 }
 
 func HandleUpdateProfileProcess(app models.App, session *models.Session) {
@@ -57,74 +40,48 @@ func HandleUpdateProfileProcess(app models.App, session *models.Session) {
 }
 
 func handleUpdateProfileUsername(app models.App, session *models.Session) {
-	msg := "❓" + translator.Translate(session.Lang, "updateProfileUsername", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().
-		AddCancel().
-		Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildUpdateProfileUsernameMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateProfileAwaitingUsername)
 }
 
 func parseUpdateProfileUsername(app models.App, session *models.Session) {
 	session.ProfileState.Username = utils.ParseMessageString(app.Update)
-
 	finishUpdateProfileProcess(app, session)
 }
 
 func handleUpdateProfileEmail(app models.App, session *models.Session) {
-	msg := "❓" + translator.Translate(session.Lang, "updateProfileEmail", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().
-		AddCancel().
-		Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildUpdateProfileEmailMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateProfileAwaitingEmail)
 }
 
 func parseUpdateProfileEmail(app models.App, session *models.Session) {
 	session.ProfileState.Email = utils.ParseMessageString(app.Update)
-
 	finishUpdateProfileProcess(app, session)
 }
 
-func updateProfile(app models.App, session *models.Session) {
-	user, err := watchlist.UpdateUser(app, session)
-	if err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "updateProfileFailure", map[string]interface{}{
-			"Username": session.User.Username,
-		}, nil)
-
-		app.SendMessage(msg, nil)
-		return
+func finishUpdateProfileProcess(app models.App, session *models.Session) {
+	if session.ProfileState.Username == "" {
+		session.ProfileState.Username = session.User.Username
 	}
-	session.User = *user
+	if session.ProfileState.Email == "" {
+		session.ProfileState.Email = session.User.Email
+	}
 
-	msg := "✏️ " + translator.Translate(session.Lang, "updateProfileSuccess", map[string]interface{}{
-		"Username": session.User.Username,
-	}, nil)
-
-	app.SendMessage(msg, nil)
+	if err := updateProfile(app, session); err == nil {
+		HandleUpdateProfileCommand(app, session)
+	}
+	session.ClearAllStates()
 }
 
-func finishUpdateProfileProcess(app models.App, session *models.Session) {
-	state := session.ProfileState
-	user := session.User
-
-	if state.Username == "" {
-		state.Username = user.Username
+func updateProfile(app models.App, session *models.Session) error {
+	user, err := watchlist.UpdateUser(app, session)
+	if err != nil {
+		app.SendMessage(messages.BuildUpdateProfileFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackProfileSelectUpdate))
+		return err
 	}
 
-	if state.Email == "" {
-		state.Email = user.Email
-	}
+	session.User = *user
+	app.SendMessage(messages.BuildUpdateProfileSuccessMessage(session), nil)
 
-	updateProfile(app, session)
-	session.ProfileState.Clear()
-	session.ClearState()
-	HandleUpdateProfileCommand(app, session)
+	return nil
 }

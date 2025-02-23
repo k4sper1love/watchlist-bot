@@ -30,16 +30,6 @@ func BuildHelpMessage(session *models.Session) string {
 	return msg
 }
 
-func BuildFeedbackMessage(session *models.Session) string {
-	part1 := translator.Translate(session.Lang, "feedbackMessageHeader", nil, nil)
-	part2 := translator.Translate(session.Lang, "feedbackMessageBody", nil, nil)
-	part3 := translator.Translate(session.Lang, "feedbackCategoryChoice", nil, nil)
-
-	msg := fmt.Sprintf("💬 <b>%s</b>\n\n<i>%s</i> 😊\n\n%s", part1, part2, part3)
-
-	return msg
-}
-
 func BuildMenuMessage(session *models.Session) string {
 	part1 := translator.Translate(session.Lang, "mainMenu", nil, nil)
 	part2 := translator.Translate(session.Lang, "choiceAction", nil, nil)
@@ -49,21 +39,22 @@ func BuildMenuMessage(session *models.Session) string {
 	return msg
 }
 
-func BuildLanguageMessage() (string, error) {
+func BuildLanguagesMessage(languages []string) string {
 	var res string
-
-	languages, err := utils.ParseSupportedLanguages("./locales")
-	if err != nil {
-		return "", err
-	}
-
 	for _, language := range languages {
 		translatedMsg := translator.Translate(language, "choiceLanguage", nil, nil)
 		upperLanguage := strings.ToUpper(language)
 		res += fmt.Sprintf("<b>%s</b>: %s\n\n", upperLanguage, translatedMsg)
 	}
 
-	return res, nil
+	return res
+}
+
+func BuildLanguagesFailureMessage(session *models.Session) string {
+	part1 := translator.Translate(session.Lang, "someError", nil, nil)
+	part2 := translator.Translate(session.Lang, "setDefaultLanguage", nil, nil)
+
+	return fmt.Sprintf("🚨 %s\n\n%s", part1, part2)
 }
 
 func BuildKinopoiskTokenMessage(session *models.Session) string {
@@ -82,6 +73,10 @@ func BuildKinopoiskTokenMessage(session *models.Session) string {
 
 func BuildKinopoiskTokenSuccessMessage(session *models.Session) string {
 	return "✅ " + translator.Translate(session.Lang, "tokenSuccess", nil, nil)
+}
+
+func BuildCancelActionMessage(session *models.Session) string {
+	return "🚫 " + translator.Translate(session.Lang, "cancelAction", nil, nil)
 }
 
 func toBold(text string) string {

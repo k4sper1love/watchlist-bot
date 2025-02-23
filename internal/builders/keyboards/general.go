@@ -32,6 +32,22 @@ var feedbackCategoryButtons = []Button{
 	{"❓", "otherIssues", states.CallbackFeedbackCategoryOther, "", true},
 }
 
+func BuildKeyboardWithCancel(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return NewKeyboard().AddCancel().Build(session.Lang)
+}
+
+func BuildKeyboardWithBack(session *models.Session, callback string) *tgbotapi.InlineKeyboardMarkup {
+	return NewKeyboard().AddBack(callback).Build(session.Lang)
+}
+
+func BuildKeyboardWithSurvey(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return NewKeyboard().AddSurvey().Build(session.Lang)
+}
+
+func BuildLanguageSelectKeyboard(languages []string) *tgbotapi.InlineKeyboardMarkup {
+	return NewKeyboard().AddLanguageSelect(languages, states.PrefixSelectStartLang).Build("")
+}
+
 func BuildMenuKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
@@ -64,31 +80,11 @@ func BuildFeedbackKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMark
 	return keyboard.Build(session.Lang)
 }
 
-func BuildProfileKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	keyboard := NewKeyboard()
-
-	keyboard.AddProfileUpdate()
-
-	keyboard.AddDelete(states.CallbackProfileSelectDelete)
-
-	keyboard.AddBack("")
-
-	return keyboard.Build(session.Lang)
-}
-
-func (k *Keyboard) AddProfileUpdate() *Keyboard {
-	return k.AddButton("✏️", "edit", states.CallbackProfileSelectUpdate, "", true)
-}
-
-func (k *Keyboard) AddProfileDelete() *Keyboard {
-	return k.AddButton("🗑️", "delete", states.CallbackProfileSelectDelete, "", true)
-}
-
 func (k *Keyboard) AddLanguageSelect(languages []string, callback string) *Keyboard {
 	var buttons []Button
 
 	for _, lang := range languages {
-		buttons = append(buttons, Button{"", fmt.Sprintf(strings.ToUpper(lang)), fmt.Sprintf("%s_%s", callback, lang), "", false})
+		buttons = append(buttons, Button{"", fmt.Sprintf(strings.ToUpper(lang)), callback + lang, "", false})
 	}
 
 	k.AddButtonsWithRowSize(2, buttons...)

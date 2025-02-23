@@ -26,6 +26,7 @@ type Config struct {
 	BotToken        string
 	Environment     string
 	DatabaseURL     string
+	LocalesDir      string
 	APIHost         string
 	APISecret       string
 	RootID          int
