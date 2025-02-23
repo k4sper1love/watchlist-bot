@@ -10,9 +10,7 @@ func ValidNumberRange[T int | float64](value T, minValue T, maxValue T) bool {
 }
 
 func ValidStringLength(value string, minLength int, maxLength int) bool {
-	length := utf8.RuneCountInString(value)
-
-	return ValidNumberRange(length, minLength, maxLength)
+	return ValidNumberRange(utf8.RuneCountInString(value), minLength, maxLength)
 }
 
 func ValidURL(u string) bool {

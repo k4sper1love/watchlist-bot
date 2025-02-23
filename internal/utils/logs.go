@@ -57,15 +57,12 @@ func LogMessageInfo(chatID int64, messageID int, hasText, hasImage, isPinned boo
 
 func LogMessageError(err error, chatID int64, messageID int) {
 	var args []slog.Attr
-
 	if err != nil {
 		args = append(args, slog.Any("error", err))
 	}
-
 	if chatID != -1 {
 		args = append(args, slog.Int64("chat_id", chatID))
 	}
-
 	if messageID != -1 {
 		args = append(args, slog.Int("message_id", messageID))
 	}
@@ -78,14 +75,6 @@ func LogRemoveFileWarn(err error, path string) {
 		"failed to remove file",
 		slog.Any("error", err),
 		slog.String("path", path),
-	)
-}
-
-func LogDownloadFileError(err error, url string) {
-	sl.Log.Warn(
-		"failed to download file",
-		slog.Any("error", err),
-		slog.String("url", url),
 	)
 }
 

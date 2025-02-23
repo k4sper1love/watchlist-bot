@@ -5,8 +5,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"io"
-	"log"
-	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -16,111 +14,135 @@ import (
 )
 
 func GetItemID(index, currentPage, pageSize int) int {
-	return (index + 1) + ((currentPage - 1) * pageSize)
+	return (index + 1) + (currentPage-1)*pageSize
 }
 
 func IsBotMessage(update *tgbotapi.Update) bool {
-	if update.Message != nil && update.Message.From.IsBot {
-		return true
-	} else if update.CallbackQuery != nil && update.CallbackQuery.From.IsBot {
-		return true
+	if update == nil {
+		return false
 	}
-
-	return false
+	return (update.Message != nil && update.Message.From.IsBot) ||
+		(update.CallbackQuery != nil && update.CallbackQuery.From.IsBot)
 }
 
 func ParseMessageID(update *tgbotapi.Update) int {
-	if update.Message != nil {
-		return update.Message.MessageID
-	} else if update.CallbackQuery != nil {
-		return update.CallbackQuery.Message.MessageID
+	if update == nil {
+		return -1
 	}
-	return -1
+	switch {
+	case update.Message != nil:
+		return update.Message.MessageID
+	case update.CallbackQuery != nil && update.CallbackQuery.Message != nil:
+		return update.CallbackQuery.Message.MessageID
+	default:
+		return -1
+	}
 }
 
 func ParseTelegramID(update *tgbotapi.Update) int {
-	if update.Message != nil {
-		return update.Message.From.ID
-	} else if update.CallbackQuery != nil {
-		return update.CallbackQuery.From.ID
+	if update == nil {
+		return -1
 	}
-	return -1
+	switch {
+	case update.Message != nil:
+		return update.Message.From.ID
+	case update.CallbackQuery != nil:
+		return update.CallbackQuery.From.ID
+	default:
+		return -1
+	}
 }
 
 func ParseTelegramName(update *tgbotapi.Update) string {
-	if update.Message != nil {
-		return update.Message.From.FirstName
-	} else if update.CallbackQuery.Message != nil {
-		return update.CallbackQuery.From.FirstName
+	if update == nil {
+		return "Guest"
 	}
-
-	return "Guest"
+	switch {
+	case update.Message != nil:
+		return update.Message.From.FirstName
+	case update.CallbackQuery != nil:
+		return update.CallbackQuery.From.FirstName
+	default:
+		return "Guest"
+	}
 }
 
 func ParseTelegramUsername(update *tgbotapi.Update) string {
-	if update.Message != nil {
-		return update.Message.From.UserName
-	} else if update.CallbackQuery.Message != nil {
-		return update.CallbackQuery.From.UserName
+	if update == nil {
+		return ""
 	}
-
-	return ""
+	switch {
+	case update.Message != nil:
+		return update.Message.From.UserName
+	case update.CallbackQuery != nil:
+		return update.CallbackQuery.From.UserName
+	default:
+		return ""
+	}
 }
 
 func ParseLanguageCode(update *tgbotapi.Update) string {
-	if update.Message != nil {
-		return update.Message.From.LanguageCode
-	} else if update.CallbackQuery != nil {
-		log.Println(update.CallbackQuery.Message.From.LanguageCode)
-		return update.CallbackQuery.From.LanguageCode
+	if update == nil {
+		return "en"
 	}
-	return "en"
+	switch {
+	case update.Message != nil:
+		return update.Message.From.LanguageCode
+	case update.CallbackQuery != nil:
+		return update.CallbackQuery.From.LanguageCode
+	default:
+		return "en"
+	}
 }
 
 func ParseCallback(update *tgbotapi.Update) string {
-	if update.CallbackQuery == nil {
-		return ""
+	if update != nil && update.CallbackQuery != nil {
+		return update.CallbackQuery.Data
 	}
-
-	return update.CallbackQuery.Data
+	return ""
 }
 
 func ParseMessageCommand(update *tgbotapi.Update) string {
-	if update.Message != nil {
-		return update.Message.Command()
-	} else if update.CallbackQuery != nil {
-		return update.CallbackQuery.Message.Command()
+	if update == nil {
+		return ""
 	}
-	return ""
+	switch {
+	case update.Message != nil:
+		return update.Message.Command()
+	case update.CallbackQuery != nil && update.CallbackQuery.Message != nil:
+		return update.CallbackQuery.Message.Command()
+	default:
+		return ""
+	}
 }
 
 func ParseMessageString(update *tgbotapi.Update) string {
-	if update.Message != nil {
-		return update.Message.Text
-	} else if update.CallbackQuery != nil {
-		return update.CallbackQuery.Message.Text
+	if update == nil {
+		return ""
 	}
-
-	return ""
+	switch {
+	case update.Message != nil:
+		return update.Message.Text
+	case update.CallbackQuery != nil && update.CallbackQuery.Message != nil:
+		return update.CallbackQuery.Message.Text
+	default:
+		return ""
+	}
 }
 
 func ParseMessageInt(update *tgbotapi.Update) int {
-	numStr := ParseMessageString(update)
-	num, err := strconv.Atoi(numStr)
+	num, err := strconv.Atoi(ParseMessageString(update))
 	if err != nil {
 		return -1
 	}
-
 	return num
 }
 
 func ParseMessageFloat(update *tgbotapi.Update) float64 {
-	numStr := ParseMessageString(update)
-	num, err := strconv.ParseFloat(numStr, 64)
+	num, err := strconv.ParseFloat(ParseMessageString(update), 64)
 	if err != nil {
 		return -1
 	}
-
 	return num
 }
 
@@ -146,28 +168,21 @@ func ExtractKinopoiskQuery(rawUrl string) (string, string, error) {
 		return "", "", err
 	}
 
-	host := parsedUrl.Host
-	if !strings.Contains(host, "kinopoisk.ru") {
+	if !strings.Contains(parsedUrl.Host, "kinopoisk.ru") {
 		return "", "", fmt.Errorf("URL is not from kinopoisk.ru")
 	}
 
-	if strings.HasPrefix(parsedUrl.Path, "/film/") || strings.HasPrefix(parsedUrl.Path, "/series/") {
-		parts := strings.Split(strings.Trim(parsedUrl.Path, "/"), "/")
-		if len(parts) > 1 {
-			return "id", parts[1], nil
-		}
-		return "", "", fmt.Errorf("ID not found in URL path")
+	parts := strings.Split(strings.Trim(parsedUrl.Path, "/"), "/")
+	if len(parts) > 1 {
+		return "id", parts[1], nil
 	}
 
-	if strings.Contains(host, "hd.kinopoisk.ru") {
-		query := parsedUrl.Query()
-		if id, ok := query["rt"]; ok && len(id) > 0 {
-			return "externalId.kpHD", id[0], nil
-		}
-		return "", "", fmt.Errorf("ID not found in URL query")
+	query := parsedUrl.Query()
+	if id, ok := query["rt"]; ok && len(id) > 0 {
+		return "externalId.kpHD", id[0], nil
 	}
 
-	return "", "", fmt.Errorf("unsupported URL format")
+	return "", "", fmt.Errorf("ID not found")
 }
 
 func SplitTextByLength(text string, maxLength int) (string, string) {
@@ -178,18 +193,15 @@ func SplitTextByLength(text string, maxLength int) (string, string) {
 	}
 
 	splitPoint := maxLength
-
 	if idx := LastIndexRune(runes, splitPoint, ' '); idx != -1 {
 		splitPoint = idx
 	}
-
 	if idx := LastIndexRune(runes, splitPoint, '\n'); idx != -1 && idx > splitPoint {
 		splitPoint = idx
 	}
 
 	firstPart := string(runes[:splitPoint])
 	secondPart := string(runes[splitPoint:])
-
 	if len(secondPart) > 0 {
 		firstPart += "..."
 	}
@@ -206,16 +218,6 @@ func LastIndexRune(runes []rune, maxLength int, target rune) int {
 	return -1
 }
 
-func CalculateNewElementPageAndIndex(totalRecords, pageSize int) (int, int) {
-	newTotalRecords := totalRecords + 1
-
-	newPage := (newTotalRecords + pageSize - 1) / pageSize
-
-	newIndex := (newTotalRecords - 1) % pageSize
-
-	return newPage, newIndex
-}
-
 func ExtractYoutubeVideoID(rawUrl string) (string, error) {
 	parsedURL, err := url.Parse(rawUrl)
 	if err != nil {
@@ -227,9 +229,7 @@ func ExtractYoutubeVideoID(rawUrl string) (string, error) {
 	}
 
 	query := parsedURL.Query()
-
 	videoID := query.Get("v")
-
 	if videoID == "" {
 		return "", fmt.Errorf("could not extract video ID")
 	}
@@ -237,11 +237,7 @@ func ExtractYoutubeVideoID(rawUrl string) (string, error) {
 	return videoID, nil
 }
 
-func Round(v float64) (float64, error) {
-	return strconv.ParseFloat(fmt.Sprintf("%.2f", v), 64)
-}
-
-func RoundOrZero(v float64) float64 {
+func Round(v float64) float64 {
 	rounded, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", v), 64)
 	return rounded
 }
@@ -277,15 +273,9 @@ func ParseSupportedLanguages(dir string) ([]string, error) {
 	}
 
 	var languages []string
-
 	for _, file := range files {
-		if !file.IsDir() {
-			fileName := file.Name()
-
-			if strings.HasSuffix(fileName, ".json") {
-				lang := strings.TrimSuffix(fileName, ".json")
-				languages = append(languages, lang)
-			}
+		if !file.IsDir() && strings.HasSuffix(file.Name(), ".json") {
+			languages = append(languages, strings.TrimSuffix(file.Name(), ".json"))
 		}
 	}
 
@@ -311,13 +301,6 @@ func BoolToEmojiColored(value bool) string {
 		return "✅"
 	}
 	return "❌"
-}
-
-func BoolToString(value bool) string {
-	if value {
-		return "yes"
-	}
-	return "no"
 }
 
 func BoolToStar(value bool) string {
@@ -348,7 +331,7 @@ func NumberToEmoji(number int) string {
 		return emojis[number]
 	}
 
-	result := ""
+	var result string
 	for number > 0 {
 		digit := number % 10
 		result = emojis[digit] + result
@@ -359,38 +342,32 @@ func NumberToEmoji(number int) string {
 
 func GetLogFilePath(userID int) (string, error) {
 	logFile := filepath.Join("logs", fmt.Sprintf("user_%d.log", userID))
-
 	if _, err := os.Stat(logFile); os.IsNotExist(err) {
 		return "", err
 	}
-
 	return logFile, nil
 }
 
-func ParseHeaders(request *http.Request, keys ...string) map[string]string {
-	var headers map[string]string
-
-	for _, key := range keys {
-		headers[key] = request.Header.Get(key)
-	}
-
-	return headers
-}
-
 func CloseBody(Body io.ReadCloser) {
-	if err := Body.Close(); err != nil {
+	if Body == nil {
+		return
+	} else if err := Body.Close(); err != nil {
 		LogBodyCloseWarn(err)
 	}
 }
 
 func CloseFile(file *os.File) {
-	if err := file.Close(); err != nil {
+	if file == nil {
+		return
+	} else if err := file.Close(); err != nil {
 		LogFileCloseWarn(err)
 	}
 }
 
 func RemoveFile(path string) {
-	if err := os.Remove(path); err != nil {
+	if path == "" {
+		return
+	} else if err := os.Remove(path); err != nil {
 		LogRemoveFileWarn(err, path)
 	}
 }

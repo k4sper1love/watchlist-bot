@@ -173,7 +173,7 @@ func (app App) SendMessage(text string, keyboard *tgbotapi.InlineKeyboardMarkup)
 func (app App) SendImage(imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	imagePath, err := utils.DownloadImage(imageURL)
 	if err != nil {
-		app.handleDownloadImageError(err, imageURL)
+		app.handleDownloadImageError()
 		return
 	}
 	defer utils.RemoveFile(imagePath)
@@ -190,7 +190,7 @@ func (app App) SendBroadcastMessage(ids []int, needPin bool, text string, keyboa
 func (app App) SendBroadcastImage(ids []int, needPin bool, imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	imagePath, err := utils.DownloadImage(imageURL)
 	if err != nil {
-		app.handleDownloadImageError(err, imageURL)
+		app.handleDownloadImageError()
 		return
 	}
 	defer utils.RemoveFile(imagePath)
@@ -207,7 +207,7 @@ func (app App) SendMessageByID(id int, text string, keyboard *tgbotapi.InlineKey
 func (app App) SendImageByID(id int, imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	imagePath, err := utils.DownloadImage(imageURL)
 	if err != nil {
-		app.handleDownloadImageError(err, imageURL)
+		app.handleDownloadImageError()
 		return
 	}
 	defer utils.RemoveFile(imagePath)
@@ -240,11 +240,8 @@ func (app App) createTempApp(id int) *App {
 	}
 }
 
-func (app App) handleDownloadImageError(err error, imageURL string) {
-	utils.LogDownloadFileError(err, imageURL)
-
+func (app App) handleDownloadImageError() {
 	lang := utils.ParseLanguageCode(app.Update)
 	msg := "🚨 " + translator.Translate(lang, "getImageFailure", nil, nil)
-
 	app.SendMessage(msg, nil)
 }

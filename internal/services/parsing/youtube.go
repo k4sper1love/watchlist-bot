@@ -93,7 +93,7 @@ func parseVideoFromYoutube(session *models.Session, video *youtube.Video, extern
 		Genre:       "YouTube Video",
 		ImageURL:    parseThumbnailFromYoutube(video),
 		Year:        parseYearFromYoutube(video.Snippet.PublishedAt),
-		Rating:      utils.RoundOrZero(externalData.Rating * 2),
+		Rating:      utils.Round(externalData.Rating * 2),
 		Description: formatDescription(session, video, externalData),
 	}
 }

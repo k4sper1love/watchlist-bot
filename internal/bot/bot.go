@@ -3,14 +3,43 @@ package bot
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
+	"github.com/k4sper1love/watchlist-bot/config"
+	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/logger"
+	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 	"log/slog"
 )
 
-func Start(app *models.App) error {
+func Run() error {
+	sl.SetupLogger("dev")
+	sl.Log.Info("starting application...")
+
+	app, err := config.InitAppConfig()
+	if err != nil {
+		return err
+	}
+	sl.Log.Info("application config loaded successfully")
+
+	sl.SetupLogger(app.Config.Environment)
+
+	if err = postgres.ConnectDatabase(app.Config); err != nil {
+		return err
+	}
+	sl.Log.Info("database connection established successfully")
+
+	err = translator.InitTranslator("./locales")
+	if err != nil {
+		return err
+	}
+	sl.Log.Info("translator initialized successfully")
+
+	return startBot(app)
+}
+
+func startBot(app *models.App) error {
 	bot, err := tgbotapi.NewBotAPI(app.Config.BotToken)
 	if err != nil {
 		sl.Log.Error("failed to create bot", slog.Any("error", err))
