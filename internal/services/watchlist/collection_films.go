@@ -104,15 +104,11 @@ func DeleteCollectionFilm(app models.App, session *models.Session) error {
 
 func buildGetCollectionFilmsURL(app models.App, session *models.Session) string {
 	baseURL := fmt.Sprintf("%s/api/v1/collections/%d/films", app.Config.APIHost, session.CollectionDetailState.ObjectID)
+	state := session.FilmsState
 	queryParams := url.Values{}
 
-	state := session.FilmsState
-
 	queryParams = addFilmsBasicParams(queryParams, state.Title, state.CurrentPage, state.PageSize)
-
 	queryParams = addFilmsFilterAndSortingParams(queryParams, state.CollectionFilters, state.CollectionSorting)
 
-	requestURL := fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
-
-	return requestURL
+	return fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
 }

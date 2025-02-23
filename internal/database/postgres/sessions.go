@@ -6,6 +6,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 	"gorm.io/gorm"
+	"log"
 	"log/slog"
 )
 
@@ -49,8 +50,11 @@ func initializeSessionDefaults(app models.App, session *models.Session) {
 		session.TelegramUsername = utils.ParseTelegramUsername(app.Update)
 	}
 
+	log.Println("keke")
 	if session.Lang == "" {
+		log.Println("hii")
 		session.Lang = utils.ParseLanguageCode(app.Update)
+		log.Println(session.Lang)
 	}
 
 	if session.AdminState == nil {
@@ -82,19 +86,38 @@ func initializeSessionDefaults(app models.App, session *models.Session) {
 	}
 
 	if session.FilmsState.FilmFilters == nil {
-		session.FilmsState.FilmFilters = &models.FiltersFilm{}
+		session.FilmsState.FilmFilters = &models.FiltersFilm{
+			FilterableID:   session.FilmsState.ID,
+			FilterableType: "FilmsState",
+		}
 	}
 
 	if session.FilmsState.CollectionFilters == nil {
-		session.FilmsState.CollectionFilters = &models.FiltersFilm{}
+		session.FilmsState.CollectionFilters = &models.FiltersFilm{
+			FilterableID:   session.FilmsState.ID,
+			FilterableType: "CollectionsState",
+		}
 	}
 
 	if session.FilmsState.FilmSorting == nil {
-		session.FilmsState.FilmSorting = &models.Sorting{}
+		session.FilmsState.FilmSorting = &models.Sorting{
+			SortableID:   session.FilmsState.ID,
+			SortableType: "FilmsState",
+		}
 	}
 
 	if session.FilmsState.CollectionSorting == nil {
-		session.FilmsState.CollectionSorting = &models.Sorting{}
+		session.FilmsState.CollectionSorting = &models.Sorting{
+			SortableID:   session.FilmsState.ID,
+			SortableType: "CollectionsState",
+		}
+	}
+
+	if session.CollectionsState.Sorting == nil {
+		session.CollectionsState.Sorting = &models.Sorting{
+			SortableID:   session.CollectionsState.ID,
+			SortableType: "CollectionsState",
+		}
 	}
 
 	if session.FilmDetailState == nil {

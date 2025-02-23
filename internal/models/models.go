@@ -46,7 +46,12 @@ func (f *Sorting) Clear() {
 }
 
 func (f *FiltersFilm) ResetFilters() {
-	*f = FiltersFilm{FilterableID: f.FilterableID, FilterableType: f.FilterableType}
+	f.Rating = ""
+	f.UserRating = ""
+	f.Year = ""
+	f.IsViewed = nil
+	f.IsFavorite = nil
+	f.HasURL = nil
 }
 
 func (f *FiltersFilm) ResetFilter(filterType string) {

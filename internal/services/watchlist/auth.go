@@ -2,7 +2,6 @@ package watchlist
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-api/pkg/tokens"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
@@ -18,14 +17,14 @@ const (
 )
 
 func Register(app models.App, session *models.Session) error {
-	return sendAuthRequest(app, session, fmt.Sprintf("%s/api/v1/auth/register/telegram", app.Config.APIHost), http.StatusCreated)
+	return sendAuthRequest(app, session, "/api/v1/auth/register/telegram", http.StatusCreated)
 }
 
 func Login(app models.App, session *models.Session) error {
-	return sendAuthRequest(app, session, fmt.Sprintf("%s/api/v1/auth/login/telegram", app.Config.APIHost), http.StatusOK)
+	return sendAuthRequest(app, session, "/api/v1/auth/login/telegram", http.StatusOK)
 }
 
-func sendAuthRequest(app models.App, session *models.Session, requestURL string, expectedStatusCode int) error {
+func sendAuthRequest(app models.App, session *models.Session, endpoint string, expectedStatusCode int) error {
 	token, err := tokens.GenerateToken(app.Config.APISecret, session.TelegramID, verificationTokenExpiration)
 	if err != nil {
 		sl.Log.Error("failed to generate verification token", slog.Any("error", err), slog.Int("telegram_id", session.TelegramID))
@@ -37,7 +36,7 @@ func sendAuthRequest(app models.App, session *models.Session, requestURL string,
 			HeaderType:         client.HeaderVerification,
 			HeaderValue:        token,
 			Method:             http.MethodPost,
-			URL:                requestURL,
+			URL:                app.Config.APIHost + endpoint,
 			Body:               nil,
 			ExpectedStatusCode: expectedStatusCode,
 		},
@@ -61,7 +60,7 @@ func IsTokenValid(app models.App, token string) bool {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        token,
 			Method:             http.MethodGet,
-			URL:                fmt.Sprintf("%s/api/v1/auth/check", app.Config.APIHost),
+			URL:                app.Config.APIHost + "/api/v1/auth/check",
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)
@@ -79,7 +78,7 @@ func RefreshAccessToken(app models.App, session *models.Session) error {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.RefreshToken,
 			Method:             http.MethodPost,
-			URL:                fmt.Sprintf("%s/api/v1/auth/refresh", app.Config.APIHost),
+			URL:                app.Config.APIHost + "/api/v1/auth/refresh",
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)
@@ -104,7 +103,7 @@ func Logout(app models.App, session *models.Session) error {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.RefreshToken,
 			Method:             http.MethodPost,
-			URL:                fmt.Sprintf("%s/api/v1/auth/logout", app.Config.APIHost),
+			URL:                app.Config.APIHost + "/api/v1/auth/logout",
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)

@@ -19,10 +19,6 @@ func GetFilmsExcludeCollection(app models.App, session *models.Session) (*models
 	return getFilmsRequest(app, session, session.CollectionDetailState.Collection.ID, session.CollectionFilmsState.CurrentPage, session.CollectionFilmsState.PageSize)
 }
 
-//func GetFilmsByTitle(app models.App, session *models.Session) (*models.FilmsResponse, error) {
-//	return getFilmsRequest(app, session, -1, session.FilmsState.CurrentPage, session.FilmsState.PageSize, session.FilmsState.Title)
-//}
-
 func getFilmsRequest(app models.App, session *models.Session, collectionID, currentPage, pageSize int) (*models.FilmsResponse, error) {
 	resp, err := client.Do(
 		&client.CustomRequest{
@@ -102,7 +98,7 @@ func CreateFilm(app models.App, session *models.Session) (*apiModels.Film, error
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodPost,
-			URL:                fmt.Sprintf("%s/api/v1/films", app.Config.APIHost),
+			URL:                app.Config.APIHost + "/api/v1/films",
 			Body:               session.FilmDetailState,
 			ExpectedStatusCode: http.StatusCreated,
 		},
@@ -141,32 +137,26 @@ func DeleteFilm(app models.App, session *models.Session) error {
 
 func buildGetFilmsURL(app models.App, session *models.Session, collectionID, currentPage, pageSize int) string {
 	baseURL := fmt.Sprintf("%s/api/v1/films", app.Config.APIHost)
+	state := session.FilmsState
 	queryParams := url.Values{}
 
 	if collectionID >= 0 {
 		queryParams.Add("exclude_collection", fmt.Sprintf("%d", collectionID))
 	}
 
-	state := session.FilmsState
-
 	queryParams = addFilmsBasicParams(queryParams, state.Title, currentPage, pageSize)
-
 	queryParams = addFilmsFilterAndSortingParams(queryParams, state.FilmFilters, state.FilmSorting)
 
-	requestURL := fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
-
-	return requestURL
+	return fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
 }
 
 func addFilmsBasicParams(queryParams url.Values, title string, currentPage, pageSize int) url.Values {
 	if title != "" {
 		queryParams.Add("title", title)
 	}
-
 	if currentPage > 0 {
 		queryParams.Add("page", fmt.Sprintf("%d", currentPage))
 	}
-
 	if pageSize > 0 {
 		queryParams.Add("page_size", fmt.Sprintf("%d", pageSize))
 	}
@@ -178,27 +168,21 @@ func addFilmsFilterAndSortingParams(queryParams url.Values, filter *models.Filte
 	if filter.Rating != "" {
 		queryParams.Add("rating", filter.Rating)
 	}
-
 	if filter.UserRating != "" {
 		queryParams.Add("user_rating", filter.UserRating)
 	}
-
 	if filter.Year != "" {
 		queryParams.Add("year", filter.Year)
 	}
-
 	if filter.IsViewed != nil {
 		queryParams.Add("is_viewed", fmt.Sprintf("%t", *filter.IsViewed))
 	}
-
 	if filter.IsFavorite != nil {
 		queryParams.Add("is_favorite", fmt.Sprintf("%t", *filter.IsFavorite))
 	}
-
 	if filter.HasURL != nil {
 		queryParams.Add("has_url", fmt.Sprintf("%t", *filter.HasURL))
 	}
-
 	if sorting.Sort != "" {
 		queryParams.Add("sort", sorting.Sort)
 	}

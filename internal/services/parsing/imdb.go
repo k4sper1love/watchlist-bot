@@ -48,12 +48,12 @@ func parseFilmFromIMDB(dest *apiModels.Film, data io.Reader) error {
 		return err
 	}
 
-	dest.Title = client.GetStringFromMap(response, "Title", "Unknown")
-	dest.Year = client.GetIntFromStringMap(response, "Year", 0)
+	dest.Title = getStringFromMap(response, "Title", "Unknown")
+	dest.Year = getIntFromStringMap(response, "Year", 0)
 	dest.Genre = getFirstGenreFromString(response, "Genre", "")
-	dest.Description = client.GetStringFromMap(response, "Plot", "")
-	dest.Rating = client.GetFloatFromStringMap(response, "imdbRating", 0.0)
-	dest.ImageURL = client.GetStringFromMap(response, "Poster", "")
+	dest.Description = getStringFromMap(response, "Plot", "")
+	dest.Rating = getFloatFromStringMap(response, "imdbRating", 0.0)
+	dest.ImageURL = getStringFromMap(response, "Poster", "")
 
 	return nil
 }
@@ -61,18 +61,15 @@ func parseFilmFromIMDB(dest *apiModels.Film, data io.Reader) error {
 func parseIDFromIMDB(url string) (string, error) {
 	shortURL := strings.TrimPrefix(url, "https://www.imdb.com/")
 	parts := strings.Split(shortURL, "/")
-
-	if len(parts) > 0 {
+	if len(parts) > 1 {
 		return parts[1], nil
 	}
-
 	return "", fmt.Errorf("id not found")
 }
 
 func getFirstGenreFromString(data map[string]interface{}, key string, defaultValue string) string {
 	if value, ok := data[key].(string); ok {
-		genres := strings.Split(value, ",")
-		if len(genres) > 0 {
+		if genres := strings.Split(value, ","); len(genres) > 0 {
 			return strings.TrimSpace(genres[0])
 		}
 	}

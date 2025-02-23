@@ -22,15 +22,9 @@ func GetFilmFromKinopoisk(session *models.Session, url string) (*apiModels.Film,
 		return nil, err
 	}
 
-	resp, err := client.Do(
-		&client.CustomRequest{
-			HeaderType:         client.HeaderExternalAPIKey,
-			HeaderValue:        session.KinopoiskAPIToken,
-			Method:             http.MethodGet,
-			URL:                fmt.Sprintf("https://api.kinopoisk.dev/v1.4/movie?%s=%s", queryKey, id),
-			ExpectedStatusCode: http.StatusOK,
-		},
-	)
+	apiURL := fmt.Sprintf("https://api.kinopoisk.dev/v1.4/movie?%s=%s", queryKey, id)
+
+	resp, err := getDataFromKinopoisk(session, apiURL)
 	if err != nil {
 		return nil, err
 	}
@@ -48,16 +42,9 @@ func GetFilmFromKinopoisk(session *models.Session, url string) (*apiModels.Film,
 func GetFilmsFromKinopoisk(session *models.Session) ([]apiModels.Film, *filters.Metadata, error) {
 	state := session.FilmsState
 	query := url.QueryEscape(state.Title)
+	apiURL := fmt.Sprintf("https://api.kinopoisk.dev/v1.4/movie/search?page=%d&limit=%d&query=%s", state.CurrentPage, state.PageSize, query)
 
-	resp, err := client.Do(
-		&client.CustomRequest{
-			HeaderType:         client.HeaderExternalAPIKey,
-			HeaderValue:        session.KinopoiskAPIToken,
-			Method:             http.MethodGet,
-			URL:                fmt.Sprintf("https://api.kinopoisk.dev/v1.4/movie/search?page=%d&limit=%d&query=%s", state.CurrentPage, state.PageSize, query),
-			ExpectedStatusCode: http.StatusOK,
-		},
-	)
+	resp, err := getDataFromKinopoisk(session, apiURL)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -72,6 +59,18 @@ func GetFilmsFromKinopoisk(session *models.Session) ([]apiModels.Film, *filters.
 	return films, metadata, nil
 }
 
+func getDataFromKinopoisk(session *models.Session, url string) (*http.Response, error) {
+	return client.Do(
+		&client.CustomRequest{
+			HeaderType:         client.HeaderExternalAPIKey,
+			HeaderValue:        session.KinopoiskAPIToken,
+			Method:             http.MethodGet,
+			URL:                url,
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
+}
+
 func parseFilmFromKinopoisk(data io.Reader) (*apiModels.Film, error) {
 	var response map[string]interface{}
 	if err := json.NewDecoder(data).Decode(&response); err != nil {
@@ -83,12 +82,7 @@ func parseFilmFromKinopoisk(data io.Reader) (*apiModels.Film, error) {
 		return nil, fmt.Errorf("film not found in response")
 	}
 
-	filmData, ok := docs[0].(map[string]interface{})
-	if !ok {
-		return nil, fmt.Errorf("invalid film data format")
-	}
-
-	return parseFilmDataKinopoisk(filmData)
+	return parseFilmDataKinopoisk(docs[0].(map[string]interface{})), nil
 }
 
 func parseFilmsFromKinopoisk(data io.Reader) ([]apiModels.Film, *filters.Metadata, error) {
@@ -109,37 +103,32 @@ func parseFilmsFromKinopoisk(data io.Reader) ([]apiModels.Film, *filters.Metadat
 			continue
 		}
 
-		film, err := parseFilmDataKinopoisk(filmData)
-		if err != nil {
-			continue
-		}
-
+		film := parseFilmDataKinopoisk(filmData)
 		film.URL = fmt.Sprintf("https://www.kinopoisk.ru/film/%d/", film.ID)
+
 		films = append(films, *film)
 	}
 
 	metadata := filters.Metadata{
-		TotalRecords: client.GetIntFromMap(response, "total", 0),
-		PageSize:     client.GetIntFromMap(response, "limit", 0),
-		CurrentPage:  client.GetIntFromMap(response, "page", 0),
-		LastPage:     client.GetIntFromMap(response, "pages", 0),
+		TotalRecords: getIntFromMap(response, "total", 0),
+		PageSize:     getIntFromMap(response, "limit", 0),
+		CurrentPage:  getIntFromMap(response, "page", 0),
+		LastPage:     getIntFromMap(response, "pages", 0),
 	}
 
 	return films, &metadata, nil
 }
 
-func parseFilmDataKinopoisk(data map[string]interface{}) (*apiModels.Film, error) {
-	film := apiModels.Film{
-		ID:          client.GetIntFromMap(data, "id", 0),
-		Title:       client.GetStringFromMap(data, "name", "Unknown"),
-		Year:        client.GetIntFromMap(data, "year", 0),
+func parseFilmDataKinopoisk(data map[string]interface{}) *apiModels.Film {
+	return &apiModels.Film{
+		ID:          getIntFromMap(data, "id", 0),
+		Title:       getStringFromMap(data, "name", "Unknown"),
+		Year:        getIntFromMap(data, "year", 0),
 		Genre:       getFirstGenre(data, ""),
-		Description: client.GetStringFromMap(data, "description", ""),
-		Rating:      client.GetFloatFromNestedMap(data, "rating", "kp", 0.0),
-		ImageURL:    client.GetStringFromNestedMap(data, "poster", "url", ""),
+		Description: getStringFromMap(data, "description", ""),
+		Rating:      getFloatFromNestedMap(data, "rating", "kp", 0.0),
+		ImageURL:    getStringFromNestedMap(data, "poster", "url", ""),
 	}
-
-	return &film, nil
 }
 
 func getFirstGenre(data map[string]interface{}, defaultValue string) string {

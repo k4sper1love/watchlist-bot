@@ -61,7 +61,7 @@ func getLocalizer(languageCode string) *i18n.Localizer {
 		return localizer.(*i18n.Localizer)
 	}
 
-	localizer := i18n.NewLocalizer(bundle, languageCode) // default language
+	localizer := i18n.NewLocalizer(bundle, languageCode, "en") // default language
 	localizers.Store(languageCode, localizer)
 	return localizer
 }

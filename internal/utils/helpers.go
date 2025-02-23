@@ -5,6 +5,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -20,6 +21,8 @@ func GetItemID(index, currentPage, pageSize int) int {
 
 func IsBotMessage(update *tgbotapi.Update) bool {
 	if update.Message != nil && update.Message.From.IsBot {
+		return true
+	} else if update.CallbackQuery != nil && update.CallbackQuery.From.IsBot {
 		return true
 	}
 
@@ -48,7 +51,7 @@ func ParseTelegramName(update *tgbotapi.Update) string {
 	if update.Message != nil {
 		return update.Message.From.FirstName
 	} else if update.CallbackQuery.Message != nil {
-		return update.CallbackQuery.Message.From.FirstName
+		return update.CallbackQuery.From.FirstName
 	}
 
 	return "Guest"
@@ -58,7 +61,7 @@ func ParseTelegramUsername(update *tgbotapi.Update) string {
 	if update.Message != nil {
 		return update.Message.From.UserName
 	} else if update.CallbackQuery.Message != nil {
-		return update.CallbackQuery.Message.From.UserName
+		return update.CallbackQuery.From.UserName
 	}
 
 	return ""
@@ -68,7 +71,8 @@ func ParseLanguageCode(update *tgbotapi.Update) string {
 	if update.Message != nil {
 		return update.Message.From.LanguageCode
 	} else if update.CallbackQuery != nil {
-		return update.CallbackQuery.Message.From.LanguageCode
+		log.Println(update.CallbackQuery.Message.From.LanguageCode)
+		return update.CallbackQuery.From.LanguageCode
 	}
 	return "en"
 }
@@ -237,6 +241,11 @@ func Round(v float64) (float64, error) {
 	return strconv.ParseFloat(fmt.Sprintf("%.2f", v), 64)
 }
 
+func RoundOrZero(v float64) float64 {
+	rounded, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", v), 64)
+	return rounded
+}
+
 func FormatTextDate(date string) string {
 	parsedDate, err := time.Parse(time.RFC3339, date)
 	if err != nil {
@@ -245,10 +254,10 @@ func FormatTextDate(date string) string {
 	return parsedDate.Format("02.01.2006 15:04")
 }
 
-func ParseISO8601Duration(isoDuration string) (string, error) {
+func ParseISO8601Duration(isoDuration string) string {
 	duration, err := time.ParseDuration(strings.ReplaceAll(strings.ToLower(isoDuration), "pt", ""))
 	if err != nil {
-		return "", nil
+		return ""
 	}
 
 	hours := int(duration.Hours())
@@ -256,9 +265,9 @@ func ParseISO8601Duration(isoDuration string) (string, error) {
 	seconds := int(duration.Seconds()) % 60
 
 	if hours > 0 {
-		return fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds), nil
+		return fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds)
 	}
-	return fmt.Sprintf("%02d:%02d", minutes, seconds), nil
+	return fmt.Sprintf("%02d:%02d", minutes, seconds)
 }
 
 func ParseSupportedLanguages(dir string) ([]string, error) {
