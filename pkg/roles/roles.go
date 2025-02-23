@@ -10,51 +10,46 @@ const (
 	Root
 )
 
+var roleNames = map[Role]string{
+	User:       "user",
+	Helper:     "helper",
+	Admin:      "admin",
+	SuperAdmin: "superAdmin",
+	Root:       "root",
+}
+
 func (r Role) String() string {
-	switch r {
-	case User:
-		return "user"
-	case Helper:
-		return "helper"
-	case Admin:
-		return "admin"
-	case SuperAdmin:
-		return "superAdmin"
-	case Root:
-		return "root"
-	default:
-		return "unknown"
+	if name, exists := roleNames[r]; exists {
+		return name
 	}
+	return "unknown"
 }
 
 func (r Role) HasAccess(required Role) bool {
-	return r >= required
+	return r >= required && r <= Root
 }
 
-func (r Role) Higher(other Role) bool {
-	return r > other
-}
-
-func (r Role) Equal(other Role) bool {
-	return r == other
+func (r Role) Compare(other Role) int {
+	switch {
+	case r > other:
+		return 1
+	case r < other:
+		return -1
+	default:
+		return 0
+	}
 }
 
 func (r Role) NextRole() Role {
-	next := r + 1
-
-	if next <= Root {
-		return next
+	if r < Root {
+		return r + 1
 	}
-
-	return r
+	return Root
 }
 
 func (r Role) PrevRole() Role {
-	prev := r - 1
-
-	if prev >= User {
-		return prev
+	if r > User {
+		return r - 1
 	}
-
-	return r
+	return User
 }

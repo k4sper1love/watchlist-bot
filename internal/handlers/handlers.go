@@ -329,5 +329,5 @@ func logUpdate(app models.App) {
 		input += "(unknown)"
 	}
 
-	app.LogAsUser(telegramID).Printf(input)
+	app.LogAsUser(telegramID).Print(input)
 }

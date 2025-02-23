@@ -86,7 +86,7 @@ func (app App) logMessage(config MessageConfig) {
 		logStr += fmt.Sprintf("\n%s", config.Text)
 	}
 
-	app.LogAsBot().Printf(logStr)
+	app.LogAsBot().Print(logStr)
 }
 
 func (app App) send(msg tgbotapi.Chattable, config MessageConfig) {
