@@ -27,6 +27,7 @@ func HandleLanguageCommand(app models.App, session *models.Session) {
 		app.SendMessage(messages.BuildLanguagesFailureMessage(session), keyboards.BuildKeyboardWithBack(session, ""))
 		return
 	}
+
 	app.SendMessage(messages.BuildLanguagesMessage(languages), keyboards.BuildLanguageSelectKeyboard(languages))
 }
 

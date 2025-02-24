@@ -1,26 +1,20 @@
 package films
 
 import (
-	"fmt"
-	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
-	"github.com/k4sper1love/watchlist-bot/internal/handlers/validator"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleUpdateFilmCommand(app models.App, session *models.Session) {
-	msg := messages.BuildFilmDetailMessage(session)
-	choiceMsg := translator.Translate(session.Lang, "updateChoiceField", nil, nil)
-	msg += fmt.Sprintf("<b>%s</b>", choiceMsg)
-
-	keyboard := keyboards.BuildFilmUpdateKeyboard(session)
-
-	app.SendImage(session.FilmDetailState.Film.ImageURL, msg, keyboard)
+	app.SendImage(
+		session.FilmDetailState.Film.ImageURL,
+		messages.BuildUpdateFilmMessage(session),
+		keyboards.BuildFilmUpdateKeyboard(session),
+	)
 }
 
 func HandleUpdateFilmButtons(app models.App, session *models.Session) {
@@ -85,6 +79,7 @@ func HandleUpdateFilmProcess(app models.App, session *models.Session) {
 
 	case states.ProcessUpdateFilmAwaitingGenre:
 		parseUpdateFilmGenre(app, session)
+
 	case states.ProcessUpdateFilmAwaitingRating:
 		parseUpdateFilmRating(app, session)
 
@@ -106,301 +101,177 @@ func HandleUpdateFilmProcess(app models.App, session *models.Session) {
 }
 
 func handleUpdateFilmURL(app models.App, session *models.Session) {
-	msg := "❓" + translator.Translate(session.Lang, "filmRequestLink", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildFilmRequestURLMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingURL)
 }
 
 func parseUpdateFilmURL(app models.App, session *models.Session) {
-	url := utils.ParseMessageString(app.Update)
-	if ok := utils.ValidURL(url); !ok {
-		validator.HandleInvalidInputURL(app, session)
+	if url, ok := parseAndValidateURL(app, session); !ok {
 		handleUpdateFilmURL(app, session)
-		return
+	} else {
+		session.FilmDetailState.URL = url
+		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 	}
-	session.FilmDetailState.URL = url
-
-	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
 
 func handleUpdateFilmImage(app models.App, session *models.Session) {
-	msg := "❓" + translator.Translate(session.Lang, "filmRequestImage", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildFilmRequestImageMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingImage)
 }
 
 func parseUpdateFilmImage(app models.App, session *models.Session) {
-	image, err := utils.ParseImageFromMessage(app.Bot, app.Update)
+	imageURL, err := parseAndUploadImageFromMessage(app)
 	if err != nil {
-		msg := "🚨" + translator.Translate(session.Lang, "getImageFailure", nil, nil)
-		app.SendMessage(msg, nil)
-		session.ClearAllStates()
-		HandleUpdateFilmCommand(app, session)
+		app.SendMessage(messages.BuildImageFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackManageFilmSelectUpdate))
+		session.ClearState()
 		return
 	}
 
-	imageURL, err := watchlist.UploadImage(app, image)
-	if err != nil {
-		msg := "🚨" + translator.Translate(session.Lang, "getImageFailure", nil, nil)
-		app.SendMessage(msg, nil)
-		session.ClearAllStates()
-		HandleUpdateFilmCommand(app, session)
-		return
-	}
-
-	session.FilmDetailState.ImageURL = imageURL
-
+	session.FilmDetailState.SetImageURL(imageURL)
 	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
 
 func handleUpdateFilmTitle(app models.App, session *models.Session) {
-	msg := "❓" + translator.Translate(session.Lang, "filmRequestTitle", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildFilmRequestTitleMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingTitle)
 }
 
 func parseUpdateFilmTitle(app models.App, session *models.Session) {
-	title := utils.ParseMessageString(app.Update)
-	if ok := utils.ValidStringLength(title, 3, 100); !ok {
-		validator.HandleInvalidInputLength(app, session, 3, 100)
+	if title, ok := parseAndValidateString(app, session, 3, 100); !ok {
 		handleUpdateFilmTitle(app, session)
-		return
+	} else {
+		session.FilmDetailState.Title = title
+		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 	}
-	session.FilmDetailState.Title = title
-
-	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
 
 func handleUpdateFilmDescription(app models.App, session *models.Session) {
-	msg := "❓" + translator.Translate(session.Lang, "filmRequestDescription", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildFilmRequestDescriptionMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingDescription)
 }
 
 func parseUpdateFilmDescription(app models.App, session *models.Session) {
-	description := utils.ParseMessageString(app.Update)
-	if ok := utils.ValidStringLength(description, 0, 1000); !ok {
-		validator.HandleInvalidInputLength(app, session, 0, 1000)
+	if description, ok := parseAndValidateString(app, session, 0, 1000); !ok {
 		handleUpdateFilmDescription(app, session)
-		return
+	} else {
+		session.FilmDetailState.Description = description
+		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 	}
-	session.FilmDetailState.Description = description
-
-	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
 
 func handleUpdateFilmGenre(app models.App, session *models.Session) {
-	msg := "❓" + translator.Translate(session.Lang, "filmRequestGenre", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildFilmRequestGenreMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingGenre)
 }
 
 func parseUpdateFilmGenre(app models.App, session *models.Session) {
-	genre := utils.ParseMessageString(app.Update)
-	if ok := utils.ValidStringLength(genre, 0, 100); !ok {
-		validator.HandleInvalidInputLength(app, session, 0, 100)
+	if genre, ok := parseAndValidateString(app, session, 0, 100); !ok {
 		handleUpdateFilmGenre(app, session)
-		return
+	} else {
+		session.FilmDetailState.Genre = genre
+		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 	}
-	session.FilmDetailState.Genre = genre
-
-	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
 
 func handleUpdateFilmRating(app models.App, session *models.Session) {
-	msg := "❓" + translator.Translate(session.Lang, "filmRequestRating", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildFilmRequestRatingMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingRating)
 }
 
 func parseUpdateFilmRating(app models.App, session *models.Session) {
-	rating := utils.ParseMessageFloat(app.Update)
-	if ok := utils.ValidNumberRange(rating, 1, 10); !ok {
-		validator.HandleInvalidInputRange(app, session, 1, 10)
+	if rating, ok := parseAndValidateNumber(app, session, 1, 10, utils.ParseMessageFloat); !ok {
 		handleUpdateFilmRating(app, session)
-		return
+	} else {
+		session.FilmDetailState.Rating = rating
+		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 	}
-	session.FilmDetailState.Rating = rating
-
-	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
 
 func handleUpdateFilmYear(app models.App, session *models.Session) {
-	msg := "❓" + translator.Translate(session.Lang, "filmRequestYear", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildFilmRequestYearMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingYear)
 }
 
 func parseUpdateFilmYear(app models.App, session *models.Session) {
-	year := utils.ParseMessageInt(app.Update)
-	if ok := utils.ValidNumberRange(year, 1888, 2100); !ok {
-		validator.HandleInvalidInputRange(app, session, 1888, 2100)
+	if year, ok := parseAndValidateNumber(app, session, 1888, 2100, utils.ParseMessageInt); !ok {
 		handleUpdateFilmYear(app, session)
-		return
+	} else {
+		session.FilmDetailState.Year = year
+		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 	}
-	session.FilmDetailState.Year = year
-
-	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
 
 func handleUpdateFilmComment(app models.App, session *models.Session) {
-	msg := "❓" + translator.Translate(session.Lang, "filmRequestComment", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildFilmRequestCommentMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingComment)
 }
 
 func parseUpdateFilmComment(app models.App, session *models.Session) {
-	comment := utils.ParseMessageString(app.Update)
-	if ok := utils.ValidStringLength(comment, 0, 500); !ok {
-		validator.HandleInvalidInputLength(app, session, 0, 500)
+	if comment, ok := parseAndValidateString(app, session, 0, 500); !ok {
 		handleUpdateFilmComment(app, session)
-		return
+	} else {
+		session.FilmDetailState.Comment = comment
+		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 	}
-	session.FilmDetailState.Comment = comment
-
-	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
 
 func handleUpdateFilmViewed(app models.App, session *models.Session) {
-	msg := "❓" + translator.Translate(session.Lang, "filmRequestTitle", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddSurvey().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildFilmRequestViewedMessage(session), keyboards.BuildKeyboardWithSurveyAndCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingViewed)
 }
 
 func parseUpdateFilmViewed(app models.App, session *models.Session) {
-	session.FilmDetailState.IsViewed = utils.IsAgree(app.Update)
-	session.FilmDetailState.IsEditViewed = true
-
+	session.FilmDetailState.SetViewed(utils.IsAgree(app.Update))
 	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
 
 func handleUpdateFilmUserRating(app models.App, session *models.Session) {
-	msg := "❓" + translator.Translate(session.Lang, "filmRequestUserRating", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildFilmRequestUserRatingMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingUserRating)
 }
 
 func parseUpdateFilmUserRating(app models.App, session *models.Session) {
-	userRating := utils.ParseMessageFloat(app.Update)
-	if ok := utils.ValidNumberRange(userRating, 1, 10); !ok {
-		validator.HandleInvalidInputRange(app, session, 1, 10)
+	if userRating, ok := parseAndValidateNumber(app, session, 1, 10, utils.ParseMessageFloat); !ok {
 		handleUpdateFilmUserRating(app, session)
-		return
+	} else {
+		session.FilmDetailState.UserRating = userRating
+		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 	}
-	session.FilmDetailState.UserRating = userRating
-
-	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
 
 func handleUpdateFilmReview(app models.App, session *models.Session) {
-	msg := "❓" + translator.Translate(session.Lang, "filmRequestReview", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildFilmRequestReviewMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingReview)
 }
 
 func parseUpdateFilmReview(app models.App, session *models.Session) {
-	review := utils.ParseMessageString(app.Update)
-	if ok := utils.ValidStringLength(review, 0, 500); !ok {
-		validator.HandleInvalidInputLength(app, session, 0, 500)
+	if review, ok := parseAndValidateString(app, session, 0, 500); !ok {
 		handleUpdateFilmReview(app, session)
-		return
+	} else {
+		session.FilmDetailState.Review = review
+		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 	}
-	session.FilmDetailState.Review = review
-
-	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
-func updateFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
+
+func updateFilm(app models.App, session *models.Session) error {
 	film, err := watchlist.UpdateFilm(app, session)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	session.FilmDetailState.Film = *film
-
-	return film, nil
+	session.FilmDetailState.UpdateFilmState(*film)
+	return nil
 }
 
 func finishUpdateFilmProcess(app models.App, session *models.Session, backFunc func(models.App, *models.Session)) {
-	state := session.FilmDetailState
-	film := state.Film
+	session.FilmDetailState.SyncValues()
 
-	state.IsFavorite = film.IsFavorite
-
-	if !state.IsEditViewed {
-		if state.UserRating == 0 {
-			state.UserRating = film.UserRating
-		}
-
-		if state.Review == "" {
-			state.Review = film.Review
-		}
-
-		if !state.IsViewed {
-			state.IsViewed = film.IsViewed
-		}
-	}
-
-	var msg string
-	updatedFilm, err := updateFilm(app, session)
-	if err != nil || updatedFilm == nil {
-		msg = "🚨" + translator.Translate(session.Lang, "updateFilmFailure", nil, nil)
+	if err := updateFilm(app, session); err != nil {
+		app.SendMessage(messages.BuildUpdateFilmFailureMessage(session), nil)
 	} else {
-		msg = "✏️ " + translator.Translate(session.Lang, "updateFilmSuccess", nil, nil)
-		session.FilmDetailState.Film = *updatedFilm
-		session.FilmDetailState.ClearIndex()
+		app.SendMessage(messages.BuildUpdateFilmSuccessMessage(session), nil)
 	}
-
-	//if err := UpdateFilmInList(app, session); err != nil {
-	//	msg = "🚨" + translator.Translate(session.Lang, "updateFilmFailure", nil, nil)
-	//}
-
-	app.SendMessage(msg, nil)
 
 	session.ClearAllStates()
-
 	backFunc(app, session)
 }

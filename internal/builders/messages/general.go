@@ -79,6 +79,26 @@ func BuildCancelActionMessage(session *models.Session) string {
 	return "🚫 " + translator.Translate(session.Lang, "cancelAction", nil, nil)
 }
 
+func BuildLastPageAlertMessage(session *models.Session) string {
+	return "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+}
+
+func BuildFirstPageAlertMessage(session *models.Session) string {
+	return "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+}
+
+func BuildImageFailureMessage(session *models.Session) string {
+	return "⚠️ " + translator.Translate(session.Lang, "getImageFailure", nil, nil)
+}
+
+func BuildChoiceWayMessage(session *models.Session) string {
+	return fmt.Sprintf("<b>%s</b>", translator.Translate(session.Lang, "choiceWay", nil, nil))
+}
+
+func BuildTokenCodeMessage(session *models.Session, code int) string {
+	return "🚨 " + translator.Translate(session.Lang, fmt.Sprintf("token%d", code), nil, nil)
+}
+
 func toBold(text string) string {
 	return fmt.Sprintf("<b>%s</b>", text)
 }

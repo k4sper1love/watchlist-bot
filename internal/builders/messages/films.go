@@ -5,6 +5,7 @@ import (
 	"github.com/k4sper1love/watchlist-api/pkg/filters"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/services/parsing"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
@@ -139,4 +140,138 @@ func BuildInvalidFilterRangeInputMessage(session *models.Session, config models.
 	msg += fmt.Sprintf("\n\n⚠️ <i>%s</i>", rangeLimits)
 
 	return msg
+}
+
+func BuildFilmsFailureMessage(session *models.Session) string {
+	return "🚨 " + translator.Translate(session.Lang, "getFilmsFailure", nil, nil)
+}
+
+func BuildFilmRequestTitleMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "filmRequestTitle", nil, nil)
+}
+
+func BuildDeleteFilmMessage(session *models.Session) string {
+	return "⚠️ " + translator.Translate(session.Lang, "deleteFilmConfirm", map[string]interface{}{
+		"Film": session.FilmDetailState.Film.Title,
+	}, nil)
+}
+
+func BuildDeleteFilmFailureMessage(session *models.Session) string {
+	return "🚨 " + translator.Translate(session.Lang, "deleteFilmFailure", map[string]interface{}{
+		"Film": session.FilmDetailState.Film.Title,
+	}, nil)
+}
+
+func BuildDeleteFilmSuccessMessage(session *models.Session) string {
+	return "🗑 " + translator.Translate(session.Lang, "deleteFilmSuccess", map[string]interface{}{
+		"Film": session.FilmDetailState.Film.Title,
+	}, nil)
+}
+
+func BuildFilmsNotFoundMessage(session *models.Session) string {
+	return "❗️" + translator.Translate(session.Lang, "filmsNotFound", nil, nil)
+}
+
+func BuildManageFilmMessage(session *models.Session) string {
+	return fmt.Sprintf("%s<b>%s</b>", BuildFilmDetailMessage(session), translator.Translate(session.Lang, "choiceAction", nil, nil))
+}
+
+func BuildRemoveFilmFailureMessage(session *models.Session) string {
+	return "🚨 " + translator.Translate(session.Lang, "removeFilmFailure", nil, nil)
+}
+
+func BuildRemoveFilmSuccessMessage(session *models.Session) string {
+	return "🧹󠁝 " + translator.Translate(session.Lang, "removeFilmSuccess", nil, nil)
+}
+
+func BuildNewFilmFromURLMessage(session *models.Session) string {
+	part1 := translator.Translate(session.Lang, "filmRequestLink", nil, nil)
+	part2 := translator.Translate(session.Lang, "supportedServices", nil, nil)
+	supportedServices := parsing.GetSupportedServicesInline()
+
+	return fmt.Sprintf("❓<b>%s</b>\n\n%s:\n<i>%s</i>", part1, part2, supportedServices)
+}
+
+func BuildFilmRequestYearMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "filmRequestYear", nil, nil)
+}
+
+func BuildFilmRequestGenreMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "filmRequestGenre", nil, nil)
+}
+
+func BuildFilmRequestDescriptionMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "filmRequestDescription", nil, nil)
+}
+
+func BuildFilmRequestRatingMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "filmRequestRating", nil, nil)
+}
+
+func BuildFilmRequestImageMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "filmRequestImage", nil, nil)
+}
+
+func BuildFilmRequestURLMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "filmRequestLink", nil, nil)
+}
+
+func BuildFilmRequestCommentMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "filmRequestComment", nil, nil)
+}
+
+func BuildFilmRequestViewedMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "filmRequestViewed", nil, nil)
+}
+
+func BuildFilmRequestUserRatingMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "filmRequestUserRating", nil, nil)
+}
+
+func BuildFilmRequestReviewMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "filmRequestReview", nil, nil)
+}
+
+func BuildCreateFilmFailureMessage(session *models.Session) string {
+	return "🚨 " + translator.Translate(session.Lang, "createFilmFailure", nil, nil)
+}
+
+func BuildCreateFilmSuccessMessage(session *models.Session) string {
+	return "🎬 " + translator.Translate(session.Lang, "createFilmSuccess", nil, nil)
+}
+
+func BuildCreateCollectionFilmSuccessMessage(session *models.Session, collectionName string) string {
+	return "🎬 " + translator.Translate(session.Lang, "createCollectionFilmSuccess", map[string]interface{}{
+		"Collection": collectionName,
+	}, nil)
+}
+
+func BuildUpdateFilmMessage(session *models.Session) string {
+	msg := BuildFilmDetailMessage(session)
+	choiceMsg := translator.Translate(session.Lang, "updateChoiceField", nil, nil)
+	msg += fmt.Sprintf("<b>%s</b>", choiceMsg)
+
+	return msg
+}
+
+func BuildUpdateFilmFailureMessage(session *models.Session) string {
+	return "🚨 " + translator.Translate(session.Lang, "updateFilmFailure", nil, nil)
+}
+
+func BuildUpdateFilmSuccessMessage(session *models.Session) string {
+	return "✏️ " + translator.Translate(session.Lang, "updateFilmSuccess", nil, nil)
+}
+
+func BuildViewedFilmRequestUserRatingMessage(session *models.Session) string {
+	part1 := translator.Translate(session.Lang, "viewedFilmRequestRating", nil, nil)
+	part2 := translator.Translate(session.Lang, "viewedFilmCanCancel", nil, nil)
+
+	return fmt.Sprintf("✔️ <b>%s</b>\n\n<i>%s</i>", part1, part2)
+}
+
+func BuildViewedFilmRequestReviewMessage(session *models.Session) string {
+	part1 := translator.Translate(session.Lang, "viewedFilmRequestReview", nil, nil)
+	part2 := translator.Translate(session.Lang, "viewedFilmCanCancel", nil, nil)
+
+	return fmt.Sprintf("✔️ <b>%s</b>\n\n<i>%s</i>", part1, part2)
 }

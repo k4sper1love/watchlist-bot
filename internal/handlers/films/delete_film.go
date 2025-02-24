@@ -3,22 +3,15 @@ package films
 import (
 	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleDeleteFilmCommand(app models.App, session *models.Session) {
-	msg := "⚠️ " + translator.Translate(session.Lang, "deleteFilmConfirm", map[string]interface{}{
-		"Film": session.FilmDetailState.Film.Title,
-	}, nil)
-
-	keyboard := keyboards.NewKeyboard().AddSurvey().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildDeleteFilmMessage(session), keyboards.BuildKeyboardWithSurvey(session))
 	session.SetState(states.ProcessDeleteFilmAwaitingConfirm)
 }
 
@@ -27,44 +20,32 @@ func HandleDeleteFilmProcess(app models.App, session *models.Session) {
 	case states.ProcessDeleteFilmAwaitingConfirm:
 		parseDeleteFilmConfirm(app, session)
 	}
+
+	session.ClearState()
 }
 
 func parseDeleteFilmConfirm(app models.App, session *models.Session) {
-	session.ClearAllStates()
-
-	switch utils.IsAgree(app.Update) {
-	case true:
-		if err := DeleteFilm(app, session); err != nil {
-			msg := "🚨 " + translator.Translate(session.Lang, "deleteFilmFailure", map[string]interface{}{
-				"Film": session.FilmDetailState.Film.Title,
-			}, nil)
-			keyboard := keyboards.NewKeyboard().AddBack(states.CallbackFilmsManage).Build(session.Lang)
-			app.SendMessage(msg, keyboard)
-			break
-		}
-
-		msg := "🗑 " + translator.Translate(session.Lang, "deleteFilmSuccess", map[string]interface{}{
-			"Film": session.FilmDetailState.Film.Title,
-		}, nil)
-
-		app.SendMessage(msg, nil)
-		HandleFilmsCommand(app, session)
-
-	case false:
-		msg := "🚫 " + translator.Translate(session.Lang, "cancelAction", nil, nil)
-		app.SendMessage(msg, nil)
+	if !utils.IsAgree(app.Update) {
+		app.SendMessage(messages.BuildCancelActionMessage(session), nil)
 		HandleManageFilmCommand(app, session)
+		return
 	}
+
+	if err := DeleteFilm(app, session); err != nil {
+		app.SendMessage(messages.BuildDeleteFilmFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsManage))
+		return
+	}
+
+	app.SendMessage(messages.BuildDeleteFilmSuccessMessage(session), nil)
+	HandleFilmsCommand(app, session)
 }
 
 func DeleteFilm(app models.App, session *models.Session) error {
 	switch session.Context {
 	case states.ContextFilm:
 		return watchlist.DeleteFilm(app, session)
-
 	case states.ContextCollection:
 		return watchlist.DeleteCollectionFilm(app, session)
-
 	default:
 		return fmt.Errorf("unsupported session context: %v", session.Context)
 	}

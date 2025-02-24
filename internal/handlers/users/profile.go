@@ -15,8 +15,8 @@ func HandleProfileCommand(app models.App, session *models.Session) {
 		app.SendMessage(err.Error(), nil)
 		return
 	}
-	session.User = *user
 
+	session.User = *user
 	app.SendMessage(messages.BuildProfileMessage(session), keyboards.BuildProfileKeyboard(session))
 }
 

@@ -41,7 +41,6 @@ func UpdateUser(app models.App, session *models.Session) (*apiModels.User, error
 			URL:                app.Config.APIHost + "/api/v1/user",
 			Body:               session.ProfileState,
 			ExpectedStatusCode: http.StatusOK,
-			WithoutLog:         true,
 		},
 	)
 	if err != nil {

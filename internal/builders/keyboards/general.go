@@ -44,6 +44,14 @@ func BuildKeyboardWithSurvey(session *models.Session) *tgbotapi.InlineKeyboardMa
 	return NewKeyboard().AddSurvey().Build(session.Lang)
 }
 
+func BuildKeyboardWithSkipAndCancel(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
+}
+
+func BuildKeyboardWithSurveyAndCancel(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return NewKeyboard().AddSurvey().AddCancel().Build(session.Lang)
+}
+
 func BuildLanguageSelectKeyboard(languages []string) *tgbotapi.InlineKeyboardMarkup {
 	return NewKeyboard().AddLanguageSelect(languages, states.PrefixSelectStartLang).Build("")
 }

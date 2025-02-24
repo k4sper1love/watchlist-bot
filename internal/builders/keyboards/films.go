@@ -186,16 +186,6 @@ func BuildFilmUpdateKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMa
 	return keyboard.Build(session.Lang)
 }
 
-func BuildFilmViewedKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	keyboard := NewKeyboard()
-
-	keyboard.AddSkip()
-
-	keyboard.AddCancel()
-
-	return keyboard.Build(session.Lang)
-}
-
 func BuildFilmsFilterKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	filter := session.GetFilmsFiltersByContext()
 
@@ -226,6 +216,18 @@ func BuildFilmsSortingKeyboard(session *models.Session) *tgbotapi.InlineKeyboard
 	keyboard.AddBack(states.CallbackSortingFilmsSelectBack)
 
 	return keyboard.Build(session.Lang)
+}
+
+func BuildFilmsNotFoundKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return NewKeyboard().AddAgain(states.CallbackFindFilmsAgain).AddBack(states.CallbackFindFilmsBack).Build(session.Lang)
+}
+
+func BuildFindNewFilmsNotFoundKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return NewKeyboard().AddAgain(states.CallbackFindNewFilmAgain).AddBack(states.CallbackFindNewFilmBack).Build(session.Lang)
+}
+
+func BuildNewFilmChangeTokenKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return NewKeyboard().AddChangeToken().AddBack(states.CallbackFilmsNew).Build(session.Lang)
 }
 
 func (k *Keyboard) AddFilmSelect(session *models.Session) *Keyboard {

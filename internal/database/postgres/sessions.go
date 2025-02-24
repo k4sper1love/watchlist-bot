@@ -6,7 +6,6 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 	"gorm.io/gorm"
-	"log"
 	"log/slog"
 )
 
@@ -50,11 +49,8 @@ func initializeSessionDefaults(app models.App, session *models.Session) {
 		session.TelegramUsername = utils.ParseTelegramUsername(app.Update)
 	}
 
-	log.Println("keke")
 	if session.Lang == "" {
-		log.Println("hii")
 		session.Lang = utils.ParseLanguageCode(app.Update)
-		log.Println(session.Lang)
 	}
 
 	if session.AdminState == nil {

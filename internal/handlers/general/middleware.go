@@ -15,10 +15,8 @@ func Auth(app models.App, session *models.Session) bool {
 	if IsBanned(app, session) {
 		return false
 	}
-	if isAuthenticated(app, session) {
-		return true
-	}
-	if err := attemptLoginOrRegister(app, session); err == nil {
+
+	if isAuthenticated(app, session) || attemptLoginOrRegister(app, session) == nil {
 		return true
 	}
 
@@ -53,23 +51,21 @@ func IsBanned(app models.App, session *models.Session) bool {
 }
 
 func isAuthenticated(app models.App, session *models.Session) bool {
-	if session.AccessToken == "" {
-		return false
-	}
-	if watchlist.IsTokenValid(app, session.AccessToken) {
-		return true
-	}
-	return session.RefreshToken != "" && watchlist.RefreshAccessToken(app, session) == nil
+	return session.AccessToken != "" &&
+		(watchlist.IsTokenValid(app, session.AccessToken) ||
+			(session.RefreshToken != "" && watchlist.RefreshAccessToken(app, session) == nil))
 }
 
 func attemptLoginOrRegister(app models.App, session *models.Session) error {
 	if err := watchlist.Login(app, session); err == nil {
 		return nil
 	}
+
 	if err := watchlist.Register(app, session); err != nil {
 		sl.Log.Error("failed to login/register", slog.Any("error", err), slog.Int("telegram_id", session.TelegramID))
 		return err
 	}
+
 	app.SendMessage(messages.BuildRegistrationSuccessMessage(session), nil)
 	return nil
 }

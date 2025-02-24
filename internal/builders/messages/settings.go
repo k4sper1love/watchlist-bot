@@ -35,13 +35,6 @@ func BuildSettingsPageSizeMessage(session *models.Session, pageSize int) string 
 	return fmt.Sprintf("🔢 <b>%s</b>: <code>%d</code>\n\n%s", part1, pageSize, part2)
 }
 
-func BuildSettingsPageSizeFailureMessage(session *models.Session, min, max int) string {
-	return "❗️" + translator.Translate(session.Lang, "invalidInputRange", map[string]interface{}{
-		"Min": min,
-		"Max": max,
-	}, nil)
-}
-
 func BuildSettingsPageSizeSuccessMessage(session *models.Session, pageSize int) string {
 	return "🔄 " + translator.Translate(session.Lang, "settingsPageSizeSuccess", map[string]interface{}{
 		"Size": pageSize,

@@ -50,8 +50,8 @@ func parseFeedbackMessage(app models.App, session *models.Session) {
 		handleFeedbackMessage(app, session)
 		return
 	}
-	session.FeedbackState.Message = text
 
+	session.FeedbackState.Message = text
 	saveFeedback(app, session)
 	session.ClearAllStates()
 }
@@ -61,5 +61,6 @@ func saveFeedback(app models.App, session *models.Session) {
 		app.SendMessage(messages.BuildFeedbackFailureMessage(session), keyboards.BuildKeyboardWithBack(session, ""))
 		return
 	}
+
 	app.SendMessage(messages.BuildFeedbackSuccessMessage(session), keyboards.BuildKeyboardWithBack(session, ""))
 }

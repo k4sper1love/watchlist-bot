@@ -19,19 +19,19 @@ func HandleDeleteProfileProcess(app models.App, session *models.Session) {
 	case states.ProcessDeleteProfileAwaitingConfirm:
 		parseDeleteProfileConfirm(app, session)
 	}
+
+	session.ClearState()
 }
 
 func parseDeleteProfileConfirm(app models.App, session *models.Session) {
 	if !utils.IsAgree(app.Update) {
 		app.SendMessage(messages.BuildCancelActionMessage(session), nil)
-		session.ClearState()
 		HandleProfileCommand(app, session)
 		return
 	}
 
 	if err := watchlist.DeleteUser(app, session); err != nil {
 		app.SendMessage(messages.BuildDeleteProfileFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectProfile))
-		session.ClearState()
 		return
 	}
 

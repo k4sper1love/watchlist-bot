@@ -135,6 +135,7 @@ const (
 	ProcessDeleteProfileAwaitingConfirm = "delete_profile_awaiting_confirm"
 
 	// films states
+	PrefixSelectFilm       = "select_film_"
 	CallbackFilmsNew       = "films_new"
 	CallbackFilmsFilters   = "films_filters"
 	CallbackFilmsSorting   = "films_sorting"
@@ -156,6 +157,7 @@ const (
 	ProcessFindFilmsAwaitingTitle = "find_films_awaiting_title"
 
 	// find new film states
+	PrefixSelectFindNewFilm         = "select_find_new_film_"
 	CallbackFindNewFilmBack         = "find_new_film_back"
 	ProcessFindNewFilmAwaitingTitle = "find_new_film_awaiting_title"
 	CallbackFindNewFilmNextPage     = "find_new_film_next_page"
@@ -254,8 +256,8 @@ const (
 	CallbackFilmDetailFavorite = "film_detail_favorite"
 
 	// viewed film states
-	ProcessViewedFilmAwaitingRating = "viewed_film_awaiting_rating"
-	ProcessViewedFilmAwaitingReview = "viewed_film_awaiting_review"
+	ProcessViewedFilmAwaitingUserRating = "viewed_film_awaiting_user_rating"
+	ProcessViewedFilmAwaitingReview     = "viewed_film_awaiting_review"
 
 	// collections states
 	CallbackCollectionsNew             = "collections_new"

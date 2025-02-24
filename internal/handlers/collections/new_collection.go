@@ -39,7 +39,7 @@ func HandleNewCollectionProcess(app models.App, session *models.Session) {
 
 func parseNewCollectionName(app models.App, session *models.Session) {
 	name := utils.ParseMessageString(app.Update)
-	if ok := utils.ValidStringLength(name, 3, 100); !ok {
+	if ok := utils.IsValidStringLength(name, 3, 100); !ok {
 		validator.HandleInvalidInputLength(app, session, 3, 100)
 		HandleNewCollectionCommand(app, session)
 		return
@@ -66,7 +66,7 @@ func parseNewCollectionDescription(app models.App, session *models.Session) {
 		return
 	}
 	description := utils.ParseMessageString(app.Update)
-	if ok := utils.ValidStringLength(description, 0, 500); !ok {
+	if ok := utils.IsValidStringLength(description, 0, 500); !ok {
 		validator.HandleInvalidInputLength(app, session, 0, 500)
 		requestNewCollectionDescription(app, session)
 		return

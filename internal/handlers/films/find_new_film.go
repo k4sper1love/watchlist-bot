@@ -9,7 +9,6 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/parsing"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 	"log/slog"
 	"strconv"
 	"strings"
@@ -18,127 +17,88 @@ import (
 func HandleFindNewFilmCommand(app models.App, session *models.Session) {
 	metadata, err := getFilmsFromKinopoisk(session)
 	if err != nil {
-		session.FilmsState.CurrentPage = 1
 		handleKinopoiskError(app, session, err)
+		clearStatesAndResetFilmsPage(session)
 		return
 	}
 
 	if metadata.TotalRecords == 0 {
-		msg := "❗️" + translator.Translate(session.Lang, "filmsNotFound", nil, nil)
-		keyboard := keyboards.NewKeyboard().AddAgain(states.CallbackFindNewFilmAgain).AddBack(states.CallbackFindNewFilmBack).Build(session.Lang)
-		app.SendMessage(msg, keyboard)
-		session.ClearAllStates()
-		session.FilmsState.CurrentPage = 1
+		app.SendMessage(messages.BuildFilmsNotFoundMessage(session), keyboards.BuildFindNewFilmsNotFoundKeyboard(session))
+		clearStatesAndResetFilmsPage(session)
 		return
 	}
 
-	msg := messages.BuildFindNewFilmMessage(session, metadata)
-
-	keyboard := keyboards.BuildFindNewFilmKeyboard(session, metadata.CurrentPage, metadata.LastPage)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildFindNewFilmMessage(session, metadata), keyboards.BuildFindNewFilmKeyboard(session, metadata.CurrentPage, metadata.LastPage))
 }
 
 func HandleFindNewFilmButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
-	switch {
-	case callback == states.CallbackFindNewFilmBack:
+	switch callback {
+	case states.CallbackFindNewFilmBack:
 		session.ClearAllStates()
 		HandleFilmsCommand(app, session)
-		return
 
-	case callback == states.CallbackFindNewFilmAgain:
+	case states.CallbackFindNewFilmAgain:
 		session.ClearAllStates()
 		handleNewFilmFind(app, session)
-		return
 
-	case callback == states.CallbackFindNewFilmNextPage:
-		if session.FilmsState.CurrentPage < session.FilmsState.LastPage {
-			session.FilmsState.CurrentPage++
-			HandleFindNewFilmCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
-		}
+	case states.CallbackFindNewFilmNextPage, states.CallbackFindNewFilmPrevPage,
+		states.CallbackFindNewFilmLastPage, states.CallbackFindNewFilmFirstPage:
+		handleFindNewFilmPagination(app, session, callback)
 
-	case callback == states.CallbackFindNewFilmPrevPage:
-		if session.FilmsState.CurrentPage > 1 {
-			session.FilmsState.CurrentPage--
-			HandleFindNewFilmCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
+	default:
+		if strings.HasPrefix(callback, states.PrefixSelectFindNewFilm) {
+			handleFindNewFilmSelect(app, session)
 		}
-
-	case callback == states.CallbackFindNewFilmLastPage:
-		if session.FilmsState.CurrentPage != session.FilmsState.LastPage {
-			session.FilmsState.CurrentPage = session.FilmsState.LastPage
-			HandleFindNewFilmCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
-		}
-
-	case callback == states.CallbackFindNewFilmFirstPage:
-		if session.FilmsState.CurrentPage != 1 {
-			session.FilmsState.CurrentPage = 1
-			HandleFindNewFilmCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
-		}
-	case strings.HasPrefix(callback, "select_find_new_film_"):
-		handleFindNewFilmSelect(app, session)
 	}
+}
+
+func handleFindNewFilmPagination(app models.App, session *models.Session, callback string) {
+	switch callback {
+	case states.CallbackFindNewFilmNextPage:
+		if session.FilmsState.CurrentPage >= session.FilmsState.LastPage {
+			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			return
+		}
+		session.FilmsState.CurrentPage++
+
+	case states.CallbackFindNewFilmPrevPage:
+		if session.FilmsState.CurrentPage <= 1 {
+			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			return
+		}
+		session.FilmsState.CurrentPage--
+
+	case states.CallbackFindNewFilmLastPage:
+		if session.FilmsState.CurrentPage == session.FilmsState.LastPage {
+			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			return
+		}
+		session.FilmsState.CurrentPage = session.FilmsState.LastPage
+
+	case states.CallbackFindNewFilmFirstPage:
+		if session.FilmsState.CurrentPage == 1 {
+			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			return
+		}
+		session.FilmsState.CurrentPage = 1
+	}
+
+	HandleFindNewFilmCommand(app, session)
 }
 
 func handleFindNewFilmSelect(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
-	indexStr := strings.TrimPrefix(callback, "select_find_new_film_")
-	index, err := strconv.Atoi(indexStr)
-	if err != nil {
-		msg := "🚨️ " + translator.Translate(session.Lang, "getFilmFailure", nil, nil)
-		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackFindNewFilmBack).Build(session.Lang)
-		app.SendMessage(msg, keyboard)
+	indexStr := strings.TrimPrefix(callback, states.PrefixSelectFindNewFilm)
+
+	if index, err := strconv.Atoi(indexStr); err != nil {
 		sl.Log.Error("failed to parse find_new_film index", slog.Any("error", err), slog.String("callback", callback))
-		return
+		app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFindNewFilmBack))
+	} else {
+		session.FilmDetailState.SetFromFilm(&session.FilmsState.Films[index])
+		handleNewFilmUploadImage(app, session)
 	}
-
-	film := session.FilmsState.Films[index]
-
-	session.FilmDetailState.SetFromFilm(&film)
-
-	imageURL, err := parseAndUploadImageFromURL(app, film.ImageURL)
-	if err != nil {
-		msg := "⚠️ " + translator.Translate(session.Lang, "getImageFailure", nil, nil)
-		app.SendMessage(msg, nil)
-		session.FilmDetailState.SetImageURL("")
-		requestNewFilmComment(app, session)
-		return
-	}
-	session.FilmDetailState.SetImageURL(imageURL)
-
-	handleFindNewFilmAdd(app, session)
-}
-
-func handleFindNewFilmAdd(app models.App, session *models.Session) {
-	session.FilmsState.CurrentPage = 1
-	session.FilmsState.Title = ""
-
-	_, err := GetFilms(app, session)
-	if err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "getFilmsFailure", nil, nil)
-		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackFindNewFilmBack).Build(session.Lang)
-		app.SendMessage(msg, keyboard)
-		session.ClearAllStates()
-		session.FilmsState.CurrentPage = 1
-		HandleFilmsCommand(app, session)
-		return
-	}
-
-	requestNewFilmComment(app, session)
 }
 
 func getFilmsFromKinopoisk(session *models.Session) (*filters.Metadata, error) {
@@ -148,6 +108,10 @@ func getFilmsFromKinopoisk(session *models.Session) (*filters.Metadata, error) {
 	}
 
 	UpdateSessionWithFilms(session, films, metadata)
-
 	return metadata, nil
+}
+
+func clearStatesAndResetFilmsPage(session *models.Session) {
+	session.ClearAllStates()
+	session.FilmsState.CurrentPage = 1
 }

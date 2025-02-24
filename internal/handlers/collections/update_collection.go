@@ -63,7 +63,7 @@ func handleUpdateCollectionName(app models.App, session *models.Session) {
 
 func parseUpdateCollectionName(app models.App, session *models.Session) {
 	name := utils.ParseMessageString(app.Update)
-	if ok := utils.ValidStringLength(name, 3, 100); !ok {
+	if ok := utils.IsValidStringLength(name, 3, 100); !ok {
 		validator.HandleInvalidInputLength(app, session, 3, 100)
 		handleUpdateCollectionName(app, session)
 		return
@@ -85,7 +85,7 @@ func handleUpdateCollectionDescription(app models.App, session *models.Session) 
 
 func parseUpdateCollectionDescription(app models.App, session *models.Session) {
 	description := utils.ParseMessageString(app.Update)
-	if ok := utils.ValidStringLength(description, 0, 500); !ok {
+	if ok := utils.IsValidStringLength(description, 0, 500); !ok {
 		validator.HandleInvalidInputLength(app, session, 0, 500)
 		handleUpdateCollectionDescription(app, session)
 		return

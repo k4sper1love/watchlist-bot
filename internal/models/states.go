@@ -39,21 +39,20 @@ type FilmsState struct {
 
 type FilmDetailState struct {
 	BaseState
-	Index        int            `json:"-"`
-	Film         apiModels.Film `json:"film" gorm:"serializer:json"`
-	IsFavorite   bool           `json:"is_favorite"`
-	Title        string         `json:"title,omitempty"`
-	Year         int            `json:"year,omitempty"`
-	Genre        string         `json:"genre,omitempty"`
-	Description  string         `json:"description,omitempty"`
-	Rating       float64        `json:"rating,omitempty"`
-	ImageURL     string         `json:"image_url,omitempty"`
-	Comment      string         `json:"comment,omitempty"`
-	IsViewed     bool           `json:"is_viewed"`
-	IsEditViewed bool           `json:"-"`
-	UserRating   float64        `json:"user_rating"`
-	Review       string         `json:"review"`
-	URL          string         `json:"url,omitempty"`
+	Index       int            `json:"-"`
+	Film        apiModels.Film `json:"film" gorm:"serializer:json"`
+	IsFavorite  *bool          `json:"is_favorite,omitempty"`
+	Title       string         `json:"title,omitempty"`
+	Year        int            `json:"year,omitempty"`
+	Genre       string         `json:"genre,omitempty"`
+	Description string         `json:"description,omitempty"`
+	Rating      float64        `json:"rating,omitempty"`
+	ImageURL    string         `json:"image_url,omitempty"`
+	Comment     string         `json:"comment,omitempty"`
+	IsViewed    *bool          `json:"is_viewed,omitempty"`
+	UserRating  float64        `json:"user_rating"`
+	Review      string         `json:"review"`
+	URL         string         `json:"url,omitempty"`
 }
 
 type CollectionsState struct {
@@ -129,12 +128,41 @@ func (s *FilmDetailState) Clear() {
 	s.Rating = 0
 	s.ImageURL = ""
 	s.Comment = ""
-	s.IsViewed = false
-	s.IsFavorite = false
-	s.IsEditViewed = false
+	s.IsViewed = nil
+	s.IsFavorite = nil
 	s.UserRating = 0
 	s.Review = ""
 	s.URL = ""
+}
+
+func (s *FilmDetailState) UpdateFilmState(film apiModels.Film) {
+	s.Film = film
+	s.ClearIndex()
+}
+
+func (s *FilmDetailState) SetFavorite(value bool) {
+	s.IsFavorite = &value
+}
+
+func (s *FilmDetailState) SetViewed(value bool) {
+	s.IsViewed = &value
+}
+
+func (s *FilmDetailState) IsViewedEdit() bool {
+	return s.IsViewed != nil
+}
+
+func (s *FilmDetailState) SyncValues() {
+	if s.IsViewedEdit() {
+		return
+	}
+
+	if s.UserRating == 0 {
+		s.UserRating = s.Film.UserRating
+	}
+	if s.Review == "" {
+		s.Review = s.Film.Review
+	}
 }
 
 func (s *FilmDetailState) HasIndex() bool {
@@ -161,4 +189,5 @@ func (s *FilmDetailState) SetFromFilm(film *apiModels.Film) {
 	s.Year = film.Year
 	s.Rating = film.Rating
 	s.URL = film.URL
+	s.ImageURL = film.ImageURL
 }

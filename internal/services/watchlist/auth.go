@@ -37,7 +37,6 @@ func sendAuthRequest(app models.App, session *models.Session, endpoint string, e
 			HeaderValue:        token,
 			Method:             http.MethodPost,
 			URL:                app.Config.APIHost + endpoint,
-			Body:               nil,
 			ExpectedStatusCode: expectedStatusCode,
 		},
 	)
@@ -62,6 +61,7 @@ func IsTokenValid(app models.App, token string) bool {
 			Method:             http.MethodGet,
 			URL:                app.Config.APIHost + "/api/v1/auth/check",
 			ExpectedStatusCode: http.StatusOK,
+			WithoutLog:         true,
 		},
 	)
 	if err != nil {

@@ -70,6 +70,7 @@ func finishUpdateProfileProcess(app models.App, session *models.Session) {
 	if err := updateProfile(app, session); err == nil {
 		HandleUpdateProfileCommand(app, session)
 	}
+
 	session.ClearAllStates()
 }
 
@@ -82,6 +83,5 @@ func updateProfile(app models.App, session *models.Session) error {
 
 	session.User = *user
 	app.SendMessage(messages.BuildUpdateProfileSuccessMessage(session), nil)
-
 	return nil
 }
