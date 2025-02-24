@@ -19,6 +19,23 @@ func BuildSelectedSortMessage(session *models.Session, sorting *models.Sorting) 
 	return msg
 }
 
+func BuildSortingMessage(session *models.Session) string {
+	choiceMsg := translator.Translate(session.Lang, "choiceSorting", nil, nil)
+	return fmt.Sprintf("<b>%s</b>", choiceMsg)
+}
+
+func BuildSortingResetSuccessMessage(session *models.Session) string {
+	return "🔄 " + translator.Translate(session.Lang, "sortingResetSuccess", nil, nil)
+}
+
+func BuildSortingAppliedMessage(session *models.Session, sorting *models.Sorting) string {
+	fieldMsg := translator.Translate(session.Lang, sorting.Field, nil, nil)
+	directionEmoji := utils.SortDirectionToEmoji(sorting.Direction)
+	return directionEmoji + " " + translator.Translate(session.Lang, "sortingApplied", map[string]interface{}{
+		"Field": fieldMsg,
+	}, nil)
+}
+
 func BuildFilterResetSuccessSimpleMessage(session *models.Session) string {
 	return "🔄 " + translator.Translate(session.Lang, "filterResetSuccess", nil, nil)
 }

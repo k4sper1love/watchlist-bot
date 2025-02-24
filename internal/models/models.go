@@ -141,3 +141,7 @@ func (f *Sorting) IsSortingEnabled() bool {
 func (f *Sorting) IsSortingFieldEnabled(field string) bool {
 	return field == strings.TrimPrefix(f.Sort, "-")
 }
+
+func (f *Sorting) SetSort() {
+	f.Sort = f.Direction + f.Sort
+}

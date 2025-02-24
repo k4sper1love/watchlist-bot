@@ -1,55 +1,41 @@
 package collections
 
 import (
-	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log"
+	"strings"
 )
 
 func HandleSortingCollectionsCommand(app models.App, session *models.Session) {
-	choiceMsg := translator.Translate(session.Lang, "choiceSorting", nil, nil)
-	msg := fmt.Sprintf("<b>%s</b>", choiceMsg)
-
-	keyboard := keyboards.BuildCollectionsSortingKeyboard(session)
-
-	app.SendMessage(msg, keyboard)
+	app.SendMessage(messages.BuildSortingMessage(session), keyboards.BuildCollectionsSortingKeyboard(session))
 }
 
 func HandleSortingCollectionsButtons(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Update) {
-	case states.CallbackSortingCollectionsSelectBack:
-		HandleCollectionsCommand(app, session)
-		return
+	callback := utils.ParseCallback(app.Update)
 
-	case states.CallbackSortingCollectionsSelectAllReset:
-		handleSortingCollectionsAllReset(app, session)
-		return
-
-	case states.CallbackSortingCollectionsSelectIsFavorite:
-		session.CollectionsState.Sorting.Field = "is_favorite"
-
-	case states.CallbackSortingCollectionsSelectName:
-		session.CollectionsState.Sorting.Field = "name"
-
-	case states.CallbackSortingCollectionsSelectCreatedAt:
-		session.CollectionsState.Sorting.Field = "created_at"
-
-	case states.CallbackSortingCollectionsSelectTotalFilms:
-		session.CollectionsState.Sorting.Field = "total_films"
+	switch callback {
+	case states.CallbackSortingCollectionsBack:
+		handleWithResetCollectionsPage(app, session, HandleCollectionsCommand)
+	case states.CallbackSortingCollectionsAllReset:
+		handleSortingCollectionsReset(app, session, HandleCollectionsCommand)
+	default:
+		handleSortingCollectionsSelect(app, session, callback)
 	}
+}
 
-	handleSortingCollectionsDirection(app, session)
+func handleSortingCollectionsSelect(app models.App, session *models.Session, callback string) {
+	if strings.HasPrefix(callback, states.PrefixSortingCollectionsSelect) {
+		session.CollectionsState.Sorting.Field = strings.TrimPrefix(callback, states.PrefixSortingCollectionsSelect)
+		handleSortingCollectionsDirection(app, session)
+	}
 }
 
 func HandleSortingCollectionsProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Update) {
-		session.ClearAllStates()
-		HandleSortingCollectionsCommand(app, session)
+		handleWithResetCollectionsPage(app, session, HandleSortingCollectionsCommand)
 		return
 	}
 
@@ -57,66 +43,36 @@ func HandleSortingCollectionsProcess(app models.App, session *models.Session) {
 	case states.ProcessSortingCollectionsAwaitingDirection:
 		parseSortingCollectionsDirection(app, session)
 	}
-
-}
-
-func handleSortingCollectionsAllReset(app models.App, session *models.Session) {
-	session.CollectionsState.Sorting.ResetSorting()
-
-	msg := "🔄 " + translator.Translate(session.Lang, "sortingResetSuccess", nil, nil)
-
-	app.SendMessage(msg, nil)
-
-	session.CollectionsState.CurrentPage = 1
-	HandleCollectionsCommand(app, session)
 }
 
 func handleSortingCollectionsDirection(app models.App, session *models.Session) {
-	msg := messages.BuildSelectedSortMessage(session, session.CollectionsState.Sorting)
-
-	keyboard := keyboards.BuildSortingDirectionKeyboard(session, session.CollectionsState.Sorting)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildSelectedSortMessage(session, session.CollectionsState.Sorting), keyboards.BuildSortingDirectionKeyboard(session, session.CollectionsState.Sorting))
 	session.SetState(states.ProcessSortingCollectionsAwaitingDirection)
 }
 
 func parseSortingCollectionsDirection(app models.App, session *models.Session) {
-	sorting := session.CollectionsState.Sorting
-
 	if utils.IsReset(app.Update) {
-		sorting.Sort = ""
-		handleSortingCollectionsReset(app, session)
+		handleSortingCollectionsReset(app, session, HandleSortingCollectionsCommand)
 		return
 	}
 
-	log.Println(utils.ParseCallback(app.Update))
-
-	if utils.ParseCallback(app.Update) == states.CallbacktDecrease {
-		sorting.Direction = "-"
+	if utils.IsDecrease(app.Update) {
+		session.CollectionsState.Sorting.Direction = "-"
 	}
 
-	sorting.Sort = sorting.Direction + sorting.Field
-
-	fieldMsg := translator.Translate(session.Lang, sorting.Field, nil, nil)
-	directionEmoji := utils.SortDirectionToEmoji(sorting.Direction)
-	msg := directionEmoji + " " + translator.Translate(session.Lang, "sortingApplied", map[string]interface{}{
-		"Field": fieldMsg,
-	}, nil)
-	app.SendMessage(msg, nil)
-
-	session.ClearAllStates()
-
-	session.CollectionsState.CurrentPage = 1
-	HandleCollectionsCommand(app, session)
+	session.CollectionsState.Sorting.SetSort()
+	app.SendMessage(messages.BuildSortingAppliedMessage(session, session.CollectionsState.Sorting), nil)
+	handleWithResetCollectionsPage(app, session, HandleCollectionsCommand)
 }
 
-func handleSortingCollectionsReset(app models.App, session *models.Session) {
-	msg := "🔄 " + translator.Translate(session.Lang, "sortingResetSuccess", nil, nil)
-	app.SendMessage(msg, nil)
+func handleSortingCollectionsReset(app models.App, session *models.Session, next func(models.App, *models.Session)) {
+	session.CollectionsState.Sorting.ResetSorting()
+	app.SendMessage(messages.BuildSortingResetSuccessMessage(session), nil)
+	handleWithResetCollectionsPage(app, session, next)
+}
 
+func handleWithResetCollectionsPage(app models.App, session *models.Session, next func(models.App, *models.Session)) {
 	session.ClearAllStates()
-
 	session.CollectionsState.CurrentPage = 1
-	HandleSortingCollectionsCommand(app, session)
+	next(app, session)
 }

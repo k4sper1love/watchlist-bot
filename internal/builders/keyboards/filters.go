@@ -43,7 +43,7 @@ func (k *Keyboard) AddResetSorting(sorting *models.Sorting) *Keyboard {
 
 func (k *Keyboard) AddSortingDirection() *Keyboard {
 	return k.AddButtonsWithRowSize(2,
-		Button{"⬇️", "decreaseOrder", states.CallbacktDecrease, "", true},
+		Button{"⬇️", "decreaseOrder", states.CallbackDecrease, "", true},
 		Button{"⬆️", "increaseOrder", states.CallbackIncrease, "", true},
 	)
 }

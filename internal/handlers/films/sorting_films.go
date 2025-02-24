@@ -1,63 +1,41 @@
 package films
 
 import (
-	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
+	"strings"
 )
 
 func HandleSortingFilmsCommand(app models.App, session *models.Session) {
-	choiceMsg := translator.Translate(session.Lang, "choiceSorting", nil, nil)
-	msg := fmt.Sprintf("<b>%s</b>", choiceMsg)
-
-	keyboard := keyboards.BuildFilmsSortingKeyboard(session)
-
-	app.SendMessage(msg, keyboard)
+	app.SendMessage(messages.BuildSortingMessage(session), keyboards.BuildFilmsSortingKeyboard(session))
 }
 
 func HandleSortingFilmsButtons(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Update) {
-	case states.CallbackSortingFilmsSelectBack:
-		HandleFilmsCommand(app, session)
-		return
+	callback := utils.ParseCallback(app.Update)
 
-	case states.CallbackSortingFilmsSelectAllReset:
-		handleSortingFilmsAllReset(app, session)
-		return
-
-	case states.CallbackSortingFilmsSelectTitle:
-		session.GetFilmsSortingByContext().Field = "title"
-
-	case states.CallbackSortingFilmsSelectRating:
-		session.GetFilmsSortingByContext().Field = "rating"
-
-	case states.CallbackSortingFilmsSelectYear:
-		session.GetFilmsSortingByContext().Field = "year"
-
-	case states.CallbackSortingFilmsSelectIsFavorite:
-		session.GetFilmsSortingByContext().Field = "is_favorite"
-
-	case states.CallbackSortingFilmsSelectIsViewed:
-		session.GetFilmsSortingByContext().Field = "is_viewed"
-
-	case states.CallbackSortingFilmsSelectUserRating:
-		session.GetFilmsSortingByContext().Field = "user_rating"
-
-	case states.CallbackSortingFilmsSelectCreatedAt:
-		session.GetFilmsSortingByContext().Field = "created_at"
+	switch callback {
+	case states.CallbackSortingFilmsBack:
+		handleWithResetFilmsPage(app, session, HandleFilmsCommand)
+	case states.CallbackSortingFilmsAllReset:
+		handleSortingFilmsReset(app, session, HandleFilmsCommand)
+	default:
+		handleSortingFilmsSelect(app, session, callback)
 	}
+}
 
-	handleSortingFilmsDirection(app, session)
+func handleSortingFilmsSelect(app models.App, session *models.Session, callback string) {
+	if strings.HasPrefix(callback, states.PrefixSortingFilmsSelect) {
+		session.GetFilmsSortingByContext().Field = strings.TrimPrefix(callback, states.PrefixSortingFilmsSelect)
+		handleSortingFilmsDirection(app, session)
+	}
 }
 
 func HandleSortingFilmsProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Update) {
-		session.ClearAllStates()
-		HandleSortingFilmsCommand(app, session)
+		handleWithResetFilmsPage(app, session, HandleSortingFilmsCommand)
 		return
 	}
 
@@ -65,63 +43,35 @@ func HandleSortingFilmsProcess(app models.App, session *models.Session) {
 	case states.ProcessSortingFilmsAwaitingDirection:
 		parseSortingFilmsDirection(app, session)
 	}
-
-}
-
-func handleSortingFilmsAllReset(app models.App, session *models.Session) {
-	session.GetFilmsSortingByContext().ResetSorting()
-
-	msg := "🔄 " + translator.Translate(session.Lang, "sortingResetSuccess", nil, nil)
-
-	app.SendMessage(msg, nil)
-
-	session.FilmsState.CurrentPage = 1
-	HandleFilmsCommand(app, session)
 }
 
 func handleSortingFilmsDirection(app models.App, session *models.Session) {
-	msg := messages.BuildSelectedSortMessage(session, session.GetFilmsSortingByContext())
-
-	keyboard := keyboards.BuildSortingDirectionKeyboard(session, session.GetFilmsSortingByContext())
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildSelectedSortMessage(session, session.GetFilmsSortingByContext()), keyboards.BuildSortingDirectionKeyboard(session, session.GetFilmsSortingByContext()))
 	session.SetState(states.ProcessSortingFilmsAwaitingDirection)
 }
 
 func parseSortingFilmsDirection(app models.App, session *models.Session) {
-	sorting := session.GetFilmsSortingByContext()
-
 	if utils.IsReset(app.Update) {
-		sorting.Sort = ""
-		handleSortingFilmsReset(app, session)
+		handleSortingFilmsReset(app, session, HandleSortingFilmsCommand)
 		return
 	}
 
-	if utils.ParseCallback(app.Update) == states.CallbacktDecrease {
-		sorting.Direction = "-"
+	if utils.IsDecrease(app.Update) {
+		session.GetFilmsSortingByContext().Direction = "-"
 	}
-	sorting.Sort = sorting.Direction + sorting.Field
 
-	fieldMsg := translator.Translate(session.Lang, sorting.Field, nil, nil)
-	directionEmoji := utils.SortDirectionToEmoji(sorting.Direction)
-	msg := directionEmoji + " " + translator.Translate(session.Lang, "sortingApplied", map[string]interface{}{
-		"Field": fieldMsg,
-	}, nil)
-	app.SendMessage(msg, nil)
-
-	session.ClearAllStates()
-
-	session.FilmsState.CurrentPage = 1
-	HandleFilmsCommand(app, session)
+	session.GetFilmsSortingByContext().SetSort()
+	app.SendMessage(messages.BuildSortingAppliedMessage(session, session.GetFilmsSortingByContext()), nil)
+	handleWithResetFilmsPage(app, session, HandleFilmsCommand)
 }
 
-func handleSortingFilmsReset(app models.App, session *models.Session) {
-	msg := "🔄 " + translator.Translate(session.Lang, "sortingResetSuccess", nil, nil)
-	app.SendMessage(msg, nil)
+func handleSortingFilmsReset(app models.App, session *models.Session, next func(models.App, *models.Session)) {
+	session.GetFilmsSortingByContext().ResetSorting()
+	app.SendMessage(messages.BuildSortingResetSuccessMessage(session), nil)
+	handleWithResetFilmsPage(app, session, next)
+}
 
-	session.ClearAllStates()
-
-	session.FilmsState.CurrentPage = 1
-	HandleSortingFilmsCommand(app, session)
+func handleWithResetFilmsPage(app models.App, session *models.Session, next func(models.App, *models.Session)) {
+	clearStatesAndResetFilmsPage(session)
+	next(app, session)
 }

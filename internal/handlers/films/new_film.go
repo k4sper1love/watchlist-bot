@@ -256,8 +256,7 @@ func handleKinopoiskError(app models.App, session *models.Session, err error) {
 	code := client.ParseErrorStatusCode(err)
 	if code == 401 || code == 403 {
 		app.SendMessage(messages.BuildTokenCodeMessage(session, code), keyboards.BuildNewFilmChangeTokenKeyboard(session))
-		return
+	} else {
+		app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsNew))
 	}
-
-	app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsNew))
 }

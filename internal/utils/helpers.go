@@ -162,6 +162,10 @@ func IsAgree(update *tgbotapi.Update) bool {
 	return ParseCallback(update) == states.CallbackYes
 }
 
+func IsDecrease(update *tgbotapi.Update) bool {
+	return ParseCallback(update) == states.CallbackDecrease
+}
+
 func ExtractKinopoiskQuery(rawUrl string) (string, string, error) {
 	parsedUrl, err := url.Parse(rawUrl)
 	if err != nil {

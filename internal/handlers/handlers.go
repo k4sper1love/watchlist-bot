@@ -127,7 +127,7 @@ func handleUserInput(app models.App, session *models.Session) {
 	case strings.HasPrefix(session.State, states.PrefixFiltersFilmsAwaiting):
 		films.HandleFiltersFilmsProcess(app, session)
 
-	case strings.HasPrefix(session.State, "sorting_films_awaiting"):
+	case strings.HasPrefix(session.State, states.PrefixSortingFilmsAwaiting):
 		films.HandleSortingFilmsProcess(app, session)
 
 	case strings.HasPrefix(session.State, "find_films_awaiting"):
@@ -151,7 +151,7 @@ func handleUserInput(app models.App, session *models.Session) {
 	case strings.HasPrefix(session.State, "delete_profile_awaiting"):
 		users.HandleDeleteProfileProcess(app, session)
 
-	case strings.HasPrefix(session.State, "sorting_collections_awaiting"):
+	case strings.HasPrefix(session.State, states.PrefixSortingCollectionsAwaiting):
 		collections.HandleSortingCollectionsProcess(app, session)
 
 	case strings.HasPrefix(session.State, "find_collections_awaiting"):
@@ -237,7 +237,7 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, states.PrefixFiltersFilms):
 		films.HandleFiltersFilmsButtons(app, session)
 
-	case strings.HasPrefix(callbackData, "sorting_films_select"):
+	case strings.HasPrefix(callbackData, states.PrefixSortingFilms):
 		films.HandleSortingFilmsButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "find_films"):
@@ -261,7 +261,7 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, "collections_") || strings.HasPrefix(callbackData, "select_collection_"):
 		collections.HandleCollectionsButtons(app, session)
 
-	case strings.HasPrefix(callbackData, "sorting_collections_select"):
+	case strings.HasPrefix(callbackData, states.PrefixSortingCollections):
 		collections.HandleSortingCollectionsButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "find_collections"):

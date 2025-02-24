@@ -17,9 +17,9 @@ func HandleFiltersFilmsButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
 	switch callback {
-	case states.CallbackFiltersFilmsSelectBack:
+	case states.CallbackFiltersFilmsBack:
 		HandleFilmsCommand(app, session)
-	case states.CallbackFiltersFilmsSelectAllReset:
+	case states.CallbackFiltersFilmsAllReset:
 		handleFiltersFilmsAllReset(app, session)
 	default:
 		if strings.HasPrefix(callback, states.PrefixFiltersFilmsSelect) {

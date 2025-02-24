@@ -10,8 +10,8 @@ const (
 	CallbackProcessCancel = "process_cancel"
 	CallbackProcessReset  = "process_reset"
 
-	CallbackIncrease  = "increase"
-	CallbacktDecrease = "decrease"
+	CallbackIncrease = "increase"
+	CallbackDecrease = "decrease"
 
 	CallbackYes = "yes"
 	CallbackNo  = "no"
@@ -174,8 +174,8 @@ const (
 	PrefixFiltersFilmsAwaiting                 = "filters_films_awaiting_"
 	PrefixFiltersFilmsAwaitingRange            = "filters_films_awaiting_range_"
 	PrefixFiltersFilmsAwaitingSwitch           = "filters_films_awaiting_switch_"
-	CallbackFiltersFilmsSelectBack             = "filters_films_back"
-	CallbackFiltersFilmsSelectAllReset         = "filters_films_all_reset"
+	CallbackFiltersFilmsBack                   = "filters_films_back"
+	CallbackFiltersFilmsAllReset               = "filters_films_all_reset"
 	CallbackFiltersFilmsSelectRangeRating      = "filters_films_select_range_rating"
 	CallbackFiltersFilmsSelectRangeUserRating  = "filters_films_select_range_user_rating"
 	CallbackFiltersFilmsSelectRangeYear        = "filters_films_select_range_year"
@@ -184,8 +184,11 @@ const (
 	CallbackFiltersFilmsSelectSwitchHasURL     = "filters_films_select_switch_has_url"
 
 	// sorting films states
-	CallbackSortingFilmsSelectBack       = "sorting_films_select_back"
-	CallbackSortingFilmsSelectAllReset   = "sorting_films_select_all_reset"
+	PrefixSortingFilms                   = "sorting_films_"
+	PrefixSortingFilmsSelect             = "sorting_films_select_"
+	PrefixSortingFilmsAwaiting           = "sorting_films_awaiting_"
+	CallbackSortingFilmsBack             = "sorting_films_back"
+	CallbackSortingFilmsAllReset         = "sorting_films_all_reset"
 	ProcessSortingFilmsAwaitingDirection = "sorting_films_awaiting_direction"
 	CallbackSortingFilmsSelectTitle      = "sorting_films_select_title"
 	CallbackSortingFilmsSelectRating     = "sorting_films_select_rating"
@@ -274,8 +277,11 @@ const (
 	CallbackCollectionsSorting         = "collections_sorting"
 
 	// sorting collections states
-	CallbackSortingCollectionsSelectBack       = "sorting_collections_select_back"
-	CallbackSortingCollectionsSelectAllReset   = "sorting_collections_select_all_reset"
+	PrefixSortingCollections                   = "sorting_collections_"
+	PrefixSortingCollectionsSelect             = "sorting_collections_select"
+	PrefixSortingCollectionsAwaiting           = "sorting_collections_awaiting"
+	CallbackSortingCollectionsBack             = "sorting_collections_back"
+	CallbackSortingCollectionsAllReset         = "sorting_collections_all_reset"
 	ProcessSortingCollectionsAwaitingDirection = "sorting_collections_awaiting_direction"
 	CallbackSortingCollectionsSelectIsFavorite = "sorting_collections_select_is_favorite"
 	CallbackSortingCollectionsSelectName       = "sorting_collections_select_name"

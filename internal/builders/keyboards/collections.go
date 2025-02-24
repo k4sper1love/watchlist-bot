@@ -89,10 +89,10 @@ func BuildCollectionsSortingKeyboard(session *models.Session) *tgbotapi.InlineKe
 	keyboard.AddButtons(parseSortingCollectionsButtons(sorting, session.Lang)...)
 
 	if sorting.IsSortingEnabled() {
-		keyboard.AddResetAllSorting(states.CallbackSortingCollectionsSelectAllReset)
+		keyboard.AddResetAllSorting(states.CallbackSortingCollectionsAllReset)
 	}
 
-	keyboard.AddBack(states.CallbackSortingCollectionsSelectBack)
+	keyboard.AddBack(states.CallbackSortingCollectionsBack)
 
 	return keyboard.Build(session.Lang)
 }

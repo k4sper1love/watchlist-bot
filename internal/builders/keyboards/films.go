@@ -197,7 +197,7 @@ func BuildFilmsFilterKeyboard(session *models.Session) *tgbotapi.InlineKeyboardM
 		keyboard.AddResetAllFilmsFilters()
 	}
 
-	keyboard.AddBack(states.CallbackFiltersFilmsSelectBack)
+	keyboard.AddBack(states.CallbackFiltersFilmsBack)
 
 	return keyboard.Build(session.Lang)
 }
@@ -210,10 +210,10 @@ func BuildFilmsSortingKeyboard(session *models.Session) *tgbotapi.InlineKeyboard
 	keyboard.AddButtons(parseSortingFilmsButtons(sorting, session.Lang)...)
 
 	if sorting.IsSortingEnabled() {
-		keyboard.AddResetAllSorting(states.CallbackSortingFilmsSelectAllReset)
+		keyboard.AddResetAllSorting(states.CallbackSortingFilmsAllReset)
 	}
 
-	keyboard.AddBack(states.CallbackSortingFilmsSelectBack)
+	keyboard.AddBack(states.CallbackSortingFilmsBack)
 
 	return keyboard.Build(session.Lang)
 }
@@ -317,7 +317,7 @@ func (k *Keyboard) AddAgain(callback string) *Keyboard {
 }
 
 func (k *Keyboard) AddResetAllFilmsFilters() *Keyboard {
-	return k.AddButton("🔄", "resetFilters", states.CallbackFiltersFilmsSelectAllReset, "", true)
+	return k.AddButton("🔄", "resetFilters", states.CallbackFiltersFilmsAllReset, "", true)
 }
 
 func (k *Keyboard) AddResetFilmsFilter(session *models.Session, filterType string) *Keyboard {

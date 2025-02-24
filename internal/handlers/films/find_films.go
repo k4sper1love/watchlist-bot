@@ -70,7 +70,6 @@ func handleFindFilmsPagination(app models.App, session *models.Session, callback
 			return
 		}
 		session.FilmsState.CurrentPage = 1
-
 	}
 
 	HandleFindFilmsCommand(app, session)
