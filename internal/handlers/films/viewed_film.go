@@ -22,10 +22,14 @@ func HandleViewedFilmProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.ProcessViewedFilmAwaitingUserRating:
-		parseViewedFilmUserRating(app, session)
+		parseFilmUserRating(app, session, requestViewedFilmUserRating, requestViewedFilmReview)
 	case states.ProcessViewedFilmAwaitingReview:
-		parseViewedFilmReview(app, session)
+		parseFilmReview(app, session, requestViewedFilmReview, finishViewedFilmProcess)
 	}
+}
+
+func finishViewedFilmProcess(app models.App, session *models.Session) {
+	HandleUpdateFilm(app, session, HandleFilmsDetailCommand)
 }
 
 func requestViewedFilmUserRating(app models.App, session *models.Session) {
@@ -33,35 +37,7 @@ func requestViewedFilmUserRating(app models.App, session *models.Session) {
 	session.SetState(states.ProcessViewedFilmAwaitingUserRating)
 }
 
-func parseViewedFilmUserRating(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Update) {
-		requestViewedFilmReview(app, session)
-		return
-	}
-
-	if userRating, ok := parseAndValidateNumber(app, session, 1, 10, utils.ParseMessageFloat); !ok {
-		requestViewedFilmUserRating(app, session)
-	} else {
-		session.FilmDetailState.UserRating = userRating
-		requestViewedFilmReview(app, session)
-	}
-}
-
 func requestViewedFilmReview(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildViewedFilmRequestReviewMessage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
 	session.SetState(states.ProcessViewedFilmAwaitingReview)
-}
-
-func parseViewedFilmReview(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Update) {
-		finishUpdateFilmProcess(app, session, HandleFilmsDetailCommand)
-		return
-	}
-
-	if review, ok := parseAndValidateString(app, session, 0, 500); !ok {
-		requestViewedFilmReview(app, session)
-	} else {
-		session.FilmDetailState.Review = review
-		finishUpdateFilmProcess(app, session, HandleFilmsDetailCommand)
-	}
 }

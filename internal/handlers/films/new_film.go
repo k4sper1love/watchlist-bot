@@ -2,12 +2,10 @@ package films
 
 import (
 	"fmt"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
-	"github.com/k4sper1love/watchlist-bot/internal/handlers/validator"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"github.com/k4sper1love/watchlist-bot/internal/services/parsing"
@@ -34,7 +32,7 @@ func HandleNewFilmButtons(app models.App, session *models.Session) {
 		handleNewFilmFind(app, session)
 
 	case states.CallbackNewFilmSelectChangeKinopoiskToken:
-		requestKinopoiskToken(app, session)
+		handleKinopoiskToken(app, session)
 	}
 }
 
@@ -52,47 +50,47 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 	case states.ProcessNewFilmAwaitingURL:
 		parseNewFilmFromURL(app, session)
 
-	case states.ProcessNewFilmAwaitingTitle:
-		parseNewFilmTitle(app, session)
-
-	case states.ProcessNewFilmAwaitingYear:
-		parseNewFilmYear(app, session)
-
-	case states.ProcessNewFilmAwaitingGenre:
-		parseNewFilmGenre(app, session)
-
-	case states.ProcessNewFilmAwaitingDescription:
-		parseNewFilmDescription(app, session)
-
-	case states.ProcessNewFilmAwaitingRating:
-		parseNewFilmRating(app, session)
-
-	case states.ProcessNewFilmAwaitingImage:
-		parseNewFilmImage(app, session)
-
-	case states.ProcessNewFilmAwaitingComment:
-		parseNewFilmComment(app, session)
-
-	case states.ProcessNewFilmAwaitingFilmURL:
-		parseNewFilmURL(app, session)
-
-	case states.ProcessNewFilmAwaitingViewed:
-		parseNewFilmViewed(app, session)
-
-	case states.ProcessNewFilmAwaitingUserRating:
-		parseNewFilmUserRating(app, session)
-
-	case states.ProcessNewFilmAwaitingReview:
-		parseNewFilmReview(app, session)
-
 	case states.ProcessNewFilmAwaitingKinopoiskToken:
 		parseKinopoiskToken(app, session)
+
+	case states.ProcessNewFilmAwaitingTitle:
+		parseFilmTitle(app, session, handleNewFilmManually, requestNewFilmYear)
+
+	case states.ProcessNewFilmAwaitingYear:
+		parseFilmYear(app, session, requestNewFilmYear, requestNewFilmGenre)
+
+	case states.ProcessNewFilmAwaitingGenre:
+		parseFilmGenre(app, session, requestNewFilmGenre, requestNewFilmDescription)
+
+	case states.ProcessNewFilmAwaitingDescription:
+		parseFilmDescription(app, session, requestNewFilmDescription, requestNewFilmRating)
+
+	case states.ProcessNewFilmAwaitingRating:
+		parseFilmRating(app, session, requestNewFilmRating, requestNewFilmImage)
+
+	case states.ProcessNewFilmAwaitingImage:
+		parseFilmImage(app, session, requestNewFilmURL)
+
+	case states.ProcessNewFilmAwaitingFilmURL:
+		parseFilmURL(app, session, requestNewFilmURL, requestNewFilmComment)
+
+	case states.ProcessNewFilmAwaitingComment:
+		parseFilmComment(app, session, requestNewFilmComment, requestNewFilmViewed)
+
+	case states.ProcessNewFilmAwaitingViewed:
+		parseFilmViewedWithFinish(app, session, finishNewFilmProcess, requestNewFilmUserRating)
+
+	case states.ProcessNewFilmAwaitingUserRating:
+		parseFilmUserRating(app, session, requestNewFilmUserRating, requestNewFilmReview)
+
+	case states.ProcessNewFilmAwaitingReview:
+		parseFilmReview(app, session, requestNewFilmReview, finishNewFilmProcess)
 	}
 }
 
 func handleNewFilmFind(app models.App, session *models.Session) {
 	if session.KinopoiskAPIToken == "" {
-		requestKinopoiskToken(app, session)
+		handleKinopoiskToken(app, session)
 		return
 	}
 
@@ -118,7 +116,7 @@ func parseNewFilmFromURL(app models.App, session *models.Session) {
 	isKinopoisk := parsing.IsKinopoisk(url)
 
 	if isKinopoisk && session.KinopoiskAPIToken == "" {
-		requestKinopoiskToken(app, session)
+		handleKinopoiskToken(app, session)
 		return
 	}
 
@@ -130,7 +128,7 @@ func parseNewFilmFromURL(app models.App, session *models.Session) {
 
 	film.URL = url
 	session.FilmDetailState.SetFromFilm(film)
-	handleNewFilmUploadImage(app, session)
+	parseFilmImage(app, session, requestNewFilmComment)
 }
 
 func handleNewFilmFromURLError(app models.App, session *models.Session, err error, isKinopoisk bool) {
@@ -145,31 +143,9 @@ func handleNewFilmFromURLError(app models.App, session *models.Session, err erro
 	HandleNewFilmCommand(app, session)
 }
 
-func handleNewFilmUploadImage(app models.App, session *models.Session) {
-	imageURL, err := parseAndUploadImageFromURL(app, session.FilmDetailState.ImageURL)
-	if err != nil {
-		app.SendMessage(messages.BuildImageFailureMessage(session), nil)
-	}
-
-	session.FilmDetailState.SetImageURL(imageURL)
-	session.FilmsState.CurrentPage = 1
-	session.FilmsState.Title = ""
-
-	requestNewFilmComment(app, session)
-}
-
 func handleNewFilmManually(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildFilmRequestTitleMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingTitle)
-}
-
-func parseNewFilmTitle(app models.App, session *models.Session) {
-	if title, ok := parseAndValidateString(app, session, 3, 100); !ok {
-		handleNewFilmManually(app, session)
-	} else {
-		session.FilmDetailState.Title = title
-		requestNewFilmYear(app, session)
-	}
 }
 
 func requestNewFilmYear(app models.App, session *models.Session) {
@@ -177,37 +153,9 @@ func requestNewFilmYear(app models.App, session *models.Session) {
 	session.SetState(states.ProcessNewFilmAwaitingYear)
 }
 
-func parseNewFilmYear(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Update) {
-		requestNewFilmGenre(app, session)
-		return
-	}
-
-	if year, ok := parseAndValidateNumber(app, session, 1888, 2100, utils.ParseMessageInt); !ok {
-		requestNewFilmYear(app, session)
-	} else {
-		session.FilmDetailState.Year = year
-		requestNewFilmGenre(app, session)
-	}
-}
-
 func requestNewFilmGenre(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildFilmRequestGenreMessage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingGenre)
-}
-
-func parseNewFilmGenre(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Update) {
-		requestNewFilmDescription(app, session)
-		return
-	}
-
-	if genre, ok := parseAndValidateString(app, session, 0, 100); !ok {
-		requestNewFilmGenre(app, session)
-	} else {
-		session.FilmDetailState.Genre = genre
-		requestNewFilmDescription(app, session)
-	}
 }
 
 func requestNewFilmDescription(app models.App, session *models.Session) {
@@ -215,37 +163,9 @@ func requestNewFilmDescription(app models.App, session *models.Session) {
 	session.SetState(states.ProcessNewFilmAwaitingDescription)
 }
 
-func parseNewFilmDescription(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Update) {
-		requestNewFilmRating(app, session)
-		return
-	}
-
-	if description, ok := parseAndValidateString(app, session, 0, 1000); !ok {
-		requestNewFilmDescription(app, session)
-	} else {
-		session.FilmDetailState.Description = description
-		requestNewFilmRating(app, session)
-	}
-}
-
 func requestNewFilmRating(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildFilmRequestRatingMessage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingRating)
-}
-
-func parseNewFilmRating(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Update) {
-		requestNewFilmImage(app, session)
-		return
-	}
-
-	if rating, ok := parseAndValidateNumber(app, session, 1, 10, utils.ParseMessageFloat); !ok {
-		requestNewFilmRating(app, session)
-	} else {
-		session.FilmDetailState.Rating = rating
-		requestNewFilmImage(app, session)
-	}
 }
 
 func requestNewFilmImage(app models.App, session *models.Session) {
@@ -253,40 +173,9 @@ func requestNewFilmImage(app models.App, session *models.Session) {
 	session.SetState(states.ProcessNewFilmAwaitingImage)
 }
 
-func parseNewFilmImage(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Update) {
-		requestNewFilmURL(app, session)
-		return
-	}
-
-	imageURL, err := parseAndUploadImageFromMessage(app)
-	if err != nil {
-		app.SendMessage(messages.BuildImageFailureMessage(session), nil)
-		requestNewFilmURL(app, session)
-		return
-	}
-
-	session.FilmDetailState.SetImageURL(imageURL)
-	requestNewFilmURL(app, session)
-}
-
 func requestNewFilmURL(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildFilmRequestURLMessage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingFilmURL)
-}
-
-func parseNewFilmURL(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Update) {
-		requestNewFilmComment(app, session)
-		return
-	}
-
-	if url, ok := parseAndValidateURL(app, session); !ok {
-		requestNewFilmURL(app, session)
-	} else {
-		session.FilmDetailState.URL = url
-		requestNewFilmComment(app, session)
-	}
 }
 
 func requestNewFilmComment(app models.App, session *models.Session) {
@@ -294,33 +183,9 @@ func requestNewFilmComment(app models.App, session *models.Session) {
 	session.SetState(states.ProcessNewFilmAwaitingComment)
 }
 
-func parseNewFilmComment(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Update) {
-		requestNewFilmViewed(app, session)
-		return
-	}
-
-	if comment, ok := parseAndValidateString(app, session, 0, 500); !ok {
-		requestNewFilmComment(app, session)
-	} else {
-		session.FilmDetailState.Comment = comment
-		requestNewFilmViewed(app, session)
-	}
-}
-
 func requestNewFilmViewed(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildFilmRequestViewedMessage(session), keyboards.BuildKeyboardWithSurveyAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingViewed)
-}
-
-func parseNewFilmViewed(app models.App, session *models.Session) {
-	if !utils.IsAgree(app.Update) {
-		finishNewFilmProcess(app, session)
-		return
-	}
-
-	session.FilmDetailState.SetViewed(true)
-	requestNewFilmUserRating(app, session)
 }
 
 func requestNewFilmUserRating(app models.App, session *models.Session) {
@@ -328,37 +193,9 @@ func requestNewFilmUserRating(app models.App, session *models.Session) {
 	session.SetState(states.ProcessNewFilmAwaitingUserRating)
 }
 
-func parseNewFilmUserRating(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Update) {
-		requestNewFilmReview(app, session)
-		return
-	}
-
-	if userRating, ok := parseAndValidateNumber(app, session, 1, 10, utils.ParseMessageFloat); !ok {
-		requestNewFilmUserRating(app, session)
-	} else {
-		session.FilmDetailState.UserRating = userRating
-		requestNewFilmReview(app, session)
-	}
-}
-
 func requestNewFilmReview(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildFilmRequestReviewMessage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingReview)
-}
-
-func parseNewFilmReview(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Update) {
-		finishNewFilmProcess(app, session)
-		return
-	}
-
-	if review, ok := parseAndValidateString(app, session, 0, 500); !ok {
-		requestNewFilmReview(app, session)
-	} else {
-		session.FilmDetailState.Review = review
-		finishNewFilmProcess(app, session)
-	}
 }
 
 func finishNewFilmProcess(app models.App, session *models.Session) {
@@ -412,15 +249,7 @@ func parseAndUploadImageFromMessage(app models.App) (string, error) {
 	return watchlist.UploadImage(app, image)
 }
 
-func parseAndUploadImageFromURL(app models.App, url string) (string, error) {
-	image, err := utils.ParseImageFromURL(url)
-	if err != nil {
-		return "", err
-	}
-	return watchlist.UploadImage(app, image)
-}
-
-func requestKinopoiskToken(app models.App, session *models.Session) {
+func handleKinopoiskToken(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildKinopoiskTokenMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingKinopoiskToken)
 }
@@ -439,34 +268,4 @@ func handleKinopoiskError(app models.App, session *models.Session, err error) {
 	}
 
 	app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsNew))
-}
-
-func parseAndValidateString(app models.App, session *models.Session, min, max int) (string, bool) {
-	input := utils.ParseMessageString(app.Update)
-
-	if !utils.IsValidStringLength(input, min, max) {
-		validator.HandleInvalidInputLength(app, session, min, max)
-		return "", false
-	}
-	return input, true
-}
-
-func parseAndValidateNumber[T int | float64](app models.App, session *models.Session, min T, max T, parser func(*tgbotapi.Update) T) (T, bool) {
-	input := parser(app.Update)
-
-	if !utils.IsValidNumberRange(input, min, max) {
-		validator.HandleInvalidInputRange(app, session, min, max)
-		return 0, false
-	}
-	return input, true
-}
-
-func parseAndValidateURL(app models.App, session *models.Session) (string, bool) {
-	input := utils.ParseMessageString(app.Update)
-
-	if !utils.IsValidURL(input) {
-		validator.HandleInvalidInputURL(app, session)
-		return "", false
-	}
-	return input, true
 }

@@ -19,6 +19,9 @@ func HandleInvalidInputRange[T int | float64](app models.App, session *models.Se
 	}), nil)
 }
 
-func HandleInvalidInputURL(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildValidationMessage(session, "invalidInputURL", nil), nil)
+func HandleInvalidInputURL(app models.App, session *models.Session, minLength, maxLength int) {
+	app.SendMessage(messages.BuildValidationMessage(session, "invalidInputURL", map[string]interface{}{
+		"Min": minLength,
+		"Max": maxLength,
+	}), nil)
 }

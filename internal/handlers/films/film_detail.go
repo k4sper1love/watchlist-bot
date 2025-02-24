@@ -67,7 +67,7 @@ func handleFilmDetailPagination(app models.App, session *models.Session, callbac
 
 func handleFavoriteFilm(app models.App, session *models.Session) {
 	session.FilmDetailState.SetFavorite(!session.FilmDetailState.Film.IsFavorite)
-	finishUpdateFilmProcess(app, session, HandleFilmsDetailCommand)
+	HandleUpdateFilm(app, session, HandleFilmsDetailCommand)
 }
 
 func getFilmsLastIndex(session *models.Session) int {

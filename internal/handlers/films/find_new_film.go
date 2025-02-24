@@ -97,7 +97,7 @@ func handleFindNewFilmSelect(app models.App, session *models.Session) {
 		app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFindNewFilmBack))
 	} else {
 		session.FilmDetailState.SetFromFilm(&session.FilmsState.Films[index])
-		handleNewFilmUploadImage(app, session)
+		parseFilmImage(app, session, requestNewFilmComment)
 	}
 }
 

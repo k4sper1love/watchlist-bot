@@ -13,7 +13,7 @@ func IsValidStringLength(value string, minLength int, maxLength int) bool {
 	return IsValidNumberRange(utf8.RuneCountInString(value), minLength, maxLength)
 }
 
-func IsValidURL(u string) bool {
+func IsValidURL(u string, minLength int, maxLength int) bool {
 	_, err := url.ParseRequestURI(u)
-	return err == nil
+	return err == nil && IsValidNumberRange(utf8.RuneCountInString(u), minLength, maxLength)
 }

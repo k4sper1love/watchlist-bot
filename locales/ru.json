@@ -21,7 +21,7 @@
     "other": "Значение должно быть в диапазоне <b>[{{.Min}}, {{.Max}}]</b>"
   },
   "invalidInputURL": {
-    "other": "Неверный URL"
+    "other": "Неверный URL или длина не находится в диапазоне <b>[{{.Min}}, {{.Max}}]</b> символов"
   },
   "kinopoiskToken": {
     "other": "Kinopoisk токен"

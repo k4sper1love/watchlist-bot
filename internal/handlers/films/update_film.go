@@ -66,38 +66,42 @@ func HandleUpdateFilmProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.ProcessUpdateFilmAwaitingURL:
-		parseUpdateFilmURL(app, session)
+		parseFilmURL(app, session, handleUpdateFilmURL, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingImage:
-		parseUpdateFilmImage(app, session)
+		parseFilmImageWithError(app, session, finishUpdateFilmProcess, states.CallbackManageFilmSelectUpdate)
 
 	case states.ProcessUpdateFilmAwaitingTitle:
-		parseUpdateFilmTitle(app, session)
+		parseFilmTitle(app, session, handleUpdateFilmTitle, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingDescription:
-		parseUpdateFilmDescription(app, session)
+		parseFilmDescription(app, session, handleUpdateFilmDescription, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingGenre:
-		parseUpdateFilmGenre(app, session)
+		parseFilmGenre(app, session, handleUpdateFilmGenre, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingRating:
-		parseUpdateFilmRating(app, session)
+		parseFilmRating(app, session, handleUpdateFilmRating, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingYear:
-		parseUpdateFilmYear(app, session)
+		parseFilmYear(app, session, handleUpdateFilmYear, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingComment:
-		parseUpdateFilmComment(app, session)
+		parseFilmComment(app, session, handleUpdateFilmComment, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingViewed:
-		parseUpdateFilmViewed(app, session)
+		parseFilmViewed(app, session, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingUserRating:
-		parseUpdateFilmUserRating(app, session)
+		parseFilmUserRating(app, session, handleUpdateFilmUserRating, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingReview:
-		parseUpdateFilmReview(app, session)
+		parseFilmReview(app, session, handleUpdateFilmReview, finishUpdateFilmProcess)
 	}
+}
+
+func finishUpdateFilmProcess(app models.App, session *models.Session) {
+	HandleUpdateFilm(app, session, HandleUpdateFilmCommand)
 }
 
 func handleUpdateFilmURL(app models.App, session *models.Session) {
@@ -105,30 +109,9 @@ func handleUpdateFilmURL(app models.App, session *models.Session) {
 	session.SetState(states.ProcessUpdateFilmAwaitingURL)
 }
 
-func parseUpdateFilmURL(app models.App, session *models.Session) {
-	if url, ok := parseAndValidateURL(app, session); !ok {
-		handleUpdateFilmURL(app, session)
-	} else {
-		session.FilmDetailState.URL = url
-		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
-	}
-}
-
 func handleUpdateFilmImage(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildFilmRequestImageMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingImage)
-}
-
-func parseUpdateFilmImage(app models.App, session *models.Session) {
-	imageURL, err := parseAndUploadImageFromMessage(app)
-	if err != nil {
-		app.SendMessage(messages.BuildImageFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackManageFilmSelectUpdate))
-		session.ClearState()
-		return
-	}
-
-	session.FilmDetailState.SetImageURL(imageURL)
-	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
 }
 
 func handleUpdateFilmTitle(app models.App, session *models.Session) {
@@ -136,27 +119,9 @@ func handleUpdateFilmTitle(app models.App, session *models.Session) {
 	session.SetState(states.ProcessUpdateFilmAwaitingTitle)
 }
 
-func parseUpdateFilmTitle(app models.App, session *models.Session) {
-	if title, ok := parseAndValidateString(app, session, 3, 100); !ok {
-		handleUpdateFilmTitle(app, session)
-	} else {
-		session.FilmDetailState.Title = title
-		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
-	}
-}
-
 func handleUpdateFilmDescription(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildFilmRequestDescriptionMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingDescription)
-}
-
-func parseUpdateFilmDescription(app models.App, session *models.Session) {
-	if description, ok := parseAndValidateString(app, session, 0, 1000); !ok {
-		handleUpdateFilmDescription(app, session)
-	} else {
-		session.FilmDetailState.Description = description
-		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
-	}
 }
 
 func handleUpdateFilmGenre(app models.App, session *models.Session) {
@@ -164,27 +129,9 @@ func handleUpdateFilmGenre(app models.App, session *models.Session) {
 	session.SetState(states.ProcessUpdateFilmAwaitingGenre)
 }
 
-func parseUpdateFilmGenre(app models.App, session *models.Session) {
-	if genre, ok := parseAndValidateString(app, session, 0, 100); !ok {
-		handleUpdateFilmGenre(app, session)
-	} else {
-		session.FilmDetailState.Genre = genre
-		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
-	}
-}
-
 func handleUpdateFilmRating(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildFilmRequestRatingMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingRating)
-}
-
-func parseUpdateFilmRating(app models.App, session *models.Session) {
-	if rating, ok := parseAndValidateNumber(app, session, 1, 10, utils.ParseMessageFloat); !ok {
-		handleUpdateFilmRating(app, session)
-	} else {
-		session.FilmDetailState.Rating = rating
-		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
-	}
 }
 
 func handleUpdateFilmYear(app models.App, session *models.Session) {
@@ -192,27 +139,9 @@ func handleUpdateFilmYear(app models.App, session *models.Session) {
 	session.SetState(states.ProcessUpdateFilmAwaitingYear)
 }
 
-func parseUpdateFilmYear(app models.App, session *models.Session) {
-	if year, ok := parseAndValidateNumber(app, session, 1888, 2100, utils.ParseMessageInt); !ok {
-		handleUpdateFilmYear(app, session)
-	} else {
-		session.FilmDetailState.Year = year
-		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
-	}
-}
-
 func handleUpdateFilmComment(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildFilmRequestCommentMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingComment)
-}
-
-func parseUpdateFilmComment(app models.App, session *models.Session) {
-	if comment, ok := parseAndValidateString(app, session, 0, 500); !ok {
-		handleUpdateFilmComment(app, session)
-	} else {
-		session.FilmDetailState.Comment = comment
-		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
-	}
 }
 
 func handleUpdateFilmViewed(app models.App, session *models.Session) {
@@ -220,23 +149,9 @@ func handleUpdateFilmViewed(app models.App, session *models.Session) {
 	session.SetState(states.ProcessUpdateFilmAwaitingViewed)
 }
 
-func parseUpdateFilmViewed(app models.App, session *models.Session) {
-	session.FilmDetailState.SetViewed(utils.IsAgree(app.Update))
-	finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
-}
-
 func handleUpdateFilmUserRating(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildFilmRequestUserRatingMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingUserRating)
-}
-
-func parseUpdateFilmUserRating(app models.App, session *models.Session) {
-	if userRating, ok := parseAndValidateNumber(app, session, 1, 10, utils.ParseMessageFloat); !ok {
-		handleUpdateFilmUserRating(app, session)
-	} else {
-		session.FilmDetailState.UserRating = userRating
-		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
-	}
 }
 
 func handleUpdateFilmReview(app models.App, session *models.Session) {
@@ -244,29 +159,10 @@ func handleUpdateFilmReview(app models.App, session *models.Session) {
 	session.SetState(states.ProcessUpdateFilmAwaitingReview)
 }
 
-func parseUpdateFilmReview(app models.App, session *models.Session) {
-	if review, ok := parseAndValidateString(app, session, 0, 500); !ok {
-		handleUpdateFilmReview(app, session)
-	} else {
-		session.FilmDetailState.Review = review
-		finishUpdateFilmProcess(app, session, HandleUpdateFilmCommand)
-	}
-}
-
-func updateFilm(app models.App, session *models.Session) error {
-	film, err := watchlist.UpdateFilm(app, session)
-	if err != nil {
-		return err
-	}
-
-	session.FilmDetailState.UpdateFilmState(*film)
-	return nil
-}
-
-func finishUpdateFilmProcess(app models.App, session *models.Session, backFunc func(models.App, *models.Session)) {
+func HandleUpdateFilm(app models.App, session *models.Session, backFunc func(models.App, *models.Session)) {
 	session.FilmDetailState.SyncValues()
 
-	if err := updateFilm(app, session); err != nil {
+	if err := updateFilmAndState(app, session); err != nil {
 		app.SendMessage(messages.BuildUpdateFilmFailureMessage(session), nil)
 	} else {
 		app.SendMessage(messages.BuildUpdateFilmSuccessMessage(session), nil)
@@ -274,4 +170,14 @@ func finishUpdateFilmProcess(app models.App, session *models.Session, backFunc f
 
 	session.ClearAllStates()
 	backFunc(app, session)
+}
+
+func updateFilmAndState(app models.App, session *models.Session) error {
+	film, err := watchlist.UpdateFilm(app, session)
+	if err != nil {
+		return err
+	}
+
+	session.FilmDetailState.UpdateFilmState(*film)
+	return nil
 }
