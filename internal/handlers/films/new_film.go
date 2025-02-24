@@ -45,7 +45,7 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.ProcessFindNewFilmAwaitingTitle:
-		parseNewFilmFind(app, session)
+		parseFilmFindTitle(app, session, HandleFindNewFilmCommand)
 
 	case states.ProcessNewFilmAwaitingURL:
 		parseNewFilmFromURL(app, session)
@@ -96,14 +96,6 @@ func handleNewFilmFind(app models.App, session *models.Session) {
 
 	app.SendMessage(messages.BuildFilmRequestTitleMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessFindNewFilmAwaitingTitle)
-}
-
-func parseNewFilmFind(app models.App, session *models.Session) {
-	session.FilmsState.Title = utils.ParseMessageString(app.Update)
-	session.FilmsState.CurrentPage = 1
-
-	session.ClearState()
-	HandleFindNewFilmCommand(app, session)
 }
 
 func handleNewFilmFromURL(app models.App, session *models.Session) {

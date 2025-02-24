@@ -2,14 +2,12 @@ package films
 
 import (
 	"github.com/k4sper1love/watchlist-api/pkg/filters"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/parsing"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"log/slog"
 	"strconv"
 	"strings"
 )
@@ -93,7 +91,7 @@ func handleFindNewFilmSelect(app models.App, session *models.Session) {
 	indexStr := strings.TrimPrefix(callback, states.PrefixSelectFindNewFilm)
 
 	if index, err := strconv.Atoi(indexStr); err != nil {
-		sl.Log.Error("failed to parse find_new_film index", slog.Any("error", err), slog.String("callback", callback))
+		utils.LogParseSelectError(err, callback)
 		app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFindNewFilmBack))
 	} else {
 		session.FilmDetailState.SetFromFilm(&session.FilmsState.Films[index])

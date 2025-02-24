@@ -123,25 +123,6 @@ func BuildFilterSwitchMessage(session *models.Session, filterType string) string
 	return msg
 }
 
-func BuildInvalidFilterRangeInputMessage(session *models.Session, config models.FilterRangeConfig) string {
-	exampleValue := translator.Translate(session.Lang, "exampleValue", nil, nil)
-	exampleRange := translator.Translate(session.Lang, "exampleRange", nil, nil)
-	examplePartialRange := translator.Translate(session.Lang, "examplePartialRange", nil, nil)
-	rangeLimits := translator.Translate(session.Lang, "rangeLimits", map[string]interface{}{
-		"Min": fmt.Sprintf("%.f", config.MinValue),
-		"Max": fmt.Sprintf("%.f", config.MaxValue),
-	}, nil)
-
-	msg := "❌ " + translator.Translate(session.Lang, "invalidInput", nil, nil)
-	msg += "\n\n<b>" + translator.Translate(session.Lang, "requestRangeInFormat", nil, nil) + "</b>"
-	msg += fmt.Sprintf("\n- %s: <code>%s</code>", exampleValue, "5.5")
-	msg += fmt.Sprintf("\n- %s: <code>%s</code>", exampleRange, "1990-2023")
-	msg += fmt.Sprintf("\n- %s: <code>%s</code> или <code>%s</code>", examplePartialRange, "5-", "-10")
-	msg += fmt.Sprintf("\n\n⚠️ <i>%s</i>", rangeLimits)
-
-	return msg
-}
-
 func BuildFilmsFailureMessage(session *models.Session) string {
 	return "🚨 " + translator.Translate(session.Lang, "getFilmsFailure", nil, nil)
 }
@@ -274,4 +255,9 @@ func BuildViewedFilmRequestReviewMessage(session *models.Session) string {
 	part2 := translator.Translate(session.Lang, "viewedFilmCanCancel", nil, nil)
 
 	return fmt.Sprintf("✔️ <b>%s</b>\n\n<i>%s</i>", part1, part2)
+}
+
+func BuildFiltersFilmsMessage(session *models.Session) string {
+	choiceMsg := translator.Translate(session.Lang, "choiceFilter", nil, nil)
+	return fmt.Sprintf("<b>%s</b>", choiceMsg)
 }

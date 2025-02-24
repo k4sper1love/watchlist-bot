@@ -26,11 +26,6 @@ type FiltersFilm struct {
 	HasURL         *bool  `json:"-"`
 }
 
-type FilterRangeConfig struct {
-	MinValue float64
-	MaxValue float64
-}
-
 type Sorting struct {
 	gorm.Model
 	SortableID   uint   `json:"-"`

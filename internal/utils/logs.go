@@ -91,3 +91,11 @@ func LogFileCloseWarn(err error) {
 		slog.Any("error", err),
 	)
 }
+
+func LogParseSelectError(err error, callback string) {
+	sl.Log.Error(
+		"failed to parse select value",
+		slog.Any("error", err),
+		slog.String("callback", callback),
+	)
+}

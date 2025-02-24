@@ -3,7 +3,6 @@ package films
 import (
 	"fmt"
 	"github.com/k4sper1love/watchlist-api/pkg/filters"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
@@ -11,7 +10,6 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"log/slog"
 	"strconv"
 	"strings"
 )
@@ -26,7 +24,7 @@ func HandleFilmsCommand(app models.App, session *models.Session) {
 	}
 }
 
-func HandleFilmsButtons(app models.App, session *models.Session, backFunc func(models.App, *models.Session)) {
+func HandleFilmsButtons(app models.App, session *models.Session, back func(models.App, *models.Session)) {
 	callback := utils.ParseCallback(app.Update)
 
 	switch callback {
@@ -34,7 +32,7 @@ func HandleFilmsButtons(app models.App, session *models.Session, backFunc func(m
 		if session.Context == states.ContextCollection {
 			session.CollectionsState.CurrentPage = 1
 		}
-		backFunc(app, session)
+		back(app, session)
 
 	case states.CallbackFilmsNextPage, states.CallbackFilmsPrevPage,
 		states.CallbackFilmsLastPage, states.CallbackFilmsFirstPage:
@@ -105,7 +103,7 @@ func HandleFilmsProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.ProcessFindFilmsAwaitingTitle:
-		parseFilmsFindTitle(app, session)
+		parseFilmFindTitle(app, session, HandleFindFilmsCommand)
 	}
 }
 
@@ -114,7 +112,7 @@ func handleFilmSelect(app models.App, session *models.Session) {
 	indexStr := strings.TrimPrefix(callback, states.PrefixSelectFilm)
 
 	if index, err := strconv.Atoi(indexStr); err != nil {
-		sl.Log.Error("failed to parse film index", slog.Any("error", err), slog.String("callback", callback))
+		utils.LogParseSelectError(err, callback)
 		app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectCollections))
 	} else {
 		session.FilmDetailState.Index = index
@@ -125,14 +123,6 @@ func handleFilmSelect(app models.App, session *models.Session) {
 func handleFilmsFindByTitle(app models.App, session *models.Session) {
 	app.SendMessage(messages.BuildFilmRequestTitleMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessFindFilmsAwaitingTitle)
-}
-
-func parseFilmsFindTitle(app models.App, session *models.Session) {
-	session.FilmsState.Title = utils.ParseMessageString(app.Update)
-	session.FilmsState.CurrentPage = 1
-
-	session.ClearState()
-	HandleFindFilmsCommand(app, session)
 }
 
 func UpdateFilmsList(app models.App, session *models.Session, next bool) error {

@@ -230,6 +230,14 @@ func BuildNewFilmChangeTokenKeyboard(session *models.Session) *tgbotapi.InlineKe
 	return NewKeyboard().AddChangeToken().AddBack(states.CallbackFilmsNew).Build(session.Lang)
 }
 
+func BuildFiltersFilmsSwitchKeyboard(session *models.Session, filterType string) *tgbotapi.InlineKeyboardMarkup {
+	return NewKeyboard().AddSurvey().AddResetFilmsFilter(session, filterType).AddCancel().Build(session.Lang)
+}
+
+func BuildFiltersFilmsRangeKeyboard(session *models.Session, filterType string) *tgbotapi.InlineKeyboardMarkup {
+	return NewKeyboard().AddResetFilmsFilter(session, filterType).AddCancel().Build(session.Lang)
+}
+
 func (k *Keyboard) AddFilmSelect(session *models.Session) *Keyboard {
 	var buttons []Button
 
@@ -340,17 +348,17 @@ func (k *Keyboard) AddChangeToken() *Keyboard {
 func parseFiltersFilmsButtons(filter *models.FiltersFilm, lang string) []Button {
 	var buttons []Button
 
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "isFavorite", states.CallbackFiltersFilmsSelectIsFavorite, true)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "is_favorite", states.CallbackFiltersFilmsSelectSwitchIsFavorite, true)
 
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "isViewed", states.CallbackFiltersFilmsSelectIsViewed, true)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "is_viewed", states.CallbackFiltersFilmsSelectSwitchIsViewed, true)
 
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "year", states.CallbackFiltersFilmsSelectYear, false)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "year", states.CallbackFiltersFilmsSelectRangeYear, false)
 
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "rating", states.CallbackFiltersFilmsSelectRating, false)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "rating", states.CallbackFiltersFilmsSelectRangeRating, false)
 
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "userRating", states.CallbackFiltersFilmsSelectUserRating, false)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "user_rating", states.CallbackFiltersFilmsSelectRangeUserRating, false)
 
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "hasURL", states.CallbackFiltersFilmsSelectHasURL, true)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "has_url", states.CallbackFiltersFilmsSelectSwitchHasURL, true)
 
 	return buttons
 }

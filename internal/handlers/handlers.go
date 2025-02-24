@@ -124,7 +124,7 @@ func handleUserInput(app models.App, session *models.Session) {
 	case strings.HasPrefix(session.State, "update_profile_awaiting"):
 		users.HandleUpdateProfileProcess(app, session)
 
-	case strings.HasPrefix(session.State, "filters_films_awaiting"):
+	case strings.HasPrefix(session.State, states.PrefixFiltersFilmsAwaiting):
 		films.HandleFiltersFilmsProcess(app, session)
 
 	case strings.HasPrefix(session.State, "sorting_films_awaiting"):
@@ -234,7 +234,7 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 			films.HandleFilmsButtons(app, session, collections.HandleCollectionsCommand)
 		}
 
-	case strings.HasPrefix(callbackData, "filters_films_select"):
+	case strings.HasPrefix(callbackData, states.PrefixFiltersFilms):
 		films.HandleFiltersFilmsButtons(app, session)
 
 	case strings.HasPrefix(callbackData, "sorting_films_select"):

@@ -91,3 +91,11 @@ func parseFilmViewedWithFinish(app models.App, session *models.Session, finish, 
 	session.FilmDetailState.SetViewed(true)
 	next(app, session)
 }
+
+func parseFilmFindTitle(app models.App, session *models.Session, next func(models.App, *models.Session)) {
+	session.FilmsState.Title = utils.ParseMessageString(app.Update)
+	session.FilmsState.CurrentPage = 1
+
+	session.ClearState()
+	next(app, session)
+}
