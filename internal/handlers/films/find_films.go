@@ -9,18 +9,11 @@ import (
 )
 
 func HandleFindFilmsCommand(app models.App, session *models.Session) {
-	metadata, err := GetFilms(app, session)
-	if err != nil {
+	if metadata, err := getFilms(app, session); err != nil {
 		app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFindFilmsBack))
-		return
+	} else {
+		app.SendMessage(messages.BuildFindFilmsMessage(session, metadata), keyboards.BuildFindFilmsKeyboard(session, metadata.CurrentPage, metadata.LastPage))
 	}
-
-	if metadata.TotalRecords == 0 {
-		app.SendMessage(messages.BuildFilmsNotFoundMessage(session), keyboards.BuildFilmsNotFoundKeyboard(session))
-		return
-	}
-
-	app.SendMessage(messages.BuildFindFilmsMessage(session, metadata), keyboards.BuildFindFilmsKeyboard(session, metadata.CurrentPage, metadata.LastPage))
 }
 
 func HandleFindFilmsButtons(app models.App, session *models.Session) {

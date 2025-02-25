@@ -135,6 +135,7 @@ const (
 	ProcessDeleteProfileAwaitingConfirm = "delete_profile_awaiting_confirm"
 
 	// films states
+	PrefixFilms            = "films_"
 	PrefixSelectFilm       = "select_film_"
 	CallbackFilmsNew       = "films_new"
 	CallbackFilmsFilters   = "films_filters"
@@ -264,6 +265,8 @@ const (
 	ProcessViewedFilmAwaitingReview     = "viewed_film_awaiting_review"
 
 	// collections states
+	PrefixCollections                  = "collections_"
+	PrefixSelectCollection             = "select_collection_"
 	CallbackCollectionsNew             = "collections_new"
 	CallbackCollectionsManage          = "collections_manage"
 	CallbackCollectionsFavorite        = "collections_favorite"

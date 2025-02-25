@@ -19,9 +19,8 @@ func HandleDeleteFilmProcess(app models.App, session *models.Session) {
 	switch session.State {
 	case states.ProcessDeleteFilmAwaitingConfirm:
 		parseDeleteFilmConfirm(app, session)
+		session.ClearState()
 	}
-
-	session.ClearState()
 }
 
 func parseDeleteFilmConfirm(app models.App, session *models.Session) {
@@ -47,6 +46,6 @@ func DeleteFilm(app models.App, session *models.Session) error {
 	case states.ContextCollection:
 		return watchlist.DeleteCollectionFilm(app, session)
 	default:
-		return fmt.Errorf("unsupported session context: %v", session.Context)
+		return fmt.Errorf("unsupported session context: %s", session.Context)
 	}
 }

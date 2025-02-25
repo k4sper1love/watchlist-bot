@@ -17,7 +17,7 @@ import (
 func HandleFilmsCommand(app models.App, session *models.Session) {
 	session.FilmsState.Clear()
 
-	if metadata, err := GetFilms(app, session); err != nil {
+	if metadata, err := getFilms(app, session); err != nil {
 		app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, ""))
 	} else {
 		app.SendMessage(messages.BuildFilmsMessage(session, metadata), keyboards.BuildFilmsKeyboard(session, metadata.CurrentPage, metadata.LastPage))
@@ -55,8 +55,21 @@ func HandleFilmsButtons(app models.App, session *models.Session, back func(model
 
 	default:
 		if strings.HasPrefix(callback, states.PrefixSelectFilm) {
-			handleFilmSelect(app, session)
+			handleFilmSelect(app, session, callback)
 		}
+	}
+}
+
+func HandleFilmsProcess(app models.App, session *models.Session) {
+	if utils.IsCancel(app.Update) {
+		session.ClearAllStates()
+		HandleFilmsCommand(app, session)
+		return
+	}
+
+	switch session.State {
+	case states.ProcessFindFilmsAwaitingTitle:
+		parseFilmFindTitle(app, session, HandleFindFilmsCommand)
 	}
 }
 
@@ -94,26 +107,10 @@ func handleFilmsPagination(app models.App, session *models.Session, callback str
 	HandleFilmsCommand(app, session)
 }
 
-func HandleFilmsProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Update) {
-		session.ClearAllStates()
-		HandleFilmsCommand(app, session)
-		return
-	}
-
-	switch session.State {
-	case states.ProcessFindFilmsAwaitingTitle:
-		parseFilmFindTitle(app, session, HandleFindFilmsCommand)
-	}
-}
-
-func handleFilmSelect(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Update)
-	indexStr := strings.TrimPrefix(callback, states.PrefixSelectFilm)
-
-	if index, err := strconv.Atoi(indexStr); err != nil {
+func handleFilmSelect(app models.App, session *models.Session, callback string) {
+	if index, err := strconv.Atoi(strings.TrimPrefix(callback, states.PrefixSelectFilm)); err != nil {
 		utils.LogParseSelectError(err, callback)
-		app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectCollections))
+		app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsBack))
 	} else {
 		session.FilmDetailState.Index = index
 		HandleFilmsDetailCommand(app, session)
@@ -125,7 +122,7 @@ func handleFilmsFindByTitle(app models.App, session *models.Session) {
 	session.SetState(states.ProcessFindFilmsAwaitingTitle)
 }
 
-func UpdateFilmsList(app models.App, session *models.Session, next bool) error {
+func updateFilmsList(app models.App, session *models.Session, next bool) error {
 	if next {
 		if session.FilmsState.CurrentPage >= session.FilmsState.LastPage {
 			return fmt.Errorf(messages.BuildLastPageAlertMessage(session))
@@ -138,11 +135,11 @@ func UpdateFilmsList(app models.App, session *models.Session, next bool) error {
 		session.FilmsState.CurrentPage--
 	}
 
-	_, err := GetFilms(app, session)
+	_, err := getFilms(app, session)
 	return err
 }
 
-func GetFilms(app models.App, session *models.Session) (*filters.Metadata, error) {
+func getFilms(app models.App, session *models.Session) (*filters.Metadata, error) {
 	var (
 		films    []apiModels.Film
 		metadata *filters.Metadata
@@ -162,7 +159,7 @@ func GetFilms(app models.App, session *models.Session) (*filters.Metadata, error
 		return nil, err
 	}
 
-	UpdateSessionWithFilms(session, films, metadata)
+	updateSessionWithFilms(session, films, metadata)
 	return metadata, nil
 }
 
@@ -185,7 +182,7 @@ func fetchFilmsFromCollection(app models.App, session *models.Session) ([]apiMod
 	return collectionResponse.CollectionFilms.Films, &collectionResponse.Metadata, nil
 }
 
-func UpdateSessionWithFilms(session *models.Session, films []apiModels.Film, metadata *filters.Metadata) {
+func updateSessionWithFilms(session *models.Session, films []apiModels.Film, metadata *filters.Metadata) {
 	session.FilmsState.Films = films
 	session.FilmsState.LastPage = metadata.LastPage
 	session.FilmsState.TotalRecords = metadata.TotalRecords

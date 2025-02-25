@@ -49,3 +49,63 @@ func BuildCollectionsMessage(session *models.Session, metadata *filters.Metadata
 
 	return msg
 }
+
+func BuildCollectionsFailureMessage(session *models.Session) string {
+	return "🚨 " + translator.Translate(session.Lang, "getCollectionsFailure", nil, nil)
+}
+
+func BuildCollectionRequestNameMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "collectionRequestName", nil, nil)
+}
+
+func BuildCollectionRequestDescriptionMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "collectionRequestDescription", nil, nil)
+}
+
+func BuildDeleteCollectionMessage(session *models.Session) string {
+	return "⚠️ " + translator.Translate(session.Lang, "deleteCollectionConfirm", map[string]interface{}{
+		"Collection": session.CollectionDetailState.Collection.Name,
+	}, nil)
+}
+
+func BuildDeleteCollectionFailureMessage(session *models.Session) string {
+	return "🚨 " + translator.Translate(session.Lang, "deleteCollectionFailure", map[string]interface{}{
+		"Collection": session.CollectionDetailState.Collection.Name,
+	}, nil)
+}
+
+func BuildDeleteCollectionSuccessMessage(session *models.Session) string {
+	return "🗑️ " + translator.Translate(session.Lang, "deleteCollectionSuccess", map[string]interface{}{
+		"Collection": session.CollectionDetailState.Collection.Name,
+	}, nil)
+}
+
+func BuildManageCollectionMessage(session *models.Session) string {
+	msg := BuildCollectionHeader(session)
+	choiceMsg := translator.Translate(session.Lang, "choiceAction", nil, nil)
+	msg += fmt.Sprintf("<b>%s</b>", choiceMsg)
+	return msg
+}
+
+func BuildCreateCollectionFailureMessage(session *models.Session) string {
+	return "🚨 " + translator.Translate(session.Lang, "createCollectionFailure", nil, nil)
+}
+
+func BuildCreateCollectionSuccessMessage(session *models.Session) string {
+	return "📚 " + translator.Translate(session.Lang, "createCollectionSuccess", nil, nil)
+}
+
+func BuildUpdateCollectionMessage(session *models.Session) string {
+	msg := BuildCollectionHeader(session)
+	choiceMsg := translator.Translate(session.Lang, "choiceAction", nil, nil)
+	msg += fmt.Sprintf("<b>%s</b>", choiceMsg)
+	return msg
+}
+
+func BuildUpdateCollectionFailureMessage(session *models.Session) string {
+	return "🚨 " + translator.Translate(session.Lang, "updateCollectionFailure", nil, nil)
+}
+
+func BuildUpdateCollectionSuccessMessage(session *models.Session) string {
+	return "✏️ " + translator.Translate(session.Lang, "updateCollectionSuccess", nil, nil)
+}

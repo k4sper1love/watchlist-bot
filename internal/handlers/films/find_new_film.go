@@ -105,7 +105,7 @@ func getFilmsFromKinopoisk(session *models.Session) (*filters.Metadata, error) {
 		return nil, err
 	}
 
-	UpdateSessionWithFilms(session, films, metadata)
+	updateSessionWithFilms(session, films, metadata)
 	return metadata, nil
 }
 

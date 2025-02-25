@@ -227,7 +227,7 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, "update_profile_select"):
 		users.HandleUpdateProfileButtons(app, session)
 
-	case strings.HasPrefix(callbackData, "films_") || strings.HasPrefix(callbackData, "select_film_"):
+	case strings.HasPrefix(callbackData, states.PrefixFilms) || strings.HasPrefix(callbackData, states.PrefixSelectFilm):
 		if session.Context == states.ContextFilm {
 			films.HandleFilmsButtons(app, session, general.HandleMenuCommand)
 		} else if session.Context == states.ContextCollection {
@@ -258,7 +258,7 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, "film_detail"):
 		films.HandleFilmsDetailButtons(app, session)
 
-	case strings.HasPrefix(callbackData, "collections_") || strings.HasPrefix(callbackData, "select_collection_"):
+	case strings.HasPrefix(callbackData, states.PrefixCollections) || strings.HasPrefix(callbackData, states.PrefixSelectCollection):
 		collections.HandleCollectionsButtons(app, session)
 
 	case strings.HasPrefix(callbackData, states.PrefixSortingCollections):

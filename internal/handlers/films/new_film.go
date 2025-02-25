@@ -88,6 +88,26 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 	}
 }
 
+func handleKinopoiskToken(app models.App, session *models.Session) {
+	app.SendMessage(messages.BuildKinopoiskTokenMessage(session), keyboards.BuildKeyboardWithCancel(session))
+	session.SetState(states.ProcessNewFilmAwaitingKinopoiskToken)
+}
+
+func parseKinopoiskToken(app models.App, session *models.Session) {
+	session.KinopoiskAPIToken = utils.ParseMessageString(app.Update)
+	app.SendMessage(messages.BuildKinopoiskTokenSuccessMessage(session), nil)
+	HandleNewFilmCommand(app, session)
+}
+
+func handleKinopoiskError(app models.App, session *models.Session, err error) {
+	code := client.ParseErrorStatusCode(err)
+	if code == 401 || code == 403 {
+		app.SendMessage(messages.BuildTokenCodeMessage(session, code), keyboards.BuildNewFilmChangeTokenKeyboard(session))
+	} else {
+		app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsNew))
+	}
+}
+
 func handleNewFilmFind(app models.App, session *models.Session) {
 	if session.KinopoiskAPIToken == "" {
 		handleKinopoiskToken(app, session)
@@ -239,24 +259,4 @@ func parseAndUploadImageFromMessage(app models.App) (string, error) {
 		return "", err
 	}
 	return watchlist.UploadImage(app, image)
-}
-
-func handleKinopoiskToken(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildKinopoiskTokenMessage(session), keyboards.BuildKeyboardWithCancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingKinopoiskToken)
-}
-
-func parseKinopoiskToken(app models.App, session *models.Session) {
-	session.KinopoiskAPIToken = utils.ParseMessageString(app.Update)
-	app.SendMessage(messages.BuildKinopoiskTokenSuccessMessage(session), nil)
-	HandleNewFilmCommand(app, session)
-}
-
-func handleKinopoiskError(app models.App, session *models.Session, err error) {
-	code := client.ParseErrorStatusCode(err)
-	if code == 401 || code == 403 {
-		app.SendMessage(messages.BuildTokenCodeMessage(session, code), keyboards.BuildNewFilmChangeTokenKeyboard(session))
-	} else {
-		app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsNew))
-	}
 }

@@ -69,7 +69,7 @@ type CollectionDetailState struct {
 	BaseState
 	ObjectID    int                  `json:"-"`
 	Collection  apiModels.Collection `json:"collection" gorm:"serializer:json"`
-	IsFavorite  bool                 `json:"is_favorite"`
+	IsFavorite  *bool                `json:"is_favorite,omitempty"`
 	Name        string               `json:"name,omitempty"`
 	Description string               `json:"description,omitempty"`
 }
@@ -174,7 +174,7 @@ func (s *FilmDetailState) ClearIndex() {
 }
 
 func (s *CollectionDetailState) Clear() {
-	s.IsFavorite = false
+	s.IsFavorite = nil
 	s.Name, s.Description = "", ""
 }
 
@@ -190,4 +190,8 @@ func (s *FilmDetailState) SetFromFilm(film *apiModels.Film) {
 	s.Rating = film.Rating
 	s.URL = film.URL
 	s.ImageURL = film.ImageURL
+}
+
+func (s *CollectionDetailState) SetFavorite(value bool) {
+	s.IsFavorite = &value
 }

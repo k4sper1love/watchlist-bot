@@ -44,7 +44,7 @@ func handleFilmDetailPagination(app models.App, session *models.Session, callbac
 	case states.CallbackFilmDetailNextPage:
 		if session.FilmDetailState.Index < getFilmsLastIndex(session) {
 			session.FilmDetailState.Index++
-		} else if err := UpdateFilmsList(app, session, true); err == nil {
+		} else if err := updateFilmsList(app, session, true); err == nil {
 			session.FilmDetailState.Index = 0
 		} else {
 			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
@@ -54,7 +54,7 @@ func handleFilmDetailPagination(app models.App, session *models.Session, callbac
 	case states.CallbackFilmDetailPrevPage:
 		if session.FilmDetailState.Index > 0 {
 			session.FilmDetailState.Index--
-		} else if err := UpdateFilmsList(app, session, false); err == nil {
+		} else if err := updateFilmsList(app, session, false); err == nil {
 			session.FilmDetailState.Index = getFilmsLastIndex(session)
 		} else {
 			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
