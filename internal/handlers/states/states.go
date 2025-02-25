@@ -328,6 +328,8 @@ const (
 	CallbackOptionsFilmToCollectionExisting = "options_film_to_collection_existing"
 
 	// add collection to film states
+	PrefixAddCollectionToFilm              = "add_collection_to_film_"
+	PrefixSelectCFCollection               = "select_cf_collection_"
 	CallbackAddCollectionToFilmBack        = "add_collection_to_film_back"
 	CallbackAddCollectionToFilmPrevPage    = "add_collection_to_film_prev_page"
 	CallbackAddCollectionToFilmNextPage    = "add_collection_to_film_next_page"
@@ -339,6 +341,8 @@ const (
 	ProcessAddCollectionToFilmAwaitingName = "add_collection_to_film_awaiting_name"
 
 	// add film to collection states
+	PrefixAddFilmToCollection               = "add_film_to_collection_"
+	PrefixSelectCFFilm                      = "select_cf_film_"
 	CallbackAddFilmToCollectionBack         = "add_film_to_collection_back"
 	CallbackAddFilmToCollectionPrevPage     = "add_film_to_collection_prev_page"
 	CallbackAddFilmToCollectionNextPage     = "add_film_to_collection_next_page"

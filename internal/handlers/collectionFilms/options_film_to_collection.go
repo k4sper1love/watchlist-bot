@@ -7,16 +7,10 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleOptionsFilmToCollectionCommand(app models.App, session *models.Session) {
-	msg := messages.BuildCollectionHeader(session)
-	msg += "<b>" + translator.Translate(session.Lang, "choiceAction", nil, nil) + "</b>"
-
-	keyboard := keyboards.BuildOptionsFilmToCollectionKeyboard(session)
-
-	app.SendMessage(msg, keyboard)
+	app.SendMessage(messages.BuildOptionsFilmToCollectionMessage(session), keyboards.BuildOptionsFilmToCollectionKeyboard(session))
 }
 
 func HandleOptionsFilmToCollectionButtons(app models.App, session *models.Session) {
@@ -28,8 +22,6 @@ func HandleOptionsFilmToCollectionButtons(app models.App, session *models.Sessio
 		films.HandleNewFilmCommand(app, session)
 
 	case states.CallbackOptionsFilmToCollectionExisting:
-		session.CollectionFilmsState.CurrentPage = 1
-		session.FilmsState.Title = ""
-		HandleAddFilmToCollectionCommand(app, session)
+		clearAndHandleFilmToCollection(app, session)
 	}
 }

@@ -76,9 +76,10 @@ type CollectionDetailState struct {
 
 type CollectionFilmsState struct {
 	BaseState
-	LastPage    int `json:"-"`
-	PageSize    int `json:"-" gorm:"default:4"`
-	CurrentPage int `json:"-"`
+	LastPage     int `json:"-"`
+	PageSize     int `json:"-" gorm:"default:4"`
+	CurrentPage  int `json:"-"`
+	TotalRecords int `json:"-"`
 }
 
 type AdminState struct {

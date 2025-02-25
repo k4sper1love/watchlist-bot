@@ -3,6 +3,7 @@ package messages
 import (
 	"fmt"
 	"github.com/k4sper1love/watchlist-api/pkg/filters"
+	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/parsing"
@@ -260,4 +261,16 @@ func BuildViewedFilmRequestReviewMessage(session *models.Session) string {
 func BuildFiltersFilmsMessage(session *models.Session) string {
 	choiceMsg := translator.Translate(session.Lang, "choiceFilter", nil, nil)
 	return fmt.Sprintf("<b>%s</b>", choiceMsg)
+}
+
+func BuildChoiceFilmMessage(session *models.Session) string {
+	choiceMsg := translator.Translate(session.Lang, "choiceFilm", nil, nil)
+	return fmt.Sprintf("<b>%s</b>", choiceMsg)
+}
+
+func BuildFilmToCollectionSuccessMessage(session *models.Session, collectionFilm *apiModels.CollectionFilm) string {
+	return "➕ " + translator.Translate(session.Lang, "filmToCollectionSuccess", map[string]interface{}{
+		"Film":       collectionFilm.Film.Title,
+		"Collection": collectionFilm.Collection.Name,
+	}, nil)
 }

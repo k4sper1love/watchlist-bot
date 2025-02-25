@@ -109,3 +109,18 @@ func BuildUpdateCollectionFailureMessage(session *models.Session) string {
 func BuildUpdateCollectionSuccessMessage(session *models.Session) string {
 	return "✏️ " + translator.Translate(session.Lang, "updateCollectionSuccess", nil, nil)
 }
+
+func BuildCollectionsNotFoundMessage(session *models.Session) string {
+	return "❗️" + translator.Translate(session.Lang, "collectionsNotFound", nil, nil)
+}
+
+func BuildChoiceCollectionMessage(session *models.Session) string {
+	choiceMsg := translator.Translate(session.Lang, "choiceCollection", nil, nil)
+	return fmt.Sprintf("<b>%s</b>", choiceMsg)
+}
+
+func BuildOptionsFilmToCollectionMessage(session *models.Session) string {
+	msg := BuildCollectionHeader(session)
+	msg += "<b>" + translator.Translate(session.Lang, "choiceAction", nil, nil) + "</b>"
+	return msg
+}

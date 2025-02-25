@@ -1,95 +1,53 @@
 package collectionFilms
 
 import (
-	"fmt"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
-	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
+	"github.com/k4sper1love/watchlist-api/pkg/filters"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/films"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log/slog"
 	"strconv"
 	"strings"
 )
 
 func HandleAddCollectionToFilmCommand(app models.App, session *models.Session) {
-	collections, err := GetCollectionsExcludeFilm(app, session)
-	if err != nil {
-		app.SendMessage(err.Error(), nil)
-		return
+	if metadata, err := GetCollectionsExcludeFilm(app, session); err != nil {
+		app.SendMessage(messages.BuildCollectionsFailureMessage(session), nil)
+	} else if metadata.TotalRecords == 0 {
+		app.SendMessage(messages.BuildCollectionsNotFoundMessage(session), keyboards.BuildAddCollectionToFilmNotFoundKeyboard(session))
+	} else {
+		app.SendMessage(messages.BuildChoiceCollectionMessage(session), keyboards.BuildAddCollectionToFilmKeyboard(session))
 	}
-
-	if len(collections) == 0 {
-		msg := "❗️" + translator.Translate(session.Lang, "collectionsNotFound", nil, nil)
-		keyboard := keyboards.BuildAddCollectionToFilmNotFoundKeyboard(session)
-		app.SendMessage(msg, keyboard)
-		return
-	}
-
-	choiceMsg := translator.Translate(session.Lang, "choiceCollection", nil, nil)
-	msg := fmt.Sprintf("<b>%s</b>", choiceMsg)
-	keyboard := keyboards.BuildAddCollectionToFilmKeyboard(session)
-	app.SendMessage(msg, keyboard)
 }
 
 func HandleAddCollectionToFilmButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
-	switch {
-	case callback == states.CallbackAddCollectionToFilmBack:
+
+	switch callback {
+	case states.CallbackAddCollectionToFilmBack:
 		films.HandleFilmsDetailCommand(app, session)
 
-	case strings.HasPrefix(callback, "select_cf_collection_"):
-		HandleAddCollectionToFilmSelect(app, session)
-
-	case callback == states.CallbackAddCollectionToFilmFind:
+	case states.CallbackAddCollectionToFilmFind:
 		handleAddCollectionToFilmFind(app, session)
 
-	case callback == states.CallbackAddCollectionToFilmAgain:
+	case states.CallbackAddCollectionToFilmAgain:
 		session.CollectionsState.Name = ""
 		handleAddCollectionToFilmFind(app, session)
 
-	case callback == states.CallbackAddCollectionToFilmReset:
+	case states.CallbackAddCollectionToFilmReset:
 		session.CollectionsState.Name = ""
 		HandleAddCollectionToFilmCommand(app, session)
 
-	case callback == states.CallbackAddCollectionToFilmNextPage:
-		if session.CollectionFilmsState.CurrentPage < session.CollectionFilmsState.LastPage {
-			session.CollectionFilmsState.CurrentPage++
-			HandleAddCollectionToFilmCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
-		}
+	case states.CallbackAddCollectionToFilmNextPage, states.CallbackAddCollectionToFilmPrevPage,
+		states.CallbackAddCollectionToFilmLastPage, states.CallbackAddCollectionToFilmFirstPage:
+		handleAddCollectionToFilmPagination(app, session, callback)
 
-	case callback == states.CallbackAddCollectionToFilmPrevPage:
-		if session.CollectionFilmsState.CurrentPage > 1 {
-			session.CollectionFilmsState.CurrentPage--
-			HandleAddCollectionToFilmCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
-		}
-
-	case callback == states.CallbackAddCollectionToFilmLastPage:
-		if session.CollectionFilmsState.CurrentPage != session.CollectionFilmsState.LastPage {
-			session.CollectionFilmsState.CurrentPage = session.CollectionFilmsState.LastPage
-			HandleAddCollectionToFilmCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
-		}
-
-	case callback == states.CallbackAddCollectionToFilmFirstPage:
-		if session.CollectionFilmsState.CurrentPage != 1 {
-			session.CollectionFilmsState.CurrentPage = 1
-			HandleAddCollectionToFilmCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
+	default:
+		if strings.HasPrefix(callback, states.PrefixSelectCFCollection) {
+			handleAddCollectionToFilmSelect(app, session, callback)
 		}
 	}
 }
@@ -107,54 +65,76 @@ func HandleAddCollectionToFilmProcess(app models.App, session *models.Session) {
 	}
 }
 
-func HandleAddCollectionToFilmSelect(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Update)
-	idStr := strings.TrimPrefix(callback, "select_cf_collection_")
-	id, err := strconv.Atoi(idStr)
+func handleAddCollectionToFilmPagination(app models.App, session *models.Session, callback string) {
+	switch callback {
+	case states.CallbackAddCollectionToFilmNextPage:
+		if session.CollectionFilmsState.CurrentPage >= session.CollectionFilmsState.LastPage {
+			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			return
+		}
+		session.CollectionFilmsState.CurrentPage++
 
-	if err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "getCollectionFailure", nil, nil)
-		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackCollectionFilmsFromFilm).Build(session.Lang)
-		app.SendMessage(msg, keyboard)
-		sl.Log.Error("failed to parse collection ID", slog.Any("error", err), slog.String("callback", callback))
-		return
+	case states.CallbackAddCollectionToFilmPrevPage:
+		if session.CollectionFilmsState.CurrentPage <= 1 {
+			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			return
+		}
+		session.CollectionFilmsState.CurrentPage--
+
+	case states.CallbackAddCollectionToFilmLastPage:
+		if session.CollectionFilmsState.CurrentPage == session.CollectionFilmsState.LastPage {
+			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			return
+		}
+		session.CollectionFilmsState.CurrentPage = session.CollectionFilmsState.LastPage
+
+	case states.CallbackAddCollectionToFilmFirstPage:
+		if session.CollectionFilmsState.CurrentPage == 1 {
+			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			return
+		}
+		session.CollectionFilmsState.CurrentPage = 1
 	}
-
-	session.CollectionDetailState.Collection.ID = id
-
-	addFilmToCollection(app, session)
-}
-
-func handleAddCollectionToFilmFind(app models.App, session *models.Session) {
-	msg := "❓ " + translator.Translate(session.Lang, "collectionRequestName", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
-	session.SetState(states.ProcessAddCollectionToFilmAwaitingName)
-}
-
-func parseAddCollectionToFilmName(app models.App, session *models.Session) {
-	name := utils.ParseMessageString(app.Update)
-
-	session.CollectionsState.Name = name
-	session.CollectionFilmsState.CurrentPage = 1
-
-	session.ClearState()
 
 	HandleAddCollectionToFilmCommand(app, session)
 }
 
-func GetCollectionsExcludeFilm(app models.App, session *models.Session) ([]apiModels.Collection, error) {
+func handleAddCollectionToFilmSelect(app models.App, session *models.Session, callback string) {
+	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.PrefixSelectCFCollection)); err != nil {
+		utils.LogParseSelectError(err, callback)
+		app.SendMessage(messages.BuildCollectionsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackCollectionFilmsFromFilm))
+	} else {
+		session.CollectionDetailState.Collection.ID = id
+		addFilmToCollection(app, session)
+	}
+}
+
+func handleAddCollectionToFilmFind(app models.App, session *models.Session) {
+	app.SendMessage(messages.BuildCollectionRequestNameMessage(session), keyboards.BuildKeyboardWithCancel(session))
+	session.SetState(states.ProcessAddCollectionToFilmAwaitingName)
+}
+
+func parseAddCollectionToFilmName(app models.App, session *models.Session) {
+	session.CollectionsState.Name = utils.ParseMessageString(app.Update)
+	session.CollectionFilmsState.CurrentPage = 1
+
+	session.ClearState()
+	HandleAddCollectionToFilmCommand(app, session)
+}
+
+func GetCollectionsExcludeFilm(app models.App, session *models.Session) (*filters.Metadata, error) {
 	collectionsResponse, err := watchlist.GetCollectionsExcludeFilm(app, session)
 	if err != nil {
 		return nil, err
 	}
 
+	updateSessionWithCollectionsExcludeFilm(session, collectionsResponse)
+	return &collectionsResponse.Metadata, nil
+}
+
+func updateSessionWithCollectionsExcludeFilm(session *models.Session, collectionsResponse *models.CollectionsResponse) {
 	session.CollectionsState.Collections = collectionsResponse.Collections
 	session.CollectionFilmsState.CurrentPage = collectionsResponse.Metadata.CurrentPage
 	session.CollectionFilmsState.LastPage = collectionsResponse.Metadata.LastPage
-
-	return collectionsResponse.Collections, nil
+	session.CollectionFilmsState.TotalRecords = collectionsResponse.Metadata.TotalRecords
 }
