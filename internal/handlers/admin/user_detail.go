@@ -15,50 +15,39 @@ import (
 )
 
 func HandleUserDetailCommand(app models.App, session *models.Session) {
-	user, err := postgres.GetUserByField("telegram_id", session.AdminState.UserID, false)
-	if err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
-		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectUsers).Build(session.Lang)
-		app.SendMessage(msg, keyboard)
-		session.ClearAllStates()
-		return
+	if user, err := getEntity(session); err != nil {
+		app.SendMessage(messages.BuildSomeErrorMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminSelectUsers))
+	} else {
+		app.SendMessage(messages.BuildAdminUserDetailMessage(session, user), keyboards.BuildAdminUserDetailKeyboard(session, user))
 	}
-
-	session.AdminState.UserLang = user.Lang
-	session.AdminState.UserRole = user.Role
-
-	msg := messages.BuildAdminUserDetailMessage(session, user)
-	keyboard := keyboards.BuildAdminUserDetailKeyboard(session, user)
-
-	app.SendMessage(msg, keyboard)
 }
 
 func HandleUserDetailButton(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
-	switch {
-	case callback == states.CallbackAdminUserDetail:
+	switch callback {
+	case states.CallbackAdminUserDetail:
 		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 
-	case callback == states.CallbackAdminUserDetailBack:
-		general.RequireRole(app, session, HandleUsersCommand, roles.Admin)
+	case states.CallbackAdminUserDetailBack:
+		general.RequireRole(app, session, HandleEntitiesCommand, roles.Admin)
 
-	case callback == states.CallbackAdminUserDetailLogs:
+	case states.CallbackAdminUserDetailLogs:
 		general.RequireRole(app, session, handleUserLogs, roles.SuperAdmin)
 
-	case callback == states.CallbackAdminUserDetailUnban:
+	case states.CallbackAdminUserDetailUnban:
 		general.RequireRole(app, session, handleUserUnban, roles.Admin)
 
-	case callback == states.CallbackAdminUserDetailBan:
+	case states.CallbackAdminUserDetailBan:
 		general.RequireRole(app, session, handleUserBan, roles.Admin)
 
-	case callback == states.CallbackAdminUserDetailRole:
+	case states.CallbackAdminUserDetailRole:
 		general.RequireRole(app, session, handleUserRole, roles.SuperAdmin)
 
-	//case callback == states.CallbackAdminUserDetailFeedback:
-
-	case strings.HasPrefix(callback, "admin_user_role_select_"):
-		general.RequireRole(app, session, processUserRole, roles.SuperAdmin)
+	default:
+		if strings.HasPrefix(callback, states.PrefixSelectAdminUserRole) {
+			general.RequireRole(app, session, processUserRole, roles.SuperAdmin)
+		}
 	}
 }
 

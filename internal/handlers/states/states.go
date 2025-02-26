@@ -70,16 +70,21 @@ const (
 	CallbackAdminUsersListLastPage  = "admin_users_list_last_page"
 	CallbackAdminUsersListFirstPage = "admin_users_list_first_page"
 
-	// admin list states
-	CallbackAdminListBack        = "admin_list_back"
-	CallbackAdminListPrevPage    = "admin_list_prev_page"
-	CallbackAdminListNextPage    = "admin_list_next_page"
-	CallbackAdminListLastPage    = "admin_list_last_page"
-	CallbackAdminListFirstPage   = "admin_list_first_page"
-	CallbackAdminListSelectFind  = "admin_list_select_find"
-	ProcessAdminListAwaitingFind = "admin_list_awaiting_find"
+	// entities states
+	PrefixEntities               = "entities_"
+	PrefixSelectAdmin            = "select_admin_"
+	PrefixSelectAdminUser        = "select_admin_user_"
+	CallbackEntitiesListBack     = "entities_back"
+	CallbackEntitiesListPrevPage = "entities_prev_page"
+	CallbackEntitiesListNextPage = "entities_next_page"
+	CallbackEntitiesListLastPage = "entities_last_page"
+	CallbackEntitiesFirstPage    = "entities_first_page"
+	CallbackEntitiesSelectFind   = "entities_select_find"
+	ProcessEntitiesAwaitingFind  = "entities_awaiting_find"
 
 	// admin user detail states
+	PrefixAdminUserDetail                = "admin_user_detail_"
+	PrefixSelectAdminUserRole            = "admin_user_role_select_"
 	CallbackAdminUserDetail              = "admin_user_detail"
 	CallbackAdminUserDetailBack          = "admin_user_detail_back"
 	CallbackAdminUserDetailLogs          = "admin_user_detail_logs"
@@ -91,11 +96,14 @@ const (
 
 	// admin detail states
 	CallbackAdminDetailBack       = "admin_detail_back"
+	CallbackAdminDetailAgain      = "admin_detail_again"
 	CallbackAdminDetailRaiseRole  = "admin_detail_raise_role"
 	CallbackAdminDetailLowerRole  = "admin_detail_lower_role"
 	CallbackAdminDetailRemoveRole = "admin_detail_remove_role"
 
 	// admin feedback list states
+	PrefixAdminFeedbackList            = "admin_feedback_list_"
+	PrefixSelectAdminFeedback          = "select_admin_feedback_"
 	CallbackAdminFeedbackListBack      = "admin_feedback_list_back"
 	CallbackAdminFeedbackListPrevPage  = "admin_feedback_list_prev_page"
 	CallbackAdminFeedbackListNextPage  = "admin_feedback_list_next_page"

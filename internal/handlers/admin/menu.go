@@ -1,46 +1,38 @@
 package admin
 
 import (
-	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/general"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleMenuCommand(app models.App, session *models.Session) {
-	part1 := translator.Translate(session.Lang, "adminPanel", nil, nil)
-	part2 := translator.Translate(session.Lang, "choiceAction", nil, nil)
-	msg := fmt.Sprintf("🛠️ <b>%s</b>\n\n%s", part1, part2)
-
-	keyboard := keyboards.BuildAdminMenuKeyboard(session)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildAdminMenuMessage(session), keyboards.BuildAdminMenuKeyboard(session))
 }
 
 func HandleMenuButton(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Update) {
 	case states.CallbackAdminSelectAdmins:
-		session.AdminState.CurrentPage = 1
-		general.RequireRole(app, session, HandleAdminsCommand, roles.SuperAdmin)
+		session.AdminState.IsAdmin = true
+		resetAdminPageAndHandle(app, session, HandleEntitiesCommand, roles.Admin)
 
 	case states.CallbackAdminSelectUsers:
-		session.AdminState.CurrentPage = 1
-		general.RequireRole(app, session, HandleUsersCommand, roles.Admin)
+		session.AdminState.IsAdmin = false
+		resetAdminPageAndHandle(app, session, HandleEntitiesCommand, roles.Admin)
 
 	case states.CallbackAdminSelectBroadcast:
-		general.RequireRole(app, session, HandleBroadcastCommand, roles.Admin)
+		resetAdminPageAndHandle(app, session, HandleBroadcastCommand, roles.Admin)
 
 	case states.CallbackAdminSelectFeedback:
-		session.AdminState.CurrentPage = 1
-		general.RequireRole(app, session, HandleFeedbacksCommand, roles.Helper)
+		resetAdminPageAndHandle(app, session, HandleFeedbacksCommand, roles.Helper)
 	}
 }
 
-//func HandleMenuProcess(app models.App, session *models.Session) {
-//
-//}
+func resetAdminPageAndHandle(app models.App, session *models.Session, next func(models.App, *models.Session), role roles.Role) {
+	session.AdminState.CurrentPage = 1
+	general.RequireRole(app, session, next, role)
+}

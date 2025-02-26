@@ -106,14 +106,12 @@ func handleUserInput(app models.App, session *models.Session) {
 	case strings.HasPrefix(session.State, "logout_awaiting"):
 		general.HandleLogoutProcess(app, session)
 
-	case strings.HasPrefix(session.State, "admin_manage_users_awaiting"):
-		general.RequireRole(app, session, admin.HandleUsersProcess, roles.Admin)
-
 	case strings.HasPrefix(session.State, "admin_user_detail_awaiting"):
 		general.RequireRole(app, session, admin.HandleUserDetailProcess, roles.Admin)
 
 	case strings.HasPrefix(session.State, "admin_list_awaiting"):
-		general.RequireRole(app, session, admin.HandleAdminsProcess, roles.Admin)
+		general.RequireRole(app, session, admin.HandleEntitiesProcess, roles.Admin)
+		//general.RequireRole(app, session, admin.HandleAdminsProcess, roles.Admin)
 
 	case strings.HasPrefix(session.State, "admin_broadcast_awaiting_"):
 		general.RequireRole(app, session, admin.HandleBroadcastProcess, roles.Admin)
@@ -202,9 +200,9 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, "admin_detail_"):
 		general.RequireRole(app, session, admin.HandleAdminDetailButtons, roles.SuperAdmin)
 
-	case strings.HasPrefix(callbackData, "admin_manage_users_select") || strings.HasPrefix(callbackData, "select_admin_user_") ||
-		strings.HasPrefix(callbackData, "admin_users_list_"):
-		general.RequireRole(app, session, admin.HandleUsersButton, roles.Helper)
+	//case strings.HasPrefix(callbackData, "admin_manage_users_select") || strings.HasPrefix(callbackData, "select_admin_user_") ||
+	//	strings.HasPrefix(callbackData, "admin_users_list_"):
+	//	general.RequireRole(app, session, admin.HandleUsersButton, roles.Helper)
 
 	case strings.HasPrefix(callbackData, "admin_user_detail") || strings.HasPrefix(callbackData, "admin_user_role_select_"):
 		general.RequireRole(app, session, admin.HandleUserDetailButton, roles.Helper)
@@ -212,8 +210,8 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, "admin_feedback_list_") || strings.HasPrefix(callbackData, "select_admin_feedback_"):
 		general.RequireRole(app, session, admin.HandleFeedbacksButtons, roles.Helper)
 
-	case strings.HasPrefix(callbackData, "admin_list_") || strings.HasPrefix(callbackData, "select_admin_"):
-		general.RequireRole(app, session, admin.HandleAdminsButtons, roles.SuperAdmin)
+	case strings.HasPrefix(callbackData, "entities_") || strings.HasPrefix(callbackData, "select_admin_"):
+		general.RequireRole(app, session, admin.HandleEntitiesButtons, roles.Helper)
 
 	case strings.HasPrefix(callbackData, "admin_feedback_detail_"):
 		general.RequireRole(app, session, admin.HandleFeedbackDetailButtons, roles.Helper)

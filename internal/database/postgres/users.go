@@ -30,6 +30,18 @@ func GetTelegramIDs() ([]int, error) {
 	return telegramIDs, err
 }
 
+func GetUsers(isAdmin bool) ([]models.Session, error) {
+	var sessions []models.Session
+
+	query := GetDatabase().Order("created_at DESC")
+	if isAdmin {
+		query = query.Where("role > 0")
+	}
+
+	err := query.Find(&sessions).Error
+	return sessions, err
+}
+
 func GetUsersWithPagination(page, pageSize int, isAdmin bool) ([]models.Session, error) {
 	var sessions []models.Session
 	offset := utils.CalculateOffset(page, pageSize)
@@ -71,16 +83,16 @@ func GetUserByField(field string, value any, isAdmin bool) (*models.Session, err
 	return &session, err
 }
 
-func GetUserByAPIUserID(id int) (*models.Session, error) {
-	var sessions []models.Session
-	if err := GetDatabase().Find(&sessions).Error; err != nil {
+func GetUserByAPIUserID(id int, isAdmin bool) (*models.Session, error) {
+	sessions, err := GetUsers(isAdmin)
+	if err != nil {
 		return nil, err
 	}
+
 	for _, session := range sessions {
 		if session.User.ID == id {
 			return &session, nil
 		}
 	}
-
 	return nil, errors.New("session not found")
 }

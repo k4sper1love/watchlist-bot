@@ -3,6 +3,7 @@ package films
 import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/parser"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
@@ -22,9 +23,9 @@ func HandleViewedFilmProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.ProcessViewedFilmAwaitingUserRating:
-		parseFilmUserRating(app, session, requestViewedFilmUserRating, requestViewedFilmReview)
+		parser.ParseFilmUserRating(app, session, requestViewedFilmUserRating, requestViewedFilmReview)
 	case states.ProcessViewedFilmAwaitingReview:
-		parseFilmReview(app, session, requestViewedFilmReview, finishViewedFilmProcess)
+		parser.ParseFilmReview(app, session, requestViewedFilmReview, finishViewedFilmProcess)
 	}
 }
 

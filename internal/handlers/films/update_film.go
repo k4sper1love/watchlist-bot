@@ -3,6 +3,7 @@ package films
 import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/parser"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
@@ -66,37 +67,37 @@ func HandleUpdateFilmProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.ProcessUpdateFilmAwaitingURL:
-		parseFilmURL(app, session, handleUpdateFilmURL, finishUpdateFilmProcess)
+		parser.ParseFilmURL(app, session, handleUpdateFilmURL, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingImage:
-		parseFilmImageWithError(app, session, finishUpdateFilmProcess, states.CallbackManageFilmSelectUpdate)
+		parser.ParseFilmImageWithError(app, session, finishUpdateFilmProcess, states.CallbackManageFilmSelectUpdate)
 
 	case states.ProcessUpdateFilmAwaitingTitle:
-		parseFilmTitle(app, session, handleUpdateFilmTitle, finishUpdateFilmProcess)
+		parser.ParseFilmTitle(app, session, handleUpdateFilmTitle, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingDescription:
-		parseFilmDescription(app, session, handleUpdateFilmDescription, finishUpdateFilmProcess)
+		parser.ParseFilmDescription(app, session, handleUpdateFilmDescription, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingGenre:
-		parseFilmGenre(app, session, handleUpdateFilmGenre, finishUpdateFilmProcess)
+		parser.ParseFilmGenre(app, session, handleUpdateFilmGenre, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingRating:
-		parseFilmRating(app, session, handleUpdateFilmRating, finishUpdateFilmProcess)
+		parser.ParseFilmRating(app, session, handleUpdateFilmRating, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingYear:
-		parseFilmYear(app, session, handleUpdateFilmYear, finishUpdateFilmProcess)
+		parser.ParseFilmYear(app, session, handleUpdateFilmYear, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingComment:
-		parseFilmComment(app, session, handleUpdateFilmComment, finishUpdateFilmProcess)
+		parser.ParseFilmComment(app, session, handleUpdateFilmComment, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingViewed:
-		parseFilmViewed(app, session, finishUpdateFilmProcess)
+		parser.ParseFilmViewed(app, session, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingUserRating:
-		parseFilmUserRating(app, session, handleUpdateFilmUserRating, finishUpdateFilmProcess)
+		parser.ParseFilmUserRating(app, session, handleUpdateFilmUserRating, finishUpdateFilmProcess)
 
 	case states.ProcessUpdateFilmAwaitingReview:
-		parseFilmReview(app, session, handleUpdateFilmReview, finishUpdateFilmProcess)
+		parser.ParseFilmReview(app, session, handleUpdateFilmReview, finishUpdateFilmProcess)
 	}
 }
 

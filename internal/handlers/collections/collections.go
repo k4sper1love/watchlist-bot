@@ -7,6 +7,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/films"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/general"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/parser"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
@@ -67,7 +68,7 @@ func HandleCollectionProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.ProcessFindCollectionsAwaitingName:
-		parseCollectionFindName(app, session, HandleFindCollectionsCommand)
+		parser.ParseCollectionFindName(app, session, HandleFindCollectionsCommand)
 	}
 }
 

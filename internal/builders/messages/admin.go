@@ -246,33 +246,29 @@ func BuildRaiseRoleNotificationMessage(session *models.Session) string {
 	return msg
 }
 
-func BuildRaiseRoleMessage(session *models.Session) string {
-	roleMsg := translator.Translate(session.Lang, session.AdminState.UserRole.NextRole().String(), nil, nil)
-	raiseMsg := translator.Translate(session.Lang, "raiseUser", map[string]interface{}{
+func BuildRoleChangeMessage(session *models.Session, raise bool) string {
+	var newRole, messageID string
+
+	if raise {
+		newRole = session.AdminState.UserRole.NextRole().String()
+		messageID = "raiseUser"
+	} else {
+		newRole = session.AdminState.UserRole.PrevRole().String()
+		messageID = "lowerUser"
+	}
+
+	roleMsg := translator.Translate(session.Lang, newRole, nil, nil)
+	statusMsg := translator.Translate(session.Lang, messageID, map[string]interface{}{
 		"ID":   toCode(fmt.Sprintf("%d", session.AdminState.UserID)),
 		"Role": toBold(roleMsg),
 	}, nil)
 
-	msg := fmt.Sprintf("⬆️ %s", raiseMsg)
-
-	return msg
+	return fmt.Sprintf("⬆️ %s", statusMsg)
 }
 
 func BuildLowerRoleNotificationMessage(session *models.Session) string {
 	roleMsg := translator.Translate(session.AdminState.UserLang, session.AdminState.UserRole.PrevRole().String(), nil, nil)
 	raiseMsg := translator.Translate(session.AdminState.UserLang, "lowerTo", map[string]interface{}{
-		"Role": toBold(roleMsg),
-	}, nil)
-
-	msg := fmt.Sprintf("⬇️ %s", raiseMsg)
-
-	return msg
-}
-
-func BuildLowerRoleMessage(session *models.Session) string {
-	roleMsg := translator.Translate(session.Lang, session.AdminState.UserRole.PrevRole().String(), nil, nil)
-	raiseMsg := translator.Translate(session.Lang, "lowerUser", map[string]interface{}{
-		"ID":   toCode(fmt.Sprintf("%d", session.AdminState.UserID)),
 		"Role": toBold(roleMsg),
 	}, nil)
 
@@ -326,4 +322,56 @@ func BuildChangeRoleMessage(session *models.Session, newRole roles.Role) string 
 	msg := fmt.Sprintf("🔄 %s", changeMsg)
 
 	return msg
+}
+
+func BuildAdminMenuMessage(session *models.Session) string {
+	part1 := translator.Translate(session.Lang, "adminPanel", nil, nil)
+	part2 := translator.Translate(session.Lang, "choiceAction", nil, nil)
+	return fmt.Sprintf("🛠️ <b>%s</b>\n\n%s", part1, part2)
+}
+
+func BuildAdminRequestIDOrUsernameMessage(session *models.Session) string {
+	return translator.Translate(session.Lang, "requestIDOrUsername", nil, nil)
+}
+
+func BuildNoAccessMessage(session *models.Session) string {
+	return "❗️" + translator.Translate(session.Lang, "noAccess", nil, nil)
+}
+
+func BuildRequestBroadcastMessage(session *models.Session) string {
+	return "💬 " + translator.Translate(session.Lang, "requestBroadcastMessage", nil, nil)
+}
+
+func BuildRequestBroadcastImageMessage(session *models.Session) string {
+	return "🏞️ " + translator.Translate(session.Lang, "requestBroadcastImage", nil, nil)
+}
+
+func BuildRequestBroadcastPinMessage(session *models.Session) string {
+	return "📌 " + translator.Translate(session.Lang, "requestBroadcastPin", nil, nil)
+}
+
+func BuildBroadcastPreviewMessage(session *models.Session) string {
+	previewMsg := translator.Translate(session.Lang, "preview", nil, nil)
+	return fmt.Sprintf("👁️ <i>%s:</i>\n\n%s", previewMsg, session.AdminState.Message)
+}
+
+func BuildBroadcastEmptyMessage(session *models.Session) string {
+	return "❗️" + translator.Translate(session.Lang, "broadcastEmpty", nil, nil)
+}
+
+func BuildBroadcastConfirmMessage(session *models.Session, count int64) string {
+	countMsg := "👥 " + translator.Translate(session.Lang, "recipientCount", nil, nil)
+	msg := fmt.Sprintf("<b>%s</b>: %d", countMsg, count)
+
+	if session.AdminState.NeedFeedbackPin {
+		msg += "\n\n📌 " + translator.Translate(session.Lang, "messageWillBePin", nil, nil)
+	}
+
+	return msg
+}
+
+func BuildFeedbackDeleteSuccessMessage(session *models.Session) string {
+	return "🗑️ " + translator.Translate(session.Lang, "deleteFeedbackSuccess", map[string]interface{}{
+		"ID": session.AdminState.FeedbackID,
+	}, nil)
 }

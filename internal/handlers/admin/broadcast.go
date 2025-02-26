@@ -1,23 +1,17 @@
 package admin
 
 import (
-	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/parser"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
-	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleBroadcastCommand(app models.App, session *models.Session) {
-	msg := "🏞️ " + translator.Translate(session.Lang, "requestBroadcastImage", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildRequestBroadcastImageMessage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
 	session.SetState(states.ProcessAdminBroadcastAwaitingImage)
 }
 
@@ -30,153 +24,80 @@ func HandleBroadcastProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.ProcessAdminBroadcastAwaitingImage:
-		parseBroadcastImage(app, session)
+		parser.ParseBroadcastImage(app, session, requestBroadcastMessage)
 
 	case states.ProcessAdminBroadcastAwaitingText:
-		parseBroadcastMessage(app, session)
+		parser.ParseBroadcastMessage(app, session, requestBroadcastMessage, requestBroadcastPin)
 
 	case states.ProcessAdminBroadcastAwaitingPin:
-		parseBroadcastPin(app, session)
+		parser.ParseBroadcastPin(app, session, previewBroadcast)
 
 	case states.ProcessAdminBroadcastAwaitingConfirm:
 		parseBroadcastConfirm(app, session)
 	}
 }
 
-func parseBroadcastImage(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Update) {
-		requestBroadcastMessage(app, session)
-		return
-	}
-
-	image, err := utils.ParseImageFromMessage(app.Bot, app.Update)
-	if err != nil {
-		handleBroadcastImageError(app, session)
-		return
-	}
-
-	imageURL, err := watchlist.UploadImage(app, image)
-	if err != nil {
-		handleBroadcastImageError(app, session)
-		return
-	}
-
-	session.AdminState.FeedbackImageURL = imageURL
-
-	requestBroadcastMessage(app, session)
-}
-
 func requestBroadcastMessage(app models.App, session *models.Session) {
-	msg := "💬 " + translator.Translate(session.Lang, "requestBroadcastMessage", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildRequestBroadcastMessage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
 	session.SetState(states.ProcessAdminBroadcastAwaitingText)
 }
 
-func parseBroadcastMessage(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Update) {
-		requestBroadcastPin(app, session)
-		return
-	}
-
-	msg := utils.ParseMessageString(app.Update)
-
-	session.AdminState.FeedbackMessage = msg
-
-	requestBroadcastPin(app, session)
-}
-
 func requestBroadcastPin(app models.App, session *models.Session) {
-	msg := "📌 " + translator.Translate(session.Lang, "requestBroadcastPin", nil, nil)
-
-	keyboard := keyboards.NewKeyboard().AddSurvey().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildRequestBroadcastPinMessage(session), keyboards.BuildKeyboardWithSurveyAndCancel(session))
 	session.SetState(states.ProcessAdminBroadcastAwaitingPin)
 }
 
-func parseBroadcastPin(app models.App, session *models.Session) {
-	if utils.IsAgree(app.Update) {
-		session.AdminState.NeedFeedbackPin = true
-	}
-
-	previewBroadcast(app, session)
-}
-
 func previewBroadcast(app models.App, session *models.Session) {
-	previewMsg := translator.Translate(session.Lang, "preview", nil, nil)
-	msg := fmt.Sprintf("👁️ <i>%s:</i>\n\n%s", previewMsg, session.AdminState.FeedbackMessage)
-
-	if session.AdminState.FeedbackImageURL != "" {
-		app.SendImage(session.AdminState.FeedbackImageURL, msg, nil)
+	if session.AdminState.ImageURL != "" {
+		app.SendImage(session.AdminState.ImageURL, messages.BuildBroadcastPreviewMessage(session), nil)
 	} else {
-		app.SendMessage(msg, nil)
+		app.SendMessage(messages.BuildBroadcastPreviewMessage(session), nil)
 	}
 
 	requestBroadcastConfirm(app, session)
 }
 
 func requestBroadcastConfirm(app models.App, session *models.Session) {
-	if session.AdminState.FeedbackMessage == "" && session.AdminState.FeedbackImageURL == "" {
-		emptyMsg := "❗️" + translator.Translate(session.Lang, "broadcastEmpty", nil, nil)
-		app.SendMessage(emptyMsg, nil)
-		session.ClearAllStates()
-		HandleMenuCommand(app, session)
+	if session.AdminState.Message == "" && session.AdminState.ImageURL == "" {
+		app.SendMessage(messages.BuildBroadcastEmptyMessage(session), nil)
+		clearStatesAndHandleMenu(app, session)
 		return
 	}
 
 	count, err := postgres.GetUserCount(false)
 	if err != nil {
-		msg := "🚨" + translator.Translate(session.Lang, "requestFailure", nil, nil)
-		app.SendMessage(msg, nil)
-		session.ClearAllStates()
-		HandleMenuCommand(app, session)
+		app.SendMessage(messages.BuildRequestFailureMessage(session), nil)
+		clearStatesAndHandleMenu(app, session)
 		return
 	}
 
-	countMsg := "👥 " + translator.Translate(session.Lang, "recipientCount", nil, nil)
-	msg := fmt.Sprintf("<b>%s</b>: %d", countMsg, count)
-
-	if session.AdminState.NeedFeedbackPin {
-		msg += "\n\n📌 " + translator.Translate(session.Lang, "messageWillBePin", nil, nil)
-	}
-
-	keyboard := keyboards.BuildBroadcastConfirmKeyboard(session)
-
-	app.SendMessage(msg, keyboard)
-
+	app.SendMessage(messages.BuildBroadcastConfirmMessage(session, count), keyboards.BuildBroadcastConfirmKeyboard(session))
 	session.SetState(states.ProcessAdminBroadcastAwaitingConfirm)
 }
 
 func parseBroadcastConfirm(app models.App, session *models.Session) {
-	switch utils.ParseCallback(app.Update) {
-	case states.CallbackAdminBroadcastSend:
-		telegramIDs, err := postgres.GetTelegramIDs()
-		if err != nil {
-			msg := "🚨 " + translator.Translate(session.Lang, "requestFailure", nil, nil)
-			keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectBroadcast).Build(session.Lang)
-			app.SendMessage(msg, keyboard)
-			session.ClearAllStates()
-			return
-		}
-
-		if session.AdminState.FeedbackImageURL != "" {
-			app.SendBroadcastImage(telegramIDs, session.AdminState.NeedFeedbackPin, session.AdminState.FeedbackImageURL, session.AdminState.FeedbackMessage, nil)
-		} else {
-			app.SendBroadcastMessage(telegramIDs, session.AdminState.NeedFeedbackPin, session.AdminState.FeedbackMessage, nil)
-		}
+	if utils.ParseCallback(app.Update) != states.CallbackAdminBroadcastSend {
+		clearStatesAndHandleMenu(app, session)
+		return
 	}
 
-	session.ClearAllStates()
-	HandleMenuCommand(app, session)
+	ids, err := postgres.GetTelegramIDs()
+	if err != nil {
+		app.SendMessage(messages.BuildRequestFailureMessage(session), nil)
+		clearStatesAndHandleMenu(app, session)
+		return
+	}
+
+	if session.AdminState.ImageURL != "" {
+		app.SendBroadcastImage(ids, session.AdminState.NeedFeedbackPin, session.AdminState.ImageURL, session.AdminState.Message, nil)
+	} else {
+		app.SendBroadcastMessage(ids, session.AdminState.NeedFeedbackPin, session.AdminState.Message, nil)
+	}
+
+	clearStatesAndHandleMenu(app, session)
 }
 
-func handleBroadcastImageError(app models.App, session *models.Session) {
-	msg := "🚨" + translator.Translate(session.Lang, "getImageFailure", nil, nil)
-	app.SendMessage(msg, nil)
-	requestBroadcastMessage(app, session)
+func clearStatesAndHandleMenu(app models.App, session *models.Session) {
+	session.ClearAllStates()
+	HandleMenuCommand(app, session)
 }

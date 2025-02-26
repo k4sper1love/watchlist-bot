@@ -84,17 +84,18 @@ type CollectionFilmsState struct {
 
 type AdminState struct {
 	BaseState
-	UserID           int        `json:"-"`
-	UserLang         string     `json:"-"`
-	UserRole         roles.Role `json:"-"`
-	FeedbackID       int        `json:"-"`
-	LastPage         int        `json:"-"`
-	PageSize         int        `json:"-" gorm:"default:4"`
-	CurrentPage      int        `json:"-"`
-	TotalRecords     int        `json:"-"`
-	FeedbackMessage  string     `json:"-"`
-	FeedbackImageURL string     `json:"-"`
-	NeedFeedbackPin  bool       `json:"-"`
+	IsAdmin         bool       `json:"-"`
+	UserID          int        `json:"-"`
+	UserLang        string     `json:"-"`
+	UserRole        roles.Role `json:"-"`
+	FeedbackID      int        `json:"-"`
+	LastPage        int        `json:"-"`
+	PageSize        int        `json:"-" gorm:"default:4"`
+	CurrentPage     int        `json:"-"`
+	TotalRecords    int        `json:"-"`
+	Message         string     `json:"-"`
+	ImageURL        string     `json:"-"`
+	NeedFeedbackPin bool       `json:"-"`
 }
 
 func (s *FilmsState) Clear() {
@@ -109,8 +110,12 @@ func (s *CollectionsState) Clear() {
 }
 
 func (s *AdminState) Clear() {
-	s.FeedbackMessage, s.FeedbackImageURL = "", ""
+	s.Message, s.ImageURL = "", ""
 	s.NeedFeedbackPin = false
+}
+
+func (s *AdminState) ResetAdmin() {
+	s.IsAdmin = false
 }
 
 func (s *ProfileState) Clear() {

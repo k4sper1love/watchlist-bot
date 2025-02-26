@@ -6,6 +6,7 @@ import (
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/parser"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
@@ -69,7 +70,7 @@ func HandleFilmsProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.ProcessFindFilmsAwaitingTitle:
-		parseFilmFindTitle(app, session, HandleFindFilmsCommand)
+		parser.ParseFilmFindTitle(app, session, HandleFindFilmsCommand)
 	}
 }
 

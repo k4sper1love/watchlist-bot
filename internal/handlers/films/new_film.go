@@ -5,6 +5,7 @@ import (
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/parser"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
@@ -45,7 +46,7 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.ProcessFindNewFilmAwaitingTitle:
-		parseFilmFindTitle(app, session, HandleFindNewFilmCommand)
+		parser.ParseFilmFindTitle(app, session, HandleFindNewFilmCommand)
 
 	case states.ProcessNewFilmAwaitingURL:
 		parseNewFilmFromURL(app, session)
@@ -54,37 +55,37 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 		parseKinopoiskToken(app, session)
 
 	case states.ProcessNewFilmAwaitingTitle:
-		parseFilmTitle(app, session, handleNewFilmManually, requestNewFilmYear)
+		parser.ParseFilmTitle(app, session, handleNewFilmManually, requestNewFilmYear)
 
 	case states.ProcessNewFilmAwaitingYear:
-		parseFilmYear(app, session, requestNewFilmYear, requestNewFilmGenre)
+		parser.ParseFilmYear(app, session, requestNewFilmYear, requestNewFilmGenre)
 
 	case states.ProcessNewFilmAwaitingGenre:
-		parseFilmGenre(app, session, requestNewFilmGenre, requestNewFilmDescription)
+		parser.ParseFilmGenre(app, session, requestNewFilmGenre, requestNewFilmDescription)
 
 	case states.ProcessNewFilmAwaitingDescription:
-		parseFilmDescription(app, session, requestNewFilmDescription, requestNewFilmRating)
+		parser.ParseFilmDescription(app, session, requestNewFilmDescription, requestNewFilmRating)
 
 	case states.ProcessNewFilmAwaitingRating:
-		parseFilmRating(app, session, requestNewFilmRating, requestNewFilmImage)
+		parser.ParseFilmRating(app, session, requestNewFilmRating, requestNewFilmImage)
 
 	case states.ProcessNewFilmAwaitingImage:
-		parseFilmImage(app, session, requestNewFilmURL)
+		parser.ParseFilmImage(app, session, requestNewFilmURL)
 
 	case states.ProcessNewFilmAwaitingFilmURL:
-		parseFilmURL(app, session, requestNewFilmURL, requestNewFilmComment)
+		parser.ParseFilmURL(app, session, requestNewFilmURL, requestNewFilmComment)
 
 	case states.ProcessNewFilmAwaitingComment:
-		parseFilmComment(app, session, requestNewFilmComment, requestNewFilmViewed)
+		parser.ParseFilmComment(app, session, requestNewFilmComment, requestNewFilmViewed)
 
 	case states.ProcessNewFilmAwaitingViewed:
-		parseFilmViewedWithFinish(app, session, finishNewFilmProcess, requestNewFilmUserRating)
+		parser.ParseFilmViewedWithFinish(app, session, finishNewFilmProcess, requestNewFilmUserRating)
 
 	case states.ProcessNewFilmAwaitingUserRating:
-		parseFilmUserRating(app, session, requestNewFilmUserRating, requestNewFilmReview)
+		parser.ParseFilmUserRating(app, session, requestNewFilmUserRating, requestNewFilmReview)
 
 	case states.ProcessNewFilmAwaitingReview:
-		parseFilmReview(app, session, requestNewFilmReview, finishNewFilmProcess)
+		parser.ParseFilmReview(app, session, requestNewFilmReview, finishNewFilmProcess)
 	}
 }
 
@@ -140,7 +141,7 @@ func parseNewFilmFromURL(app models.App, session *models.Session) {
 
 	film.URL = url
 	session.FilmDetailState.SetFromFilm(film)
-	parseFilmImage(app, session, requestNewFilmComment)
+	parser.ParseFilmImage(app, session, requestNewFilmComment)
 }
 
 func handleNewFilmFromURLError(app models.App, session *models.Session, err error, isKinopoisk bool) {
@@ -251,12 +252,4 @@ func createNewCollectionFilm(app models.App, session *models.Session) (*apiModel
 
 	app.SendMessage(messages.BuildCreateCollectionFilmSuccessMessage(session, collectionFilm.Collection.Name), nil)
 	return &collectionFilm.Film, nil
-}
-
-func parseAndUploadImageFromMessage(app models.App) (string, error) {
-	image, err := utils.ParseImageFromMessage(app.Bot, app.Update)
-	if err != nil {
-		return "", err
-	}
-	return watchlist.UploadImage(app, image)
 }

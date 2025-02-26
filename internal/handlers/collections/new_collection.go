@@ -3,6 +3,7 @@ package collections
 import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/parser"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
@@ -23,10 +24,10 @@ func HandleNewCollectionProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.ProcessNewCollectionAwaitingName:
-		parseCollectionName(app, session, HandleNewCollectionCommand, requestNewCollectionDescription)
+		parser.ParseCollectionName(app, session, HandleNewCollectionCommand, requestNewCollectionDescription)
 
 	case states.ProcessNewCollectionAwaitingDescription:
-		parseCollectionDescription(app, session, requestNewCollectionDescription, finishNewCollectionProcess)
+		parser.ParseCollectionDescription(app, session, requestNewCollectionDescription, finishNewCollectionProcess)
 	}
 }
 

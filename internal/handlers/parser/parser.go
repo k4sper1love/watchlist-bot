@@ -3,6 +3,7 @@ package parser
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
@@ -29,4 +30,12 @@ func ProcessInput[T any, N int | float64](
 
 	setter(session, input)
 	next(app, session)
+}
+
+func ParseAndUploadImageFromMessage(app models.App) (string, error) {
+	image, err := utils.ParseImageFromMessage(app.Bot, app.Update)
+	if err != nil {
+		return "", err
+	}
+	return watchlist.UploadImage(app, image)
 }

@@ -77,21 +77,25 @@ func BuildAdminListKeyboard(session *models.Session, admins []models.Session) *t
 	keyboard := NewKeyboard()
 
 	if len(admins) > 0 {
-		keyboard.AddSearch(states.CallbackAdminListSelectFind)
+		keyboard.AddSearch(states.CallbackEntitiesSelectFind)
 	}
 
-	keyboard.AddAdminSelect(session, admins)
+	if session.AdminState.IsAdmin {
+		keyboard.AddAdminSelect(session, admins)
+	} else {
+		keyboard.AddAdminUserSelect(session, admins)
+	}
 
 	keyboard.AddNavigation(
 		session.AdminState.CurrentPage,
 		session.AdminState.LastPage,
-		states.CallbackAdminListPrevPage,
-		states.CallbackAdminListNextPage,
-		states.CallbackAdminListFirstPage,
-		states.CallbackAdminListLastPage,
+		states.CallbackEntitiesListPrevPage,
+		states.CallbackEntitiesListNextPage,
+		states.CallbackEntitiesFirstPage,
+		states.CallbackEntitiesListLastPage,
 	)
 
-	keyboard.AddBack(states.CallbackAdminListBack)
+	keyboard.AddBack(states.CallbackEntitiesListBack)
 
 	return keyboard.Build(session.Lang)
 }

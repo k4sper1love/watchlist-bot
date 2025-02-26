@@ -99,6 +99,18 @@ func BuildTokenCodeMessage(session *models.Session, code int) string {
 	return "🚨 " + translator.Translate(session.Lang, fmt.Sprintf("token%d", code), nil, nil)
 }
 
+func BuildSomeErrorMessage(session *models.Session) string {
+	return "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
+}
+
+func BuildNotFoundMessage(session *models.Session) string {
+	return "❗️" + translator.Translate(session.Lang, "notFound", nil, nil)
+}
+
+func BuildRequestFailureMessage(session *models.Session) string {
+	return "🚨" + translator.Translate(session.Lang, "requestFailure", nil, nil)
+}
+
 func toBold(text string) string {
 	return fmt.Sprintf("<b>%s</b>", text)
 }
