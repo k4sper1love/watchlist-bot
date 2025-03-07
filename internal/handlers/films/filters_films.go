@@ -28,15 +28,6 @@ func HandleFiltersFilmsButtons(app models.App, session *models.Session) {
 	}
 }
 
-func handleFiltersFilmsSelect(app models.App, session *models.Session, callback string) {
-	switch {
-	case strings.HasPrefix(callback, states.PrefixFiltersFilmsSelectRange):
-		handleFiltersFilmsRange(app, session, strings.TrimPrefix(callback, states.PrefixFiltersFilmsSelectRange))
-	case strings.HasPrefix(callback, states.PrefixFiltersFilmsSelectSwitch):
-		handleFiltersFilmsSwitch(app, session, strings.TrimPrefix(callback, states.PrefixFiltersFilmsSelectSwitch))
-	}
-}
-
 func HandleFiltersFilmsProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Update) {
 		resetFilmsStateAndHandleFiltersFilms(app, session)
@@ -48,6 +39,15 @@ func HandleFiltersFilmsProcess(app models.App, session *models.Session) {
 		parseFiltersFilmsRange(app, session, strings.TrimPrefix(session.State, states.PrefixFiltersFilmsAwaitingRange))
 	case strings.HasPrefix(session.State, states.PrefixFiltersFilmsAwaitingSwitch):
 		parseFiltersFilmsSwitch(app, session, strings.TrimPrefix(session.State, states.PrefixFiltersFilmsAwaitingSwitch))
+	}
+}
+
+func handleFiltersFilmsSelect(app models.App, session *models.Session, callback string) {
+	switch {
+	case strings.HasPrefix(callback, states.PrefixFiltersFilmsSelectRange):
+		handleFiltersFilmsRange(app, session, strings.TrimPrefix(callback, states.PrefixFiltersFilmsSelectRange))
+	case strings.HasPrefix(callback, states.PrefixFiltersFilmsSelectSwitch):
+		handleFiltersFilmsSwitch(app, session, strings.TrimPrefix(callback, states.PrefixFiltersFilmsSelectSwitch))
 	}
 }
 

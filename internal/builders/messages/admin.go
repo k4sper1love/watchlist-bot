@@ -375,3 +375,28 @@ func BuildFeedbackDeleteSuccessMessage(session *models.Session) string {
 		"ID": session.AdminState.FeedbackID,
 	}, nil)
 }
+
+func BuildLogsNotFoundMessage(session *models.Session) string {
+	return "❗" + translator.Translate(session.Lang, "logsNotFound", nil, nil)
+}
+
+func BuildLogsFoundMessage(session *models.Session) string {
+	return "💾 " + translator.Translate(session.Lang, "logsFound", map[string]interface{}{
+		"ID": session.AdminState.UserID,
+	}, nil)
+}
+
+func BuildNeedRemoveRoleMessage(session *models.Session) string {
+	return "❗" + translator.Translate(session.Lang, "needRemoveRole", nil, nil)
+}
+
+func BuildRequestBanReasonMessage(session *models.Session) string {
+	return "❓" + translator.Translate(session.Lang, "requestBanReason", nil, nil)
+}
+
+func BuildUserRoleMessage(session *models.Session) string {
+	part1 := translator.Translate(session.Lang, "currentRole", nil, nil)
+	part2 := translator.Translate(session.Lang, session.AdminState.UserRole.String(), nil, nil)
+	part3 := translator.Translate(session.Lang, "choiceRole", nil, nil)
+	return fmt.Sprintf("<b>%s</b>: %s\n\n%s", part1, part2, part3)
+}

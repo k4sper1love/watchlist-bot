@@ -113,28 +113,7 @@ func parseEntitiesFind(app models.App, session *models.Session) {
 		return
 	}
 
-	input := utils.ParseMessageString(app.Update)
-	var user *models.Session
-	var err error
-
-	if strings.HasPrefix(input, "@") {
-		user, err = postgres.GetUserByField(postgres.TelegramUsernameField, strings.TrimPrefix(input, "@"), session.AdminState.IsAdmin)
-	} else if strings.HasPrefix(input, "api_") {
-		id, errConv := strconv.Atoi(strings.TrimPrefix(input, "api_"))
-		if errConv == nil {
-			user, err = postgres.GetUserByAPIUserID(id, session.AdminState.IsAdmin)
-		} else {
-			err = errConv
-		}
-	} else {
-		telegramID, errConv := strconv.Atoi(input)
-		if errConv == nil {
-			user, err = postgres.GetUserByField(postgres.TelegramIDField, telegramID, session.AdminState.IsAdmin)
-		} else {
-			err = errConv
-		}
-	}
-
+	user, err := parseEntityByField(session, utils.ParseMessageString(app.Update))
 	if err != nil || user == nil {
 		app.SendMessage(messages.BuildNotFoundMessage(session), nil)
 		HandleEntitiesCommand(app, session)
@@ -144,6 +123,27 @@ func parseEntitiesFind(app models.App, session *models.Session) {
 	session.AdminState.UserID = user.TelegramID
 	session.ClearState()
 	HandleEntityDetailCommand(app, session)
+}
+
+func parseEntityByField(session *models.Session, input string) (*models.Session, error) {
+	switch {
+	case strings.HasPrefix(input, "@"):
+		return postgres.GetUserByField(postgres.TelegramUsernameField, strings.TrimPrefix(input, "@"), session.AdminState.IsAdmin)
+
+	case strings.HasPrefix(input, "api_"):
+		id, err := strconv.Atoi(strings.TrimPrefix(input, "api_"))
+		if err != nil {
+			return nil, err
+		}
+		return postgres.GetUserByAPIUserID(id, session.AdminState.IsAdmin)
+
+	default:
+		telegramID, err := strconv.Atoi(input)
+		if err != nil {
+			return nil, err
+		}
+		return postgres.GetUserByField(postgres.TelegramIDField, telegramID, session.AdminState.IsAdmin)
+	}
 }
 
 func getSelectEntityPrefix(session *models.Session) string {

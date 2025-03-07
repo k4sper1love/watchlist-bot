@@ -181,7 +181,7 @@ func BuildAdminUserRoleKeyboard(session *models.Session) *tgbotapi.InlineKeyboar
 		keyboard.AddButtons(superRoleButton)
 	}
 
-	keyboard.AddBack(states.CallbackAdminUserRoleSelectBack)
+	keyboard.AddBack(states.CallbackAdminUserDetailAgain)
 
 	return keyboard.Build(session.Lang)
 }

@@ -49,7 +49,7 @@ func handleRoleChange(app models.App, session *models.Session, raise bool) {
 		return
 	}
 
-	notifyUser(app, session, raise)
+	notifyUserAboutRole(app, session, raise)
 	app.SendMessage(messages.BuildRoleChangeMessage(session, raise), nil)
 	general.RequireRole(app, session, HandleAdminDetailCommand, roles.Admin)
 }
@@ -74,7 +74,7 @@ func getNewRole(current roles.Role, raise bool) roles.Role {
 	return current.PrevRole()
 }
 
-func notifyUser(app models.App, session *models.Session, raise bool) {
+func notifyUserAboutRole(app models.App, session *models.Session, raise bool) {
 	if raise {
 		app.SendMessageByID(session.AdminState.UserID, messages.BuildRaiseRoleNotificationMessage(session), nil)
 	} else {

@@ -32,12 +32,6 @@ func HandleFeedbackDetailButtons(app models.App, session *models.Session) {
 }
 
 func handleFeedbackDetailDelete(app models.App, session *models.Session) {
-	//feedback, err := postgres.GetFeedbackByID(session.AdminState.FeedbackID)
-	//if err != nil {
-	//	app.SendMessage(messages.BuildSomeErrorMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminSelectFeedback))
-	//	return
-	//}
-
 	if err := postgres.DeleteFeedbackByID(session.AdminState.FeedbackID); err != nil {
 		app.SendMessage(messages.BuildSomeErrorMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminSelectFeedback))
 		return

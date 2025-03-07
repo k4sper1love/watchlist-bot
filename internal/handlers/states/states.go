@@ -85,7 +85,7 @@ const (
 	// admin user detail states
 	PrefixAdminUserDetail                = "admin_user_detail_"
 	PrefixSelectAdminUserRole            = "admin_user_role_select_"
-	CallbackAdminUserDetail              = "admin_user_detail"
+	CallbackAdminUserDetailAgain         = "admin_user_detail_again"
 	CallbackAdminUserDetailBack          = "admin_user_detail_back"
 	CallbackAdminUserDetailLogs          = "admin_user_detail_logs"
 	CallbackAdminUserDetailRole          = "admin_user_detail_role"
@@ -115,7 +115,6 @@ const (
 	CallbackAdminFeedbackDetailDelete = "admin_feedback_detail_delete"
 
 	// admin user roles states
-	CallbackAdminUserRoleSelectBack   = "admin_user_role_select_back"
 	CallbackAdminUserRoleSelectUser   = "admin_user_role_select_user"
 	CallbackAdminUserRoleSelectHelper = "admin_user_role_select_helper"
 	CallbackAdminUserRoleSelectAdmin  = "admin_user_role_select_admin"
