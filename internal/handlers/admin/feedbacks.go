@@ -15,9 +15,9 @@ import (
 
 func HandleFeedbacksCommand(app models.App, session *models.Session) {
 	if feedbacks, err := getFeedbacks(session); err != nil {
-		app.SendMessage(messages.BuildSomeErrorMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectAdmin))
+		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectAdmin))
 	} else {
-		app.SendMessage(messages.BuildFeedbackListMessage(session, feedbacks), keyboards.BuildFeedbackListKeyboard(session, feedbacks))
+		app.SendMessage(messages.FeedbackList(session, feedbacks), keyboards.BuildFeedbackListKeyboard(session, feedbacks))
 	}
 }
 
@@ -43,28 +43,28 @@ func handleFeedbackPagination(app models.App, session *models.Session, callback 
 	switch callback {
 	case states.CallbackAdminFeedbackListNextPage:
 		if session.AdminState.CurrentPage >= session.AdminState.LastPage {
-			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage++
 
 	case states.CallbackAdminFeedbackListPrevPage:
 		if session.AdminState.CurrentPage <= 1 {
-			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage--
 
 	case states.CallbackAdminFeedbackListLastPage:
 		if session.AdminState.CurrentPage == session.AdminState.LastPage {
-			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage = session.AdminState.LastPage
 
 	case states.CallbackAdminFeedbackListFirstPage:
 		if session.AdminState.CurrentPage == 1 {
-			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage = 1
@@ -76,7 +76,7 @@ func handleFeedbackPagination(app models.App, session *models.Session, callback 
 func handleFeedbackSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.PrefixSelectAdminFeedback)); err != nil {
 		utils.LogParseSelectError(err, callback)
-		app.SendMessage(messages.BuildSomeErrorMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminSelectFeedback))
+		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminSelectFeedback))
 	} else {
 		session.AdminState.FeedbackID = id
 		HandleFeedbackDetailCommand(app, session)

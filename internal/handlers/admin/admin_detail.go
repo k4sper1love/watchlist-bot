@@ -13,9 +13,9 @@ import (
 
 func HandleAdminDetailCommand(app models.App, session *models.Session) {
 	if admin, err := getEntity(session); err != nil {
-		app.SendMessage(messages.BuildSomeErrorMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminSelectAdmins))
+		resetAdminPageAndHandle(app, session, HandleEntitiesCommand, roles.Admin)
 	} else {
-		app.SendMessage(messages.BuildAdminUserDetailMessage(session, admin), keyboards.BuildAdminDetailKeyboard(session, admin))
+		app.SendMessage(messages.UserDetail(session, admin), keyboards.BuildAdminDetailKeyboard(session, admin))
 	}
 }
 
@@ -40,17 +40,17 @@ func HandleAdminDetailButtons(app models.App, session *models.Session) {
 
 func handleRoleChange(app models.App, session *models.Session, raise bool) {
 	if !canChangeRole(session, raise) {
-		app.SendMessage(messages.BuildNoAccessMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminDetailAgain))
+		app.SendMessage(messages.NoAccess(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminDetailAgain))
 		return
 	}
 
 	if err := postgres.SetUserRole(session.AdminState.UserID, getNewRole(session.AdminState.UserRole, raise)); err != nil {
-		app.SendMessage(messages.BuildSomeErrorMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminDetailAgain))
+		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminDetailAgain))
 		return
 	}
 
-	notifyUserAboutRole(app, session, raise)
-	app.SendMessage(messages.BuildRoleChangeMessage(session, raise), nil)
+	app.SendMessageByID(session.AdminState.UserID, messages.ShiftRoleNotification(session, raise), nil)
+	app.SendMessage(messages.ShiftRole(session, raise), nil)
 	general.RequireRole(app, session, HandleAdminDetailCommand, roles.Admin)
 }
 
@@ -64,7 +64,7 @@ func canChangeRole(session *models.Session, raise bool) bool {
 	if raise {
 		return !(session.AdminState.UserRole.HasAccess(roles.Admin) && !session.Role.HasAccess(roles.Root) || session.AdminState.UserRole.HasAccess(roles.SuperAdmin))
 	}
-	return !(session.AdminState.UserRole.HasAccess(roles.SuperAdmin) && !session.Role.HasAccess(roles.Root) || session.AdminState.UserRole.HasAccess(roles.User))
+	return !(session.AdminState.UserRole.HasAccess(roles.SuperAdmin) && !session.Role.HasAccess(roles.Root) || session.AdminState.UserRole == roles.User)
 }
 
 func getNewRole(current roles.Role, raise bool) roles.Role {
@@ -74,26 +74,18 @@ func getNewRole(current roles.Role, raise bool) roles.Role {
 	return current.PrevRole()
 }
 
-func notifyUserAboutRole(app models.App, session *models.Session, raise bool) {
-	if raise {
-		app.SendMessageByID(session.AdminState.UserID, messages.BuildRaiseRoleNotificationMessage(session), nil)
-	} else {
-		app.SendMessageByID(session.AdminState.UserID, messages.BuildLowerRoleNotificationMessage(session), nil)
-	}
-}
-
 func handleRemoveRole(app models.App, session *models.Session) {
-	if session.AdminState.UserRole.HasAccess(session.Role) {
-		app.SendMessage(messages.BuildNoAccessMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminDetailAgain))
+	if session.AdminState.UserRole.HasAccess(session.Role) && session.Role.HasAccess(roles.SuperAdmin) {
+		app.SendMessage(messages.NoAccess(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminDetailAgain))
 		return
 	}
 
 	if err := postgres.SetUserRole(session.AdminState.UserID, roles.User); err != nil {
-		app.SendMessage(messages.BuildSomeErrorMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminDetailAgain))
+		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminDetailAgain))
 		return
 	}
 
-	app.SendMessageByID(session.AdminState.UserID, messages.BuildRemoveRoleNotificationMessage(session), nil)
-	app.SendMessage(messages.BuildRemoveRoleMessage(session), nil)
+	app.SendMessageByID(session.AdminState.UserID, messages.RemoveRoleNotification(session), nil)
+	app.SendMessage(messages.RemoveRole(session), nil)
 	general.RequireRole(app, session, HandleAdminDetailCommand, roles.Admin)
 }

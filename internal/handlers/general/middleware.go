@@ -20,7 +20,7 @@ func Auth(app models.App, session *models.Session) bool {
 		return true
 	}
 
-	app.SendMessage(messages.BuildAuthFailureMessage(session), nil)
+	app.SendMessage(messages.AuthFailure(session), nil)
 	session.ClearAllStates()
 	return false
 }
@@ -37,7 +37,7 @@ func RequireRole(app models.App, session *models.Session, next func(models.App, 
 		return
 	}
 
-	app.SendMessage(messages.BuildPermissionsNotEnoughMessage(session), keyboards.BuildKeyboardWithBack(session, ""))
+	app.SendMessage(messages.PermissionsNotEnough(session), keyboards.BuildKeyboardWithBack(session, ""))
 	session.ClearState()
 }
 
@@ -46,7 +46,7 @@ func IsBanned(app models.App, session *models.Session) bool {
 		return false
 	}
 
-	app.SendMessage(messages.BuildBannedMessage(session), nil)
+	app.SendMessage(messages.Banned(session), nil)
 	return true
 }
 
@@ -66,6 +66,6 @@ func attemptLoginOrRegister(app models.App, session *models.Session) error {
 		return err
 	}
 
-	app.SendMessage(messages.BuildRegistrationSuccessMessage(session), nil)
+	app.SendMessage(messages.RegistrationSuccess(session), nil)
 	return nil
 }

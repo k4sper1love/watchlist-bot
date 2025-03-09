@@ -10,7 +10,7 @@ import (
 )
 
 func HandleSortingCollectionsCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildSortingMessage(session), keyboards.BuildCollectionsSortingKeyboard(session))
+	app.SendMessage(messages.ChoiceSorting(session), keyboards.BuildCollectionsSortingKeyboard(session))
 }
 
 func HandleSortingCollectionsButtons(app models.App, session *models.Session) {
@@ -46,7 +46,7 @@ func HandleSortingCollectionsProcess(app models.App, session *models.Session) {
 }
 
 func handleSortingCollectionsDirection(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildSelectedSortMessage(session, session.CollectionsState.Sorting), keyboards.BuildSortingDirectionKeyboard(session, session.CollectionsState.Sorting))
+	app.SendMessage(messages.RequestSortDirection(session, session.CollectionsState.Sorting), keyboards.BuildSortingDirectionKeyboard(session, session.CollectionsState.Sorting))
 	session.SetState(states.ProcessSortingCollectionsAwaitingDirection)
 }
 
@@ -61,13 +61,13 @@ func parseSortingCollectionsDirection(app models.App, session *models.Session) {
 	}
 
 	session.CollectionsState.Sorting.SetSort()
-	app.SendMessage(messages.BuildSortingAppliedMessage(session, session.CollectionsState.Sorting), nil)
+	app.SendMessage(messages.SortingApplied(session, session.CollectionsState.Sorting), nil)
 	handleWithResetCollectionsPage(app, session, HandleCollectionsCommand)
 }
 
 func handleSortingCollectionsReset(app models.App, session *models.Session, next func(models.App, *models.Session)) {
 	session.CollectionsState.Sorting.ResetSorting()
-	app.SendMessage(messages.BuildSortingResetSuccessMessage(session), nil)
+	app.SendMessage(messages.ResetSortingSuccess(session), nil)
 	handleWithResetCollectionsPage(app, session, next)
 }
 

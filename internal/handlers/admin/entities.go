@@ -15,9 +15,9 @@ import (
 
 func HandleEntitiesCommand(app models.App, session *models.Session) {
 	if entities, err := getEntities(session); err != nil {
-		app.SendMessage(messages.BuildSomeErrorMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectAdmin))
+		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectAdmin))
 	} else {
-		app.SendMessage(messages.BuildAdminUserListMessage(session, entities), keyboards.BuildAdminListKeyboard(session, entities))
+		app.SendMessage(messages.UserList(session, entities), keyboards.BuildAdminListKeyboard(session, entities))
 	}
 }
 
@@ -53,28 +53,28 @@ func handleEntitiesPagination(app models.App, session *models.Session, callback 
 	switch callback {
 	case states.CallbackEntitiesListNextPage:
 		if session.AdminState.CurrentPage >= session.AdminState.LastPage {
-			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage++
 
 	case states.CallbackEntitiesListPrevPage:
 		if session.AdminState.CurrentPage <= 1 {
-			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage--
 
 	case states.CallbackEntitiesListLastPage:
 		if session.AdminState.CurrentPage == session.AdminState.LastPage {
-			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage = session.AdminState.LastPage
 
 	case states.CallbackEntitiesFirstPage:
 		if session.AdminState.CurrentPage == 1 {
-			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage = 1
@@ -86,7 +86,7 @@ func handleEntitiesPagination(app models.App, session *models.Session, callback 
 func handleEntitiesSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, getSelectEntityPrefix(session))); err != nil {
 		utils.LogParseSelectError(err, callback)
-		app.SendMessage(messages.BuildSomeErrorMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectAdmin))
+		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectAdmin))
 	} else {
 		session.AdminState.UserID = id
 		HandleEntityDetailCommand(app, session)
@@ -102,7 +102,7 @@ func HandleEntityDetailCommand(app models.App, session *models.Session) {
 }
 
 func handleEntitiesFindCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildAdminRequestIDOrUsernameMessage(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestEntityField(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessEntitiesAwaitingFind)
 }
 
@@ -115,8 +115,8 @@ func parseEntitiesFind(app models.App, session *models.Session) {
 
 	user, err := parseEntityByField(session, utils.ParseMessageString(app.Update))
 	if err != nil || user == nil {
-		app.SendMessage(messages.BuildNotFoundMessage(session), nil)
-		HandleEntitiesCommand(app, session)
+		app.SendMessage(messages.NotFound(session), nil)
+		handleEntitiesFindCommand(app, session)
 		return
 	}
 

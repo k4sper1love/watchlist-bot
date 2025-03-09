@@ -149,7 +149,7 @@ func BuildAdminDetailKeyboard(session *models.Session, user *models.Session) *tg
 		keyboard.AddRaiseRank()
 	}
 
-	if user.Role.HasAccess(roles.Helper) && !user.Role.HasAccess(roles.Root) {
+	if user.Role.HasAccess(roles.Admin) && !user.Role.HasAccess(roles.Root) {
 		keyboard.AddLowerRank()
 	}
 
@@ -189,7 +189,7 @@ func BuildAdminUserRoleKeyboard(session *models.Session) *tgbotapi.InlineKeyboar
 func BuildBroadcastConfirmKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := NewKeyboard()
 
-	keyboard.addSendBroadcast()
+	keyboard.AddSendBroadcast()
 
 	keyboard.AddCancel()
 
@@ -264,7 +264,7 @@ func (k *Keyboard) AddFeedbackDelete() *Keyboard {
 	return k.AddButton("🗑️", "delete", states.CallbackAdminFeedbackDetailDelete, "", true)
 }
 
-func (k *Keyboard) addSendBroadcast() *Keyboard {
+func (k *Keyboard) AddSendBroadcast() *Keyboard {
 	return k.AddButton("➤", "send", states.CallbackAdminBroadcastSend, "", true)
 }
 

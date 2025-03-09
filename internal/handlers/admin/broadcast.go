@@ -11,7 +11,7 @@ import (
 )
 
 func HandleBroadcastCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildRequestBroadcastImageMessage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestBroadcastImage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
 	session.SetState(states.ProcessAdminBroadcastAwaitingImage)
 }
 
@@ -38,40 +38,40 @@ func HandleBroadcastProcess(app models.App, session *models.Session) {
 }
 
 func requestBroadcastMessage(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildRequestBroadcastMessage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestBroadcastMessage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
 	session.SetState(states.ProcessAdminBroadcastAwaitingText)
 }
 
 func requestBroadcastPin(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildRequestBroadcastPinMessage(session), keyboards.BuildKeyboardWithSurveyAndCancel(session))
+	app.SendMessage(messages.RequestBroadcastPin(session), keyboards.BuildKeyboardWithSurveyAndCancel(session))
 	session.SetState(states.ProcessAdminBroadcastAwaitingPin)
 }
 
 func previewBroadcast(app models.App, session *models.Session) {
+	if session.AdminState.Message == "" && session.AdminState.ImageURL == "" {
+		app.SendMessage(messages.BroadcastEmpty(session), nil)
+		clearStatesAndHandleMenu(app, session)
+		return
+	}
+
 	if session.AdminState.ImageURL != "" {
-		app.SendImage(session.AdminState.ImageURL, messages.BuildBroadcastPreviewMessage(session), nil)
+		app.SendImage(session.AdminState.ImageURL, messages.BroadcastPreview(session), nil)
 	} else {
-		app.SendMessage(messages.BuildBroadcastPreviewMessage(session), nil)
+		app.SendMessage(messages.BroadcastPreview(session), nil)
 	}
 
 	requestBroadcastConfirm(app, session)
 }
 
 func requestBroadcastConfirm(app models.App, session *models.Session) {
-	if session.AdminState.Message == "" && session.AdminState.ImageURL == "" {
-		app.SendMessage(messages.BuildBroadcastEmptyMessage(session), nil)
-		clearStatesAndHandleMenu(app, session)
-		return
-	}
-
 	count, err := postgres.GetUserCount(false)
 	if err != nil {
-		app.SendMessage(messages.BuildRequestFailureMessage(session), nil)
+		app.SendMessage(messages.RequestFailure(session), nil)
 		clearStatesAndHandleMenu(app, session)
 		return
 	}
 
-	app.SendMessage(messages.BuildBroadcastConfirmMessage(session, count), keyboards.BuildBroadcastConfirmKeyboard(session))
+	app.SendMessage(messages.BroadcastConfirm(session, count), keyboards.BuildBroadcastConfirmKeyboard(session))
 	session.SetState(states.ProcessAdminBroadcastAwaitingConfirm)
 }
 
@@ -83,7 +83,7 @@ func parseBroadcastConfirm(app models.App, session *models.Session) {
 
 	ids, err := postgres.GetTelegramIDs()
 	if err != nil {
-		app.SendMessage(messages.BuildRequestFailureMessage(session), nil)
+		app.SendMessage(messages.RequestFailure(session), nil)
 		clearStatesAndHandleMenu(app, session)
 		return
 	}

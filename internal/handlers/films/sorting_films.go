@@ -10,7 +10,7 @@ import (
 )
 
 func HandleSortingFilmsCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildSortingMessage(session), keyboards.BuildFilmsSortingKeyboard(session))
+	app.SendMessage(messages.ChoiceSorting(session), keyboards.BuildFilmsSortingKeyboard(session))
 }
 
 func HandleSortingFilmsButtons(app models.App, session *models.Session) {
@@ -46,7 +46,7 @@ func HandleSortingFilmsProcess(app models.App, session *models.Session) {
 }
 
 func handleSortingFilmsDirection(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildSelectedSortMessage(session, session.GetFilmsSortingByContext()), keyboards.BuildSortingDirectionKeyboard(session, session.GetFilmsSortingByContext()))
+	app.SendMessage(messages.RequestSortDirection(session, session.GetFilmsSortingByContext()), keyboards.BuildSortingDirectionKeyboard(session, session.GetFilmsSortingByContext()))
 	session.SetState(states.ProcessSortingFilmsAwaitingDirection)
 }
 
@@ -61,13 +61,13 @@ func parseSortingFilmsDirection(app models.App, session *models.Session) {
 	}
 
 	session.GetFilmsSortingByContext().SetSort()
-	app.SendMessage(messages.BuildSortingAppliedMessage(session, session.GetFilmsSortingByContext()), nil)
+	app.SendMessage(messages.SortingApplied(session, session.GetFilmsSortingByContext()), nil)
 	handleWithResetFilmsPage(app, session, HandleFilmsCommand)
 }
 
 func handleSortingFilmsReset(app models.App, session *models.Session, next func(models.App, *models.Session)) {
 	session.GetFilmsSortingByContext().ResetSorting()
-	app.SendMessage(messages.BuildSortingResetSuccessMessage(session), nil)
+	app.SendMessage(messages.ResetSortingSuccess(session), nil)
 	handleWithResetFilmsPage(app, session, next)
 }
 

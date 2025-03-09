@@ -13,9 +13,9 @@ import (
 
 func HandleFeedbackDetailCommand(app models.App, session *models.Session) {
 	if feedback, err := postgres.GetFeedbackByID(session.AdminState.FeedbackID); err != nil {
-		app.SendMessage(messages.BuildSomeErrorMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminSelectFeedback))
+		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminSelectFeedback))
 	} else {
-		app.SendMessage(messages.BuildFeedbackDetailMessage(session, feedback), keyboards.BuildAdminFeedbackDetailKeyboard(session))
+		app.SendMessage(messages.FeedbackDetail(session, feedback), keyboards.BuildAdminFeedbackDetailKeyboard(session))
 	}
 }
 
@@ -33,10 +33,10 @@ func HandleFeedbackDetailButtons(app models.App, session *models.Session) {
 
 func handleFeedbackDetailDelete(app models.App, session *models.Session) {
 	if err := postgres.DeleteFeedbackByID(session.AdminState.FeedbackID); err != nil {
-		app.SendMessage(messages.BuildSomeErrorMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminSelectFeedback))
+		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminSelectFeedback))
 		return
 	}
 
-	app.SendMessage(messages.BuildFeedbackDeleteSuccessMessage(session), nil)
+	app.SendMessage(messages.FeedbackDeleteSuccess(session), nil)
 	HandleFeedbacksCommand(app, session)
 }

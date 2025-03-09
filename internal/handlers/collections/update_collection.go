@@ -11,7 +11,7 @@ import (
 )
 
 func HandleUpdateCollectionCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildUpdateCollectionMessage(session), keyboards.BuildCollectionUpdateKeyboard(session))
+	app.SendMessage(messages.UpdateCollection(session), keyboards.BuildCollectionUpdateKeyboard(session))
 }
 
 func HandleUpdateCollectionButtons(app models.App, session *models.Session) {
@@ -48,20 +48,20 @@ func finishUpdateCollectionProcess(app models.App, session *models.Session) {
 }
 
 func handleUpdateCollectionName(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildCollectionRequestNameMessage(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestCollectionName(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateCollectionAwaitingName)
 }
 
 func handleUpdateCollectionDescription(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildCollectionRequestDescriptionMessage(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestCollectionDescription(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateCollectionAwaitingDescription)
 }
 
 func HandleUpdateCollection(app models.App, session *models.Session, back func(models.App, *models.Session)) {
 	if err := updateCollectionAndState(app, session); err != nil {
-		app.SendMessage(messages.BuildUpdateCollectionFailureMessage(session), nil)
+		app.SendMessage(messages.UpdateCollectionFailure(session), nil)
 	} else {
-		app.SendMessage(messages.BuildUpdateCollectionSuccessMessage(session), nil)
+		app.SendMessage(messages.UpdateCollectionSuccess(session), nil)
 	}
 
 	session.ClearAllStates()

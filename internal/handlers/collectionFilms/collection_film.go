@@ -31,11 +31,11 @@ func handleFilmsWithContext(app models.App, session *models.Session) {
 func addFilmToCollection(app models.App, session *models.Session) {
 	collectionFilm, err := watchlist.AddCollectionFilm(app, session)
 	if err != nil {
-		app.SendMessage(messages.BuildCreateFilmFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectFilms))
+		app.SendMessage(messages.CreateFilmFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectFilms))
 		return
 	}
 
-	app.SendMessage(messages.BuildFilmToCollectionSuccessMessage(session, collectionFilm), nil)
+	app.SendMessage(messages.AddFilmToCollectionSuccess(session, collectionFilm), nil)
 	session.ClearAllStates()
 	handleFilmsWithContext(app, session)
 }

@@ -11,29 +11,39 @@ import (
 	"unicode/utf8"
 )
 
-func BuildFilmDetailMessage(session *models.Session) string {
+func FilmDetail(session *models.Session) string {
 	film := session.FilmDetailState.Film
+	return fmt.Sprintf("%s%s%s\n\n%s%s%s%s%s",
+		toBold(film.Title),
+		toItalic(formatOptionalNumber("", film.Year, 0, "%s (%d)")),
+		formatOptionalBool("⭐", film.IsFavorite, " %s"),
+		formatFilmDetails(&film),
+		formatOptionalString(toBold(translator.Translate(session.Lang, "description", nil, nil)),
+			toItalic(film.Description), "%s:\n%s\n\n"),
+		formatOptionalString(toBold(translator.Translate(session.Lang, "comment", nil, nil)),
+			toItalic(film.Comment), "%s:\n%s\n\n"),
+		formatOptionalString(toBold(translator.Translate(session.Lang, "review", nil, nil)),
+			formatOptionalBool(toItalic(film.Review), film.IsViewed, "%s"), "%s:\n%s\n\n"),
+		formatOptionalBool(toItalic(session.CollectionDetailState.Collection.Name), session.Context == states.ContextCollection, "📚 %s\n\n"))
+}
 
-	var msg strings.Builder
+func FilmGeneral(session *models.Session, film *apiModels.Film, needViewed bool) string {
+	return fmt.Sprintf("%s%s | %s\n%s%s\n",
+		toBold(film.Title),
+		toItalic(fmt.Sprintf(" (%d)", film.Year)),
+		utils.ViewedToEmojiColored(film.IsViewed),
+		formatFilmGeneralDetails(film, needViewed),
+		formatFilmGeneralDescription(session, film))
+}
 
-	msg.WriteString(fmt.Sprintf("<b>%s</b>", film.Title))
+func formatFilmDetails(film *apiModels.Film) string {
+	var details []string
 
-	if film.Year != 0 {
-		msg.WriteString(fmt.Sprintf(" <i>(%d)</i>", film.Year))
-	}
-
-	if film.IsFavorite {
-		msg.WriteString(fmt.Sprintf(" ⭐"))
-	}
-
-	msg.WriteString("\n\n")
-
-	details := make([]string, 0)
 	details = append(details, utils.ViewedToEmojiColored(film.IsViewed))
-
 	details = append(details, fmt.Sprintf("%d", film.ID))
+
 	if film.Genre != "" {
-		details = append(details, fmt.Sprintf("%s", film.Genre))
+		details = append(details, film.Genre)
 	}
 	if film.Rating != 0 {
 		details = append(details, fmt.Sprintf("★%.2f", film.Rating))
@@ -41,50 +51,16 @@ func BuildFilmDetailMessage(session *models.Session) string {
 	if film.IsViewed && film.UserRating != 0 {
 		details = append(details, fmt.Sprintf("👤%.2f", film.UserRating))
 	}
+
 	if len(details) > 0 {
-		msg.WriteString(strings.Join(details, " | ") + "\n\n")
+		return strings.Join(details, " | ") + "\n\n"
 	}
-
-	if film.Description != "" {
-		msg.WriteString(fmt.Sprintf("<b>Описание:</b>\n<i>%s</i>\n\n", film.Description))
-	}
-
-	if film.Comment != "" {
-		commentMsg := translator.Translate(session.Lang, "comment", nil, nil)
-		msg.WriteString(fmt.Sprintf("<b>%s:</b>\n<i>%s</i>\n\n", commentMsg, film.Comment))
-	}
-
-	if film.IsViewed && film.Review != "" {
-		reviewMsg := translator.Translate(session.Lang, "review", nil, nil)
-		msg.WriteString(fmt.Sprintf("<b>%s:</b>\n<i>%s</i>\n\n", reviewMsg, film.Review))
-	}
-
-	if session.Context == states.ContextCollection {
-		msg.WriteString(fmt.Sprintf("📚 <i>%s</i>\n\n", session.CollectionDetailState.Collection.Name))
-	}
-
-	return msg.String()
+	return ""
 }
 
-func BuildFilmDetailWithNumberMessage(session *models.Session, itemID int) string {
-	numberEmoji := utils.NumberToEmoji(itemID)
+func formatFilmGeneralDetails(film *apiModels.Film, needViewed bool) string {
+	var details []string
 
-	msg := fmt.Sprintf("%s", numberEmoji)
-	return msg + BuildFilmDetailMessage(session)
-}
-
-func BuildFilmGeneralMessage(session *models.Session, film *apiModels.Film, needViewed bool) string {
-	var msg strings.Builder
-
-	msg.WriteString(fmt.Sprintf("<b>%s</b>", film.Title))
-
-	if film.Year != 0 {
-		msg.WriteString(fmt.Sprintf(" <i>(%d)</i>", film.Year))
-	}
-
-	msg.WriteString(fmt.Sprintf(" | %s\n", utils.ViewedToEmojiColored(film.IsViewed)))
-
-	details := make([]string, 0)
 	if film.Genre != "" {
 		details = append(details, fmt.Sprintf("%s", film.Genre))
 	}
@@ -94,42 +70,30 @@ func BuildFilmGeneralMessage(session *models.Session, film *apiModels.Film, need
 	if needViewed && film.IsViewed && film.UserRating != 0 {
 		details = append(details, fmt.Sprintf("👤%.2f", film.UserRating))
 	}
+
 	if len(details) > 0 {
-		msg.WriteString(strings.Join(details, " , ") + "\n")
+		return strings.Join(details, " , ") + "\n"
 	}
-
-	if film.Description != "" {
-		if film.Genre == "YouTube Video" {
-			parts := strings.Split(film.Description, "\n")
-			parts = strings.Split(parts[0], ":")
-			author := strings.TrimSpace(parts[1])
-			film.Description = fmt.Sprintf("👨‍💼 <i>%s</i>", author)
-
-			msg.WriteString(fmt.Sprintf("%s\n", film.Description))
-
-		} else {
-			if utf8.RuneCountInString(film.Description) > 230 {
-				film.Description, _ = utils.SplitTextByLength(film.Description, 230)
-			}
-
-			descriptionMsg := translator.Translate(session.Lang, "description", nil, nil)
-			msg.WriteString(fmt.Sprintf("<b>%s:</b>\n<i>%s</i>\n", descriptionMsg, film.Description))
-		}
-	}
-
-	msg.WriteString("\n")
-
-	return msg.String()
+	return ""
 }
 
-func viewedToString(session *models.Session, viewed bool) string {
-	var messageCode string
-
-	if viewed {
-		messageCode = "viewed"
-	} else {
-		messageCode = "notViewed"
+func formatFilmGeneralDescription(session *models.Session, film *apiModels.Film) string {
+	if film.Description == "" {
+		return ""
 	}
 
-	return translator.Translate(session.Lang, messageCode, nil, nil)
+	if film.Genre == "YouTube Video" {
+		parts := strings.Split(strings.Split(film.Description, "\n")[0], ":")
+		film.Description = fmt.Sprintf("👨‍💼 %s", toItalic(strings.TrimSpace(parts[1])))
+		return fmt.Sprintf("%s\n\n", film.Description)
+	}
+
+	if utf8.RuneCountInString(film.Description) > 230 {
+		film.Description, _ = utils.SplitTextByLength(film.Description, 230)
+	}
+
+	return fmt.Sprintf("%s:\n%s\n",
+		toBold(translator.Translate(session.Lang, "description", nil, nil)),
+		toItalic(film.Description),
+	)
 }

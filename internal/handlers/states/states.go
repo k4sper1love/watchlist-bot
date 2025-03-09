@@ -34,7 +34,7 @@ const (
 	PrefixFeedbackCategory              = "feedback_category_"
 	CallbackFeedbackCategorySuggestions = "feedback_category_suggestions"
 	CallbackFeedbackCategoryBugs        = "feedback_category_bugs"
-	CallbackFeedbackCategoryOther       = "feedback_category_other"
+	CallbackFeedbackCategoryIssues      = "feedback_category_issues"
 	ProcessFeedbackAwaitingMessage      = "feedback_awaiting_message"
 
 	// logout states

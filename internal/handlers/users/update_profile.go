@@ -10,7 +10,7 @@ import (
 )
 
 func HandleUpdateProfileCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildUpdateProfileMessage(session), keyboards.BuildUpdateProfileKeyboard(session))
+	app.SendMessage(messages.UpdateProfile(session), keyboards.BuildUpdateProfileKeyboard(session))
 }
 
 func HandleUpdateProfileButtons(app models.App, session *models.Session) {
@@ -40,7 +40,7 @@ func HandleUpdateProfileProcess(app models.App, session *models.Session) {
 }
 
 func handleUpdateProfileUsername(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildUpdateProfileUsernameMessage(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestProfileUsername(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateProfileAwaitingUsername)
 }
 
@@ -50,7 +50,7 @@ func parseUpdateProfileUsername(app models.App, session *models.Session) {
 }
 
 func handleUpdateProfileEmail(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildUpdateProfileEmailMessage(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestProfileEmail(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessUpdateProfileAwaitingEmail)
 }
 
@@ -77,11 +77,11 @@ func finishUpdateProfileProcess(app models.App, session *models.Session) {
 func updateProfile(app models.App, session *models.Session) error {
 	user, err := watchlist.UpdateUser(app, session)
 	if err != nil {
-		app.SendMessage(messages.BuildUpdateProfileFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackProfileSelectUpdate))
+		app.SendMessage(messages.UpdateProfileFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackProfileSelectUpdate))
 		return err
 	}
 
 	session.User = *user
-	app.SendMessage(messages.BuildUpdateProfileSuccessMessage(session), nil)
+	app.SendMessage(messages.UpdateProfileSuccess(session), nil)
 	return nil
 }

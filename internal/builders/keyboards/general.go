@@ -27,9 +27,9 @@ var settingsButtons = []Button{
 }
 
 var feedbackCategoryButtons = []Button{
-	{"💡", "offers", states.CallbackFeedbackCategorySuggestions, "", true},
-	{"🐞", "mistakes", states.CallbackFeedbackCategoryBugs, "", true},
-	{"❓", "otherIssues", states.CallbackFeedbackCategoryOther, "", true},
+	{"💡", "suggestions", states.CallbackFeedbackCategorySuggestions, "", true},
+	{"🐞", "bugs", states.CallbackFeedbackCategoryBugs, "", true},
+	{"❓", "issues", states.CallbackFeedbackCategoryIssues, "", true},
 }
 
 func BuildKeyboardWithCancel(session *models.Session) *tgbotapi.InlineKeyboardMarkup {

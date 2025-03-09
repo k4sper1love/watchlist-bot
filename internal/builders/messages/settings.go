@@ -4,38 +4,37 @@ import (
 	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
+	"strconv"
 	"strings"
 )
 
-func BuildSettingsMessage(session *models.Session) string {
-	part1 := translator.Translate(session.Lang, "settings", nil, nil)
-	part2 := translator.Translate(session.Lang, "settingsChoice", nil, nil)
-
-	return fmt.Sprintf("⚙️ <b>%s</b>\n\n%s", part1, part2)
+func Settings(session *models.Session) string {
+	return fmt.Sprintf("⚙️ %s\n\n%s",
+		toBold(translator.Translate(session.Lang, "settings", nil, nil)),
+		translator.Translate(session.Lang, "settingsChoice", nil, nil))
 }
 
-func BuildSettingsLanguageMessage(session *models.Session) string {
-	part1 := translator.Translate(session.Lang, "currentLanguage", nil, nil)
-	part2 := strings.ToUpper(session.Lang)
-	part3 := translator.Translate(session.Lang, "languageChoice", nil, nil)
-
-	return fmt.Sprintf("🈳 <b>%s:</b> <code>%s</code>\n\n%s", part1, part2, part3)
+func SettingsLanguage(session *models.Session) string {
+	return fmt.Sprintf("🈳 %s: %s\n\n%s",
+		toBold(translator.Translate(session.Lang, "currentLanguage", nil, nil)),
+		toCode(strings.ToUpper(session.Lang)),
+		translator.Translate(session.Lang, "languageChoice", nil, nil))
 }
 
-func BuildSettingsLanguageSuccessMessage(session *models.Session) string {
+func SettingsLanguageSuccess(session *models.Session) string {
 	return "🔄 " + translator.Translate(session.Lang, "settingsLanguageSuccess", map[string]interface{}{
 		"Language": strings.ToUpper(session.Lang),
 	}, nil)
 }
 
-func BuildSettingsPageSizeMessage(session *models.Session, pageSize int) string {
-	part1 := translator.Translate(session.Lang, "currentPageSize", nil, nil)
-	part2 := translator.Translate(session.Lang, "settingsPageSizeChoice", nil, nil)
-
-	return fmt.Sprintf("🔢 <b>%s</b>: <code>%d</code>\n\n%s", part1, pageSize, part2)
+func SettingsPageSize(session *models.Session, pageSize int) string {
+	return fmt.Sprintf("🔢 %s: %s\n\n%s",
+		toBold(translator.Translate(session.Lang, "currentPageSize", nil, nil)),
+		toCode(strconv.Itoa(pageSize)),
+		translator.Translate(session.Lang, "settingsPageSizeChoice", nil, nil))
 }
 
-func BuildSettingsPageSizeSuccessMessage(session *models.Session, pageSize int) string {
+func SettingsPageSizeSuccess(session *models.Session, pageSize int) string {
 	return "🔄 " + translator.Translate(session.Lang, "settingsPageSizeSuccess", map[string]interface{}{
 		"Size": pageSize,
 	}, nil)

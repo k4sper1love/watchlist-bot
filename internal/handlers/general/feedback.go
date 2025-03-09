@@ -14,7 +14,7 @@ import (
 const maxFeedbackLength = 3000
 
 func HandleFeedbackCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildFeedbackMessage(session), keyboards.BuildFeedbackKeyboard(session))
+	app.SendMessage(messages.Feedback(session), keyboards.BuildFeedbackKeyboard(session))
 }
 
 func HandleFeedbackButtons(app models.App, session *models.Session) {
@@ -39,14 +39,14 @@ func HandleFeedbackProcess(app models.App, session *models.Session) {
 }
 
 func handleFeedbackMessage(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildFeedbackRequestMessage(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFeedbackMessage(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessFeedbackAwaitingMessage)
 }
 
 func parseFeedbackMessage(app models.App, session *models.Session) {
 	text := utils.ParseMessageString(app.Update)
 	if utf8.RuneCountInString(text) > maxFeedbackLength {
-		app.SendMessage(messages.BuildFeedbackMaxLengthMessage(session, maxFeedbackLength), nil)
+		app.SendMessage(messages.WarningMaxLength(session, maxFeedbackLength), nil)
 		handleFeedbackMessage(app, session)
 		return
 	}
@@ -58,9 +58,9 @@ func parseFeedbackMessage(app models.App, session *models.Session) {
 
 func saveFeedback(app models.App, session *models.Session) {
 	if err := postgres.SaveFeedback(session.TelegramID, session.TelegramUsername, session.FeedbackState.Category, session.FeedbackState.Message); err != nil {
-		app.SendMessage(messages.BuildFeedbackFailureMessage(session), keyboards.BuildKeyboardWithBack(session, ""))
+		app.SendMessage(messages.FeedbackFailure(session), keyboards.BuildKeyboardWithBack(session, ""))
 		return
 	}
 
-	app.SendMessage(messages.BuildFeedbackSuccessMessage(session), keyboards.BuildKeyboardWithBack(session, ""))
+	app.SendMessage(messages.FeedbackSuccess(session), keyboards.BuildKeyboardWithBack(session, ""))
 }

@@ -840,13 +840,13 @@
   "back": {
     "other": "Back"
   },
-  "offers": {
+  "suggestions": {
     "other": "Suggestions"
   },
-  "mistakes": {
+  "bugs": {
     "other": "Bugs"
   },
-  "otherIssues": {
+  "issues": {
     "other": "Other questions"
   },
   "edit": {

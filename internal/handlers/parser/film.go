@@ -44,7 +44,7 @@ func ParseFilmReview(app models.App, session *models.Session, retry, next func(m
 	ProcessInput(app, session, retry, next, 0, 500, utils.ParseMessageString, utils.IsValidStringLength, validator.HandleInvalidInputLength, func(s *models.Session, v string) { s.FilmDetailState.Review = v })
 }
 
-func ParseFilmImage(app models.App, session *models.Session, next func(models.App, *models.Session)) {
+func ParseFilmImageFromMessage(app models.App, session *models.Session, next func(models.App, *models.Session)) {
 	if utils.IsSkip(app.Update) {
 		next(app, session)
 		return
@@ -52,14 +52,14 @@ func ParseFilmImage(app models.App, session *models.Session, next func(models.Ap
 
 	imageURL, err := ParseAndUploadImageFromMessage(app)
 	if err != nil {
-		app.SendMessage(messages.BuildImageFailureMessage(session), nil)
+		app.SendMessage(messages.ImageFailure(session), nil)
 	}
 
 	session.FilmDetailState.SetImageURL(imageURL)
 	next(app, session)
 }
 
-func ParseFilmImageWithError(app models.App, session *models.Session, next func(models.App, *models.Session), callback string) {
+func ParseFilmImageFromMessageWithError(app models.App, session *models.Session, next func(models.App, *models.Session), callback string) {
 	if utils.IsSkip(app.Update) {
 		next(app, session)
 		return
@@ -67,9 +67,19 @@ func ParseFilmImageWithError(app models.App, session *models.Session, next func(
 
 	imageURL, err := ParseAndUploadImageFromMessage(app)
 	if err != nil {
-		app.SendMessage(messages.BuildImageFailureMessage(session), keyboards.BuildKeyboardWithBack(session, callback))
+		app.SendMessage(messages.ImageFailure(session), keyboards.BuildKeyboardWithBack(session, callback))
 		session.ClearState()
 		return
+	}
+
+	session.FilmDetailState.SetImageURL(imageURL)
+	next(app, session)
+}
+
+func ParseFilmImageFromURL(app models.App, session *models.Session, imageURL string, next func(models.App, *models.Session)) {
+	imageURL, err := ParseAndUploadImageFromURL(app, imageURL)
+	if err != nil {
+		app.SendMessage(messages.ImageFailure(session), nil)
 	}
 
 	session.FilmDetailState.SetImageURL(imageURL)

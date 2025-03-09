@@ -39,3 +39,11 @@ func ParseAndUploadImageFromMessage(app models.App) (string, error) {
 	}
 	return watchlist.UploadImage(app, image)
 }
+
+func ParseAndUploadImageFromURL(app models.App, imageURL string) (string, error) {
+	image, err := utils.ParseImageFromURL(imageURL)
+	if err != nil {
+		return "", err
+	}
+	return watchlist.UploadImage(app, image)
+}

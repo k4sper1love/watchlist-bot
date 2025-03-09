@@ -11,7 +11,7 @@ import (
 )
 
 func HandleNewCollectionCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildCollectionRequestNameMessage(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestCollectionName(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessNewCollectionAwaitingName)
 }
 
@@ -32,7 +32,7 @@ func HandleNewCollectionProcess(app models.App, session *models.Session) {
 }
 
 func requestNewCollectionDescription(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildCollectionRequestDescriptionMessage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestCollectionDescription(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
 	session.SetState(states.ProcessNewCollectionAwaitingDescription)
 }
 
@@ -40,11 +40,11 @@ func finishNewCollectionProcess(app models.App, session *models.Session) {
 	collection, err := watchlist.CreateCollection(app, session)
 	session.ClearAllStates()
 	if err != nil {
-		app.SendMessage(messages.BuildCreateCollectionFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackCollectionsNew))
+		app.SendMessage(messages.CreateCollectionFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackCollectionsNew))
 		return
 	}
 
 	session.CollectionDetailState.ObjectID = collection.ID
-	app.SendMessage(messages.BuildCreateCollectionSuccessMessage(session), nil)
+	app.SendMessage(messages.CreateCollectionSuccess(session), nil)
 	setContextAndHandleFilms(app, session)
 }

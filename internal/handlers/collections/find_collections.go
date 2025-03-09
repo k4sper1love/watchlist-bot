@@ -10,9 +10,9 @@ import (
 
 func HandleFindCollectionsCommand(app models.App, session *models.Session) {
 	if metadata, err := getCollections(app, session); err != nil {
-		app.SendMessage(messages.BuildCollectionsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFindCollectionsBack))
+		app.SendMessage(messages.CollectionsFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFindCollectionsBack))
 	} else {
-		app.SendMessage(messages.BuildCollectionsMessage(session, metadata, true), keyboards.BuildFindCollectionsKeyboard(session, metadata.CurrentPage, metadata.LastPage))
+		app.SendMessage(messages.Collections(session, metadata, true), keyboards.BuildFindCollectionsKeyboard(session, metadata.CurrentPage, metadata.LastPage))
 	}
 }
 
@@ -38,28 +38,28 @@ func handleFindCollectionPagination(app models.App, session *models.Session, cal
 	switch callback {
 	case states.CallbackFindCollectionsNextPage:
 		if session.CollectionsState.CurrentPage >= session.CollectionsState.LastPage {
-			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.CollectionsState.CurrentPage++
 
 	case states.CallbackFindCollectionsPrevPage:
 		if session.CollectionsState.CurrentPage <= 1 {
-			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.CollectionsState.CurrentPage--
 
 	case states.CallbackFindCollectionsLastPage:
 		if session.CollectionsState.CurrentPage == session.CollectionsState.LastPage {
-			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.CollectionsState.CurrentPage = session.CollectionsState.LastPage
 
 	case states.CallbackFindCollectionsFirstPage:
 		if session.CollectionsState.CurrentPage == 1 {
-			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.CollectionsState.CurrentPage = 1

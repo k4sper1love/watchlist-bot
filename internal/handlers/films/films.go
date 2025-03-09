@@ -19,9 +19,9 @@ func HandleFilmsCommand(app models.App, session *models.Session) {
 	session.FilmsState.Clear()
 
 	if metadata, err := getFilms(app, session); err != nil {
-		app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, ""))
+		app.SendMessage(messages.FilmsFailure(session), keyboards.BuildKeyboardWithBack(session, ""))
 	} else {
-		app.SendMessage(messages.BuildFilmsMessage(session, metadata), keyboards.BuildFilmsKeyboard(session, metadata.CurrentPage, metadata.LastPage))
+		app.SendMessage(messages.Films(session, metadata), keyboards.BuildFilmsKeyboard(session, metadata.CurrentPage, metadata.LastPage))
 	}
 }
 
@@ -78,28 +78,28 @@ func handleFilmsPagination(app models.App, session *models.Session, callback str
 	switch callback {
 	case states.CallbackFilmsNextPage:
 		if session.FilmsState.CurrentPage >= session.FilmsState.LastPage {
-			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.FilmsState.CurrentPage++
 
 	case states.CallbackFilmsPrevPage:
 		if session.FilmsState.CurrentPage <= 1 {
-			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.FilmsState.CurrentPage--
 
 	case states.CallbackFilmsLastPage:
 		if session.FilmsState.CurrentPage == session.FilmsState.LastPage {
-			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.FilmsState.CurrentPage = session.FilmsState.LastPage
 
 	case states.CallbackFilmsFirstPage:
 		if session.FilmsState.CurrentPage == 1 {
-			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.FilmsState.CurrentPage = 1
@@ -111,7 +111,7 @@ func handleFilmsPagination(app models.App, session *models.Session, callback str
 func handleFilmSelect(app models.App, session *models.Session, callback string) {
 	if index, err := strconv.Atoi(strings.TrimPrefix(callback, states.PrefixSelectFilm)); err != nil {
 		utils.LogParseSelectError(err, callback)
-		app.SendMessage(messages.BuildFilmsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsBack))
+		app.SendMessage(messages.FilmsFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsBack))
 	} else {
 		session.FilmDetailState.Index = index
 		HandleFilmsDetailCommand(app, session)
@@ -119,19 +119,19 @@ func handleFilmSelect(app models.App, session *models.Session, callback string) 
 }
 
 func handleFilmsFindByTitle(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildFilmRequestTitleMessage(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFilmTitle(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessFindFilmsAwaitingTitle)
 }
 
 func updateFilmsList(app models.App, session *models.Session, next bool) error {
 	if next {
 		if session.FilmsState.CurrentPage >= session.FilmsState.LastPage {
-			return fmt.Errorf(messages.BuildLastPageAlertMessage(session))
+			return fmt.Errorf(messages.LastPageAlert(session))
 		}
 		session.FilmsState.CurrentPage++
 	} else {
 		if session.FilmsState.CurrentPage <= 1 {
-			return fmt.Errorf(messages.BuildFirstPageAlertMessage(session))
+			return fmt.Errorf(messages.FirstPageAlert(session))
 		}
 		session.FilmsState.CurrentPage--
 	}

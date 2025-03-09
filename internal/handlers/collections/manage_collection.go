@@ -10,7 +10,7 @@ import (
 )
 
 func HandleManageCollectionCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildManageCollectionMessage(session), keyboards.BuildCollectionManageKeyboard(session))
+	app.SendMessage(messages.CollectionChoiceAction(session), keyboards.BuildCollectionManageKeyboard(session))
 }
 
 func HandleManageCollectionButtons(app models.App, session *models.Session) {

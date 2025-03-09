@@ -10,7 +10,7 @@ import (
 )
 
 func HandleFiltersFilmsCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildFiltersFilmsMessage(session), keyboards.BuildFilmsFilterKeyboard(session))
+	app.SendMessage(messages.ChoiceFilter(session), keyboards.BuildFilmsFilterKeyboard(session))
 }
 
 func HandleFiltersFilmsButtons(app models.App, session *models.Session) {
@@ -53,12 +53,12 @@ func handleFiltersFilmsSelect(app models.App, session *models.Session, callback 
 
 func handleFiltersFilmsAllReset(app models.App, session *models.Session) {
 	session.GetFilmsFiltersByContext().ResetFilters()
-	app.SendMessage(messages.BuildFilterResetSuccessSimpleMessage(session), nil)
+	app.SendMessage(messages.ResetFiltersSuccess(session), nil)
 	resetFilmsStateAndHandleFiltersFilms(app, session)
 }
 
 func handleFiltersFilmsSwitch(app models.App, session *models.Session, filterType string) {
-	app.SendMessage(messages.BuildFilterSwitchMessage(session, filterType), keyboards.BuildFiltersFilmsSwitchKeyboard(session, filterType))
+	app.SendMessage(messages.FilterSwitch(session, filterType), keyboards.BuildFiltersFilmsSwitchKeyboard(session, filterType))
 	session.SetState(states.PrefixFiltersFilmsAwaitingSwitch + filterType)
 }
 
@@ -73,7 +73,7 @@ func parseFiltersFilmsSwitch(app models.App, session *models.Session, filterType
 }
 
 func handleFiltersFilmsRange(app models.App, session *models.Session, filterType string) {
-	app.SendMessage(messages.BuildFilterRangeMessage(session, filterType), keyboards.BuildFiltersFilmsRangeKeyboard(session, filterType))
+	app.SendMessage(messages.FilterRange(session, filterType), keyboards.BuildFiltersFilmsRangeKeyboard(session, filterType))
 	session.SetState(states.PrefixFiltersFilmsAwaitingRange + filterType)
 }
 
@@ -107,17 +107,17 @@ func getFilterRangeConfig(filterType string) utils.FilterRangeConfig {
 
 func handleFiltersFilmsReset(app models.App, session *models.Session, filterType string) {
 	session.GetFilmsFiltersByContext().ResetFilter(filterType)
-	app.SendMessage(messages.BuildFilterResetSuccessMessage(session, filterType), nil)
+	app.SendMessage(messages.ResetFilterSuccess(session, filterType), nil)
 	resetFilmsStateAndHandleFiltersFilms(app, session)
 }
 
 func handleFiltersFilmsApplied(app models.App, session *models.Session, filterType, emoji string) {
-	app.SendMessage(messages.BuildFilterAppliedMessage(session, filterType, emoji), nil)
+	app.SendMessage(messages.FilterApplied(session, filterType, emoji), nil)
 	resetFilmsStateAndHandleFiltersFilms(app, session)
 }
 
 func handleFiltersInvalidRangeInput(app models.App, session *models.Session, filterType string, config utils.FilterRangeConfig) {
-	app.SendMessage(messages.BuildInvalidFilterRangeInputMessage(session, config), nil)
+	app.SendMessage(messages.InvalidFilterRange(session, config), nil)
 	handleFiltersFilmsRange(app, session, filterType)
 }
 

@@ -10,7 +10,7 @@ import (
 )
 
 func HandleDeleteProfileCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildDeleteProfileMessage(session), keyboards.BuildKeyboardWithSurvey(session))
+	app.SendMessage(messages.DeleteProfile(session), keyboards.BuildKeyboardWithSurvey(session))
 	session.SetState(states.ProcessDeleteProfileAwaitingConfirm)
 }
 
@@ -25,16 +25,16 @@ func HandleDeleteProfileProcess(app models.App, session *models.Session) {
 
 func parseDeleteProfileConfirm(app models.App, session *models.Session) {
 	if !utils.IsAgree(app.Update) {
-		app.SendMessage(messages.BuildCancelActionMessage(session), nil)
+		app.SendMessage(messages.CancelAction(session), nil)
 		HandleProfileCommand(app, session)
 		return
 	}
 
 	if err := watchlist.DeleteUser(app, session); err != nil {
-		app.SendMessage(messages.BuildDeleteProfileFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectProfile))
+		app.SendMessage(messages.DeleteProfileFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectProfile))
 		return
 	}
 
-	app.SendMessage(messages.BuildDeleteProfileSuccessMessage(session), nil)
+	app.SendMessage(messages.DeleteProfileSuccess(session), nil)
 	session.Logout()
 }

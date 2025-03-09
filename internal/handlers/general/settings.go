@@ -14,7 +14,7 @@ import (
 )
 
 func HandleSettingsCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildSettingsMessage(session), keyboards.BuildSettingsKeyboard(session))
+	app.SendMessage(messages.Settings(session), keyboards.BuildSettingsKeyboard(session))
 }
 
 func HandleSettingsButton(app models.App, session *models.Session) {
@@ -55,26 +55,26 @@ func HandleSettingsProcess(app models.App, session *models.Session) {
 func handleLanguage(app models.App, session *models.Session) {
 	if languages, err := utils.ParseSupportedLanguages(app.Config.LocalesDir); err != nil {
 		sl.Log.Error("failed to parse supported languages", slog.Any("error", err), slog.String("dir", app.Config.LocalesDir))
-		app.SendMessage(messages.BuildLanguagesFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectSettings))
+		app.SendMessage(messages.LanguagesFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectSettings))
 	} else {
-		app.SendMessage(messages.BuildSettingsLanguageMessage(session), keyboards.BuildSettingsLanguageSelectKeyboard(session, languages))
+		app.SendMessage(messages.SettingsLanguage(session), keyboards.BuildSettingsLanguageSelectKeyboard(session, languages))
 	}
 }
 
 func handleLanguageSelect(app models.App, session *models.Session) {
 	session.Lang = strings.TrimPrefix(utils.ParseCallback(app.Update), states.PrefixSelectLang)
-	app.SendMessage(messages.BuildSettingsLanguageSuccessMessage(session), nil)
+	app.SendMessage(messages.SettingsLanguageSuccess(session), nil)
 	returnToSettingsMenu(app, session)
 }
 
 func handleKinopoiskToken(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildKinopoiskTokenMessage(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.KinopoiskToken(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessSettingsAwaitingKinopoiskToken)
 }
 
 func parseKinopoiskToken(app models.App, session *models.Session) {
 	session.KinopoiskAPIToken = utils.ParseMessageString(app.Update)
-	app.SendMessage(messages.BuildKinopoiskTokenSuccessMessage(session), nil)
+	app.SendMessage(messages.KinopoiskTokenSuccess(session), nil)
 	returnToSettingsMenu(app, session)
 }
 
@@ -92,7 +92,7 @@ func handlePageSizeSetting(app models.App, session *models.Session) {
 		session.SetState(states.ProcessSettingsObjectsAwaitingPageSize)
 	}
 
-	app.SendMessage(messages.BuildSettingsPageSizeMessage(session, pageSize), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.SettingsPageSize(session, pageSize), keyboards.BuildKeyboardWithCancel(session))
 }
 
 func parsePageSizeSetting(app models.App, session *models.Session) {
@@ -124,7 +124,7 @@ func parseAndValidatePageSize(app models.App, session *models.Session) (int, boo
 }
 
 func handlePageSizeSuccess(app models.App, session *models.Session, pageSize int) {
-	app.SendMessage(messages.BuildSettingsPageSizeSuccessMessage(session, pageSize), nil)
+	app.SendMessage(messages.SettingsPageSizeSuccess(session, pageSize), nil)
 	returnToSettingsMenu(app, session)
 }
 

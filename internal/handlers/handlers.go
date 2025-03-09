@@ -109,7 +109,7 @@ func handleUserInput(app models.App, session *models.Session) {
 	case strings.HasPrefix(session.State, "admin_user_detail_awaiting"):
 		general.RequireRole(app, session, admin.HandleUserDetailProcess, roles.Admin)
 
-	case strings.HasPrefix(session.State, "admin_list_awaiting"):
+	case strings.HasPrefix(session.State, "entities_awaiting"):
 		general.RequireRole(app, session, admin.HandleEntitiesProcess, roles.Admin)
 		//general.RequireRole(app, session, admin.HandleAdminsProcess, roles.Admin)
 

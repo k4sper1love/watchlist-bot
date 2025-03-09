@@ -3,124 +3,106 @@ package messages
 import (
 	"fmt"
 	"github.com/k4sper1love/watchlist-api/pkg/filters"
+	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
+	"strings"
 )
 
-func BuildCollectionsMessage(session *models.Session, metadata *filters.Metadata, isFind bool) string {
-	collections := session.CollectionsState.Collections
-
-	msg := ""
-
+func Collections(session *models.Session, metadata *filters.Metadata, isFind bool) string {
 	if metadata.TotalRecords == 0 {
-		msg += "❗️" + translator.Translate(session.Lang, "collectionsNotFound", nil, nil)
-		return msg
+		return "❗️" + translator.Translate(session.Lang, "collectionsNotFound", nil, nil)
 	}
 
-	totalCollectionsMsgKey := "totalCollections"
+	var msg strings.Builder
+	totalCollectionsKey := "totalCollections"
 	if isFind {
-		totalCollectionsMsgKey = "totalCollectionsFilms"
+		totalCollectionsKey = "totalCollectionsFilms"
 	}
 
-	totalCollectionsMsg := translator.Translate(session.Lang, totalCollectionsMsgKey, nil, nil)
-	msg += fmt.Sprintf("📚 <b>%s:</b> %d\n\n", totalCollectionsMsg, metadata.TotalRecords)
+	msg.WriteString(fmt.Sprintf("📚 %s: %d\n\n",
+		toBold(translator.Translate(session.Lang, totalCollectionsKey, nil, nil)),
+		metadata.TotalRecords))
 
-	for i, collection := range collections {
-		itemID := utils.GetItemID(i, metadata.CurrentPage, metadata.PageSize)
-
-		msg += utils.NumberToEmoji(itemID)
-
-		if collection.IsFavorite {
-			msg += "⭐"
-		}
-
-		msg += fmt.Sprintf(" <i>ID: %d</i>", collection.ID)
-
-		msg += "\n" + BuildCollectionDetailMessage(session, &collection)
+	for i, collection := range session.CollectionsState.Collections {
+		msg.WriteString(formatCollection(metadata, &collection, i))
 	}
 
-	pageMsg := translator.Translate(session.Lang, "pageCounter", map[string]interface{}{
-		"CurrentPage": metadata.CurrentPage,
-		"LastPage":    metadata.LastPage,
-	}, nil)
-
-	msg += fmt.Sprintf("<b>📄 %s</b>", pageMsg)
-
-	return msg
+	msg.WriteString(formatPageCounter(session, metadata.CurrentPage, metadata.LastPage))
+	return msg.String()
 }
 
-func BuildCollectionsFailureMessage(session *models.Session) string {
+func CollectionsFailure(session *models.Session) string {
 	return "🚨 " + translator.Translate(session.Lang, "getCollectionsFailure", nil, nil)
 }
 
-func BuildCollectionRequestNameMessage(session *models.Session) string {
+func RequestCollectionName(session *models.Session) string {
 	return "❓" + translator.Translate(session.Lang, "collectionRequestName", nil, nil)
 }
 
-func BuildCollectionRequestDescriptionMessage(session *models.Session) string {
+func RequestCollectionDescription(session *models.Session) string {
 	return "❓" + translator.Translate(session.Lang, "collectionRequestDescription", nil, nil)
 }
 
-func BuildDeleteCollectionMessage(session *models.Session) string {
+func DeleteCollection(session *models.Session) string {
 	return "⚠️ " + translator.Translate(session.Lang, "deleteCollectionConfirm", map[string]interface{}{
 		"Collection": session.CollectionDetailState.Collection.Name,
 	}, nil)
 }
 
-func BuildDeleteCollectionFailureMessage(session *models.Session) string {
+func DeleteCollectionFailure(session *models.Session) string {
 	return "🚨 " + translator.Translate(session.Lang, "deleteCollectionFailure", map[string]interface{}{
 		"Collection": session.CollectionDetailState.Collection.Name,
 	}, nil)
 }
 
-func BuildDeleteCollectionSuccessMessage(session *models.Session) string {
+func DeleteCollectionSuccess(session *models.Session) string {
 	return "🗑️ " + translator.Translate(session.Lang, "deleteCollectionSuccess", map[string]interface{}{
 		"Collection": session.CollectionDetailState.Collection.Name,
 	}, nil)
 }
 
-func BuildManageCollectionMessage(session *models.Session) string {
-	msg := BuildCollectionHeader(session)
-	choiceMsg := translator.Translate(session.Lang, "choiceAction", nil, nil)
-	msg += fmt.Sprintf("<b>%s</b>", choiceMsg)
-	return msg
+func CollectionChoiceAction(session *models.Session) string {
+	return fmt.Sprintf("%s%s",
+		CollectionHeader(session),
+		toBold(translator.Translate(session.Lang, "choiceAction", nil, nil)))
 }
 
-func BuildCreateCollectionFailureMessage(session *models.Session) string {
+func CreateCollectionFailure(session *models.Session) string {
 	return "🚨 " + translator.Translate(session.Lang, "createCollectionFailure", nil, nil)
 }
 
-func BuildCreateCollectionSuccessMessage(session *models.Session) string {
+func CreateCollectionSuccess(session *models.Session) string {
 	return "📚 " + translator.Translate(session.Lang, "createCollectionSuccess", nil, nil)
 }
 
-func BuildUpdateCollectionMessage(session *models.Session) string {
-	msg := BuildCollectionHeader(session)
-	choiceMsg := translator.Translate(session.Lang, "choiceAction", nil, nil)
-	msg += fmt.Sprintf("<b>%s</b>", choiceMsg)
-	return msg
+func UpdateCollection(session *models.Session) string {
+	return fmt.Sprintf("%s%s",
+		CollectionHeader(session),
+		toBold(translator.Translate(session.Lang, "choiceAction", nil, nil)))
 }
 
-func BuildUpdateCollectionFailureMessage(session *models.Session) string {
+func UpdateCollectionFailure(session *models.Session) string {
 	return "🚨 " + translator.Translate(session.Lang, "updateCollectionFailure", nil, nil)
 }
 
-func BuildUpdateCollectionSuccessMessage(session *models.Session) string {
+func UpdateCollectionSuccess(session *models.Session) string {
 	return "✏️ " + translator.Translate(session.Lang, "updateCollectionSuccess", nil, nil)
 }
 
-func BuildCollectionsNotFoundMessage(session *models.Session) string {
+func CollectionsNotFound(session *models.Session) string {
 	return "❗️" + translator.Translate(session.Lang, "collectionsNotFound", nil, nil)
 }
 
-func BuildChoiceCollectionMessage(session *models.Session) string {
-	choiceMsg := translator.Translate(session.Lang, "choiceCollection", nil, nil)
-	return fmt.Sprintf("<b>%s</b>", choiceMsg)
+func ChoiceCollection(session *models.Session) string {
+	return toBold(translator.Translate(session.Lang, "choiceCollection", nil, nil))
 }
 
-func BuildOptionsFilmToCollectionMessage(session *models.Session) string {
-	msg := BuildCollectionHeader(session)
-	msg += "<b>" + translator.Translate(session.Lang, "choiceAction", nil, nil) + "</b>"
-	return msg
+func formatCollection(metadata *filters.Metadata, collection *apiModels.Collection, index int) string {
+	return fmt.Sprintf("%s%s %s\n%s",
+		utils.NumberToEmoji(utils.GetItemID(index, metadata.CurrentPage, metadata.PageSize)),
+		formatOptionalBool("⭐", collection.IsFavorite, "%s"),
+		toItalic(fmt.Sprintf("ID: %d", collection.ID)),
+		CollectionDetail(collection))
 }

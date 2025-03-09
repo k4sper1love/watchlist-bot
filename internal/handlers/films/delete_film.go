@@ -11,7 +11,7 @@ import (
 )
 
 func HandleDeleteFilmCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildDeleteFilmMessage(session), keyboards.BuildKeyboardWithSurvey(session))
+	app.SendMessage(messages.DeleteFilm(session), keyboards.BuildKeyboardWithSurvey(session))
 	session.SetState(states.ProcessDeleteFilmAwaitingConfirm)
 }
 
@@ -25,17 +25,17 @@ func HandleDeleteFilmProcess(app models.App, session *models.Session) {
 
 func parseDeleteFilmConfirm(app models.App, session *models.Session) {
 	if !utils.IsAgree(app.Update) {
-		app.SendMessage(messages.BuildCancelActionMessage(session), nil)
+		app.SendMessage(messages.CancelAction(session), nil)
 		HandleManageFilmCommand(app, session)
 		return
 	}
 
 	if err := DeleteFilm(app, session); err != nil {
-		app.SendMessage(messages.BuildDeleteFilmFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsManage))
+		app.SendMessage(messages.DeleteFilmFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsManage))
 		return
 	}
 
-	app.SendMessage(messages.BuildDeleteFilmSuccessMessage(session), nil)
+	app.SendMessage(messages.DeleteFilmSuccess(session), nil)
 	HandleFilmsCommand(app, session)
 }
 

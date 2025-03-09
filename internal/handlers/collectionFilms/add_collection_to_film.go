@@ -15,11 +15,11 @@ import (
 
 func HandleAddCollectionToFilmCommand(app models.App, session *models.Session) {
 	if metadata, err := GetCollectionsExcludeFilm(app, session); err != nil {
-		app.SendMessage(messages.BuildCollectionsFailureMessage(session), nil)
+		app.SendMessage(messages.CollectionsFailure(session), nil)
 	} else if metadata.TotalRecords == 0 {
-		app.SendMessage(messages.BuildCollectionsNotFoundMessage(session), keyboards.BuildAddCollectionToFilmNotFoundKeyboard(session))
+		app.SendMessage(messages.CollectionsNotFound(session), keyboards.BuildAddCollectionToFilmNotFoundKeyboard(session))
 	} else {
-		app.SendMessage(messages.BuildChoiceCollectionMessage(session), keyboards.BuildAddCollectionToFilmKeyboard(session))
+		app.SendMessage(messages.ChoiceCollection(session), keyboards.BuildAddCollectionToFilmKeyboard(session))
 	}
 }
 
@@ -69,28 +69,28 @@ func handleAddCollectionToFilmPagination(app models.App, session *models.Session
 	switch callback {
 	case states.CallbackAddCollectionToFilmNextPage:
 		if session.CollectionFilmsState.CurrentPage >= session.CollectionFilmsState.LastPage {
-			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.CollectionFilmsState.CurrentPage++
 
 	case states.CallbackAddCollectionToFilmPrevPage:
 		if session.CollectionFilmsState.CurrentPage <= 1 {
-			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.CollectionFilmsState.CurrentPage--
 
 	case states.CallbackAddCollectionToFilmLastPage:
 		if session.CollectionFilmsState.CurrentPage == session.CollectionFilmsState.LastPage {
-			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.CollectionFilmsState.CurrentPage = session.CollectionFilmsState.LastPage
 
 	case states.CallbackAddCollectionToFilmFirstPage:
 		if session.CollectionFilmsState.CurrentPage == 1 {
-			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.CollectionFilmsState.CurrentPage = 1
@@ -102,7 +102,7 @@ func handleAddCollectionToFilmPagination(app models.App, session *models.Session
 func handleAddCollectionToFilmSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.PrefixSelectCFCollection)); err != nil {
 		utils.LogParseSelectError(err, callback)
-		app.SendMessage(messages.BuildCollectionsFailureMessage(session), keyboards.BuildKeyboardWithBack(session, states.CallbackCollectionFilmsFromFilm))
+		app.SendMessage(messages.CollectionsFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackCollectionFilmsFromFilm))
 	} else {
 		session.CollectionDetailState.Collection.ID = id
 		addFilmToCollection(app, session)
@@ -110,7 +110,7 @@ func handleAddCollectionToFilmSelect(app models.App, session *models.Session, ca
 }
 
 func handleAddCollectionToFilmFind(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildCollectionRequestNameMessage(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestCollectionName(session), keyboards.BuildKeyboardWithCancel(session))
 	session.SetState(states.ProcessAddCollectionToFilmAwaitingName)
 }
 

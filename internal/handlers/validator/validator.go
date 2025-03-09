@@ -6,21 +6,21 @@ import (
 )
 
 func HandleInvalidInputLength(app models.App, session *models.Session, minLength, maxLength int) {
-	app.SendMessage(messages.BuildValidationMessage(session, "invalidInputLength", map[string]interface{}{
+	app.SendMessage(messages.ValidationWarning(session, "invalidInputLength", map[string]interface{}{
 		"Min": minLength,
 		"Max": maxLength,
 	}), nil)
 }
 
 func HandleInvalidInputRange[T int | float64](app models.App, session *models.Session, minValue T, maxValue T) {
-	app.SendMessage(messages.BuildValidationMessage(session, "invalidInputRange", map[string]interface{}{
+	app.SendMessage(messages.ValidationWarning(session, "invalidInputRange", map[string]interface{}{
 		"Min": minValue,
 		"Max": maxValue,
 	}), nil)
 }
 
 func HandleInvalidInputURL(app models.App, session *models.Session, minLength, maxLength int) {
-	app.SendMessage(messages.BuildValidationMessage(session, "invalidInputURL", map[string]interface{}{
+	app.SendMessage(messages.ValidationWarning(session, "invalidInputURL", map[string]interface{}{
 		"Min": minLength,
 		"Max": maxLength,
 	}), nil)

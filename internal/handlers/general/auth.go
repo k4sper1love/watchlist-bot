@@ -10,7 +10,7 @@ import (
 )
 
 func HandleLogoutCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildLogoutMessage(session), keyboards.BuildKeyboardWithSurvey(session))
+	app.SendMessage(messages.Logout(session), keyboards.BuildKeyboardWithSurvey(session))
 	session.SetState(states.ProcessLogoutAwaitingConfirm)
 }
 
@@ -23,18 +23,18 @@ func HandleLogoutProcess(app models.App, session *models.Session) {
 
 func parseLogoutConfirm(app models.App, session *models.Session) {
 	if !utils.IsAgree(app.Update) {
-		app.SendMessage(messages.BuildCancelActionMessage(session), nil)
+		app.SendMessage(messages.CancelAction(session), nil)
 		session.ClearState()
 		HandleMenuCommand(app, session)
 		return
 	}
 
 	if err := watchlist.Logout(app, session); err != nil {
-		app.SendMessage(messages.BuildLogoutFailureMessage(session), keyboards.BuildKeyboardWithBack(session, ""))
+		app.SendMessage(messages.LogoutFailure(session), keyboards.BuildKeyboardWithBack(session, ""))
 		session.ClearState()
 		return
 	}
 
-	app.SendMessage(messages.BuildLogoutSuccessMessage(session), nil)
+	app.SendMessage(messages.LogoutSuccess(session), nil)
 	session.Logout()
 }

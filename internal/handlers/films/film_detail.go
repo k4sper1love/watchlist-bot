@@ -15,7 +15,7 @@ func HandleFilmsDetailCommand(app models.App, session *models.Session) {
 
 	app.SendImage(
 		session.FilmDetailState.Film.ImageURL,
-		messages.BuildFilmDetailMessage(session),
+		messages.FilmDetail(session),
 		keyboards.BuildFilmDetailKeyboard(session),
 	)
 }
@@ -47,7 +47,7 @@ func handleFilmDetailPagination(app models.App, session *models.Session, callbac
 		} else if err := updateFilmsList(app, session, true); err == nil {
 			session.FilmDetailState.Index = 0
 		} else {
-			app.SendMessage(messages.BuildLastPageAlertMessage(session), nil)
+			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 
@@ -57,7 +57,7 @@ func handleFilmDetailPagination(app models.App, session *models.Session, callbac
 		} else if err := updateFilmsList(app, session, false); err == nil {
 			session.FilmDetailState.Index = getFilmsLastIndex(session)
 		} else {
-			app.SendMessage(messages.BuildFirstPageAlertMessage(session), nil)
+			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 	}

@@ -12,23 +12,23 @@ import (
 )
 
 func HandleStartCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildStartMessage(app, session), nil)
+	app.SendMessage(messages.Start(app, session), nil)
 	HandleLanguageCommand(app, session)
 }
 
 func HandleHelpCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildHelpMessage(session), nil)
+	app.SendMessage(messages.Help(session), nil)
 }
 
 func HandleLanguageCommand(app models.App, session *models.Session) {
 	languages, err := utils.ParseSupportedLanguages(app.Config.LocalesDir)
 	if err != nil {
 		sl.Log.Error("failed to parse supported languages", slog.Any("error", err), slog.String("dir", app.Config.LocalesDir))
-		app.SendMessage(messages.BuildLanguagesFailureMessage(session), keyboards.BuildKeyboardWithBack(session, ""))
+		app.SendMessage(messages.LanguagesFailure(session), keyboards.BuildKeyboardWithBack(session, ""))
 		return
 	}
 
-	app.SendMessage(messages.BuildLanguagesMessage(languages), keyboards.BuildLanguageSelectKeyboard(languages))
+	app.SendMessage(messages.Languages(languages), keyboards.BuildLanguageSelectKeyboard(languages))
 }
 
 func HandleLanguageButton(app models.App, session *models.Session) {
@@ -37,5 +37,5 @@ func HandleLanguageButton(app models.App, session *models.Session) {
 }
 
 func HandleMenuCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.BuildMenuMessage(session), keyboards.BuildMenuKeyboard(session))
+	app.SendMessage(messages.Menu(session), keyboards.BuildMenuKeyboard(session))
 }
