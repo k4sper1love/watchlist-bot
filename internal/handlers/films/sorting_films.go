@@ -10,7 +10,7 @@ import (
 )
 
 func HandleSortingFilmsCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.ChoiceSorting(session), keyboards.BuildFilmsSortingKeyboard(session))
+	app.SendMessage(messages.ChoiceSorting(session), keyboards.FilmsSorting(session))
 }
 
 func HandleSortingFilmsButtons(app models.App, session *models.Session) {
@@ -46,7 +46,7 @@ func HandleSortingFilmsProcess(app models.App, session *models.Session) {
 }
 
 func handleSortingFilmsDirection(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestSortDirection(session, session.GetFilmsSortingByContext()), keyboards.BuildSortingDirectionKeyboard(session, session.GetFilmsSortingByContext()))
+	app.SendMessage(messages.RequestSortDirection(session, session.GetFilmsSortingByContext()), keyboards.SortingDirection(session, session.GetFilmsSortingByContext()))
 	session.SetState(states.ProcessSortingFilmsAwaitingDirection)
 }
 

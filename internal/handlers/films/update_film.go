@@ -14,7 +14,7 @@ func HandleUpdateFilmCommand(app models.App, session *models.Session) {
 	app.SendImage(
 		session.FilmDetailState.Film.ImageURL,
 		messages.UpdateFilm(session),
-		keyboards.BuildFilmUpdateKeyboard(session),
+		keyboards.FilmUpdate(session),
 	)
 }
 
@@ -106,57 +106,57 @@ func finishUpdateFilmProcess(app models.App, session *models.Session) {
 }
 
 func handleUpdateFilmURL(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmURL(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFilmURL(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingURL)
 }
 
 func handleUpdateFilmImage(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmImage(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFilmImage(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingImage)
 }
 
 func handleUpdateFilmTitle(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmTitle(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFilmTitle(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingTitle)
 }
 
 func handleUpdateFilmDescription(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmDescription(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFilmDescription(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingDescription)
 }
 
 func handleUpdateFilmGenre(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmGenre(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFilmGenre(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingGenre)
 }
 
 func handleUpdateFilmRating(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmRating(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFilmRating(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingRating)
 }
 
 func handleUpdateFilmYear(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmYear(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFilmYear(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingYear)
 }
 
 func handleUpdateFilmComment(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmComment(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFilmComment(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingComment)
 }
 
 func handleUpdateFilmViewed(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmViewed(session), keyboards.BuildKeyboardWithSurveyAndCancel(session))
+	app.SendMessage(messages.RequestFilmViewed(session), keyboards.SurveyAndCancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingViewed)
 }
 
 func handleUpdateFilmUserRating(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmUserRating(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFilmUserRating(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingUserRating)
 }
 
 func handleUpdateFilmReview(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmReview(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFilmReview(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateFilmAwaitingReview)
 }
 

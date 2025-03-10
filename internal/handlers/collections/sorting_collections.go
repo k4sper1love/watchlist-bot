@@ -10,7 +10,7 @@ import (
 )
 
 func HandleSortingCollectionsCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.ChoiceSorting(session), keyboards.BuildCollectionsSortingKeyboard(session))
+	app.SendMessage(messages.ChoiceSorting(session), keyboards.CollectionsSorting(session))
 }
 
 func HandleSortingCollectionsButtons(app models.App, session *models.Session) {
@@ -46,7 +46,7 @@ func HandleSortingCollectionsProcess(app models.App, session *models.Session) {
 }
 
 func handleSortingCollectionsDirection(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestSortDirection(session, session.CollectionsState.Sorting), keyboards.BuildSortingDirectionKeyboard(session, session.CollectionsState.Sorting))
+	app.SendMessage(messages.RequestSortDirection(session, session.CollectionsState.Sorting), keyboards.SortingDirection(session, session.CollectionsState.Sorting))
 	session.SetState(states.ProcessSortingCollectionsAwaitingDirection)
 }
 

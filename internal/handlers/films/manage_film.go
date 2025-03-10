@@ -13,7 +13,7 @@ func HandleManageFilmCommand(app models.App, session *models.Session) {
 	app.SendImage(
 		session.FilmDetailState.Film.ImageURL,
 		messages.ManageFilm(session),
-		keyboards.BuildFilmManageKeyboard(session),
+		keyboards.FilmManage(session),
 	)
 }
 
@@ -35,7 +35,7 @@ func HandleManageFilmButtons(app models.App, session *models.Session) {
 
 func handleRemoveFilmFromCollection(app models.App, session *models.Session) {
 	if err := watchlist.DeleteCollectionFilm(app, session); err != nil {
-		app.SendMessage(messages.RemoveFilmFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsManage))
+		app.SendMessage(messages.RemoveFilmFailure(session), keyboards.Back(session, states.CallbackFilmsManage))
 		return
 	}
 

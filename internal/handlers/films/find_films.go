@@ -10,9 +10,9 @@ import (
 
 func HandleFindFilmsCommand(app models.App, session *models.Session) {
 	if metadata, err := getFilms(app, session); err != nil {
-		app.SendMessage(messages.FilmsFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFindFilmsBack))
+		app.SendMessage(messages.FilmsFailure(session), keyboards.FilmsNotFound(session))
 	} else {
-		app.SendMessage(messages.FindFilms(session, metadata), keyboards.BuildFindFilmsKeyboard(session, metadata.CurrentPage, metadata.LastPage))
+		app.SendMessage(messages.FindFilms(session, metadata), keyboards.FindFilms(session, metadata.CurrentPage, metadata.LastPage))
 	}
 }
 
@@ -28,36 +28,36 @@ func HandleFindFilmsButtons(app models.App, session *models.Session) {
 		session.ClearAllStates()
 		handleFilmsFindByTitle(app, session)
 
-	case states.CallbackFindFilmsNextPage, states.CallbackFindFilmsPrevPage,
-		states.CallbackFindFilmsLastPage, states.CallbackFindFilmsFirstPage:
+	case states.CallbackFindFilmsPageNext, states.CallbackFindFilmsPagePrev,
+		states.CallbackFindFilmsPageLast, states.CallbackFindFilmsPageFirst:
 		handleFindFilmsPagination(app, session, callback)
 	}
 }
 
 func handleFindFilmsPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
-	case states.CallbackFindFilmsNextPage:
+	case states.CallbackFindFilmsPageNext:
 		if session.FilmsState.CurrentPage >= session.FilmsState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.FilmsState.CurrentPage++
 
-	case states.CallbackFindFilmsPrevPage:
+	case states.CallbackFindFilmsPagePrev:
 		if session.FilmsState.CurrentPage <= 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.FilmsState.CurrentPage--
 
-	case states.CallbackFindFilmsLastPage:
+	case states.CallbackFindFilmsPageLast:
 		if session.FilmsState.CurrentPage == session.FilmsState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.FilmsState.CurrentPage = session.FilmsState.LastPage
 
-	case states.CallbackFindFilmsFirstPage:
+	case states.CallbackFindFilmsPageFirst:
 		if session.FilmsState.CurrentPage == 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return

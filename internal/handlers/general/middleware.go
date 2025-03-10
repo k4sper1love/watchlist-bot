@@ -37,7 +37,7 @@ func RequireRole(app models.App, session *models.Session, next func(models.App, 
 		return
 	}
 
-	app.SendMessage(messages.PermissionsNotEnough(session), keyboards.BuildKeyboardWithBack(session, ""))
+	app.SendMessage(messages.PermissionsNotEnough(session), keyboards.Back(session, ""))
 	session.ClearState()
 }
 

@@ -10,7 +10,7 @@ import (
 )
 
 func HandleLogoutCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.Logout(session), keyboards.BuildKeyboardWithSurvey(session))
+	app.SendMessage(messages.Logout(session), keyboards.Survey(session))
 	session.SetState(states.ProcessLogoutAwaitingConfirm)
 }
 
@@ -30,7 +30,7 @@ func parseLogoutConfirm(app models.App, session *models.Session) {
 	}
 
 	if err := watchlist.Logout(app, session); err != nil {
-		app.SendMessage(messages.LogoutFailure(session), keyboards.BuildKeyboardWithBack(session, ""))
+		app.SendMessage(messages.LogoutFailure(session), keyboards.Back(session, ""))
 		session.ClearState()
 		return
 	}

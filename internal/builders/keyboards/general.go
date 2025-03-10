@@ -1,12 +1,10 @@
 package keyboards
 
 import (
-	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
-	"strings"
 )
 
 var menuButtons = []Button{
@@ -18,84 +16,54 @@ var menuButtons = []Button{
 	{"🚪", "logout", states.CallbackMenuSelectLogout, "", true},
 }
 
-var settingsButtons = []Button{
-	{"🈳", "language", states.CallbackSettingsLanguage, "", true},
-	{"🌐", "kinopoiskToken", states.CallbackSettingsKinopoiskToken, "", true},
-	{"🔢", "collectionsPageSize", states.CallbackSettingsCollectionsPageSize, "", true},
-	{"🔢", "filmsPageSize", states.CallbackSettingsFilmsPageSize, "", true},
-	{"🔢", "objectsPageSize", states.CallbackSettingsObjectsPageSize, "", true},
-}
-
 var feedbackCategoryButtons = []Button{
 	{"💡", "suggestions", states.CallbackFeedbackCategorySuggestions, "", true},
 	{"🐞", "bugs", states.CallbackFeedbackCategoryBugs, "", true},
 	{"❓", "issues", states.CallbackFeedbackCategoryIssues, "", true},
 }
 
-func BuildKeyboardWithCancel(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	return NewKeyboard().AddCancel().Build(session.Lang)
+func Cancel(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return New().AddCancel().Build(session.Lang)
 }
 
-func BuildKeyboardWithBack(session *models.Session, callback string) *tgbotapi.InlineKeyboardMarkup {
-	return NewKeyboard().AddBack(callback).Build(session.Lang)
+func Back(session *models.Session, callback string) *tgbotapi.InlineKeyboardMarkup {
+	return New().AddBack(callback).Build(session.Lang)
 }
 
-func BuildKeyboardWithSurvey(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	return NewKeyboard().AddSurvey().Build(session.Lang)
+func Survey(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return New().AddSurvey().Build(session.Lang)
 }
 
-func BuildKeyboardWithSkipAndCancel(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	return NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
+func SkipAndCancel(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return New().
+		AddSkip().
+		AddCancel().
+		Build(session.Lang)
 }
 
-func BuildKeyboardWithSurveyAndCancel(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	return NewKeyboard().AddSurvey().AddCancel().Build(session.Lang)
+func SurveyAndCancel(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return New().
+		AddSurvey().
+		AddCancel().
+		Build(session.Lang)
 }
 
-func BuildLanguageSelectKeyboard(languages []string) *tgbotapi.InlineKeyboardMarkup {
-	return NewKeyboard().AddLanguageSelect(languages, states.PrefixSelectStartLang).Build("")
+func LanguageSelect(languages []string) *tgbotapi.InlineKeyboardMarkup {
+	return New().AddLanguageSelect(languages, states.PrefixSelectStartLang).Build("")
 }
 
-func BuildMenuKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	keyboard := NewKeyboard()
-
-	if session.Role.HasAccess(roles.Helper) {
-		keyboard.AddButton("🛠️", "adminPanel", states.CallbackMenuSelectAdmin, "", true)
-	}
-
-	keyboard.AddButtons(menuButtons...)
-
-	return keyboard.Build(session.Lang)
+func Menu(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return New().
+		AddIf(session.Role.HasAccess(roles.Helper), func(k *Keyboard) {
+			k.AddAdminPanel()
+		}).
+		AddButtons(menuButtons...).
+		Build(session.Lang)
 }
 
-func BuildSettingsKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	keyboard := NewKeyboard()
-
-	keyboard.AddButtons(settingsButtons...)
-
-	keyboard.AddBack("")
-
-	return keyboard.Build(session.Lang)
-}
-
-func BuildFeedbackKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	keyboard := NewKeyboard()
-
-	keyboard.AddButtons(feedbackCategoryButtons...)
-
-	keyboard.AddBack("")
-
-	return keyboard.Build(session.Lang)
-}
-
-func (k *Keyboard) AddLanguageSelect(languages []string, callback string) *Keyboard {
-	var buttons []Button
-
-	for _, lang := range languages {
-		buttons = append(buttons, Button{"", fmt.Sprintf(strings.ToUpper(lang)), callback + lang, "", false})
-	}
-
-	k.AddButtonsWithRowSize(2, buttons...)
-
-	return k
+func Feedback(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return New().
+		AddButtons(feedbackCategoryButtons...).
+		AddBack("").
+		Build(session.Lang)
 }

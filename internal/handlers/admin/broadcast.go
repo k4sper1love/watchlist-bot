@@ -11,7 +11,7 @@ import (
 )
 
 func HandleBroadcastCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestBroadcastImage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestBroadcastImage(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessAdminBroadcastAwaitingImage)
 }
 
@@ -38,12 +38,12 @@ func HandleBroadcastProcess(app models.App, session *models.Session) {
 }
 
 func requestBroadcastMessage(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestBroadcastMessage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestBroadcastMessage(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessAdminBroadcastAwaitingText)
 }
 
 func requestBroadcastPin(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestBroadcastPin(session), keyboards.BuildKeyboardWithSurveyAndCancel(session))
+	app.SendMessage(messages.RequestBroadcastPin(session), keyboards.SurveyAndCancel(session))
 	session.SetState(states.ProcessAdminBroadcastAwaitingPin)
 }
 
@@ -71,7 +71,7 @@ func requestBroadcastConfirm(app models.App, session *models.Session) {
 		return
 	}
 
-	app.SendMessage(messages.BroadcastConfirm(session, count), keyboards.BuildBroadcastConfirmKeyboard(session))
+	app.SendMessage(messages.BroadcastConfirm(session, count), keyboards.BroadcastConfirm(session))
 	session.SetState(states.ProcessAdminBroadcastAwaitingConfirm)
 }
 

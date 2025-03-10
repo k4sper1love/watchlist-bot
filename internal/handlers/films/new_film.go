@@ -15,7 +15,7 @@ import (
 )
 
 func HandleNewFilmCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.ChoiceWay(session), keyboards.BuildFilmNewKeyboard(session))
+	app.SendMessage(messages.ChoiceWay(session), keyboards.FilmNew(session))
 }
 
 func HandleNewFilmButtons(app models.App, session *models.Session) {
@@ -90,7 +90,7 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 }
 
 func handleKinopoiskToken(app models.App, session *models.Session) {
-	app.SendMessage(messages.KinopoiskToken(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.KinopoiskToken(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingKinopoiskToken)
 }
 
@@ -103,9 +103,9 @@ func parseKinopoiskToken(app models.App, session *models.Session) {
 func handleKinopoiskError(app models.App, session *models.Session, err error) {
 	code := client.ParseErrorStatusCode(err)
 	if code == 401 || code == 403 {
-		app.SendMessage(messages.KinopoiskFailureCode(session, code), keyboards.BuildNewFilmChangeTokenKeyboard(session))
+		app.SendMessage(messages.KinopoiskFailureCode(session, code), keyboards.NewFilmChangeToken(session))
 	} else {
-		app.SendMessage(messages.FilmsFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsNew))
+		app.SendMessage(messages.FilmsFailure(session), keyboards.Back(session, states.CallbackFilmsNew))
 	}
 }
 
@@ -115,12 +115,12 @@ func handleNewFilmFind(app models.App, session *models.Session) {
 		return
 	}
 
-	app.SendMessage(messages.RequestFilmTitle(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFilmTitle(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessFindNewFilmAwaitingTitle)
 }
 
 func handleNewFilmFromURL(app models.App, session *models.Session) {
-	app.SendMessage(messages.NewFilmFromURL(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.NewFilmFromURL(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingURL)
 }
 
@@ -157,57 +157,57 @@ func handleNewFilmFromURLError(app models.App, session *models.Session, err erro
 }
 
 func handleNewFilmManually(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmTitle(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestFilmTitle(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingTitle)
 }
 
 func requestNewFilmYear(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmYear(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestFilmYear(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingYear)
 }
 
 func requestNewFilmGenre(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmGenre(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestFilmGenre(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingGenre)
 }
 
 func requestNewFilmDescription(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmDescription(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestFilmDescription(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingDescription)
 }
 
 func requestNewFilmRating(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmRating(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestFilmRating(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingRating)
 }
 
 func requestNewFilmImage(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmImage(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestFilmImage(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingImage)
 }
 
 func requestNewFilmURL(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmURL(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestFilmURL(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingFilmURL)
 }
 
 func requestNewFilmComment(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmComment(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestFilmComment(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingComment)
 }
 
 func requestNewFilmViewed(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmViewed(session), keyboards.BuildKeyboardWithSurveyAndCancel(session))
+	app.SendMessage(messages.RequestFilmViewed(session), keyboards.SurveyAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingViewed)
 }
 
 func requestNewFilmUserRating(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmUserRating(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestFilmUserRating(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingUserRating)
 }
 
 func requestNewFilmReview(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestFilmReview(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestFilmReview(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessNewFilmAwaitingReview)
 }
 
@@ -215,7 +215,7 @@ func finishNewFilmProcess(app models.App, session *models.Session) {
 	film, err := createNewFilm(app, session)
 	session.ClearAllStates()
 	if err != nil {
-		app.SendMessage(messages.CreateFilmFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFilmsNew))
+		app.SendMessage(messages.CreateFilmFailure(session), keyboards.Back(session, states.CallbackFilmsNew))
 		return
 	}
 

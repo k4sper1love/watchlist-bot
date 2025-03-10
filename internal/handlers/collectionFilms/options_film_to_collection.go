@@ -10,7 +10,7 @@ import (
 )
 
 func HandleOptionsFilmToCollectionCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.CollectionChoiceAction(session), keyboards.BuildOptionsFilmToCollectionKeyboard(session))
+	app.SendMessage(messages.CollectionChoiceAction(session), keyboards.FilmToCollectionOptions(session))
 }
 
 func HandleOptionsFilmToCollectionButtons(app models.App, session *models.Session) {

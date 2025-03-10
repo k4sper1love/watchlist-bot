@@ -10,7 +10,7 @@ import (
 )
 
 func HandleDeleteCollectionCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.DeleteCollection(session), keyboards.BuildKeyboardWithSurvey(session))
+	app.SendMessage(messages.DeleteCollection(session), keyboards.Survey(session))
 	session.SetState(states.ProcessDeleteCollectionAwaitingConfirm)
 }
 
@@ -30,7 +30,7 @@ func parseDeleteCollectionConfirm(app models.App, session *models.Session) {
 	}
 
 	if err := watchlist.DeleteCollection(app, session); err != nil {
-		app.SendMessage(messages.DeleteCollectionFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackCollectionsManage))
+		app.SendMessage(messages.DeleteCollectionFailure(session), keyboards.Back(session, states.CallbackCollectionsManage))
 		return
 	}
 

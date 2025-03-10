@@ -15,7 +15,7 @@ func HandleAdminDetailCommand(app models.App, session *models.Session) {
 	if admin, err := getEntity(session); err != nil {
 		resetAdminPageAndHandle(app, session, HandleEntitiesCommand, roles.Admin)
 	} else {
-		app.SendMessage(messages.UserDetail(session, admin), keyboards.BuildAdminDetailKeyboard(session, admin))
+		app.SendMessage(messages.UserDetail(session, admin), keyboards.AdminDetail(session, admin))
 	}
 }
 
@@ -40,12 +40,12 @@ func HandleAdminDetailButtons(app models.App, session *models.Session) {
 
 func handleRoleChange(app models.App, session *models.Session, raise bool) {
 	if !canChangeRole(session, raise) {
-		app.SendMessage(messages.NoAccess(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminDetailAgain))
+		app.SendMessage(messages.NoAccess(session), keyboards.Back(session, states.CallbackAdminDetailAgain))
 		return
 	}
 
 	if err := postgres.SetUserRole(session.AdminState.UserID, getNewRole(session.AdminState.UserRole, raise)); err != nil {
-		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminDetailAgain))
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallbackAdminDetailAgain))
 		return
 	}
 
@@ -76,12 +76,12 @@ func getNewRole(current roles.Role, raise bool) roles.Role {
 
 func handleRemoveRole(app models.App, session *models.Session) {
 	if session.AdminState.UserRole.HasAccess(session.Role) && session.Role.HasAccess(roles.SuperAdmin) {
-		app.SendMessage(messages.NoAccess(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminDetailAgain))
+		app.SendMessage(messages.NoAccess(session), keyboards.Back(session, states.CallbackAdminDetailAgain))
 		return
 	}
 
 	if err := postgres.SetUserRole(session.AdminState.UserID, roles.User); err != nil {
-		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminDetailAgain))
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallbackAdminDetailAgain))
 		return
 	}
 

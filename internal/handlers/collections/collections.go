@@ -20,9 +20,9 @@ func HandleCollectionsCommand(app models.App, session *models.Session) {
 	session.CollectionsState.Clear()
 
 	if metadata, err := getCollections(app, session); err != nil {
-		app.SendMessage(messages.CollectionsFailure(session), keyboards.BuildKeyboardWithBack(session, ""))
+		app.SendMessage(messages.CollectionsFailure(session), keyboards.Back(session, ""))
 	} else {
-		app.SendMessage(messages.Collections(session, metadata, false), keyboards.BuildCollectionsKeyboard(session, metadata.CurrentPage, metadata.LastPage))
+		app.SendMessage(messages.Collections(session, metadata, false), keyboards.Collections(session, metadata.CurrentPage, metadata.LastPage))
 	}
 }
 
@@ -33,8 +33,8 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 	case states.CallbackCollectionsBack:
 		general.HandleMenuCommand(app, session)
 
-	case states.CallbackCollectionsNextPage, states.CallbackCollectionsPrevPage,
-		states.CallbackCollectionsLastPage, states.CallbackCollectionsFirstPage:
+	case states.CallbackCollectionsPageNext, states.CallbackCollectionsPagePrev,
+		states.CallbackCollectionsPageLast, states.CallbackCollectionsPageFirst:
 		handleCollectionsPagination(app, session, callback)
 
 	case states.CallbackCollectionsNew:
@@ -74,28 +74,28 @@ func HandleCollectionProcess(app models.App, session *models.Session) {
 
 func handleCollectionsPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
-	case states.CallbackCollectionsNextPage:
+	case states.CallbackCollectionsPageNext:
 		if session.CollectionsState.CurrentPage >= session.CollectionsState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.CollectionsState.CurrentPage++
 
-	case states.CallbackCollectionsPrevPage:
+	case states.CallbackCollectionsPagePrev:
 		if session.CollectionsState.CurrentPage <= 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.CollectionsState.CurrentPage--
 
-	case states.CallbackCollectionsLastPage:
+	case states.CallbackCollectionsPageLast:
 		if session.CollectionsState.CurrentPage == session.CollectionsState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.CollectionsState.CurrentPage = session.CollectionsState.LastPage
 
-	case states.CallbackCollectionsFirstPage:
+	case states.CallbackCollectionsPageFirst:
 		if session.CollectionsState.CurrentPage == 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
@@ -109,7 +109,7 @@ func handleCollectionsPagination(app models.App, session *models.Session, callba
 func handleCollectionSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.PrefixSelectCollection)); err != nil {
 		utils.LogParseSelectError(err, callback)
-		app.SendMessage(messages.CollectionsFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackCollectionsBack))
+		app.SendMessage(messages.CollectionsFailure(session), keyboards.Back(session, states.CallbackCollectionsBack))
 	} else {
 		session.CollectionDetailState.ObjectID = id
 		setContextAndHandleFilms(app, session)
@@ -117,7 +117,7 @@ func handleCollectionSelect(app models.App, session *models.Session, callback st
 }
 
 func handleCollectionsFindByName(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestCollectionName(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestCollectionName(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessFindCollectionsAwaitingName)
 }
 

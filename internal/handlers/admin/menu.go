@@ -11,7 +11,7 @@ import (
 )
 
 func HandleMenuCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.AdminMenu(session), keyboards.BuildAdminMenuKeyboard(session))
+	app.SendMessage(messages.AdminMenu(session), keyboards.AdminMenu(session))
 }
 
 func HandleMenuButton(app models.App, session *models.Session) {

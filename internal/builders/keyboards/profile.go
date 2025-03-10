@@ -7,33 +7,21 @@ import (
 )
 
 var updateProfileButtons = []Button{
-	{"", "Имя", states.CallbackUpdateProfileSelectUsername, "", true},
-	{"", "Email", states.CallbackUpdateProfileSelectEmail, "", true},
+	{"", "name", states.CallbackUpdateProfileSelectUsername, "", true},
+	{"", "email", states.CallbackUpdateProfileSelectEmail, "", true},
 }
 
-func BuildProfileKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	keyboard := NewKeyboard()
-
-	keyboard.AddProfileUpdate()
-
-	keyboard.AddDelete(states.CallbackProfileSelectDelete)
-
-	keyboard.AddBack("")
-
-	return keyboard.Build(session.Lang)
-}
-
-func BuildUpdateProfileKeyboard(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
-	return NewKeyboard().
-		AddButtons(updateProfileButtons...).
-		AddBack(states.CallbackUpdateProfileSelectBack).
+func Profile(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return New().
+		AddProfileUpdate().
+		AddDelete(states.CallbackProfileSelectDelete).
+		AddBack("").
 		Build(session.Lang)
 }
 
-func (k *Keyboard) AddProfileUpdate() *Keyboard {
-	return k.AddButton("✏️", "edit", states.CallbackProfileSelectUpdate, "", true)
-}
-
-func (k *Keyboard) AddProfileDelete() *Keyboard {
-	return k.AddButton("🗑️", "delete", states.CallbackProfileSelectDelete, "", true)
+func UpdateProfile(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
+	return New().
+		AddButtons(updateProfileButtons...).
+		AddBack(states.CallbackUpdateProfileSelectBack).
+		Build(session.Lang)
 }

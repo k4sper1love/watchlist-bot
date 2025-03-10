@@ -67,7 +67,7 @@ func ParseFilmImageFromMessageWithError(app models.App, session *models.Session,
 
 	imageURL, err := ParseAndUploadImageFromMessage(app)
 	if err != nil {
-		app.SendMessage(messages.ImageFailure(session), keyboards.BuildKeyboardWithBack(session, callback))
+		app.SendMessage(messages.ImageFailure(session), keyboards.Back(session, callback))
 		session.ClearState()
 		return
 	}

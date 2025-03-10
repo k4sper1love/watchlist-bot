@@ -16,7 +16,7 @@ func HandleFilmsDetailCommand(app models.App, session *models.Session) {
 	app.SendImage(
 		session.FilmDetailState.Film.ImageURL,
 		messages.FilmDetail(session),
-		keyboards.BuildFilmDetailKeyboard(session),
+		keyboards.FilmDetail(session),
 	)
 }
 
@@ -24,7 +24,7 @@ func HandleFilmsDetailButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
 	switch callback {
-	case states.CallbackFilmDetailNextPage, states.CallbackFilmDetailPrevPage:
+	case states.CallbackFilmDetailPageNext, states.CallbackFilmDetailPagePrev:
 		handleFilmDetailPagination(app, session, callback)
 
 	case states.CallbackFilmDetailBack:
@@ -41,7 +41,7 @@ func HandleFilmsDetailButtons(app models.App, session *models.Session) {
 
 func handleFilmDetailPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
-	case states.CallbackFilmDetailNextPage:
+	case states.CallbackFilmDetailPageNext:
 		if session.FilmDetailState.Index < getFilmsLastIndex(session) {
 			session.FilmDetailState.Index++
 		} else if err := updateFilmsList(app, session, true); err == nil {
@@ -51,7 +51,7 @@ func handleFilmDetailPagination(app models.App, session *models.Session, callbac
 			return
 		}
 
-	case states.CallbackFilmDetailPrevPage:
+	case states.CallbackFilmDetailPagePrev:
 		if session.FilmDetailState.Index > 0 {
 			session.FilmDetailState.Index--
 		} else if err := updateFilmsList(app, session, false); err == nil {

@@ -10,9 +10,9 @@ import (
 
 func HandleFindCollectionsCommand(app models.App, session *models.Session) {
 	if metadata, err := getCollections(app, session); err != nil {
-		app.SendMessage(messages.CollectionsFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackFindCollectionsBack))
+		app.SendMessage(messages.CollectionsFailure(session), keyboards.Back(session, states.CallbackFindCollectionsBack))
 	} else {
-		app.SendMessage(messages.Collections(session, metadata, true), keyboards.BuildFindCollectionsKeyboard(session, metadata.CurrentPage, metadata.LastPage))
+		app.SendMessage(messages.Collections(session, metadata, true), keyboards.FindCollections(session, metadata.CurrentPage, metadata.LastPage))
 	}
 }
 
@@ -28,36 +28,36 @@ func HandleFindCollectionsButtons(app models.App, session *models.Session) {
 		session.ClearAllStates()
 		handleCollectionsFindByName(app, session)
 
-	case states.CallbackFindCollectionsNextPage, states.CallbackFindCollectionsPrevPage,
-		states.CallbackFindCollectionsLastPage, states.CallbackFindCollectionsFirstPage:
+	case states.CallbackFindCollectionsPageNext, states.CallbackFindCollectionsPagePrev,
+		states.CallbackFindCollectionsPageLast, states.CallbackFindCollectionsPageFirst:
 		handleFindCollectionPagination(app, session, callback)
 	}
 }
 
 func handleFindCollectionPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
-	case states.CallbackFindCollectionsNextPage:
+	case states.CallbackFindCollectionsPageNext:
 		if session.CollectionsState.CurrentPage >= session.CollectionsState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.CollectionsState.CurrentPage++
 
-	case states.CallbackFindCollectionsPrevPage:
+	case states.CallbackFindCollectionsPagePrev:
 		if session.CollectionsState.CurrentPage <= 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.CollectionsState.CurrentPage--
 
-	case states.CallbackFindCollectionsLastPage:
+	case states.CallbackFindCollectionsPageLast:
 		if session.CollectionsState.CurrentPage == session.CollectionsState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.CollectionsState.CurrentPage = session.CollectionsState.LastPage
 
-	case states.CallbackFindCollectionsFirstPage:
+	case states.CallbackFindCollectionsPageFirst:
 		if session.CollectionsState.CurrentPage == 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return

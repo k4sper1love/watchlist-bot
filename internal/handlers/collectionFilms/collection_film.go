@@ -31,7 +31,7 @@ func handleFilmsWithContext(app models.App, session *models.Session) {
 func addFilmToCollection(app models.App, session *models.Session) {
 	collectionFilm, err := watchlist.AddCollectionFilm(app, session)
 	if err != nil {
-		app.SendMessage(messages.CreateFilmFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectFilms))
+		app.SendMessage(messages.CreateFilmFailure(session), keyboards.Back(session, states.CallbackMenuSelectFilms))
 		return
 	}
 

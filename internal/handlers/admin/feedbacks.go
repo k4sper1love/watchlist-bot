@@ -15,9 +15,9 @@ import (
 
 func HandleFeedbacksCommand(app models.App, session *models.Session) {
 	if feedbacks, err := getFeedbacks(session); err != nil {
-		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackMenuSelectAdmin))
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallbackMenuSelectAdmin))
 	} else {
-		app.SendMessage(messages.FeedbackList(session, feedbacks), keyboards.BuildFeedbackListKeyboard(session, feedbacks))
+		app.SendMessage(messages.FeedbackList(session, feedbacks), keyboards.FeedbackList(session, feedbacks))
 	}
 }
 
@@ -28,8 +28,8 @@ func HandleFeedbacksButtons(app models.App, session *models.Session) {
 	case states.CallbackAdminFeedbackListBack:
 		general.RequireRole(app, session, HandleMenuCommand, roles.Helper)
 
-	case states.CallbackAdminFeedbackListNextPage, states.CallbackAdminFeedbackListPrevPage,
-		states.CallbackAdminFeedbackListLastPage, states.CallbackAdminFeedbackListFirstPage:
+	case states.CallbackAdminFeedbackListPageNext, states.CallbackAdminFeedbackListPagePrev,
+		states.CallbackAdminFeedbackListPageLast, states.CallbackAdminFeedbackListPageFirst:
 		handleFeedbackPagination(app, session, callback)
 
 	default:
@@ -41,28 +41,28 @@ func HandleFeedbacksButtons(app models.App, session *models.Session) {
 
 func handleFeedbackPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
-	case states.CallbackAdminFeedbackListNextPage:
+	case states.CallbackAdminFeedbackListPageNext:
 		if session.AdminState.CurrentPage >= session.AdminState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage++
 
-	case states.CallbackAdminFeedbackListPrevPage:
+	case states.CallbackAdminFeedbackListPagePrev:
 		if session.AdminState.CurrentPage <= 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage--
 
-	case states.CallbackAdminFeedbackListLastPage:
+	case states.CallbackAdminFeedbackListPageLast:
 		if session.AdminState.CurrentPage == session.AdminState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage = session.AdminState.LastPage
 
-	case states.CallbackAdminFeedbackListFirstPage:
+	case states.CallbackAdminFeedbackListPageFirst:
 		if session.AdminState.CurrentPage == 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
@@ -76,7 +76,7 @@ func handleFeedbackPagination(app models.App, session *models.Session, callback 
 func handleFeedbackSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.PrefixSelectAdminFeedback)); err != nil {
 		utils.LogParseSelectError(err, callback)
-		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminSelectFeedback))
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallbackAdminSelectFeedback))
 	} else {
 		session.AdminState.FeedbackID = id
 		HandleFeedbackDetailCommand(app, session)

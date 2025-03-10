@@ -34,11 +34,11 @@ func finishViewedFilmProcess(app models.App, session *models.Session) {
 }
 
 func requestViewedFilmUserRating(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestViewedFilmUserRating(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestViewedFilmUserRating(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessViewedFilmAwaitingUserRating)
 }
 
 func requestViewedFilmReview(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestViewedFilmReview(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestViewedFilmReview(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessViewedFilmAwaitingReview)
 }

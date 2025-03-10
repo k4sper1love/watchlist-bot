@@ -17,7 +17,7 @@ func HandleProfileCommand(app models.App, session *models.Session) {
 	}
 
 	session.User = *user
-	app.SendMessage(messages.Profile(session), keyboards.BuildProfileKeyboard(session))
+	app.SendMessage(messages.Profile(session), keyboards.Profile(session))
 }
 
 func HandleProfileButtons(app models.App, session *models.Session) {

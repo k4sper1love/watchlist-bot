@@ -10,7 +10,7 @@ import (
 )
 
 func HandleFiltersFilmsCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.ChoiceFilter(session), keyboards.BuildFilmsFilterKeyboard(session))
+	app.SendMessage(messages.ChoiceFilter(session), keyboards.FilmsFilter(session))
 }
 
 func HandleFiltersFilmsButtons(app models.App, session *models.Session) {
@@ -58,7 +58,7 @@ func handleFiltersFilmsAllReset(app models.App, session *models.Session) {
 }
 
 func handleFiltersFilmsSwitch(app models.App, session *models.Session, filterType string) {
-	app.SendMessage(messages.FilterSwitch(session, filterType), keyboards.BuildFiltersFilmsSwitchKeyboard(session, filterType))
+	app.SendMessage(messages.FilterSwitch(session, filterType), keyboards.FilmFilterSwitch(session, filterType))
 	session.SetState(states.PrefixFiltersFilmsAwaitingSwitch + filterType)
 }
 
@@ -73,7 +73,7 @@ func parseFiltersFilmsSwitch(app models.App, session *models.Session, filterType
 }
 
 func handleFiltersFilmsRange(app models.App, session *models.Session, filterType string) {
-	app.SendMessage(messages.FilterRange(session, filterType), keyboards.BuildFiltersFilmsRangeKeyboard(session, filterType))
+	app.SendMessage(messages.FilterRange(session, filterType), keyboards.FilmFilterRange(session, filterType))
 	session.SetState(states.PrefixFiltersFilmsAwaitingRange + filterType)
 }
 

@@ -11,7 +11,7 @@ import (
 )
 
 func HandleUpdateCollectionCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.UpdateCollection(session), keyboards.BuildCollectionUpdateKeyboard(session))
+	app.SendMessage(messages.UpdateCollection(session), keyboards.CollectionUpdate(session))
 }
 
 func HandleUpdateCollectionButtons(app models.App, session *models.Session) {
@@ -48,12 +48,12 @@ func finishUpdateCollectionProcess(app models.App, session *models.Session) {
 }
 
 func handleUpdateCollectionName(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestCollectionName(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestCollectionName(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateCollectionAwaitingName)
 }
 
 func handleUpdateCollectionDescription(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestCollectionDescription(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestCollectionDescription(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateCollectionAwaitingDescription)
 }
 

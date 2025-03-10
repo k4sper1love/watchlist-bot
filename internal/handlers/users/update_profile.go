@@ -10,7 +10,7 @@ import (
 )
 
 func HandleUpdateProfileCommand(app models.App, session *models.Session) {
-	app.SendMessage(messages.UpdateProfile(session), keyboards.BuildUpdateProfileKeyboard(session))
+	app.SendMessage(messages.UpdateProfile(session), keyboards.UpdateProfile(session))
 }
 
 func HandleUpdateProfileButtons(app models.App, session *models.Session) {
@@ -40,7 +40,7 @@ func HandleUpdateProfileProcess(app models.App, session *models.Session) {
 }
 
 func handleUpdateProfileUsername(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestProfileUsername(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestProfileUsername(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateProfileAwaitingUsername)
 }
 
@@ -50,7 +50,7 @@ func parseUpdateProfileUsername(app models.App, session *models.Session) {
 }
 
 func handleUpdateProfileEmail(app models.App, session *models.Session) {
-	app.SendMessage(messages.RequestProfileEmail(session), keyboards.BuildKeyboardWithCancel(session))
+	app.SendMessage(messages.RequestProfileEmail(session), keyboards.Cancel(session))
 	session.SetState(states.ProcessUpdateProfileAwaitingEmail)
 }
 
@@ -77,7 +77,7 @@ func finishUpdateProfileProcess(app models.App, session *models.Session) {
 func updateProfile(app models.App, session *models.Session) error {
 	user, err := watchlist.UpdateUser(app, session)
 	if err != nil {
-		app.SendMessage(messages.UpdateProfileFailure(session), keyboards.BuildKeyboardWithBack(session, states.CallbackProfileSelectUpdate))
+		app.SendMessage(messages.UpdateProfileFailure(session), keyboards.Back(session, states.CallbackProfileSelectUpdate))
 		return err
 	}
 

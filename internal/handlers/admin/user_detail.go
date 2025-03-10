@@ -14,9 +14,9 @@ import (
 
 func HandleUserDetailCommand(app models.App, session *models.Session) {
 	if user, err := getEntity(session); err != nil {
-		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminSelectUsers))
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallbackAdminSelectUsers))
 	} else {
-		app.SendMessage(messages.UserDetail(session, user), keyboards.BuildAdminUserDetailKeyboard(session, user))
+		app.SendMessage(messages.UserDetail(session, user), keyboards.UserDetail(session, user))
 	}
 }
 
@@ -84,15 +84,15 @@ func handleUserDetailSelect(app models.App, session *models.Session) {
 
 func handleUserLogs(app models.App, session *models.Session) {
 	if path, err := utils.GetLogFilePath(session.AdminState.UserID); err != nil {
-		app.SendMessage(messages.LogsNotFound(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminUserDetailAgain))
+		app.SendMessage(messages.LogsNotFound(session), keyboards.Back(session, states.CallbackAdminUserDetailAgain))
 	} else {
-		app.SendFile(path, messages.LogsFound(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminUserDetailAgain))
+		app.SendFile(path, messages.LogsFound(session), keyboards.Back(session, states.CallbackAdminUserDetailAgain))
 	}
 }
 
 func handleUserUnban(app models.App, session *models.Session) {
 	if err := postgres.SetUserBanStatus(session.AdminState.UserID, false); err != nil {
-		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminUserDetailAgain))
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallbackAdminUserDetailAgain))
 		return
 	}
 
@@ -103,11 +103,11 @@ func handleUserUnban(app models.App, session *models.Session) {
 
 func handleUserBan(app models.App, session *models.Session) {
 	if session.AdminState.UserRole.HasAccess(roles.Helper) {
-		app.SendMessage(messages.NeedRemoveRole(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminUserDetailAgain))
+		app.SendMessage(messages.NeedRemoveRole(session), keyboards.Back(session, states.CallbackAdminUserDetailAgain))
 		return
 	}
 
-	app.SendMessage(messages.RequestBanReason(session), keyboards.BuildKeyboardWithSkipAndCancel(session))
+	app.SendMessage(messages.RequestBanReason(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.ProcessAdminUserDetailAwaitingReason)
 }
 
@@ -121,7 +121,7 @@ func parseUserBanReason(app models.App, session *models.Session) {
 
 func processUserBan(app models.App, session *models.Session, reason string) {
 	if err := postgres.SetUserBanStatus(session.AdminState.UserID, true); err != nil {
-		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminUserDetailAgain))
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallbackAdminUserDetailAgain))
 		return
 	}
 
@@ -131,17 +131,17 @@ func processUserBan(app models.App, session *models.Session, reason string) {
 }
 
 func handleUserRole(app models.App, session *models.Session) {
-	app.SendMessage(messages.ChoiceRole(session), keyboards.BuildAdminUserRoleKeyboard(session))
+	app.SendMessage(messages.ChoiceRole(session), keyboards.UserRoleSelect(session))
 }
 
 func processUserRole(app models.App, session *models.Session, role roles.Role) {
 	if !canChangeRole(session, role > session.AdminState.UserRole) {
-		app.SendMessage(messages.NoAccess(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminUserDetailAgain))
+		app.SendMessage(messages.NoAccess(session), keyboards.Back(session, states.CallbackAdminUserDetailAgain))
 		return
 	}
 
 	if err := postgres.SetUserRole(session.AdminState.UserID, role); err != nil {
-		app.SendMessage(messages.SomeError(session), keyboards.BuildKeyboardWithBack(session, states.CallbackAdminUserDetailAgain))
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallbackAdminUserDetailAgain))
 		return
 	}
 
