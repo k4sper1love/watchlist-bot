@@ -148,7 +148,9 @@ func AdminMenu(session *models.Session) string {
 }
 
 func RequestEntityField(session *models.Session) string {
-	return translator.Translate(session.Lang, "requestIDOrUsername", nil, nil)
+	return fmt.Sprintf("%s\n\n%s",
+		translator.Translate(session.Lang, "requestIDOrUsername", nil, nil),
+		translator.Translate(session.Lang, "hintAPIUserID", nil, nil))
 }
 
 func NoAccess(session *models.Session) string {

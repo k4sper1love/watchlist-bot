@@ -1,6 +1,99 @@
 {
   "choiceLanguage": {
-    "other": "Будь ласка, виберіть мову для спілкування з ботом. Ви зможете поміняти його в налаштуваннях"
+    "other": "Будь ласка, виберіть мову для спілкування з ботом. Ви зможете змінити її в налаштуваннях"
+  },
+  "suggestions": {
+    "other": "Пропозиції"
+  },
+  "bugs": {
+    "other": "Помилки"
+  },
+  "issues": {
+    "other": "Інші питання"
+  },
+  "messageWillPin": {
+    "other": "Повідомлення буде закріплене"
+  },
+  "requestBroadcastPin": {
+    "other": "Ви хочете закріпити повідомлення?"
+  },
+  "getCollectionsFailure": {
+    "other": "Помилка отримання колекцій"
+  },
+  "getFilmsFailure": {
+    "other": "Помилка отримання фільмів"
+  },
+  "invalidInputLength": {
+    "other": "Довжина має бути в діапазоні <b>[{{.Min}}, {{.Max}}]</b> символів"
+  },
+  "invalidInputRange": {
+    "other": "Значення має бути в діапазоні <b>[{{.Min}}, {{.Max}}]</b>"
+  },
+  "invalidInputURL": {
+    "other": "Невірний URL або довжина не входить в діапазон <b>[{{.Min}}, {{.Max}}]</b> символів"
+  },
+  "kinopoiskToken": {
+    "other": "Токен Kinopoisk"
+  },
+  "currentToken": {
+    "other": "Поточний токен"
+  },
+  "changeToken": {
+    "other": "Змінити токен"
+  },
+  "token403": {
+    "other": "Ви досягли денного ліміту використання Kinopoisk"
+  },
+  "token401": {
+    "other": "Невірний токен Kinopoisk"
+  },
+  "tokenRequestInfo": {
+    "other": "Отримайте токен у @kinopoiskdev_bot для роботи з Kinopoisk"
+  },
+  "tokenRequest": {
+    "other": "Введіть отриманий токен"
+  },
+  "tokenSuccess": {
+    "other": "Токен успішно встановлено"
+  },
+  "logsNotFound": {
+    "other": "Файл журналу не знайдено"
+  },
+  "logsFound": {
+    "other": "Знайдено файл журналу для <code>{{.ID}}</code>"
+  },
+  "logs": {
+    "other": "Журнали"
+  },
+  "update": {
+    "other": "Оновити"
+  },
+  "manage": {
+    "other": "Керування"
+  },
+  "updateFilmSuccess": {
+    "other": "Фільм успішно оновлено"
+  },
+  "maxLengthInSymbols": {
+    "other": "<b>Максимальна довжина:</b> {{.Length}} символів"
+  },
+  "chuckTextError": {
+    "other": "Помилка розбиття тексту. Повідомлення занадто довге і не може бути надіслане"
+  },
+  "choiceField": {
+    "other": "Виберіть поле"
+  },
+  "deleteFeedbackSuccess": {
+    "other": "Повідомлення <code>{{.ID}}</code> успішно видалено"
+  },
+  "preview": {
+    "other": "Попередній перегляд"
+  },
+  "access": {
+    "other": "Доступ"
+  },
+  "findFilm": {
+    "other": "Знайти фільм (kinopoisk.ru)"
   },
   "status": {
     "other": "Статус"
@@ -9,16 +102,16 @@
     "other": "<code>api_ID</code> для пошуку API користувачів"
   },
   "makeFavorite": {
-    "other": "Додати до улюблених"
+    "other": "Додати в обране"
   },
   "removeFavorite": {
-    "other": "Видалити з улюблених"
+    "other": "Прибрати з обраного"
   },
   "inFavorite": {
-    "other": "В улюблених"
+    "other": "В обраному"
   },
   "invalidInput": {
-    "other": "Некоректний ввід."
+    "other": "Некоректне введення"
   },
   "requestRangeInFormat": {
     "other": "Будь ласка, вкажіть точне значення або діапазон у форматі:"
@@ -33,7 +126,7 @@
     "other": "Частковий діапазон (наприклад)"
   },
   "rangeLimits": {
-    "other": "Дозволений діапазон для цього поля: від <code>{{.Min}}</code> до <code>{{.Max}}</code>."
+    "other": "Допустимий діапазон для цього поля: від <code>{{.Min}}</code> до <code>{{.Max}}</code>"
   },
   "isFavorite": {
     "other": "Обране"
@@ -45,7 +138,7 @@
     "other": "Переглянуто"
   },
   "filterInstructionSwitch": {
-    "other": "Виберіть значення для фільтра <b>\"{{.Filter}}\"</b>"
+    "other": "Виберіть значення для фільтру <b>{{.Filter}}</b>"
   },
   "true": {
     "other": "Так"
@@ -60,22 +153,22 @@
     "other": "Переглянуто"
   },
   "user_rating": {
-    "other": "Оцінка користувача"
+    "other": "Оцінка"
   },
-  "hasURL": {
+  "has_url": {
     "other": "Посилання"
   },
   "filterInstructionRange": {
-    "other": "<b>Введіть значення або діапазон</b> (наприклад, <code>7.5</code> або <code>5-10</code>)."
+    "other": "<b>Введіть значення або діапазон</b> (наприклад, <code>7.5</code> або <code>5-10</code>)"
   },
   "filterInstructionPartialRange": {
-    "other": "Часткові діапазони (<code>5-</code> або <code>-7.5</code>) автоматично заповнять відсутню межу."
+    "other": "Часткові діапазони (<code>5-</code> або <code>-7.5</code>) автоматично підставлять відсутню межу"
   },
-"notFoundMessages": {
+  "notFoundMessages": {
     "other": "Повідомлення не знайдено"
   },
   "choiceMessage": {
-    "other": "Оберіть повідомлення"
+    "other": "Виберіть повідомлення"
   },
   "created_at": {
     "other": "Дата створення"
@@ -83,26 +176,26 @@
   "total_films": {
     "other": "Кількість фільмів"
   },
-  "totalCollectionsFilms": {
-    "other": "Знайдено колекцій"
-  },
   "filters": {
     "other": "Фільтри"
+  },
+  "totalCollectionsFilms": {
+    "other": "Знайдено колекцій"
   },
   "sorting": {
     "other": "Сортування"
   },
   "choiceFilter": {
-    "other": "Оберіть фільтр, щоб увімкнути/вимкнути його"
+    "other": "Виберіть фільтр, щоб увімкнути/вимкнути його"
   },
   "choiceSorting": {
-    "other": "Оберіть поле для сортування"
+    "other": "Виберіть поле для сортування"
   },
   "requestValueOrRange": {
     "other": "Введіть точне значення або діапазон, використовуючи <code>-</code>"
   },
   "filterApplied": {
-    "other": "Фільтр успішно застосовано!"
+    "other": "Фільтр <b>{{.Filter}}</b> застосовано"
   },
   "resetFilters": {
     "other": "Скинути фільтри"
@@ -114,20 +207,20 @@
     "other": "Поточне значення"
   },
   "ratingMustBeLower": {
-    "other": "Рейтинг повинен бути меншим або рівним максимальному рейтингу"
+    "other": "Рейтинг має бути меншим або дорівнювати максимальному рейтингу"
   },
   "ratingMustBeHigher": {
-    "other": "Рейтинг повинен бути більшим або рівним мінімальному рейтингу"
+    "other": "Рейтинг має бути більшим або дорівнювати мінімальному рейтингу"
   },
   "filterResetSuccess": {
-    "one": "Фільтр успішно скинуто!",
-    "other": "Фільтри успішно скинуто!"
+    "one": "Фільтр <b>{{.Filter}}</b> скинуто",
+    "other": "Усі фільтри скинуті"
   },
   "sortingResetSuccess": {
-    "other": "Параметри сортування успішно скинуто!"
+    "other": "Сортування скинуто"
   },
   "selectedSortField": {
-    "other": "Ви обрали сортування за <b>{{.Field}}</b>"
+    "other": "Сортування за <b>{{.Field}}</b>"
   },
   "requestDirection": {
     "other": "Оберіть напрямок"
@@ -139,16 +232,16 @@
     "other": "За спаданням"
   },
   "sortingApplied": {
-    "other": "Сортування успішно застосовано!"
+    "other": "Сортування за <b>{{.Field}}</b> застосовано"
   },
   "resetSorting": {
     "other": "Скинути сортування"
   },
-"raisedTo": {
-    "other": "Вас підвищено до ролі \"{{.Role}}\""
+  "raiseTo": {
+    "other": "Вас підвищено до ролі {{.Role}}"
   },
   "lowerTo": {
-    "other": "Вас понижено до ролі \"{{.Role}}\""
+    "other": "Вас понижено до ролі {{.Role}}"
   },
   "raiseUser": {
     "other": "Ви підвищили {{.ID}} до ролі {{.Role}}"
@@ -157,34 +250,34 @@
     "other": "Ви понизили {{.ID}} до ролі {{.Role}}"
   },
   "cannotLowerSelf": {
-    "other": "Ви не можете понизити свою власну роль"
+    "other": "Ви не можете понизити власну роль"
   },
   "removedRole": {
-    "other": "Ваші права адміністратора були скасовані"
+    "other": "У вас відібрано права адміністратора"
   },
   "removeUserRole": {
-    "other": "Ви скасували права адміністратора у {{.ID}}"
+    "other": "Ви відібрали права адміністратора у {{.ID}}"
   },
   "changedRole": {
-    "other": "Ваша роль {{.OldRole}} була змінена на {{.NewRole}}"
+    "other": "Ваша роль {{.OldRole}} змінена на {{.NewRole}}"
   },
   "changeUserRole": {
     "other": "Ви змінили роль {{.ID}} з {{.OldRole}} на {{.NewRole}}"
   },
-"someError": {
-    "other": "Сталася якась помилка"
+  "someError": {
+    "other": "Сталася помилка"
   },
   "setDefaultLanguage": {
-    "other": "Встановлено мову за замовчуванням."
+    "other": "Встановлено мову за замовчуванням"
   },
   "openInBrowser": {
-    "other": "Відкрити у браузері"
+    "other": "Відкрити в браузері"
   },
   "filmURL": {
     "other": "Посилання на фільм"
   },
-  "removeFilmFromCollection": {
-    "other": "Видалити фільм з колекції"
+  "removeFromCollection": {
+    "other": "Видалити з колекції"
   },
   "removeFilmFailure": {
     "other": "Не вдалося видалити фільм з колекції"
@@ -208,10 +301,10 @@
     "other": "Доступ до бота заборонено"
   },
   "banUser": {
-    "other": "Користувач \"{{.ID}}\" був заблокований"
+    "other": "Користувач <code>{{.ID}}</code> був заблокований"
   },
   "unbanUser": {
-    "other": "Користувач \"{{.ID}}\" був розблокований"
+    "other": "Користувач <code>{{.ID}}</code> був розблокований"
   },
   "admins": {
     "other": "Адміністратори"
@@ -225,9 +318,6 @@
   "broadcast": {
     "other": "Розсилка"
   },
-  "findUser": {
-    "other": "Знайти користувача"
-  },
   "requestIDOrUsername": {
     "other": "Введіть ID або @username"
   },
@@ -235,7 +325,7 @@
     "other": "Старший Адміністратор"
   },
   "helper": {
-    "other": "Помічник"
+    "other": "Хелпер"
   },
   "root": {
     "other": "Головний Адміністратор"
@@ -250,22 +340,19 @@
     "other": "Заблокувати"
   },
   "alreadyMaxRole": {
-    "other": "У користувача вже максимальна роль"
+    "other": "Користувач уже має максимальну роль"
   },
   "alreadyMinRole": {
-    "other": "У користувача вже мінімальна роль"
-  },
-  "findAdmin": {
-    "other": "Знайти адміністратора"
+    "other": "Користувач уже має мінімальну роль"
   },
   "foundFeedbacks": {
-    "other": "Знайдено відгуків"
+    "other": "Знайдено повідомлень"
   },
   "noAccess": {
     "other": "Немає доступу"
   },
   "viewFeedback": {
-    "other": "Переглянути відгук"
+    "other": "Переглянути фідбек"
   },
   "foundUsers": {
     "other": "Знайдено користувачів"
@@ -274,10 +361,10 @@
     "other": "Роль"
   },
   "unknown": {
-    "other": "Невідомо"
+    "other": "Невідомий"
   },
   "requestBroadcastImage": {
-    "other": "Надішліть посилання або зображення для розсилки"
+    "other": "Надішліть зображення або посилання на нього для розсилки"
   },
   "send": {
     "other": "Надіслати"
@@ -286,7 +373,7 @@
     "other": "Неможливо надіслати порожню розсилку"
   },
   "feedbackDetails": {
-    "other": "Деталі відгуку"
+    "other": "Дані фідбеку"
   },
   "currentRole": {
     "other": "Поточна роль"
@@ -304,16 +391,16 @@
     "other": "Порожньо"
   },
   "sessionDetails": {
-    "other": "Деталі сесії"
+    "other": "Дані сесії"
   },
   "apiDetails": {
-    "other": "Деталі API"
+    "other": "Дані API"
   },
   "updated": {
     "other": "Оновлено"
   },
   "choiceForDetails": {
-    "other": "Оберіть для перегляду деталей"
+    "other": "Виберіть для перегляду деталей"
   },
   "needRemoveRole": {
     "other": "Спочатку потрібно забрати права адміністратора"
@@ -325,7 +412,7 @@
     "other": "Поточна роль"
   },
   "choiceRole": {
-    "other": "Оберіть роль"
+    "other": "Виберіть роль"
   },
   "success": {
     "other": "Успішно"
@@ -337,19 +424,19 @@
     "other": "Підвищити роль"
   },
   "lowerRole": {
-    "other": "Знизити роль"
+    "other": "Понизити роль"
   },
   "removeAdminRole": {
-    "other": "Вилучити права адміністратора"
+    "other": "Забрати права адміністратора"
   },
   "welcomeMessageGreeting": {
     "other": "Ласкаво просимо до Watchlist Bot, {{.Name}}!"
   },
   "welcomeMessageBody": {
-    "other": "Наразі бот знаходиться в розробці (версія {{.Version}}), але основні функції вже доступні."
+    "other": "Бот наразі перебуває в розробці (версія {{.Version}}), але основні функції вже доступні."
   },
   "welcomeMessageCallToAction": {
-    "other": "Введіть /help, щоб побачити список доступних команд."
+    "other": "Введіть /help, щоб переглянути список доступних команд."
   },
   "listOfCommands": {
     "other": "Список доступних команд:"
@@ -364,25 +451,25 @@
     "other": "Зверніться до адміністратора для розблокування."
   },
   "authRequest": {
-    "other": "Для виконання цієї команди потрібно бути авторизованим. Використовуйте /start"
+    "other": "Щоб виконати цю команду, потрібно авторизуватися. Використовуйте /start."
   },
   "authExpired": {
-    "other": "Ваші токени закінчилися. Виконуємо вхід до системи"
+    "other": "Термін дії ваших токенів закінчився. Виконуємо вхід..."
   },
   "authFailure": {
-    "other": "Не вдалося увійти до системи. Використовуйте /start."
+    "other": "Не вдалося увійти в систему. Використовуйте /start."
   },
   "authUpdated": {
-    "other": "Ваш токен успішно оновлено"
+    "other": "Ваш токен було успішно оновлено"
   },
   "permissionsNotEnough": {
-    "other": "Недостатній рівень прав"
+    "other": "Недостатньо прав"
   },
   "mainMenu": {
     "other": "Головне меню"
   },
   "choiceAction": {
-    "other": "Оберіть одну з дій"
+    "other": "Виберіть дію"
   },
   "adminPanel": {
     "other": "Адмін-панель"
@@ -400,10 +487,10 @@
     "other": "Налаштування"
   },
   "feedback": {
-    "other": "Зворотній зв'язок"
+    "other": "Зворотній зв’язок"
   },
   "logout": {
-    "other": "Вийти із системи"
+    "other": "Вийти з системи"
   },
   "name": {
     "other": "Ім'я"
@@ -418,85 +505,82 @@
     "other": "Дата реєстрації"
   },
   "deleteProfileConfirm": {
-    "other": "Ви впевнені, що хочете видалити акаунт \"{{.Username}}\"?"
+    "other": "Ви впевнені, що хочете видалити акаунт <code>{{.Username}}</code>?"
   },
   "deleteProfileFailure": {
-    "other": "Не вдалося видалити акаунт \"{{.Username}}\""
+    "other": "Не вдалося видалити акаунт <code>{{.Username}}</code>"
   },
   "deleteProfileSuccess": {
-    "other": "Акаунт \"{{.Username}}\" успішно видалено!"
+    "other": "Акаунт <code>{{.Username}}</code> успішно видалено!"
   },
   "cancelAction": {
     "other": "Дію скасовано"
   },
   "updateChoiceField": {
-    "other": "Оберіть, яке поле ви хочете змінити?"
+    "other": "Виберіть поле для зміни"
   },
   "updateProfileUsername": {
-    "other": "Введіть новий username"
+    "other": "Введіть нове ім'я"
   },
   "updateProfileEmail": {
-    "other": "Введіть нову адресу електронної пошти"
+    "other": "Введіть новий email"
   },
   "updateProfileFailure": {
-    "other": "Не вдалося оновити акаунт \"{{.Username}}\""
+    "other": "Не вдалося оновити акаунт <code>{{.Username}}</code>"
   },
   "updateProfileSuccess": {
-    "other": "Акаунт \"{{.Username}}\" успішно оновлено!"
+    "other": "Акаунт <code>{{.Username}}</code> успішно оновлено"
   },
   "settingsChoice": {
-    "other": "Оберіть, який параметр ви хочете змінити"
+    "other": "Виберіть параметр для зміни"
   },
-  "settingsLanguage": {
-    "other": "Змінити мову"
+  "collectionsPageSize": {
+    "other": "Розмір сторінки для колекцій"
   },
-  "settingsCollectionsPageSize": {
-    "other": "Змінити кількість колекцій на сторінці"
+  "filmsPageSize": {
+    "other": "Розмір сторінки для фільмів"
   },
-  "settingsFilmsPageSize": {
-    "other": "Змінити кількість фільмів на сторінці"
-  },
-  "settingsObjectsPageSize": {
-    "other": "Змінити кількість об'єктів на сторінці"
+  "objectsPageSize": {
+    "other": "Розмір сторінки для об'єктів"
   },
   "parseLanguagesFailure": {
-    "other": "Помилка під час отримання списку доступних мов"
+    "other": "Помилка отримання доступних мов"
   },
   "currentLanguage": {
     "other": "Поточна мова"
   },
-  "settingsLanguageChoice": {
-    "other": "Оберіть бажану мову"
+  "languageChoice": {
+    "other": "Оберіть мову"
   },
   "settingsLanguageSuccess": {
-    "other": "Мову успішно змінено на {{.Language}}"
-  },
-  "currentCollectionsPageSize": {
-    "other": "Розмір сторінки для колекцій"
+    "other": "Мову успішно змінено на <code>{{.Language}}</code>"
   },
   "settingsPageSizeChoice": {
-    "other": "Оберіть бажаний розмір (від 1 і більше)"
+    "other": "Введіть новий розмір"
+  },
+  "newPageSize": {
+    "other": "Новий розмір сторінки"
+  },
+  "currentPageSize": {
+    "other": "Поточний розмір сторінки"
+  },
+  "settingsPageSizeSuccess": {
+    "other": "Розмір сторінки встановлено: <code>{{.Size}}</code>"
   },
   "settingsCollectionsPageSizeSuccess": {
     "other": "Новий розмір сторінки для списку колекцій"
   },
-  "currentFilmsPageSize": {
-    "other": "Розмір сторінки для фільмів"
-  },
   "settingsFilmsPageSizeSuccess": {
     "other": "Новий розмір сторінки для списку фільмів"
-  },
-  "currentObjectsPageSize": {
-    "other": "Розмір сторінки для об'єктів"
   },
   "settingsObjectsPageSizeSuccess": {
     "other": "Новий розмір сторінки для списку об'єктів"
   },
   "feedbackMessageHeader": {
-    "other": "Залиште ваш відгук"
+    "other": "Залиште свій відгук"
   },
   "feedbackMessageBody": {
-    "other": "Напишіть вашу думку, пропозиції чи ідеї, і ми обов'язково їх врахуємо!"
+    "other": "Напишіть свою думку, пропозиції або ідеї, і ми обов'язково їх врахуємо!"
   },
   "feedbackCategoryChoice": {
     "other": "Оберіть категорію"
@@ -505,34 +589,34 @@
     "other": "Ви обрали категорію"
   },
   "feedbackTextRequest": {
-    "other": "Будь ласка, напишіть ваш відгук"
+    "other": "Напишіть своє повідомлення"
   },
   "feedbackFailure": {
-    "other": "Помилка збереження відгуку"
+    "other": "Помилка під час відправки повідомлення"
   },
   "feedbackSuccess": {
-    "other": "Дякуємо за ваш відгук! Ми цінуємо вашу думку"
+    "other": "Дякуємо за ваше повідомлення!"
   },
   "tryLater": {
     "other": "Спробуйте пізніше"
   },
   "loginSuccess": {
-    "other": "Успішний вхід до акаунту \"{{.Username}}\"!"
+    "other": "Вхід у акаунт <code>{{.Username}}</code> виконано!"
   },
   "registrationSuccess": {
-    "other": "Успішна реєстрація акаунту \"{{.Username}}\"!"
+    "other": "Акаунт <code>{{.Username}}</code> зареєстровано!"
   },
   "logoutConfirm": {
-    "other": "Ви впевнені, що хочете вийти з акаунту \"{{.Username}}\"?"
+    "other": "Ви впевнені, що хочете вийти з акаунта <code>{{.Username}}</code>?"
   },
   "logoutFailure": {
-    "other": "Не вдалося вийти з акаунту \"{{.Username}}\""
+    "other": "Не вдалося вийти з акаунта <code>{{.Username}}</code>"
   },
   "logoutSuccess": {
-    "other": "Успішно вийшли з акаунту \"{{.Username}}\""
+    "other": "Ви вийшли з акаунта <code>{{.Username}}</code>"
   },
   "logoutCancel": {
-    "other": "Вихід з акаунту \"{{.Username}}\" скасовано"
+    "other": "Вихід з акаунта <code>{{.Username}}</code> скасовано"
   },
   "unknownState": {
     "other": "Невідомий стан. Введіть /reset для скидання."
@@ -544,7 +628,7 @@
     "other": "Оцініть фільм"
   },
   "viewedFilmCanCancel": {
-    "other": "Ви можете скасувати \"перегляд\" фільму, натиснувши кнопку скасування"
+    "other": "Ви можете скасувати статус \"переглянуто\", натиснувши кнопку скасування"
   },
   "viewedFilmRequestReview": {
     "other": "Залиште відгук про фільм"
@@ -592,7 +676,7 @@
     "other": "Знайдено фільмів"
   },
   "again": {
-    "other": "Знову"
+    "other": "Заново"
   },
   "search": {
     "other": "Пошук"
@@ -619,7 +703,7 @@
     "other": "Введіть вашу оцінку фільму"
   },
   "filmRequestReview": {
-    "other": "Введіть ваш відгук до фільму"
+    "other": "Введіть ваш відгук про фільм"
   },
   "updateFilmFailure": {
     "other": "Не вдалося оновити фільм"
@@ -628,7 +712,7 @@
     "other": "Помилка при оновленні списку фільмів"
   },
   "choiceWay": {
-    "other": "Оберіть один зі способів"
+    "other": "Виберіть один із варіантів"
   },
   "filmRequestLink": {
     "other": "Надішліть посилання на фільм"
@@ -643,10 +727,10 @@
     "other": "Не вдалося створити фільм"
   },
   "createFilmSuccess": {
-    "other": "Новий фільм успішно створено"
+    "other": "Фільм успішно створено"
   },
   "createCollectionFilmSuccess": {
-    "other": "Новий фільм успішно додано до колекції \"{{.Collection}}\""
+    "other": "Фільм успішно додано до колекції <code>{{.Collection}}</code>"
   },
   "lastPageAlert": {
     "other": "Ви вже на останній сторінці"
@@ -655,13 +739,13 @@
     "other": "Ви вже на першій сторінці"
   },
   "deleteFilmConfirm": {
-    "other": "Ви впевнені, що хочете видалити фільм \"{{.Film}}\"?"
+    "other": "Ви впевнені, що хочете видалити фільм <code>{{.Film}}</code>?"
   },
   "deleteFilmFailure": {
-    "other": "Не вдалося видалити фільм \"{{.Film}}\""
+    "other": "Не вдалося видалити фільм <code>{{.Film}}</code>"
   },
   "deleteFilmSuccess": {
-    "other": "Фільм \"{{.Film}}\" успішно видалено"
+    "other": "Фільм <code>{{.Film}}</code> успішно видалено"
   },
   "collectionRequestName": {
     "other": "Введіть назву колекції"
@@ -679,34 +763,34 @@
     "other": "Не вдалося створити колекцію"
   },
   "createCollectionSuccess": {
-    "other": "Нову колекцію успішно створено!"
+    "other": "Колекцію успішно створено"
   },
   "deleteCollectionConfirm": {
-    "other": "Ви впевнені, що хочете видалити колекцію \"{{.Collection}}\"?"
+    "other": "Ви впевнені, що хочете видалити колекцію <code>{{.Collection}}</code>?"
   },
   "deleteCollectionFailure": {
-    "other": "Не вдалося видалити колекцію \"{{.Collection}}\""
+    "other": "Не вдалося видалити колекцію <code>{{.Collection}}</code>"
   },
   "deleteCollectionSuccess": {
-    "other": "Колекцію \"{{.Collection}}\" успішно видалено"
+    "other": "Колекцію <code>{{.Collection}}</code> успішно видалено"
   },
   "getCollectionFailure": {
     "other": "Помилка при отриманні колекції"
   },
   "filmToCollectionSuccess": {
-    "other": "Фільм \"{{.Film}}\" успішно додано до колекції \"{{.Collection}}\""
+    "other": "Фільм <code>{{.Film}}</code> успішно додано до колекції <code>{{.Collection}}</code>"
   },
   "filmsNotFound": {
-    "other": "Фільми не знайдено"
+    "other": "Фільми не знайдені"
   },
-  "choiceFilmToCollection": {
-    "other": "Оберіть, який фільм додати до колекції?"
+  "choiceFilm": {
+    "other": "Оберіть фільм"
   },
   "collectionsNotFound": {
     "other": "Колекції не знайдено"
   },
-  "choiceCollectionToFilm": {
-    "other": "Оберіть, до якої колекції додати фільм?"
+  "choiceCollection": {
+    "other": "Оберіть колекцію"
   },
   "adminOptionUserCount": {
     "other": "Дізнатися кількість користувачів"
@@ -715,7 +799,7 @@
     "other": "Надіслати розсилку"
   },
   "adminOptionFeedback": {
-    "other": "Переглянути відгуки"
+    "other": "Перегляд відгуків"
   },
   "adminOptionUserList": {
     "other": "Список користувачів"
@@ -727,7 +811,7 @@
     "other": "Унікальні користувачі бота"
   },
   "recipientCount": {
-    "other": "Кількість одержувачів"
+    "other": "Кількість отримувачів"
   },
   "requestBroadcastMessage": {
     "other": "Введіть повідомлення для розсилки"
@@ -746,9 +830,6 @@
   },
   "deleteFeedbackFailure": {
     "other": "Не вдалося видалити відгук"
-  },
-  "deleteFeedbackSuccess": {
-    "other": "Відгук успішно видалено"
   },
   "emptyUserList": {
     "other": "Список користувачів порожній"
@@ -769,16 +850,16 @@
     "other": "Створено"
   },
   "badFormatID": {
-    "other": "Неправильний формат ID"
+    "other": "Невірний формат ID"
   },
   "banFailure": {
-    "other": "Помилка при блокуванні користувача"
+    "other": "Помилка під час блокування користувача"
   },
   "banSuccess": {
     "other": "Користувач \"{{.User}}\" успішно заблокований"
   },
   "unbanFailure": {
-    "other": "Помилка при розблокуванні користувача"
+    "other": "Помилка під час розблокування користувача"
   },
   "unbanSuccess": {
     "other": "Користувач \"{{.User}}\" успішно розблокований"
@@ -793,16 +874,16 @@
     "other": "Всього фільмів"
   },
   "pageCounter": {
-    "other": "Сторінка {{.CurrentPage}} із {{.LastPage}}"
+    "other": "Сторінка {{.CurrentPage}} з {{.LastPage}}"
   },
   "choiceFilmForDetails": {
-    "other": "Оберіть фільм, щоб дізнатися більше"
+    "other": "Виберіть фільм, щоб дізнатися більше"
   },
   "collection": {
     "other": "Колекція"
   },
   "notFoundFilmsInCollection": {
-    "other": "Фільми у цій колекції не знайдено"
+    "other": "У цій колекції не знайдено фільмів"
   },
   "yourRating": {
     "other": "Ваша оцінка"
@@ -817,13 +898,13 @@
     "other": "Всього колекцій"
   },
   "choiceCollectionForDetails": {
-    "other": "Оберіть колекцію, щоб дізнатися більше"
+    "other": "Виберіть колекцію, щоб дізнатися більше"
   },
   "backward": {
     "other": "Назад"
   },
   "forward": {
-    "other": "Далі"
+    "other": "Вперед"
   },
   "cancel": {
     "other": "Скасувати"
@@ -839,15 +920,6 @@
   },
   "back": {
     "other": "Повернутися"
-  },
-  "offers": {
-    "other": "Пропозиції"
-  },
-  "mistakes": {
-    "other": "Помилки"
-  },
-  "otherIssues": {
-    "other": "Інші питання"
   },
   "edit": {
     "other": "Редагувати"
@@ -871,7 +943,7 @@
     "other": "Вручну"
   },
   "fromURL": {
-    "other": "З зовнішнього URL"
+    "other": "Зовнішній URL"
   },
   "createCollection": {
     "other": "Створити колекцію"
@@ -892,13 +964,13 @@
     "other": "Додати фільм до колекції"
   },
   "choiceFromFilms": {
-    "other": "Оберіть із моїх фільмів"
+    "other": "Вибрати з моїх фільмів"
   },
   "unknownCommand": {
     "other": "Невідома команда. Введіть /menu"
   },
   "sendImageFailure": {
-    "other": "Помилка під час відправлення зображення"
+    "other": "Помилка надсилання зображення"
   },
   "author": {
     "other": "Автор"
@@ -916,7 +988,7 @@
     "other": "Коментарі"
   },
   "dateOfRelease": {
-    "other": "Дата публікації"
+    "other": "Опубліковано"
   },
   "year": {
     "other": "Рік"

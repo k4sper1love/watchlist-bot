@@ -11,7 +11,7 @@
   "issues": {
     "other": "Другие вопросы"
   },
-  "messageWillBePin": {
+  "messageWillPin": {
     "other": "Сообщение будет закреплено"
   },
   "requestBroadcastPin": {
@@ -595,7 +595,6 @@
     "other": "Ошибка при отправке сообщения"
   },
   "feedbackSuccess": {
-
     "other": "Спасибо за ваше сообщение!"
   },
   "tryLater": {
@@ -766,7 +765,6 @@
   "createCollectionSuccess": {
     "other": "Коллекция успешно создана"
   },
-
   "deleteCollectionConfirm": {
     "other": "Вы уверены, что хотите удалить коллекцию <code>{{.Collection}}</code>?"
   },
@@ -953,7 +951,6 @@
   "updateCollection": {
     "other": "Обновить коллекцию"
   },
-
   "deleteCollection": {
     "other": "Удалить коллекцию"
   },
