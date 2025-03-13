@@ -58,7 +58,7 @@ func prepareImageRequest(app models.App, data []byte) (*http.Request, error) {
 		return nil, fmt.Errorf("failed to close writer: %v", err)
 	}
 
-	request, err := http.NewRequest(http.MethodPost, app.Vars.Host+"/upload", body)
+	request, err := http.NewRequest(http.MethodPost, app.Config.APIHost+"/upload", body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %v", err)
 	}

@@ -41,7 +41,7 @@ func CreateCollectionFilm(app models.App, session *models.Session) (*apiModels.C
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodPost,
-			URL:                fmt.Sprintf("%s/api/v1/collections/%d/films", app.Vars.Host, session.CollectionDetailState.Collection.ID),
+			URL:                fmt.Sprintf("%s/api/v1/collections/%d/films", app.Config.APIHost, session.CollectionDetailState.Collection.ID),
 			Body:               session.FilmDetailState,
 			ExpectedStatusCode: http.StatusCreated,
 		},
@@ -66,7 +66,7 @@ func AddCollectionFilm(app models.App, session *models.Session) (*apiModels.Coll
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodPost,
-			URL:                fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID),
+			URL:                fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Config.APIHost, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID),
 			ExpectedStatusCode: http.StatusCreated,
 		},
 	)
@@ -90,7 +90,7 @@ func DeleteCollectionFilm(app models.App, session *models.Session) error {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodDelete,
-			URL:                fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID),
+			URL:                fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Config.APIHost, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID),
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)
@@ -103,16 +103,12 @@ func DeleteCollectionFilm(app models.App, session *models.Session) error {
 }
 
 func buildGetCollectionFilmsURL(app models.App, session *models.Session) string {
-	baseURL := fmt.Sprintf("%s/api/v1/collections/%d/films", app.Vars.Host, session.CollectionDetailState.ObjectID)
+	baseURL := fmt.Sprintf("%s/api/v1/collections/%d/films", app.Config.APIHost, session.CollectionDetailState.ObjectID)
+	state := session.FilmsState
 	queryParams := url.Values{}
 
-	state := session.FilmsState
-
 	queryParams = addFilmsBasicParams(queryParams, state.Title, state.CurrentPage, state.PageSize)
-
 	queryParams = addFilmsFilterAndSortingParams(queryParams, state.CollectionFilters, state.CollectionSorting)
 
-	requestURL := fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
-
-	return requestURL
+	return fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
 }

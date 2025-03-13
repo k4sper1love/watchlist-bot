@@ -9,60 +9,34 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleFeedbackDetailCommand(app models.App, session *models.Session) {
-	feedback, err := postgres.GetFeedbackByID(session.AdminState.FeedbackID)
-	if err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
-		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectFeedback).Build(session.Lang)
-		app.SendMessage(msg, keyboard)
-		session.ClearAllStates()
-		return
+	if feedback, err := postgres.GetFeedbackByID(session.AdminState.FeedbackID); err != nil {
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallAdminFeedback))
+	} else {
+		app.SendMessage(messages.FeedbackDetail(session, feedback), keyboards.FeedbackDetail(session))
 	}
-
-	msg := messages.BuildFeedbackDetailMessage(session, feedback)
-	keyboard := keyboards.BuildAdminFeedbackDetailKeyboard(session)
-
-	app.SendMessage(msg, keyboard)
 }
 
 func HandleFeedbackDetailButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 
-	switch {
-	case callback == states.CallbackAdminFeedbackDetailBack:
+	switch callback {
+	case states.CallFeedbackDetailBack:
 		general.RequireRole(app, session, HandleFeedbacksCommand, roles.Admin)
 
-	case callback == states.CallbackAdminFeedbackDetailDelete:
+	case states.CallFeedbackDetailDelete:
 		general.RequireRole(app, session, handleFeedbackDetailDelete, roles.Admin)
 	}
 }
 
 func handleFeedbackDetailDelete(app models.App, session *models.Session) {
-	feedback, err := postgres.GetFeedbackByID(session.AdminState.FeedbackID)
-	if err != nil {
-		handleFeedbackDetailError(app, session)
+	if err := postgres.DeleteFeedbackByID(session.AdminState.FeedbackID); err != nil {
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallAdminFeedback))
 		return
 	}
 
-	err = postgres.DeleteFeedbackByID(int(feedback.ID))
-	if err != nil {
-		handleFeedbackDetailError(app, session)
-		return
-	}
-
-	msg := "🗑️ " + translator.Translate(session.Lang, "deleteFeedbackSuccess", map[string]interface{}{
-		"ID": feedback.ID,
-	}, nil)
-	app.SendMessage(msg, nil)
-
+	app.SendMessage(messages.FeedbackDeleteSuccess(session), nil)
 	HandleFeedbacksCommand(app, session)
-}
-
-func handleFeedbackDetailError(app models.App, session *models.Session) {
-	msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
-	keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectFeedback).Build(session.Lang)
-	app.SendMessage(msg, keyboard)
 }

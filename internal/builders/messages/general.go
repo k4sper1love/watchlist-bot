@@ -8,86 +8,98 @@ import (
 	"strings"
 )
 
-func BuildStartMessage(app models.App, session *models.Session) string {
-	part1 := translator.Translate(session.Lang, "welcomeMessageGreeting", map[string]interface{}{
-		"Name": utils.ParseTelegramName(app.Upd),
-	}, nil)
-
-	part2 := translator.Translate(session.Lang, "welcomeMessageBody", map[string]interface{}{
-		"Version": app.Vars.Version,
-	}, nil)
-
-	part3 := translator.Translate(session.Lang, "welcomeMessageCallToAction", nil, nil)
-
-	msg := fmt.Sprintf("👋 <b>%s</b>\n\n%s 🚀\n\n%s", part1, part2, part3)
-
-	return msg
+func Start(app models.App, session *models.Session) string {
+	return fmt.Sprintf("👋 %s\n\n%s 🚀",
+		toBold(translator.Translate(session.Lang, "welcomeMessageGreeting", map[string]interface{}{
+			"Name": utils.ParseTelegramName(app.Update),
+		}, nil)),
+		translator.Translate(session.Lang, "welcomeMessageBody", map[string]interface{}{
+			"Version": app.Config.Version,
+		}, nil))
 }
 
-func BuildHelpMessage(session *models.Session) string {
-	msg := translator.Translate(session.Lang, "helpMessage", nil, nil)
-
-	return msg
+func Help(session *models.Session) string {
+	return translator.Translate(session.Lang, "helpMessage", nil, nil)
 }
 
-func BuildFeedbackMessage(session *models.Session) string {
-	part1 := translator.Translate(session.Lang, "feedbackMessageHeader", nil, nil)
-	part2 := translator.Translate(session.Lang, "feedbackMessageBody", nil, nil)
-	part3 := translator.Translate(session.Lang, "feedbackCategoryChoice", nil, nil)
-
-	msg := fmt.Sprintf("💬 <b>%s</b>\n\n<i>%s</i> 😊\n\n%s", part1, part2, part3)
-
-	return msg
+func Menu(session *models.Session) string {
+	return fmt.Sprintf("📋 %s\n\n%s",
+		toBold(translator.Translate(session.Lang, "mainMenu", nil, nil)),
+		translator.Translate(session.Lang, "choiceAction", nil, nil))
 }
 
-func BuildMenuMessage(session *models.Session) string {
-	part1 := translator.Translate(session.Lang, "mainMenu", nil, nil)
-	part2 := translator.Translate(session.Lang, "choiceAction", nil, nil)
-
-	msg := fmt.Sprintf("📋 <b>%s</b>\n\n%s", part1, part2)
-
-	return msg
-}
-
-func BuildLanguageMessage() (string, error) {
-	var res string
-
-	languages, err := utils.ParseSupportedLanguages("./locales")
-	if err != nil {
-		return "", err
-	}
-
+func Languages(languages []string) string {
+	var msg strings.Builder
 	for _, language := range languages {
-		translatedMsg := translator.Translate(language, "choiceLanguage", nil, nil)
-		upperLanguage := strings.ToUpper(language)
-		res += fmt.Sprintf("<b>%s</b>: %s\n\n", upperLanguage, translatedMsg)
+		msg.WriteString(fmt.Sprintf("%s: %s\n\n",
+			toBold(strings.ToUpper(language)),
+			translator.Translate(language, "choiceLanguage", nil, nil)))
 	}
-
-	return res, nil
+	return msg.String()
 }
 
-func BuildKinopoiskTokenMessage(session *models.Session) string {
-	msg := "⚠️ " + translator.Translate(session.Lang, "tokenRequestInfo", nil, nil)
-
-	if session.KinopoiskAPIToken != "" {
-		part := translator.Translate(session.Lang, "currentToken", nil, nil)
-		msg += fmt.Sprintf("\n\n%s: <code>%s</code>", part, session.KinopoiskAPIToken)
-	}
-
-	part := translator.Translate(session.Lang, "tokenRequest", nil, nil)
-	msg += fmt.Sprintf("\n\n<b>%s</b>", part)
-
-	return msg
+func LanguagesFailure(session *models.Session) string {
+	return fmt.Sprintf("🚨 %s\n\n%s",
+		translator.Translate(session.Lang, "someError", nil, nil),
+		translator.Translate(session.Lang, "setDefaultLanguage", nil, nil))
 }
 
-func BuildKinopoiskTokenSuccessMessage(session *models.Session) string {
+func RequestKinopoiskToken(session *models.Session) string {
+	return fmt.Sprintf("⚠️ %s\n\n%s%s",
+		translator.Translate(session.Lang, "tokenRequestInfo", nil, nil),
+		formatOptionalString(translator.Translate(session.Lang, "currentToken", nil, nil),
+			toCode(session.KinopoiskAPIToken), "%s: %s\n\n"),
+		toBold(translator.Translate(session.Lang, "tokenRequest", nil, nil)))
+}
+
+func KinopoiskTokenSuccess(session *models.Session) string {
 	return "✅ " + translator.Translate(session.Lang, "tokenSuccess", nil, nil)
 }
 
-func toBold(text string) string {
-	return fmt.Sprintf("<b>%s</b>", text)
+func UnknownCommand(session *models.Session) string {
+	return "❗" + translator.Translate(session.Lang, "unknownCommand", nil, nil)
 }
 
-func toCode(text string) string {
-	return fmt.Sprintf("<code>%s</code>", text)
+func UnknownState(session *models.Session) string {
+	return "❗" + translator.Translate(session.Lang, "unknownState", nil, nil)
+}
+
+func SessionError(lang string) string {
+	return translator.Translate(lang, "sessionError", nil, nil)
+}
+
+func CancelAction(session *models.Session) string {
+	return "🚫 " + translator.Translate(session.Lang, "cancelAction", nil, nil)
+}
+
+func LastPageAlert(session *models.Session) string {
+	return "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
+}
+
+func FirstPageAlert(session *models.Session) string {
+	return "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
+}
+
+func ImageFailure(session *models.Session) string {
+	return "⚠️ " + translator.Translate(session.Lang, "getImageFailure", nil, nil)
+}
+
+func ChoiceWay(session *models.Session) string {
+	return toBold(translator.Translate(session.Lang, "choiceWay", nil, nil))
+}
+
+func KinopoiskFailureCode(session *models.Session, code int) string {
+	return "🚨 " + translator.Translate(session.Lang, fmt.Sprintf("token%d", code), nil, nil)
+}
+
+func SomeError(session *models.Session) string {
+	return "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
+}
+
+func NotFound(session *models.Session) string {
+	return "❗️" + translator.Translate(session.Lang, "notFound", nil, nil)
+}
+
+func RequestFailure(session *models.Session) string {
+	return "🚨" + translator.Translate(session.Lang, "requestFailure", nil, nil)
 }

@@ -1,7 +1,6 @@
 package watchlist
 
 import (
-	"fmt"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
@@ -15,7 +14,7 @@ func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodGet,
-			URL:                fmt.Sprintf("%s/api/v1/user", app.Vars.Host),
+			URL:                app.Config.APIHost + "/api/v1/user",
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)
@@ -39,7 +38,7 @@ func UpdateUser(app models.App, session *models.Session) (*apiModels.User, error
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodPut,
-			URL:                fmt.Sprintf("%s/api/v1/user", app.Vars.Host),
+			URL:                app.Config.APIHost + "/api/v1/user",
 			Body:               session.ProfileState,
 			ExpectedStatusCode: http.StatusOK,
 		},
@@ -64,7 +63,7 @@ func DeleteUser(app models.App, session *models.Session) error {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodDelete,
-			URL:                fmt.Sprintf("%s/api/v1/user", app.Vars.Host),
+			URL:                app.Config.APIHost + "/api/v1/user",
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)

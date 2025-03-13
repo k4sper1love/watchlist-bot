@@ -11,12 +11,9 @@ import (
 
 func GetSessionByTelegramID(app models.App) (*models.Session, error) {
 	var session models.Session
+	telegramID := utils.ParseTelegramID(app.Update)
 
-	telegramID := utils.ParseTelegramID(app.Upd)
-	lang := utils.ParseLanguageCode(app.Upd)
-	username := utils.ParseTelegramUsername(app.Upd)
-
-	if err := GetDB().
+	if err := GetDatabase().
 		Preload("ProfileState").
 		Preload("FeedbackState").
 		Preload("CollectionsState").
@@ -32,28 +29,28 @@ func GetSessionByTelegramID(app models.App) (*models.Session, error) {
 		Preload("AdminState").
 		FirstOrInit(&session, models.Session{TelegramID: telegramID}).Error; err != nil {
 		sl.Log.Warn(
-			"failed to get session by telegram ID",
+			"failed to get session by Telegram ID",
 			slog.Any("error", err),
 			slog.Int("telegram_id", telegramID),
 		)
 		return nil, err
 	}
 
-	session = initializeSessionDefaults(session, lang, username, app.Vars.RootID)
+	initializeSessionDefaults(app, &session)
 	return &session, nil
 }
 
-func initializeSessionDefaults(session models.Session, lang, username string, rootID int) models.Session {
-	if session.TelegramID == rootID {
+func initializeSessionDefaults(app models.App, session *models.Session) {
+	if session.TelegramID == app.Config.RootID {
 		session.Role = roles.Root
 	}
 
-	if session.TelegramUsername == "" && username != "" {
-		session.TelegramUsername = username
+	if session.TelegramUsername == "" {
+		session.TelegramUsername = utils.ParseTelegramUsername(app.Update)
 	}
 
 	if session.Lang == "" {
-		session.Lang = lang
+		session.Lang = utils.ParseLanguageCode(app.Update)
 	}
 
 	if session.AdminState == nil {
@@ -85,19 +82,38 @@ func initializeSessionDefaults(session models.Session, lang, username string, ro
 	}
 
 	if session.FilmsState.FilmFilters == nil {
-		session.FilmsState.FilmFilters = &models.FiltersFilm{}
+		session.FilmsState.FilmFilters = &models.FilmFilters{
+			FilterableID:   session.FilmsState.ID,
+			FilterableType: "FilmsState",
+		}
 	}
 
 	if session.FilmsState.CollectionFilters == nil {
-		session.FilmsState.CollectionFilters = &models.FiltersFilm{}
+		session.FilmsState.CollectionFilters = &models.FilmFilters{
+			FilterableID:   session.FilmsState.ID,
+			FilterableType: "CollectionsState",
+		}
 	}
 
 	if session.FilmsState.FilmSorting == nil {
-		session.FilmsState.FilmSorting = &models.Sorting{}
+		session.FilmsState.FilmSorting = &models.Sorting{
+			SortableID:   session.FilmsState.ID,
+			SortableType: "FilmsState",
+		}
 	}
 
 	if session.FilmsState.CollectionSorting == nil {
-		session.FilmsState.CollectionSorting = &models.Sorting{}
+		session.FilmsState.CollectionSorting = &models.Sorting{
+			SortableID:   session.FilmsState.ID,
+			SortableType: "CollectionsState",
+		}
+	}
+
+	if session.CollectionsState.Sorting == nil {
+		session.CollectionsState.Sorting = &models.Sorting{
+			SortableID:   session.CollectionsState.ID,
+			SortableType: "CollectionsState",
+		}
 	}
 
 	if session.FilmDetailState == nil {
@@ -107,25 +123,8 @@ func initializeSessionDefaults(session models.Session, lang, username string, ro
 	if session.CollectionFilmsState == nil {
 		session.CollectionFilmsState = &models.CollectionFilmsState{}
 	}
-
-	return session
 }
 
 func SaveSessionWithDependencies(session *models.Session) {
-	//Save(
-	//	session,
-	//	session.ProfileState,
-	//	session.FeedbackState,
-	//	session.CollectionsState,
-	//	session.CollectionDetailState,
-	//	session.FilmDetailState,
-	//	session.CollectionFilmsState,
-	//	session.AdminState,
-	//	session.FilmsState,
-	//	session.FilmsState.FilmFilters,
-	//	session.FilmsState.CollectionFilters,
-	//	session.FilmsState.FilmSorting,
-	//	session.FilmsState.CollectionSorting,
-	//)
-	db.Session(&gorm.Session{FullSaveAssociations: true}).Save(session)
+	GetDatabase().Session(&gorm.Session{FullSaveAssociations: true}).Save(session)
 }

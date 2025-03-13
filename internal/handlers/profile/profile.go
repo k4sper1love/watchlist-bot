@@ -1,4 +1,4 @@
-package users
+package profile
 
 import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
@@ -10,28 +10,20 @@ import (
 )
 
 func HandleProfileCommand(app models.App, session *models.Session) {
-	user, err := watchlist.GetUser(app, session)
-	if err != nil {
+	if user, err := watchlist.GetUser(app, session); err != nil {
 		app.SendMessage(err.Error(), nil)
-		return
+	} else {
+		session.User = *user
+		app.SendMessage(messages.Profile(session), keyboards.Profile(session))
 	}
-	session.User = *user
-
-	msg := messages.BuildProfileMessage(session)
-
-	keyboard := keyboards.BuildProfileKeyboard(session)
-
-	app.SendMessage(msg, keyboard)
 }
 
 func HandleProfileButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
-
-	switch {
-	case callback == states.CallbackProfileSelectUpdate:
+	switch utils.ParseCallback(app.Update) {
+	case states.CallProfileUpdate:
 		HandleUpdateProfileCommand(app, session)
 
-	case callback == states.CallbackProfileSelectDelete:
+	case states.CallProfileDelete:
 		HandleDeleteProfileCommand(app, session)
 	}
 }

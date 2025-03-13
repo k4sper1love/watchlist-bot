@@ -6,79 +6,66 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
+	"strings"
 )
 
 func HandleFindFilmsCommand(app models.App, session *models.Session) {
-	metadata, err := GetFilms(app, session)
-	if err != nil {
-		app.SendMessage(err.Error(), nil)
-		return
+	if metadata, err := getFilms(app, session); err != nil {
+		app.SendMessage(messages.FilmsFailure(session), keyboards.FilmsNotFound(session))
+	} else {
+		app.SendMessage(messages.FindFilms(session, metadata), keyboards.FindFilms(session, metadata.CurrentPage, metadata.LastPage))
 	}
-
-	if metadata.TotalRecords == 0 {
-		msg := "❗️" + translator.Translate(session.Lang, "filmsNotFound", nil, nil)
-		keyboard := keyboards.NewKeyboard().AddAgain(states.CallbackFindFilmsAgain).AddBack(states.CallbackFindFilmsBack).Build(session.Lang)
-		app.SendMessage(msg, keyboard)
-		return
-	}
-
-	msg := messages.BuildFindFilmsMessage(session, metadata)
-
-	keyboard := keyboards.BuildFindFilmsKeyboard(session, metadata.CurrentPage, metadata.LastPage)
-
-	app.SendMessage(msg, keyboard)
 }
 
 func HandleFindFilmsButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 
-	switch {
-	case callback == states.CallbackFindFilmsBack:
+	switch callback {
+	case states.CallFindFilmsBack:
 		session.ClearAllStates()
 		HandleFilmsCommand(app, session)
-		return
 
-	case callback == states.CallbackFindFilmsAgain:
+	case states.CallFindFilmsAgain:
 		session.ClearAllStates()
-		handleFilmsFindByTitle(app, session)
-		return
+		requestFindFilmsTitle(app, session)
 
-	case callback == states.CallbackFindFilmsNextPage:
-		if session.FilmsState.CurrentPage < session.FilmsState.LastPage {
-			session.FilmsState.CurrentPage++
-			HandleFindFilmsCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
+	default:
+		if strings.HasPrefix(callback, states.FindFilmsPage) {
+			handleFindFilmsPagination(app, session, callback)
 		}
-
-	case callback == states.CallbackFindFilmsPrevPage:
-		if session.FilmsState.CurrentPage > 1 {
-			session.FilmsState.CurrentPage--
-			HandleFindFilmsCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
-		}
-
-	case callback == states.CallbackFindFilmsLastPage:
-		if session.FilmsState.CurrentPage != session.FilmsState.LastPage {
-			session.FilmsState.CurrentPage = session.FilmsState.LastPage
-			HandleFindFilmsCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
-		}
-
-	case callback == states.CallbackFindFilmsFirstPage:
-		if session.FilmsState.CurrentPage != 1 {
-			session.FilmsState.CurrentPage = 1
-			HandleFindFilmsCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
-		}
-
 	}
+}
+
+func handleFindFilmsPagination(app models.App, session *models.Session, callback string) {
+	switch callback {
+	case states.CallFindFilmsPageNext:
+		if session.FilmsState.CurrentPage >= session.FilmsState.LastPage {
+			app.SendMessage(messages.LastPageAlert(session), nil)
+			return
+		}
+		session.FilmsState.CurrentPage++
+
+	case states.CallFindFilmsPagePrev:
+		if session.FilmsState.CurrentPage <= 1 {
+			app.SendMessage(messages.FirstPageAlert(session), nil)
+			return
+		}
+		session.FilmsState.CurrentPage--
+
+	case states.CallFindFilmsPageLast:
+		if session.FilmsState.CurrentPage == session.FilmsState.LastPage {
+			app.SendMessage(messages.LastPageAlert(session), nil)
+			return
+		}
+		session.FilmsState.CurrentPage = session.FilmsState.LastPage
+
+	case states.CallFindFilmsPageFirst:
+		if session.FilmsState.CurrentPage == 1 {
+			app.SendMessage(messages.FirstPageAlert(session), nil)
+			return
+		}
+		session.FilmsState.CurrentPage = 1
+	}
+
+	HandleFindFilmsCommand(app, session)
 }

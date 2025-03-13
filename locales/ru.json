@@ -2,7 +2,16 @@
   "choiceLanguage": {
     "other": "Пожалуйста, выберите язык для общения с ботом. Вы сможете поменять его в настройках"
   },
-  "messageWillBePin": {
+  "suggestions": {
+    "other": "Предложения"
+  },
+  "bugs": {
+    "other": "Ошибки"
+  },
+  "issues": {
+    "other": "Другие вопросы"
+  },
+  "messageWillPin": {
     "other": "Сообщение будет закреплено"
   },
   "requestBroadcastPin": {
@@ -21,7 +30,10 @@
     "other": "Значение должно быть в диапазоне <b>[{{.Min}}, {{.Max}}]</b>"
   },
   "invalidInputURL": {
-    "other": "Неверный URL"
+    "other": "Неверный URL или длина не находится в диапазоне <b>[{{.Min}}, {{.Max}}]</b> символов"
+  },
+  "invalidInputEmail": {
+    "other": "Неверный email или длина не находится в диапазоне <b>[{{.Min}}, {{.Max}}]</b> символов"
   },
   "kinopoiskToken": {
     "other": "Kinopoisk токен"
@@ -32,10 +44,10 @@
   "changeToken": {
     "other": "Сменить токен"
   },
-  "tokenLimit": {
+  "token403": {
     "other": "Вы достигли суточного лимита для работы с Kinopoisk"
   },
- "tokenFailure":{
+ "token401":{
    "other": "Неправильный Kinopoisk токен"
  },
   "tokenRequestInfo": {
@@ -146,7 +158,7 @@
   "user_rating": {
     "other": "Оценка"
   },
-  "hasURL": {
+  "has_url": {
     "other": "Ссылка"
   },
   "filterInstructionRange": {
@@ -228,12 +240,11 @@
   "resetSorting": {
     "other": "Сбросить сортировку"
   },
-  "raisedTo": {
-
-    "other": "Вы были повышены до роли \"{{.Role}}\""
+  "raiseTo": {
+    "other": "Вы были повышены до роли {{.Role}}"
   },
   "lowerTo": {
-    "other": "Вы были понижены до роли \"{{.Role}}\""
+    "other": "Вы были понижены до роли {{.Role}}"
   },
   "raiseUser": {
     "other": "Вы повысили {{.ID}} до роли {{.Role}}"
@@ -425,8 +436,7 @@
     "other": "Добро пожаловать в Watchlist Bot, {{.Name}}!"
   },
   "welcomeMessageBody": {
-
-    "other": "На данный момент бот находится в разработке (версия {{.Version}}), но основные функции уже доступны."
+    "other": "На данный момент бот находится в разработке (версия {{.Version}}), но основные функции уже доступны"
   },
   "welcomeMessageCallToAction": {
     "other": "Введите /help, чтобы увидеть список доступных команд."
@@ -549,7 +559,7 @@
     "other": "Язык успешно изменен на <code>{{.Language}}</code>"
   },
   "settingsPageSizeChoice": {
-    "other": "Введите новый размер (от 1 до 100)"
+    "other": "Введите новый размер"
   },
   "newPageSize": {
     "other": "Новый размер страницы"
@@ -558,7 +568,7 @@
     "other": "Текущий размер страницы"
   },
   "settingsPageSizeSuccess": {
-    "other": "Установлен размер страницы: <code>{{.Size}}</code>"
+    "other": "Новый размер страницы установлен"
   },
   "settingsCollectionsPageSizeSuccess": {
     "other": "Новый размер страницы для списка коллекций"
@@ -588,7 +598,6 @@
     "other": "Ошибка при отправке сообщения"
   },
   "feedbackSuccess": {
-
     "other": "Спасибо за ваше сообщение!"
   },
   "tryLater": {
@@ -759,7 +768,6 @@
   "createCollectionSuccess": {
     "other": "Коллекция успешно создана"
   },
-
   "deleteCollectionConfirm": {
     "other": "Вы уверены, что хотите удалить коллекцию <code>{{.Collection}}</code>?"
   },
@@ -916,15 +924,6 @@
   "back": {
     "other": "Обратно"
   },
-  "offers": {
-    "other": "Предложения"
-  },
-  "mistakes": {
-    "other": "Ошибки"
-  },
-  "otherIssues": {
-    "other": "Другие вопросы"
-  },
   "edit": {
     "other": "Редактировать"
   },
@@ -955,7 +954,6 @@
   "updateCollection": {
     "other": "Обновить коллекцию"
   },
-
   "deleteCollection": {
     "other": "Удалить коллекцию"
   },

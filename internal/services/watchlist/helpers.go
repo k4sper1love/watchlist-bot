@@ -15,7 +15,6 @@ func parseAuth(dest *models.Session, data io.Reader) error {
 	}{
 		Auth: auth,
 	})
-
 	if err != nil {
 		return err
 	}

@@ -1,12 +1,108 @@
 {
   "choiceLanguage": {
-    "other": "Please select a language to communicate with the bot. You can change it in the settings"
+    "other": "Please select a language for communication with the bot. You can change it in the settings"
+  },
+  "suggestions": {
+    "other": "Suggestions"
+  },
+  "bugs": {
+    "other": "Bugs"
+  },
+  "issues": {
+    "other": "Other issues"
+  },
+  "messageWillPin": {
+    "other": "The message will be pinned"
+  },
+  "requestBroadcastPin": {
+    "other": "Do you want to pin the message?"
+  },
+  "getCollectionsFailure": {
+    "other": "Error retrieving collections"
+  },
+  "getFilmsFailure": {
+    "other": "Error retrieving films"
+  },
+  "invalidInputLength": {
+    "other": "The length must be within the range <b>[{{.Min}}, {{.Max}}]</b> characters"
+  },
+  "invalidInputRange": {
+    "other": "The value must be within the range <b>[{{.Min}}, {{.Max}}]</b>"
+  },
+  "invalidInputURL": {
+    "other": "Invalid URL or length is out of the range <b>[{{.Min}}, {{.Max}}]</b> characters"
+  },
+  "invalidInputEmail": {
+    "other": "Invalid email or length is not within the range <b>[{{.Min}}, {{.Max}}]</b> characters"
+  },
+  "kinopoiskToken": {
+    "other": "Kinopoisk token"
+  },
+  "currentToken": {
+    "other": "Current token"
+  },
+  "changeToken": {
+    "other": "Change token"
+  },
+  "token403": {
+    "other": "You have reached the daily limit for working with Kinopoisk"
+  },
+  "token401": {
+    "other": "Incorrect Kinopoisk token"
+  },
+  "tokenRequestInfo": {
+    "other": "Get a token from @kinopoiskdev_bot to work with Kinopoisk"
+  },
+  "tokenRequest": {
+    "other": "Enter the received token"
+  },
+  "tokenSuccess": {
+    "other": "Token successfully set"
+  },
+  "logsNotFound": {
+    "other": "Log file not found"
+  },
+  "logsFound": {
+    "other": "Log file found for <code>{{.ID}}</code>"
+  },
+  "logs": {
+    "other": "Logs"
+  },
+  "update": {
+    "other": "Update"
+  },
+  "manage": {
+    "other": "Manage"
+  },
+  "updateFilmSuccess": {
+    "other": "The film has been successfully updated"
+  },
+  "maxLengthInSymbols": {
+    "other": "<b>Maximum length:</b> {{.Length}} characters"
+  },
+  "chuckTextError": {
+    "other": "Text splitting error. The message is too long and cannot be sent"
+  },
+  "choiceField": {
+    "other": "Select a field"
+  },
+  "deleteFeedbackSuccess": {
+    "other": "Message <code>{{.ID}}</code> has been successfully deleted"
+  },
+  "preview": {
+    "other": "Preview"
+  },
+  "access": {
+    "other": "Access"
+  },
+  "findFilm": {
+    "other": "Find a film (kinopoisk.ru)"
   },
   "status": {
     "other": "Status"
   },
   "hintAPIUserID": {
-    "other": "<code>api_ID</code> to search API users"
+    "other": "<code>api_ID</code> for searching API users"
   },
   "makeFavorite": {
     "other": "Add to favorites"
@@ -18,22 +114,22 @@
     "other": "In favorites"
   },
   "invalidInput": {
-    "other": "Invalid input."
+    "other": "Invalid input"
   },
   "requestRangeInFormat": {
     "other": "Please specify an exact value or range in the format:"
   },
   "exampleValue": {
-    "other": "Exact value (e.g.)"
+    "other": "Exact value (for example)"
   },
   "exampleRange": {
-    "other": "Range (e.g.)"
+    "other": "Range (for example)"
   },
   "examplePartialRange": {
-    "other": "Partial range (e.g.)"
+    "other": "Partial range (for example)"
   },
   "rangeLimits": {
-    "other": "Allowed range for this field: from <code>{{.Min}}</code> to <code>{{.Max}}</code>."
+    "other": "Allowed range for this field: from <code>{{.Min}}</code> to <code>{{.Max}}</code>"
   },
   "isFavorite": {
     "other": "Favorite"
@@ -45,7 +141,7 @@
     "other": "Viewed"
   },
   "filterInstructionSwitch": {
-    "other": "Select a value for the filter <b>\"{{.Filter}}\"</b>"
+    "other": "Select a value for the <b>{{.Filter}}</b> filter"
   },
   "true": {
     "other": "Yes"
@@ -54,28 +150,28 @@
     "other": "No"
   },
   "createdAt": {
-    "other": "Creation Date"
+    "other": "Creation date"
   },
   "is_viewed": {
     "other": "Viewed"
   },
   "user_rating": {
-    "other": "User Rating"
+    "other": "Rating"
   },
-  "hasURL": {
+  "has_url": {
     "other": "Link"
   },
   "filterInstructionRange": {
-    "other": "<b>Enter a value or range</b> (e.g., <code>7.5</code> or <code>5-10</code>)."
+    "other": "<b>Enter a value or range</b> (e.g., <code>7.5</code> or <code>5-10</code>)"
   },
   "filterInstructionPartialRange": {
-    "other": "Partial ranges (<code>5-</code> or <code>-7.5</code>) will automatically complete the missing boundary."
+    "other": "Partial ranges (<code>5-</code> or <code>-7.5</code>) will automatically fill the missing boundary"
   },
-"notFoundMessages": {
+  "notFoundMessages": {
     "other": "No messages found"
   },
   "choiceMessage": {
-    "other": "Choose a message"
+    "other": "Select a message"
   },
   "created_at": {
     "other": "Creation date"
@@ -83,26 +179,26 @@
   "total_films": {
     "other": "Number of films"
   },
-"totalCollectionsFilms": {
-    "other": "Collections found"
-  },
   "filters": {
     "other": "Filters"
+  },
+  "totalCollectionsFilms": {
+    "other": "Collections found"
   },
   "sorting": {
     "other": "Sorting"
   },
   "choiceFilter": {
-    "other": "Choose a filter to enable/disable it"
+    "other": "Select a filter to enable/disable it"
   },
   "choiceSorting": {
-    "other": "Choose a field for sorting"
+    "other": "Select a sorting field"
   },
   "requestValueOrRange": {
     "other": "Enter an exact value or range using <code>-</code>"
   },
   "filterApplied": {
-    "other": "Filter successfully applied!"
+    "other": "Filter <b>{{.Filter}}</b> applied"
   },
   "resetFilters": {
     "other": "Reset filters"
@@ -114,23 +210,23 @@
     "other": "Current value"
   },
   "ratingMustBeLower": {
-    "other": "The rating must be less than or equal to the maximum rating"
+    "other": "Rating must be less than or equal to the maximum rating"
   },
   "ratingMustBeHigher": {
-    "other": "The rating must be greater than or equal to the minimum rating"
+    "other": "Rating must be greater than or equal to the minimum rating"
   },
   "filterResetSuccess": {
-    "one": "Filter successfully reset!",
-    "other": "Filters successfully reset!"
+    "one": "Filter <b>{{.Filter}}</b> reset",
+    "other": "All filters reset"
   },
   "sortingResetSuccess": {
-    "other": "Sorting parameters successfully reset!"
+    "other": "Sorting reset"
   },
   "selectedSortField": {
-    "other": "You have chosen sorting by <b>{{.Field}}</b>"
+    "other": "Sorting by <b>{{.Field}}</b>"
   },
   "requestDirection": {
-    "other": "Choose the direction"
+    "other": "Select direction"
   },
   "increaseOrder": {
     "other": "Ascending"
@@ -139,43 +235,43 @@
     "other": "Descending"
   },
   "sortingApplied": {
-    "other": "Sorting successfully applied!"
+    "other": "Sorting by <b>{{.Field}}</b> applied"
   },
   "resetSorting": {
     "other": "Reset sorting"
   },
-  "raisedTo": {
-    "other": "You have been promoted to the role of \"{{.Role}}\""
+  "raiseTo": {
+    "other": "You have been promoted to {{.Role}}"
   },
   "lowerTo": {
-    "other": "You have been demoted to the role of \"{{.Role}}\""
+    "other": "You have been demoted to {{.Role}}"
   },
   "raiseUser": {
-    "other": "You promoted {{.ID}} to the role of {{.Role}}"
+    "other": "You promoted {{.ID}} to {{.Role}}"
   },
   "lowerUser": {
-    "other": "You demoted {{.ID}} to the role of {{.Role}}"
+    "other": "You demoted {{.ID}} to {{.Role}}"
   },
   "cannotLowerSelf": {
-    "other": "You cannot demote your own role"
+    "other": "You cannot demote yourself"
   },
   "removedRole": {
-    "other": "Your administrator rights have been removed"
+    "other": "Your administrator rights have been revoked"
   },
   "removeUserRole": {
-    "other": "You removed administrator rights from {{.ID}}"
+    "other": "You revoked administrator rights from {{.ID}}"
   },
   "changedRole": {
     "other": "Your role {{.OldRole}} has been changed to {{.NewRole}}"
   },
   "changeUserRole": {
-    "other": "You changed the role of {{.ID}} from {{.OldRole}} to {{.NewRole}}"
+    "other": "You changed {{.ID}}'s role from {{.OldRole}} to {{.NewRole}}"
   },
-"someError": {
-    "other": "Some kind of error has occurred."
+  "someError": {
+    "other": "An error occurred"
   },
   "setDefaultLanguage": {
-    "other": "The default language is set"
+    "other": "Default language set"
   },
   "openInBrowser": {
     "other": "Open in browser"
@@ -183,8 +279,8 @@
   "filmURL": {
     "other": "Film URL"
   },
-  "removeFilmFromCollection": {
-    "other": "Remove film from collection"
+  "removeFromCollection": {
+    "other": "Remove from collection"
   },
   "removeFilmFailure": {
     "other": "Failed to remove film from collection"
@@ -193,13 +289,13 @@
     "other": "Film successfully removed from collection"
   },
   "requestBanReason": {
-    "other": "Specify the reason for blocking the user"
+    "other": "Specify the reason for banning the user"
   },
   "bannedBy": {
-    "other": "You have been banned by {{.Role}}"
+    "other": "You were banned by {{.Role}}"
   },
   "unbannedBy": {
-    "other": "You have been unbanned by {{.Role}}"
+    "other": "You were unbanned by {{.Role}}"
   },
   "reason": {
     "other": "Reason"
@@ -208,10 +304,10 @@
     "other": "Access to the bot is denied"
   },
   "banUser": {
-    "other": "User \"{{.ID}}\" has been banned"
+    "other": "User <code>{{.ID}}</code> has been banned"
   },
   "unbanUser": {
-    "other": "User \"{{.ID}}\" has been unbanned"
+    "other": "User <code>{{.ID}}</code> has been unbanned"
   },
   "admins": {
     "other": "Administrators"
@@ -225,14 +321,11 @@
   "broadcast": {
     "other": "Broadcast"
   },
-  "findUser": {
-    "other": "Find User"
-  },
   "requestIDOrUsername": {
     "other": "Enter ID or @username"
   },
   "superAdmin": {
-    "other": "Super Administrator"
+    "other": "Senior Administrator"
   },
   "helper": {
     "other": "Helper"
@@ -241,7 +334,7 @@
     "other": "Chief Administrator"
   },
   "manageUserRole": {
-    "other": "Change Role"
+    "other": "Change role"
   },
   "unban": {
     "other": "Unban"
@@ -250,25 +343,22 @@
     "other": "Ban"
   },
   "alreadyMaxRole": {
-    "other": "The user already has the maximum role"
+    "other": "User already has the maximum role"
   },
   "alreadyMinRole": {
-    "other": "The user already has the minimum role"
-  },
-  "findAdmin": {
-    "other": "Find Administrator"
+    "other": "User already has the minimum role"
   },
   "foundFeedbacks": {
-    "other": "Feedbacks Found"
+    "other": "Messages found"
   },
   "noAccess": {
-    "other": "No Access"
+    "other": "No access"
   },
   "viewFeedback": {
-    "other": "View Feedback"
+    "other": "View feedback"
   },
   "foundUsers": {
-    "other": "Users Found"
+    "other": "Users found"
   },
   "role": {
     "other": "Role"
@@ -277,7 +367,7 @@
     "other": "Unknown"
   },
   "requestBroadcastImage": {
-    "other": "Send a link or an image for the broadcast"
+    "other": "Send an image or a link to it for the broadcast"
   },
   "send": {
     "other": "Send"
@@ -286,10 +376,10 @@
     "other": "Cannot send an empty broadcast"
   },
   "feedbackDetails": {
-    "other": "Feedback Details"
+    "other": "Feedback details"
   },
   "currentRole": {
-    "other": "Current Role"
+    "other": "Current role"
   },
   "choiceUserForDetails": {
     "other": "Select a user"
@@ -304,10 +394,10 @@
     "other": "Empty"
   },
   "sessionDetails": {
-    "other": "Session Details"
+    "other": "Session details"
   },
   "apiDetails": {
-    "other": "API Details"
+    "other": "API details"
   },
   "updated": {
     "other": "Updated"
@@ -316,76 +406,76 @@
     "other": "Select to view details"
   },
   "needRemoveRole": {
-    "other": "You need to revoke admin rights first"
+    "other": "Administrator rights must be removed first"
   },
   "unbanned": {
-    "other": "Unblocked"
+    "other": "Unbanned"
   },
   "currenRole": {
-    "other": "Current Role"
+    "other": "Current role"
   },
   "choiceRole": {
-    "other": "Choose Role"
+    "other": "Select a role"
   },
   "success": {
     "other": "Success"
   },
   "notFound": {
-    "other": "Not Found"
+    "other": "Not found"
   },
   "raiseRole": {
-    "other": "Raise Role"
+    "other": "Promote role"
   },
   "lowerRole": {
-    "other": "Lower Role"
+    "other": "Demote role"
   },
   "removeAdminRole": {
-    "other": "Remove Administrator Role"
-},
+    "other": "Remove administrator rights"
+  },
   "welcomeMessageGreeting": {
-    "other": "Welcome to the Watchlist Bot, {{.Name}}!"
+    "other": "Welcome to Watchlist Bot, {{.Name}}!"
   },
   "welcomeMessageBody": {
-    "other": "At the moment, the bot is under development (version {{.Version}}), but the main functions are already available."
+    "other": "The bot is currently in development (version {{.Version}}), but the main features are already available."
   },
   "welcomeMessageCallToAction": {
-    "other": "Type /help to see the list of available commands."
+    "other": "Enter /help to see the list of available commands."
   },
   "listOfCommands": {
-    "other": "List of available commands"
+    "other": "List of available commands:"
   },
   "sessionError": {
-    "other": "An error occurred while receiving the session."
+    "other": "An error occurred while retrieving the session"
   },
   "bannedHeader": {
-    "other": "You are banned.."
+    "other": "You are banned."
   },
   "bannedBody": {
-    "other": "Contact your administrator to unban."
+    "other": "Contact the administrator to get unbanned."
   },
   "authRequest": {
-    "other": "You need to be authorized to run this command. Use /start"
+    "other": "You need to be authorized to execute this command. Use /start."
   },
   "authExpired": {
-    "other": "Your tokens have expired. We log in to the system"
+    "other": "Your tokens have expired. Logging in..."
   },
   "authFailure": {
-    "other": "Couldn't log in. Use /start"
+    "other": "Failed to log in. Use /start."
   },
   "authUpdated": {
     "other": "Your token has been successfully updated"
   },
   "permissionsNotEnough": {
-    "other": "Insufficient level of rights"
+    "other": "Insufficient permissions"
   },
   "mainMenu": {
-    "other": "Main Menu"
+    "other": "Main menu"
   },
   "choiceAction": {
-    "other": "Choose one of the actions"
+    "other": "Select an action"
   },
   "adminPanel": {
-    "other": "Admin-panel"
+    "other": "Admin panel"
   },
   "profile": {
     "other": "Profile"
@@ -403,7 +493,7 @@
     "other": "Feedback"
   },
   "logout": {
-    "other": "Logout"
+    "other": "Log out"
   },
   "name": {
     "other": "Name"
@@ -415,139 +505,136 @@
     "other": "Email"
   },
   "joinDate": {
-    "other": "Date of registration"
+    "other": "Registration Date"
   },
   "deleteProfileConfirm": {
-    "other": "Are you sure you want to delete \"{{.Username}}\" account"
+    "other": "Are you sure you want to delete the account <code>{{.Username}}</code>?"
   },
   "deleteProfileFailure": {
-    "other": "Account \"{{.Username}}\" could not be deleted"
+    "other": "Failed to delete the account <code>{{.Username}}</code>"
   },
   "deleteProfileSuccess": {
-    "other": "Account \"{{.Username}}\" successfully deleted!"
+    "other": "The account <code>{{.Username}}</code> has been successfully deleted!"
   },
   "cancelAction": {
-    "other": "Action cancelled"
+    "other": "Action canceled"
   },
   "updateChoiceField": {
-    "other": "Choose which field you want to change?"
+    "other": "Select which field you want to update"
   },
   "updateProfileUsername": {
-    "other": "Enter a new username"
+    "other": "Enter a new name"
   },
   "updateProfileEmail": {
-    "other": "Enter a new email address"
+    "other": "Enter a new email"
   },
   "updateProfileFailure": {
-    "other": "Account \"{{.Username}}\" update failed"
+    "other": "Failed to update the account <code>{{.Username}}</code>"
   },
   "updateProfileSuccess": {
-    "other": "Account \"{{.Username}}\" successfully updated!"
+    "other": "The account <code>{{.Username}}</code> has been successfully updated"
   },
   "settingsChoice": {
-    "other": "Select which parameter you want to change"
+    "other": "Select which parameter to change"
   },
-  "settingsLanguage": {
-    "other": "Change the language"
+  "collectionsPageSize": {
+    "other": "Collections page size"
   },
-  "settingsCollectionsPageSize": {
-    "other": "Change the number of collections on a page"
+  "filmsPageSize": {
+    "other": "Films page size"
   },
-  "settingsFilmsPageSize": {
-    "other": "Change the number of films on a page"
-  },
-  "settingsObjectsPageSize": {
-    "other": "Change the number of objects on the page"
+  "objectsPageSize": {
+    "other": "Objects page size"
   },
   "parseLanguagesFailure": {
-    "other": "Error when getting the list of available languages"
+    "other": "Error retrieving available languages"
   },
   "currentLanguage": {
     "other": "Current language"
   },
-  "settingsLanguageChoice": {
-    "other": "Select the desired language"
+  "languageChoice": {
+    "other": "Select a language"
   },
   "settingsLanguageSuccess": {
-    "other": "Language successfully changed to \"{{.Language}}\""
-  },
-  "currentCollectionsPageSize": {
-    "other": "Page size for collections"
+    "other": "Language successfully changed to <code>{{.Language}}</code>"
   },
   "settingsPageSizeChoice": {
-    "other": "Choose the desired size (from 1 and above)"
+    "other": "Enter a new size"
+  },
+  "newPageSize": {
+    "other": "New page size"
+  },
+  "currentPageSize": {
+    "other": "Current page size"
+  },
+  "settingsPageSizeSuccess": {
+    "other": "The new page size has been set"
   },
   "settingsCollectionsPageSizeSuccess": {
-    "other": "New page size for the list of collections"
-  },
-  "currentFilmsPageSize": {
-    "other": "Page size for films"
+    "other": "New page size for collections list"
   },
   "settingsFilmsPageSizeSuccess": {
-    "other": "New page size for the film list"
-  },
-  "currentObjectsPageSize": {
-    "other": "Page size for objects"
+    "other": "New page size for films list"
   },
   "settingsObjectsPageSizeSuccess": {
-    "other": "New page size for the object list"
+    "other": "New page size for objects list"
   },
   "feedbackMessageHeader": {
     "other": "Leave your feedback"
   },
   "feedbackMessageBody": {
-    "other": "Write your opinions, suggestions, or ideas, and we will definitely consider them!"
+    "other": "Write your opinion, suggestions, or ideas, and we will definitely consider them!"
   },
   "feedbackCategoryChoice": {
-    "other": "Choose a category"
+    "other": "Select a category"
   },
   "feedbackCurrentCategory": {
     "other": "You have selected the category"
   },
   "feedbackTextRequest": {
-    "other": "Please write your feedback"
+    "other": "Write your message"
   },
   "feedbackFailure": {
-    "other": "Failed to save feedback"
+    "other": "Error sending message"
   },
   "feedbackSuccess": {
-    "other": "Thank you for your feedback! We appreciate your opinion"
+    "other": "Thank you for your message!"
   },
   "tryLater": {
     "other": "Try again later"
   },
   "loginSuccess": {
-    "other": "Successfully logged into the account \"{{.Username}}\"!"
+    "other": "Logged into account <code>{{.Username}}</code>!"
   },
   "registrationSuccess": {
-    "other": "Account registration successful for \"{{.Username}}\"!"
+    "other": "Account <code>{{.Username}}</code> has been registered!"
   },
   "logoutConfirm": {
-    "other": "Are you sure you want to log out of the account \"{{.Username}}\"?"
+    "other": "Are you sure you want to log out of account <code>{{.Username}}</code>?"
   },
   "logoutFailure": {
-    "other": "Failed to log out of the account \"{{.Username}}\""
+    "other": "Failed to log out of account <code>{{.Username}}</code>"
   },
   "logoutSuccess": {
-    "other": "Successfully logged out of the account \"{{.Username}}\""
+    "other": "You have logged out of account <code>{{.Username}}</code>"
   },
   "logoutCancel": {
-    "other": "Logout canceled for the account \"{{.Username}}\""
+    "other": "Logout canceled for account <code>{{.Username}}</code>"
   },
   "unknownState": {
     "other": "Unknown state. Enter /reset to reset."
   },
   "viewedFilmViewed": {
-    "other": "The film is viewed"
+    "other": "Film marked as watched"
   },
   "viewedFilmRequestRating": {
-    "other": "Rate the film"
+    "other": "Rate the movie"
   },
   "viewedFilmCanCancel": {
-    "other": "You can cancel the film as \"viewed\" by clicking the cancel button"
+    "other": "You can cancel the 'watched' status by clicking the cancel button"
   },
   "viewedFilmRequestReview": {
-    "other": "Leave a review for the film"
+    "other": "Leave a review for the movie"
   },
   "image": {
     "other": "Image"
@@ -571,7 +658,7 @@
     "other": "Comment"
   },
   "viewed": {
-    "other": "Viewed"
+    "other": "Watched"
   },
   "userRating": {
     "other": "User rating"
@@ -583,13 +670,13 @@
     "other": "Send an image or a link to it"
   },
   "getImageFailure": {
-    "other": "Failed to retrieve the image"
+    "other": "Error retrieving image"
   },
   "filmRequestTitle": {
-    "other": "Enter the film title"
+    "other": "Enter the movie title"
   },
   "totalFindFilms": {
-    "other": "Films found"
+    "other": "Total movies found"
   },
   "again": {
     "other": "Again"
@@ -598,55 +685,55 @@
     "other": "Search"
   },
   "filmRequestDescription": {
-    "other": "Enter the film description"
+    "other": "Enter the movie description"
   },
   "filmRequestYear": {
-    "other": "Enter the film's release year"
+    "other": "Enter the movie release year"
   },
   "filmRequestGenre": {
-    "other": "Enter the film genre"
+    "other": "Enter the movie genre"
   },
   "filmRequestRating": {
-    "other": "Enter the film rating"
+    "other": "Enter the movie rating"
   },
   "filmRequestComment": {
-    "other": "Enter your comment for the film"
+    "other": "Enter your comment about the movie"
   },
   "filmRequestViewed": {
-    "other": "Have you already watched this film?"
+    "other": "Have you already watched this movie?"
   },
   "filmRequestUserRating": {
-    "other": "Enter your rating for the film"
+    "other": "Enter your rating for the movie"
   },
   "filmRequestReview": {
-    "other": "Enter your review for the film"
+    "other": "Enter your review for the movie"
   },
   "updateFilmFailure": {
-    "other": "Failed to update the film"
+    "other": "Failed to update the movie"
   },
   "updateFilmListFailure": {
-    "other": "Error updating the film list"
+    "other": "Error updating the movie list"
   },
   "choiceWay": {
-    "other": "Choose one of the ways"
+    "other": "Choose one of the options"
   },
   "filmRequestLink": {
-    "other": "Send a link to the film"
+    "other": "Send a link to the movie"
   },
   "supportedServices": {
     "other": "Supported services"
   },
   "getFilmFailure": {
-    "other": "Failed to retrieve the film"
+    "other": "Error retrieving the movie"
   },
   "createFilmFailure": {
-    "other": "Failed to create the film"
+    "other": "Failed to create the movie"
   },
   "createFilmSuccess": {
-    "other": "New film successfully created"
+    "other": "The movie was successfully created"
   },
   "createCollectionFilmSuccess": {
-    "other": "New film successfully added to the collection \"{{.Collection}}\""
+    "other": "The movie was successfully added to the collection <code>{{.Collection}}</code>"
   },
   "lastPageAlert": {
     "other": "You are already on the last page"
@@ -655,13 +742,13 @@
     "other": "You are already on the first page"
   },
   "deleteFilmConfirm": {
-    "other": "Are you sure you want to delete the film \"{{.Film}}\"?"
+    "other": "Are you sure you want to delete the movie <code>{{.Film}}</code>?"
   },
   "deleteFilmFailure": {
-    "other": "Failed to delete the film \"{{.Film}}\""
+    "other": "Failed to delete the movie <code>{{.Film}}</code>"
   },
   "deleteFilmSuccess": {
-    "other": "The film \"{{.Film}}\" has been successfully deleted"
+    "other": "The movie <code>{{.Film}}</code> was successfully deleted"
   },
   "collectionRequestName": {
     "other": "Enter the collection name"
@@ -673,46 +760,46 @@
     "other": "Failed to update the collection"
   },
   "updateCollectionSuccess": {
-    "other": "The collection has been successfully updated"
+    "other": "The collection was successfully updated"
   },
   "createCollectionFailure": {
     "other": "Failed to create the collection"
   },
   "createCollectionSuccess": {
-    "other": "The new collection has been successfully created!"
+    "other": "The collection was successfully created"
   },
   "deleteCollectionConfirm": {
-    "other": "Are you sure you want to delete the collection \"{{.Collection}}\"?"
+    "other": "Are you sure you want to delete the collection <code>{{.Collection}}</code>?"
   },
   "deleteCollectionFailure": {
-    "other": "Failed to delete the collection \"{{.Collection}}\""
+    "other": "Failed to delete the collection <code>{{.Collection}}</code>"
   },
   "deleteCollectionSuccess": {
-    "other": "The collection \"{{.Collection}}\" has been successfully deleted"
+    "other": "The collection <code>{{.Collection}}</code> was successfully deleted"
   },
   "getCollectionFailure": {
     "other": "Error retrieving the collection"
   },
   "filmToCollectionSuccess": {
-    "other": "The film \"{{.Film}}\" has been successfully added to the collection \"{{.Collection}}\""
+    "other": "The movie <code>{{.Film}}</code> was successfully added to the collection <code>{{.Collection}}</code>"
   },
   "filmsNotFound": {
-    "other": "Films not found"
+    "other": "No movies found"
   },
-  "choiceFilmToCollection": {
-    "other": "Choose which film to add to the collection?"
+  "choiceFilm": {
+    "other": "Choose a movie"
   },
   "collectionsNotFound": {
-    "other": "Collections not found"
+    "other": "No collections found"
   },
-  "choiceCollectionToFilm": {
-    "other": "Choose which collection to add the film to?"
+  "choiceCollection": {
+    "other": "Choose a collection"
   },
   "adminOptionUserCount": {
     "other": "Check the number of users"
   },
   "adminOptionBroadcast": {
-    "other": "Send a broadcast"
+    "other": "Send broadcast"
   },
   "adminOptionFeedback": {
     "other": "View feedbacks"
@@ -721,7 +808,7 @@
     "other": "User list"
   },
   "requestFailure": {
-    "other": "Request failed"
+    "other": "Failed to process request"
   },
   "uniqueUsersCount": {
     "other": "Unique bot users"
@@ -730,10 +817,10 @@
     "other": "Number of recipients"
   },
   "requestBroadcastMessage": {
-    "other": "Enter the message for the broadcast"
+    "other": "Enter the message for broadcast"
   },
   "emptyFeedbackList": {
-    "other": "No new feedback to view"
+    "other": "No new feedbacks to view"
   },
   "feedbackList": {
     "other": "Feedback list"
@@ -747,11 +834,8 @@
   "deleteFeedbackFailure": {
     "other": "Failed to delete feedback"
   },
-  "deleteFeedbackSuccess": {
-    "other": "Feedback successfully deleted"
-  },
   "emptyUserList": {
-    "other": "The user list is empty"
+    "other": "User list is empty"
   },
   "userList": {
     "other": "User list"
@@ -772,19 +856,19 @@
     "other": "Invalid ID format"
   },
   "banFailure": {
-    "other": "Error banning the user"
+    "other": "Error banning user"
   },
   "banSuccess": {
-    "other": "The user \"{{.User}}\" has been successfully banned"
+    "other": "User \"{{.User}}\" successfully banned"
   },
   "unbanFailure": {
-    "other": "Error unbanning the user"
+    "other": "Error unbanning user"
   },
   "unbanSuccess": {
-    "other": "The user \"{{.User}}\" has been successfully unbanned"
+    "other": "User \"{{.User}}\" successfully unbanned"
   },
   "helpMessage": {
-    "other": "Use /menu to interact with the bot"
+    "other": "Use /menu to work with the bot"
   },
   "unknownContext": {
     "other": "Unknown context"
@@ -796,7 +880,7 @@
     "other": "Page {{.CurrentPage}} of {{.LastPage}}"
   },
   "choiceFilmForDetails": {
-    "other": "Choose a film to learn more"
+    "other": "Select a film to learn more"
   },
   "collection": {
     "other": "Collection"
@@ -817,13 +901,13 @@
     "other": "Total collections"
   },
   "choiceCollectionForDetails": {
-    "other": "Choose a collection to learn more"
+    "other": "Select a collection to learn more"
   },
   "backward": {
     "other": "Back"
   },
   "forward": {
-    "other": "Next"
+    "other": "Forward"
   },
   "cancel": {
     "other": "Cancel"
@@ -838,16 +922,7 @@
     "other": "No"
   },
   "back": {
-    "other": "Back"
-  },
-  "offers": {
-    "other": "Suggestions"
-  },
-  "mistakes": {
-    "other": "Bugs"
-  },
-  "otherIssues": {
-    "other": "Other questions"
+    "other": "Return"
   },
   "edit": {
     "other": "Edit"
@@ -856,40 +931,40 @@
     "other": "Delete"
   },
   "createFilm": {
-    "other": "Create a film"
+    "other": "Create film"
   },
   "updateFilm": {
-    "other": "Update the film"
+    "other": "Update film"
   },
   "deleteFilm": {
-    "other": "Delete the film"
+    "other": "Delete film"
   },
   "manageFilm": {
-    "other": "Manage the film"
+    "other": "Manage film"
   },
   "manually": {
     "other": "Manually"
   },
   "fromURL": {
-    "other": "From an external URL"
+    "other": "From external URL"
   },
   "createCollection": {
-    "other": "Create a collection"
+    "other": "Create collection"
   },
   "updateCollection": {
-    "other": "Update the collection"
+    "other": "Update collection"
   },
   "deleteCollection": {
-    "other": "Delete the collection"
+    "other": "Delete collection"
   },
   "manageCollection": {
-    "other": "Manage the collection"
+    "other": "Manage collection"
   },
   "addFilmToCollection": {
-    "other": "Add a film"
+    "other": "Add film"
   },
   "addCollectionToFilm": {
-    "other": "Add a film to the collection"
+    "other": "Add film to collection"
   },
   "choiceFromFilms": {
     "other": "Choose from my films"
@@ -898,7 +973,7 @@
     "other": "Unknown command. Enter /menu"
   },
   "sendImageFailure": {
-    "other": "Failed to send the image"
+    "other": "Error sending image"
   },
   "author": {
     "other": "Author"
@@ -910,13 +985,13 @@
     "other": "Views"
   },
   "grades": {
-    "other": "Grades"
+    "other": "Ratings"
   },
   "comments": {
     "other": "Comments"
   },
   "dateOfRelease": {
-    "other": "Release date"
+    "other": "Published"
   },
   "year": {
     "other": "Year"

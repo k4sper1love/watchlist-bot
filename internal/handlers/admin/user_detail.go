@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
@@ -10,197 +9,143 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 	"strings"
 )
 
 func HandleUserDetailCommand(app models.App, session *models.Session) {
-	user, err := postgres.GetUserByTelegramID(session.AdminState.UserID)
-	if err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
-		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectUsers).Build(session.Lang)
-		app.SendMessage(msg, keyboard)
-		session.ClearAllStates()
-		return
+	if user, err := getEntity(session); err != nil {
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallAdminUsers))
+	} else {
+		app.SendMessage(messages.UserDetail(session, user), keyboards.UserDetail(session, user))
 	}
-
-	session.AdminState.UserLang = user.Lang
-	session.AdminState.UserRole = user.Role
-
-	msg := messages.BuildAdminUserDetailMessage(session, user)
-	keyboard := keyboards.BuildAdminUserDetailKeyboard(session, user)
-
-	app.SendMessage(msg, keyboard)
 }
 
 func HandleUserDetailButton(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
+	callback := utils.ParseCallback(app.Update)
 
-	switch {
-	case callback == states.CallbackAdminUserDetail:
+	switch callback {
+	case states.CallUserDetailBack:
+		general.RequireRole(app, session, HandleEntitiesCommand, roles.Admin)
+
+	case states.CallUserDetailAgain:
 		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 
-	case callback == states.CallbackAdminUserDetailBack:
-		general.RequireRole(app, session, HandleUsersCommand, roles.Admin)
-
-	case callback == states.CallbackAdminUserDetailLogs:
+	case states.CallUserDetailLogs:
 		general.RequireRole(app, session, handleUserLogs, roles.SuperAdmin)
 
-	case callback == states.CallbackAdminUserDetailUnban:
+	case states.CallUserDetailUnban:
 		general.RequireRole(app, session, handleUserUnban, roles.Admin)
 
-	case callback == states.CallbackAdminUserDetailBan:
+	case states.CallUserDetailBan:
 		general.RequireRole(app, session, handleUserBan, roles.Admin)
 
-	case callback == states.CallbackAdminUserDetailRole:
+	case states.CallUserDetailRole:
 		general.RequireRole(app, session, handleUserRole, roles.SuperAdmin)
 
-	//case callback == states.CallbackAdminUserDetailFeedback:
-
-	case strings.HasPrefix(callback, "admin_user_role_select_"):
-		general.RequireRole(app, session, processUserRole, roles.SuperAdmin)
+	default:
+		if strings.HasPrefix(callback, states.CallUserDetailRole) {
+			general.RequireRole(app, session, handleUserDetailSelect, roles.SuperAdmin)
+		}
 	}
 }
 
 func HandleUserDetailProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
 		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 		return
 	}
 
 	switch session.State {
-	case states.ProcessAdminUserDetailAwaitingReason:
-		processUserBan(app, session)
+	case states.AwaitUserDetailReason:
+		parseUserBanReason(app, session)
 	}
+}
+
+func handleUserDetailSelect(app models.App, session *models.Session) {
+	var role roles.Role
+
+	switch utils.ParseCallback(app.Update) {
+	case states.CallUserDetailRoleSelectUser:
+		role = roles.User
+
+	case states.CallUserDetailRoleSelectHelper:
+		role = roles.Helper
+
+	case states.CallUserDetailRoleSelectAdmin:
+		role = roles.Admin
+
+	case states.CallUserDetailRoleSelectSuper:
+		role = roles.SuperAdmin
+	}
+
+	processUserRole(app, session, role)
 }
 
 func handleUserLogs(app models.App, session *models.Session) {
-	path, err := utils.GetLogFilePath(session.AdminState.UserID)
-	if err != nil {
-		msg := "❗" + translator.Translate(session.Lang, "logsNotFound", nil, nil)
-		app.SendMessage(msg, nil)
-		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
-		return
+	if path, err := utils.GetLogFilePath(session.AdminState.UserID); err != nil {
+		app.SendMessage(messages.LogsNotFound(session), keyboards.Back(session, states.CallUserDetailAgain))
+	} else {
+		app.SendFile(path, messages.LogsFound(session), keyboards.Back(session, states.CallUserDetailAgain))
 	}
-
-	msg := "💾 " + translator.Translate(session.Lang, "logsFound", map[string]interface{}{
-		"ID": session.AdminState.UserID,
-	}, nil)
-
-	keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminUserDetail).Build(session.Lang)
-
-	app.SendFile(path, msg, keyboard)
 }
 
 func handleUserUnban(app models.App, session *models.Session) {
-	err := postgres.UnbanUser(session.AdminState.UserID)
-	if err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
-		app.SendMessage(msg, nil)
-	} else {
-		msg := messages.BuildUnbanMessage(session)
-		app.SendMessage(msg, nil)
-
-		msg = messages.BuildUserUnbanNotificationMessage(session)
-		app.SendMessageByID(session.AdminState.UserID, msg, nil)
+	if err := postgres.SetUserBanStatus(session.AdminState.UserID, false); err != nil {
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallUserDetailAgain))
+		return
 	}
 
+	app.SendMessage(messages.Unban(session), nil)
+	app.SendMessageByID(session.AdminState.UserID, messages.UnbanNotification(session), nil)
 	general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 }
 
 func handleUserBan(app models.App, session *models.Session) {
 	if session.AdminState.UserRole.HasAccess(roles.Helper) {
-		msg := "❗" + translator.Translate(session.Lang, "needRemoveRole", nil, nil)
-		app.SendMessage(msg, nil)
-		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
+		app.SendMessage(messages.NeedRemoveRole(session), keyboards.Back(session, states.CallUserDetailAgain))
 		return
 	}
 
-	msg := "❓" + translator.Translate(session.Lang, "requestBanReason", nil, nil)
-	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
-
-	app.SendMessage(msg, keyboard)
-
-	session.SetState(states.ProcessAdminUserDetailAwaitingReason)
+	app.SendMessage(messages.RequestBanReason(session), keyboards.SkipAndCancel(session))
+	session.SetState(states.AwaitUserDetailReason)
 }
 
-func processUserBan(app models.App, session *models.Session) {
-	var reason string
-
-	if !utils.IsSkip(app.Upd) {
-		reason = utils.ParseMessageString(app.Upd)
-	}
-
-	err := postgres.BanUser(session.AdminState.UserID)
-	if err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
-		app.SendMessage(msg, nil)
+func parseUserBanReason(app models.App, session *models.Session) {
+	if utils.IsSkip(app.Update) {
+		processUserBan(app, session, "")
 	} else {
-		msg := messages.BuildBanMessage(session, reason)
-		app.SendMessage(msg, nil)
+		processUserBan(app, session, utils.ParseMessageString(app.Update))
+	}
+}
 
-		msg = messages.BuildUserBanNotificationMessage(session, reason)
-		app.SendMessageByID(session.AdminState.UserID, msg, nil)
+func processUserBan(app models.App, session *models.Session, reason string) {
+	if err := postgres.SetUserBanStatus(session.AdminState.UserID, true); err != nil {
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallUserDetailAgain))
+		return
 	}
 
-	session.ClearAllStates()
-
+	app.SendMessage(messages.Ban(session, reason), nil)
+	app.SendMessageByID(session.AdminState.UserID, messages.BanNotification(session, reason), nil)
 	general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 }
 
 func handleUserRole(app models.App, session *models.Session) {
-	part1 := translator.Translate(session.Lang, "currentRole", nil, nil)
-	part2 := translator.Translate(session.Lang, session.AdminState.UserRole.String(), nil, nil)
-	part3 := translator.Translate(session.Lang, "choiceRole", nil, nil)
-	msg := fmt.Sprintf("<b>%s</b>: %s\n\n%s", part1, part2, part3)
-
-	keyboard := keyboards.BuildAdminUserRoleKeyboard(session)
-
-	app.SendMessage(msg, keyboard)
+	app.SendMessage(messages.ChoiceRole(session), keyboards.UserRoleSelect(session))
 }
 
-func processUserRole(app models.App, session *models.Session) {
-	if (session.AdminState.UserRole == roles.SuperAdmin && !session.Role.HasAccess(roles.Root)) || session.AdminState.UserRole.HasAccess(roles.Root) {
-		msg := "❗" + translator.Translate(session.Lang, "noAccess", nil, nil)
-		app.SendMessage(msg, nil)
-		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
+func processUserRole(app models.App, session *models.Session, role roles.Role) {
+	if !canChangeRole(session, role > session.AdminState.UserRole) {
+		app.SendMessage(messages.NoAccess(session), keyboards.Back(session, states.CallUserDetailAgain))
 		return
 	}
 
-	var role roles.Role
-
-	switch utils.ParseCallback(app.Upd) {
-	case states.CallbackAdminUserRoleSelectBack:
-		general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
+	if err := postgres.SetUserRole(session.AdminState.UserID, role); err != nil {
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallUserDetailAgain))
 		return
-
-	case states.CallbackAdminUserRoleSelectUser:
-		role = roles.User
-
-	case states.CallbackAdminUserRoleSelectHelper:
-		role = roles.Helper
-
-	case states.CallbackAdminUserRoleSelectAdmin:
-		role = roles.Admin
-
-	case states.CallbackAdminUserRoleSelectSuper:
-		role = roles.SuperAdmin
 	}
 
-	msg := " "
-
-	_, err := postgres.SetUserRole(session.AdminState.UserID, role)
-	if err != nil {
-		msg = "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
-	} else {
-		msg = messages.BuildChangeRoleNotificationMessage(session, role)
-		app.SendMessageByID(session.AdminState.UserID, msg, nil)
-
-		msg = messages.BuildChangeRoleMessage(session, role)
-	}
-
-	app.SendMessage(msg, nil)
-
+	app.SendMessage(messages.ChangeRole(session, role), nil)
+	app.SendMessageByID(session.AdminState.UserID, messages.ChangeRoleNotification(session, role), nil)
 	general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 }

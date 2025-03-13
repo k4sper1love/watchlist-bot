@@ -15,10 +15,6 @@ func GetCollections(app models.App, session *models.Session) (*models.Collection
 	return getCollectionsRequest(app, session, -1, -1, session.CollectionsState.CurrentPage, session.CollectionsState.PageSize)
 }
 
-func GetCollectionsByFilm(app models.App, session *models.Session) (*models.CollectionsResponse, error) {
-	return getCollectionsRequest(app, session, session.FilmDetailState.Film.ID, -1, session.CollectionsState.CurrentPage, session.CollectionsState.PageSize)
-}
-
 func GetCollectionsExcludeFilm(app models.App, session *models.Session) (*models.CollectionsResponse, error) {
 	return getCollectionsRequest(app, session, -1, session.FilmDetailState.Film.ID, session.CollectionFilmsState.CurrentPage, session.CollectionFilmsState.PageSize)
 }
@@ -53,7 +49,7 @@ func CreateCollection(app models.App, session *models.Session) (*apiModels.Colle
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodPost,
-			URL:                fmt.Sprintf("%s/api/v1/collections", app.Vars.Host),
+			URL:                app.Config.APIHost + "/api/v1/collections",
 			Body:               session.CollectionDetailState,
 			ExpectedStatusCode: http.StatusCreated,
 		},
@@ -78,7 +74,7 @@ func UpdateCollection(app models.App, session *models.Session) (*apiModels.Colle
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodPut,
-			URL:                fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID),
+			URL:                fmt.Sprintf("%s/api/v1/collections/%d", app.Config.APIHost, session.CollectionDetailState.Collection.ID),
 			Body:               session.CollectionDetailState,
 			ExpectedStatusCode: http.StatusOK,
 		},
@@ -103,7 +99,7 @@ func DeleteCollection(app models.App, session *models.Session) error {
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        session.AccessToken,
 			Method:             http.MethodDelete,
-			URL:                fmt.Sprintf("%s/api/v1/collections/%d", app.Vars.Host, session.CollectionDetailState.Collection.ID),
+			URL:                fmt.Sprintf("%s/api/v1/collections/%d", app.Config.APIHost, session.CollectionDetailState.Collection.ID),
 			ExpectedStatusCode: http.StatusOK,
 		},
 	)
@@ -116,34 +112,27 @@ func DeleteCollection(app models.App, session *models.Session) error {
 }
 
 func buildGetCollectionsURL(app models.App, session *models.Session, filmID, excludeFilmID, currentPage, pageSize int) string {
-	baseURL := fmt.Sprintf("%s/api/v1/collections", app.Vars.Host)
+	baseURL := fmt.Sprintf("%s/api/v1/collections", app.Config.APIHost)
 	queryParams := url.Values{}
 
 	if filmID >= 0 {
 		queryParams.Add("film", fmt.Sprintf("%d", filmID))
 	}
-
 	if excludeFilmID >= 0 {
 		queryParams.Add("exclude_film", fmt.Sprintf("%d", excludeFilmID))
 	}
-
 	if currentPage > 0 {
 		queryParams.Add("page", fmt.Sprintf("%d", currentPage))
 	}
-
 	if pageSize > 0 {
 		queryParams.Add("page_size", fmt.Sprintf("%d", pageSize))
 	}
-
 	if session.CollectionsState.Name != "" {
 		queryParams.Add("name", session.CollectionsState.Name)
 	}
-
 	if session.CollectionsState.Sorting.Sort != "" {
 		queryParams.Add("sort", session.CollectionsState.Sorting.Sort)
 	}
 
-	requestURL := fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
-
-	return requestURL
+	return fmt.Sprintf("%s?%s", baseURL, queryParams.Encode())
 }

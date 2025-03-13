@@ -1,24 +1,120 @@
 {
   "choiceLanguage": {
-    "other": "Ботпен сөйлесу үшін Тілді таңдаңыз. Сіз оны параметрлерде өзгерте аласыз"
+    "other": "Ботпен сөйлесу үшін тілді таңдаңыз. Оны баптаулардан өзгерте аласыз"
+  },
+  "suggestions": {
+    "other": "Ұсыныстар"
+  },
+  "bugs": {
+    "other": "Қателер"
+  },
+  "issues": {
+    "other": "Басқа сұрақтар"
+  },
+  "messageWillPin": {
+    "other": "Хабарлама бекітіледі"
+  },
+  "requestBroadcastPin": {
+    "other": "Хабарламаны бекіткіңіз келе ме?"
+  },
+  "getCollectionsFailure": {
+    "other": "Топтамаларды алу қатесі"
+  },
+  "getFilmsFailure": {
+    "other": "Фильмдерді алу қатесі"
+  },
+  "invalidInputLength": {
+    "other": "Ұзындығы <b>[{{.Min}}, {{.Max}}]</b> таңбалары арасында болуы керек"
+  },
+  "invalidInputRange": {
+    "other": "Мәні <b>[{{.Min}}, {{.Max}}]</b> диапазонында болуы керек"
+  },
+  "invalidInputURL": {
+    "other": "Қате URL немесе ұзындығы <b>[{{.Min}}, {{.Max}}]</b> таңбалары арасында емес"
+  },
+  "invalidInputEmail": {
+    "other": "Қате email немесе ұзындығы <b>[{{.Min}}, {{.Max}}]</b> таңбалар диапазонында емес"
+  },
+  "kinopoiskToken": {
+    "other": "Kinopoisk токені"
+  },
+  "currentToken": {
+    "other": "Қазіргі токен"
+  },
+  "changeToken": {
+    "other": "Токенді өзгерту"
+  },
+  "token403": {
+    "other": "Сіз Kinopoisk пайдалану үшін күндік лимитке жеттіңіз"
+  },
+  "token401": {
+    "other": "Қате Kinopoisk токені"
+  },
+  "tokenRequestInfo": {
+    "other": "Kinopoisk-ті пайдалану үшін @kinopoiskdev_bot-тан токен алыңыз"
+  },
+  "tokenRequest": {
+    "other": "Алынған токенді енгізіңіз"
+  },
+  "tokenSuccess": {
+    "other": "Токен сәтті орнатылды"
+  },
+  "logsNotFound": {
+    "other": "Журнал файлы табылмады"
+  },
+  "logsFound": {
+    "other": "<code>{{.ID}}</code> үшін журнал файлы табылды"
+  },
+  "logs": {
+    "other": "Журналдар"
+  },
+  "update": {
+    "other": "Жаңарту"
+  },
+  "manage": {
+    "other": "Басқару"
+  },
+  "updateFilmSuccess": {
+    "other": "Фильм сәтті жаңартылды"
+  },
+  "maxLengthInSymbols": {
+    "other": "<b>Максималды ұзындық:</b> {{.Length}} таңба"
+  },
+  "chuckTextError": {
+    "other": "Мәтінді бөлу қатесі. Хабарлама тым ұзын және жіберілмейді"
+  },
+  "choiceField": {
+    "other": "Өрісті таңдаңыз"
+  },
+  "deleteFeedbackSuccess": {
+    "other": "<code>{{.ID}}</code> хабарламасы сәтті жойылды"
+  },
+  "preview": {
+    "other": "Алдын ала қарау"
+  },
+  "access": {
+    "other": "Қолжетімділік"
+  },
+  "findFilm": {
+    "other": "Фильмді табу (kinopoisk.ru)"
   },
   "status": {
-    "other": "Статус"
+    "other": "Күйі"
   },
   "hintAPIUserID": {
-    "other": "<code>api_ID</code> API қолданушыларын іздеу үшін"
+    "other": "API пайдаланушыларын іздеу үшін <code>api_ID</code>"
   },
   "makeFavorite": {
-    "other": "Таңдаулыға қосу"
+    "other": "Таңдаулыларға қосу"
   },
   "removeFavorite": {
-    "other": "Таңдаулылардан алып тастау"
+    "other": "Таңдаулылардан өшіру"
   },
   "inFavorite": {
     "other": "Таңдаулыларда"
   },
   "invalidInput": {
-    "other": "Қате енгізу."
+    "other": "Қате енгізу"
   },
   "requestRangeInFormat": {
     "other": "Нақты мәнді немесе диапазонды келесі форматта көрсетіңіз:"
@@ -30,10 +126,10 @@
     "other": "Диапазон (мысалы)"
   },
   "examplePartialRange": {
-    "other": "Толық емес диапазон (мысалы)"
+    "other": "Жартылай диапазон (мысалы)"
   },
   "rangeLimits": {
-    "other": "Осы өріс үшін рұқсат етілген диапазон: <code>{{.Min}}</code>-ден <code>{{.Max}}</code>-ге дейін."
+    "other": "Бұл өріс үшін рұқсат етілген диапазон: <code>{{.Min}}</code> - <code>{{.Max}}</code> аралығы"
   },
   "isFavorite": {
     "other": "Таңдаулы"
@@ -42,10 +138,10 @@
     "other": "Таңдаулы"
   },
   "isViewed": {
-    "other": "Көрілді"
+    "other": "Қаралды"
   },
   "filterInstructionSwitch": {
-    "other": "<b>\"{{.Filter}}\"</b> сүзгісі үшін мәнді таңдаңыз"
+    "other": "<b>{{.Filter}}</b> сүзгісі үшін мәнді таңдаңыз"
   },
   "true": {
     "other": "Иә"
@@ -57,21 +153,21 @@
     "other": "Жасалған күні"
   },
   "is_viewed": {
-    "other": "Көрілді"
+    "other": "Қаралды"
   },
   "user_rating": {
-    "other": "Пайдаланушының бағасы"
+    "other": "Баға"
   },
-  "hasURL": {
+  "has_url": {
     "other": "Сілтеме"
   },
   "filterInstructionRange": {
-    "other": "<b>Мәнді немесе ауқымды енгізіңіз</b> (мысалы, <code>7.5</code> немесе <code>5-10</code>)."
+    "other": "<b>Мәнді немесе диапазонды енгізіңіз</b> (мысалы, <code>7.5</code> немесе <code>5-10</code>)"
   },
   "filterInstructionPartialRange": {
-    "other": "Жартылай диапазондар (<code>5-</code> немесе <code>-7.5</code>) автоматты түрде жетіспейтін шекті қосады."
+    "other": "Жартылай диапазондар (<code>5-</code> немесе <code>-7.5</code>) автоматты түрде жетіспейтін шекті толтырады"
   },
-"notFoundMessages": {
+  "notFoundMessages": {
     "other": "Хабарламалар табылмады"
   },
   "choiceMessage": {
@@ -83,78 +179,78 @@
   "total_films": {
     "other": "Фильмдер саны"
   },
-  "totalCollectionsFilms": {
-    "other": "Табылған коллекциялар"
-  },
   "filters": {
     "other": "Сүзгілер"
+  },
+  "totalCollectionsFilms": {
+    "other": "Табылған топтамалар"
   },
   "sorting": {
     "other": "Сұрыптау"
   },
   "choiceFilter": {
-    "other": "Сүзгіні қосу/өшiру үшін таңдаңыз"
+    "other": "Қосу/өшіру үшін сүзгіні таңдаңыз"
   },
   "choiceSorting": {
-    "other": "Сұрыптау үшін өрісті таңдаңыз"
+    "other": "Сұрыптау өрісін таңдаңыз"
   },
   "requestValueOrRange": {
-    "other": "Дәл мәнді немесе <code>-</code> қолдана отырып ауқымды енгізіңіз"
+    "other": "<code>-</code> қолданып нақты мәнді немесе диапазонды енгізіңіз"
   },
   "filterApplied": {
-    "other": "Сүзгі сәтті қолданылды!"
+    "other": "<b>{{.Filter}}</b> сүзгісі қолданылды"
   },
   "resetFilters": {
-    "other": "Сүзгілерді қалпына келтіру"
+    "other": "Фильтрлерді тазалау"
   },
   "reset": {
-    "other": "Қалпына келтіру"
+    "other": "Тазалау"
   },
   "currentValue": {
-    "other": "Ағымдағы мән"
+    "other": "Қазіргі мән"
   },
   "ratingMustBeLower": {
-    "other": "Рейтинг ең жоғары рейтингтен төмен немесе тең болуы керек"
+    "other": "Рейтинг ең жоғарғы рейтингтен төмен немесе тең болуы керек"
   },
   "ratingMustBeHigher": {
     "other": "Рейтинг ең төменгі рейтингтен жоғары немесе тең болуы керек"
   },
   "filterResetSuccess": {
-    "one": "Сүзгі сәтті қалпына келтірілді!",
-    "other": "Сүзгілер сәтті қалпына келтірілді!"
+    "one": "<b>{{.Filter}}</b> фильтрі тазаланды",
+    "other": "Барлық фильтрлер тазаланды"
   },
   "sortingResetSuccess": {
-    "other": "Сұрыптау параметрлері сәтті қалпына келтірілді!"
+    "other": "Сұрыптау тазаланды"
   },
   "selectedSortField": {
-    "other": "Сіз <b>{{.Field}}</b> сұрыптауды таңдадыңыз"
+    "other": "<b>{{.Field}}</b> бойынша сұрыптау"
   },
   "requestDirection": {
     "other": "Бағытты таңдаңыз"
   },
   "increaseOrder": {
-    "other": "Өсу бойынша"
+    "other": "Өсу ретімен"
   },
   "decreaseOrder": {
-    "other": "Кему бойынша"
+    "other": "Кему ретімен"
   },
   "sortingApplied": {
-    "other": "Сұрыптау сәтті қолданылды!"
+    "other": "<b>{{.Field}}</b> бойынша сұрыптау қолданылды"
   },
   "resetSorting": {
-    "other": "Сұрыптауды қалпына келтіру"
+    "other": "Сұрыптауды тазалау"
   },
-"raisedTo": {
-    "other": "Сіз \"{{.Role}}\" рөліне жоғарылатылдыңыз"
+  "raiseTo": {
+    "other": "Сіз {{.Role}} рөліне көтерілдіңіз"
   },
   "lowerTo": {
-    "other": "Сіз \"{{.Role}}\" рөліне төмендетілдіңіз"
+    "other": "Сіз {{.Role}} рөліне төмендетілдіңіз"
   },
   "raiseUser": {
-    "other": "Сіз {{.ID}} қолданушысын {{.Role}} рөліне жоғарылаттыңыз"
+    "other": "Сіз {{.ID}} пайдаланушысын {{.Role}} рөліне көтердіңіз"
   },
   "lowerUser": {
-    "other": "Сіз {{.ID}} қолданушысын {{.Role}} рөліне төмендеттіңіз"
+    "other": "Сіз {{.ID}} пайдаланушысын {{.Role}} рөліне төмендеттіңіз"
   },
   "cannotLowerSelf": {
     "other": "Сіз өз рөліңізді төмендете алмайсыз"
@@ -163,19 +259,19 @@
     "other": "Сіздің әкімші құқықтарыңыз алынып тасталды"
   },
   "removeUserRole": {
-    "other": "Сіз {{.ID}} қолданушысынан әкімші құқықтарын алып тастадыңыз"
+    "other": "Сіз {{.ID}} пайдаланушысынан әкімші құқықтарын алдыңыз"
   },
   "changedRole": {
-    "other": "Сіздің {{.OldRole}} рөліңіз {{.NewRole}} болып өзгертілді"
+    "other": "Сіздің рөліңіз {{.OldRole}} {{.NewRole}} болып өзгертілді"
   },
   "changeUserRole": {
-    "other": "Сіз {{.ID}} қолданушысының рөлін {{.OldRole}}-ден {{.NewRole}}-ге өзгерттіңіз"
+    "other": "Сіз {{.ID}} пайдаланушысының рөлін {{.OldRole}}-дан {{.NewRole}}-ға өзгерттіңіз"
   },
-"someError": {
-    "other": "Қандай да бір қателік болды"
+  "someError": {
+    "other": "Қате орын алды"
   },
   "setDefaultLanguage": {
-    "other": "Әдепкі тіл орнатылған"
+    "other": "Әдепкі тіл орнатылды"
   },
   "openInBrowser": {
     "other": "Браузерде ашу"
@@ -183,14 +279,14 @@
   "filmURL": {
     "other": "Фильм сілтемесі"
   },
-  "removeFilmFromCollection": {
-    "other": "Фильмді коллекциядан жою"
+  "removeFromCollection": {
+    "other": "Топтамадан өшіру"
   },
   "removeFilmFailure": {
-    "other": "Фильмді коллекциядан жою сәтсіз аяқталды"
+    "other": "Фильмді топтамадан өшіру мүмкін болмады"
   },
   "removeFilmSuccess": {
-    "other": "Фильм коллекциядан сәтті жойылды"
+    "other": "Фильм сәтті өшірілді"
   },
   "requestBanReason": {
     "other": "Пайдаланушыны бұғаттау себебін көрсетіңіз"
@@ -208,10 +304,10 @@
     "other": "Ботқа кіруге тыйым салынған"
   },
   "banUser": {
-    "other": "Пайдаланушы \"{{.ID}}\" бұғатталды"
+    "other": "Пайдаланушы <code>{{.ID}}</code> бұғатталды"
   },
   "unbanUser": {
-    "other": "Пайдаланушы \"{{.ID}}\" бұғаттан шығарылды"
+    "other": "Пайдаланушы <code>{{.ID}}</code> бұғаттан шығарылды"
   },
   "admins": {
     "other": "Әкімшілер"
@@ -225,11 +321,8 @@
   "broadcast": {
     "other": "Хабар тарату"
   },
-  "findUser": {
-    "other": "Пайдаланушыны табу"
-  },
   "requestIDOrUsername": {
-    "other": "ID немесе @пайдаланушы атын енгізіңіз"
+    "other": "ID немесе @username енгізіңіз"
   },
   "superAdmin": {
     "other": "Аға әкімші"
@@ -238,7 +331,7 @@
     "other": "Көмекші"
   },
   "root": {
-    "other": "Бас Әкімші"
+    "other": "Бас әкімші"
   },
   "manageUserRole": {
     "other": "Рөлді өзгерту"
@@ -250,25 +343,22 @@
     "other": "Бұғаттау"
   },
   "alreadyMaxRole": {
-    "other": "Пайдаланушыда ең жоғары рөл бар"
+    "other": "Пайдаланушыда қазірдің өзінде ең жоғарғы рөл бар"
   },
   "alreadyMinRole": {
-    "other": "Пайдаланушыда ең төменгі рөл бар"
-  },
-  "findAdmin": {
-    "other": "Әкімшіні табу"
+    "other": "Пайдаланушыда қазірдің өзінде ең төменгі рөл бар"
   },
   "foundFeedbacks": {
-    "other": "Кері байланыстар табылды"
+    "other": "Табылған хабарламалар"
   },
   "noAccess": {
     "other": "Қолжетімділік жоқ"
   },
   "viewFeedback": {
-    "other": "Кері байланысты көру"
+    "other": "Пікірді қарау"
   },
   "foundUsers": {
-    "other": "Пайдаланушылар табылды"
+    "other": "Табылған пайдаланушылар"
   },
   "role": {
     "other": "Рөл"
@@ -277,16 +367,16 @@
     "other": "Белгісіз"
   },
   "requestBroadcastImage": {
-    "other": "Хабар тарату үшін сілтеме немесе сурет жіберіңіз"
+    "other": "Хабар тарату үшін сурет немесе оның сілтемесін жіберіңіз"
   },
   "send": {
     "other": "Жіберу"
   },
   "broadcastEmpty": {
-    "other": "Бос хабар таратуды жіберу мүмкін емес"
+    "other": "Бос хабарламаны жіберу мүмкін емес"
   },
   "feedbackDetails": {
-    "other": "Кері байланыстың егжей-тегжейлері"
+    "other": "Пікір мәліметтері"
   },
   "currentRole": {
     "other": "Ағымдағы рөл"
@@ -298,25 +388,25 @@
     "other": "Тіл"
   },
   "state": {
-    "other": "Мәртебе"
+    "other": "Күйі"
   },
   "empty": {
     "other": "Бос"
   },
   "sessionDetails": {
-    "other": "Сессия мәліметтері"
+    "other": "Сеанс мәліметтері"
   },
   "apiDetails": {
     "other": "API мәліметтері"
   },
   "updated": {
-    "other": "Жаңартылған"
+    "other": "Жаңартылды"
   },
   "choiceForDetails": {
-    "other": "Мәліметтерді көру үшін таңдаңыз"
+    "other": "Толық ақпаратты қарау үшін таңдаңыз"
   },
   "needRemoveRole": {
-    "other": "Әуелі әкімші құқықтарын алып тастау керек"
+    "other": "Әкімші құқықтарын алдымен алып тастау керек"
   },
   "unbanned": {
     "other": "Бұғаттан шығарылды"
@@ -331,7 +421,7 @@
     "other": "Сәтті"
   },
   "notFound": {
-    "other": "Табылмады"
+    "other": "Табылған жоқ"
   },
   "raiseRole": {
     "other": "Рөлді жоғарылату"
@@ -340,46 +430,49 @@
     "other": "Рөлді төмендету"
   },
   "removeAdminRole": {
-    "other": "Әкімші рөлін жою"
+    "other": "Әкімші құқықтарын алу"
+  },
+  "welcomeMessageGreeting": {
+    "other": "Watchlist Bot-қа қош келдіңіз, {{.Name}}!"
   },
   "welcomeMessageBody": {
-    "other": "Қазіргі уақытта бот әзірлену кезеңінде (нұсқа {{.Version}}), бірақ негізгі функциялары қолжетімді."
+    "other": "Бот қазір әзірлену үстінде (нұсқа {{.Version}}), бірақ негізгі функциялар қолжетімді."
   },
   "welcomeMessageCallToAction": {
-    "other": "/help пәрменін енгізіп, қолжетімді командалардың тізімін көріңіз."
+    "other": "/help енгізіңіз, қолжетімді командалар тізімін көру үшін."
   },
   "listOfCommands": {
-    "other": "Қолжетімді командалардың тізімі"
+    "other": "Қолжетімді командалар тізімі:"
   },
   "sessionError": {
-    "other": "Сессияны алу кезінде қате орын алды."
+    "other": "Сессияны алу кезінде қате орын алды"
   },
   "bannedHeader": {
     "other": "Сіз бұғатталғансыз."
   },
   "bannedBody": {
-    "other": "Бұғаттан шығу үшін әкімшіге хабарласыңыз."
+    "other": "Бұғаттан шығару үшін әкімшіге хабарласыңыз."
   },
   "authRequest": {
-    "other": "Бұл пәрменді іске қосу үшін авторизация қажет. /start пәрменін қолданыңыз"
+    "other": "Бұл команданы орындау үшін авторизация қажет. /start қолданыңыз."
   },
   "authExpired": {
-    "other": "Сіздің токендеріңіздің мерзімі аяқталды. Жүйеге қайта кіріңіз."
+    "other": "Сіздің токендеріңіздің мерзімі аяқталды. Жүйеге кіру..."
   },
   "authFailure": {
-    "other": "Кіру мүмкін болмады. /start пәрменін қолданыңыз."
+    "other": "Жүйеге кіру сәтсіз аяқталды. /start қолданыңыз."
   },
   "authUpdated": {
-    "other": "Сіздің токеніңіз сәтті жаңартылды."
+    "other": "Сіздің токеніңіз сәтті жаңартылды"
   },
   "permissionsNotEnough": {
-    "other": "Құқықтар деңгейі жеткіліксіз."
+    "other": "Құқықтар жеткіліксіз"
   },
   "mainMenu": {
     "other": "Негізгі мәзір"
   },
   "choiceAction": {
-    "other": "Әрекеттердің бірін таңдаңыз"
+    "other": "Әрекетті таңдаңыз"
   },
   "adminPanel": {
     "other": "Әкімші панелі"
@@ -394,13 +487,13 @@
     "other": "Коллекциялар"
   },
   "settings": {
-    "other": "Параметрлер"
+    "other": "Баптаулар"
   },
   "feedback": {
-    "other": "Пікірлер"
+    "other": "Кері байланыс"
   },
   "logout": {
-    "other": "Шығу"
+    "other": "Жүйеден шығу"
   },
   "name": {
     "other": "Аты"
@@ -409,145 +502,142 @@
     "other": "ID"
   },
   "email": {
-    "other": "Электрондық пошта"
+    "other": "Email"
   },
   "joinDate": {
-    "other": "Тіркеу күні"
+    "other": "Тіркелу күні"
   },
   "deleteProfileConfirm": {
-    "other": "Сіз \"{{.Username}}\" аккаунтын жойғыңыз келетініне сенімдісіз бе?"
+    "other": "Сіз <code>{{.Username}}</code> аккаунтын жоюға сенімдісіз бе?"
   },
   "deleteProfileFailure": {
-    "other": "\"{{.Username}}\" аккаунтын жою мүмкін болмады."
+    "other": "<code>{{.Username}}</code> аккаунтын жою сәтсіз аяқталды"
   },
   "deleteProfileSuccess": {
-    "other": "\"{{.Username}}\" аккаунты сәтті жойылды!"
+    "other": "<code>{{.Username}}</code> аккаунты сәтті жойылды!"
   },
   "cancelAction": {
-    "other": "Әрекет тоқтатылды."
+    "other": "Әрекет тоқтатылды"
   },
   "updateChoiceField": {
-    "other": "Қай өрісті өзгерткіңіз келеді?"
+    "other": "Қай өрісті өзгерту керек екенін таңдаңыз"
   },
   "updateProfileUsername": {
-    "other": "Жаңа пайдаланушы атын енгізіңіз."
+    "other": "Жаңа ат енгізіңіз"
   },
   "updateProfileEmail": {
-    "other": "Жаңа электрондық поштаны енгізіңіз."
+    "other": "Жаңа email енгізіңіз"
   },
   "updateProfileFailure": {
-    "other": "\"{{.Username}}\" аккаунтын жаңарту сәтсіз аяқталды."
+    "other": "<code>{{.Username}}</code> аккаунтын жаңарту сәтсіз аяқталды"
   },
   "updateProfileSuccess": {
-    "other": "\"{{.Username}}\" аккаунты сәтті жаңартылды!"
+    "other": "<code>{{.Username}}</code> аккаунты сәтті жаңартылды"
   },
   "settingsChoice": {
-    "other": "Өзгерту қажет параметрді таңдаңыз."
+    "other": "Қай параметрді өзгерту керектігін таңдаңыз"
   },
-  "settingsLanguage": {
-    "other": "Тілді өзгерту."
+  "collectionsPageSize": {
+    "other": "Коллекциялар бетінің өлшемі"
   },
-  "settingsCollectionsPageSize": {
-    "other": "Беттегі коллекциялар санын өзгерту."
+  "filmsPageSize": {
+    "other": "Фильмдер бетінің өлшемі"
   },
-  "settingsFilmsPageSize": {
-    "other": "Беттегі фильмдер санын өзгерту."
-  },
-  "settingsObjectsPageSize": {
-    "other": "Беттегі объектілер санын өзгерту."
+  "objectsPageSize": {
+    "other": "Объектілер бетінің өлшемі"
   },
   "parseLanguagesFailure": {
-    "other": "Қолжетімді тілдер тізімін алу кезінде қате орын алды."
+    "other": "Қолжетімді тілдерді алу қатесі"
   },
   "currentLanguage": {
-    "other": "Ағымдағы тіл."
+    "other": "Ағымдағы тіл"
   },
-  "settingsLanguageChoice": {
-    "other": "Қажетті тілді таңдаңыз."
+  "languageChoice": {
+    "other": "Тілді таңдаңыз"
   },
   "settingsLanguageSuccess": {
-    "other": "Тіл \"{{.Language}}\" сәтті өзгертілді."
-  },
-  "currentCollectionsPageSize": {
-    "other": "Коллекциялар үшін бет өлшемі."
+    "other": "Тіл сәтті <code>{{.Language}}</code> болып өзгертілді"
   },
   "settingsPageSizeChoice": {
-    "other": "Қажетті өлшемді таңдаңыз (1 және одан жоғары)."
+    "other": "Жаңа өлшем енгізіңіз"
+  },
+  "newPageSize": {
+    "other": "Жаңа бет өлшемі"
+  },
+  "currentPageSize": {
+    "other": "Ағымдағы бет өлшемі"
+  },
+  "settingsPageSizeSuccess": {
+    "other": "Жаңа бет өлшемі орнатылды"
   },
   "settingsCollectionsPageSizeSuccess": {
-    "other": "Коллекциялар тізімі үшін жаңа бет өлшемі."
-  },
-  "currentFilmsPageSize": {
-    "other": "Фильмдер үшін бет өлшемі."
+    "other": "Коллекциялар тізімі үшін жаңа бет өлшемі"
   },
   "settingsFilmsPageSizeSuccess": {
-    "other": "Фильмдер тізімі үшін жаңа бет өлшемі."
-  },
-  "currentObjectsPageSize": {
-    "other": "Объектілер үшін бет өлшемі."
+    "other": "Фильмдер тізімі үшін жаңа бет өлшемі"
   },
   "settingsObjectsPageSizeSuccess": {
-    "other": "Объектілер тізімі үшін жаңа бет өлшемі."
+    "other": "Объектілер тізімі үшін жаңа бет өлшемі"
   },
   "feedbackMessageHeader": {
-    "other": "Өз пікіріңізді қалдырыңыз."
+    "other": "Пікіріңізді қалдырыңыз"
   },
   "feedbackMessageBody": {
-    "other": "Өз ойларыңызды, ұсыныстарыңызды немесе идеяларыңызды жазыңыз, біз оларды міндетті түрде қарастырамыз!"
+    "other": "Өз ойыңызды, ұсыныстарыңызды немесе идеяларыңызды жазыңыз, біз оларды міндетті түрде қарастырамыз!"
   },
   "feedbackCategoryChoice": {
-    "other": "Санатты таңдаңыз."
+    "other": "Санатты таңдаңыз"
   },
   "feedbackCurrentCategory": {
-    "other": "Сіз санатты таңдадыңыз."
+    "other": "Сіз таңдаған санат"
   },
   "feedbackTextRequest": {
-    "other": "Өтінеміз, өз пікіріңізді жазыңыз."
+    "other": "Хабарламаңызды жазыңыз"
   },
   "feedbackFailure": {
-    "other": "Пікірді сақтау сәтсіз аяқталды."
+    "other": "Хабарламаны жіберу қатесі"
   },
   "feedbackSuccess": {
-    "other": "Пікіріңіз үшін рахмет! Біз сіздің пікіріңізді бағалаймыз."
+    "other": "Хабарламаңыз үшін рахмет!"
   },
   "tryLater": {
-    "other": "Кейінірек көріңіз."
+    "other": "Кейінірек қайталап көріңіз"
   },
   "loginSuccess": {
-    "other": "\"{{.Username}}\" аккаунтына сәтті кірдіңіз!"
+    "other": "<code>{{.Username}}</code> аккаунтына сәтті кірдіңіз!"
   },
   "registrationSuccess": {
-    "other": "\"{{.Username}}\" аккаунты сәтті тіркелді!"
+    "other": "<code>{{.Username}}</code> аккаунты тіркелді!"
   },
   "logoutConfirm": {
-    "other": "\"{{.Username}}\" аккаунтынан шығу керек екеніне сенімдісіз бе?"
+    "other": "Сіз <code>{{.Username}}</code> аккаунтынан шығуды қалайсыз ба?"
   },
   "logoutFailure": {
-    "other": "\"{{.Username}}\" аккаунтынан шығу мүмкін болмады."
+    "other": "<code>{{.Username}}</code> аккаунтынан шығу сәтсіз аяқталды"
   },
   "logoutSuccess": {
-    "other": "\"{{.Username}}\" аккаунтынан сәтті шықтыңыз."
+    "other": "Сіз <code>{{.Username}}</code> аккаунтынан шықтыңыз"
   },
   "logoutCancel": {
-    "other": "\"{{.Username}}\" аккаунтынан шығу тоқтатылды."
+    "other": "<code>{{.Username}}</code> аккаунтынан шығу тоқтатылды"
   },
   "unknownState": {
-    "other": "Белгісіз күй. Қалпына келтіру үшін /reset енгізіңіз."
+    "other": "Белгісіз күй. Қайта орнату үшін /reset енгізіңіз."
   },
   "viewedFilmViewed": {
-    "other": "Фильм қаралды"
+    "other": "Фильм қаралған деп белгіленді"
   },
   "viewedFilmRequestRating": {
-    "other": "Фильмге баға қойыңыз"
+    "other": "Фильмге баға беріңіз"
   },
   "viewedFilmCanCancel": {
-    "other": "Фильмді \"қаралған\" ретінде алып тастау үшін болдырмау батырмасын басыңыз"
+    "other": "Көру мәртебесін бас тарту түймесін басу арқылы өзгерте аласыз"
   },
   "viewedFilmRequestReview": {
-    "other": "Фильмге пікір қалдырыңыз"
+    "other": "Фильмге шолу қалдырыңыз"
   },
   "image": {
-    "other": "Сурет"
+    "other": "Кескін"
   },
   "title": {
     "other": "Атауы"
@@ -559,7 +649,7 @@
     "other": "Жанр"
   },
   "rating": {
-    "other": "Бағасы"
+    "other": "Рейтинг"
   },
   "yearOfRelease": {
     "other": "Шығарылған жылы"
@@ -571,25 +661,25 @@
     "other": "Қаралды"
   },
   "userRating": {
-    "other": "Пайдаланушының бағасы"
+    "other": "Қолданушы бағасы"
   },
   "review": {
     "other": "Шолу"
   },
   "filmRequestImage": {
-    "other": "Суретті немесе оның сілтемесін жіберіңіз"
+    "other": "Суретті немесе оған сілтемені жіберіңіз"
   },
   "getImageFailure": {
-    "other": "Суретті алу кезінде қате орын алды"
+    "other": "Суретті жүктеу қатесі"
   },
   "filmRequestTitle": {
     "other": "Фильмнің атауын енгізіңіз"
   },
   "totalFindFilms": {
-    "other": "Фильмдер табылды"
+    "other": "Табылған фильмдер саны"
   },
   "again": {
-    "other": "Қайтадан"
+    "other": "Қайталау"
   },
   "search": {
     "other": "Іздеу"
@@ -598,52 +688,52 @@
     "other": "Фильмнің сипаттамасын енгізіңіз"
   },
   "filmRequestYear": {
-    "other": "Фильмнің шығарылған жылын енгізіңіз"
+    "other": "Фильмнің шыққан жылын енгізіңіз"
   },
   "filmRequestGenre": {
-    "other": "Фильмнің жанрын енгізіңіз"
+    "other": "Фильм жанрын енгізіңіз"
   },
   "filmRequestRating": {
-    "other": "Фильмнің бағасын енгізіңіз"
+    "other": "Фильм рейтингісін енгізіңіз"
   },
   "filmRequestComment": {
-    "other": "Фильмге пікіріңізді енгізіңіз"
+    "other": "Фильм туралы пікіріңізді жазыңыз"
   },
   "filmRequestViewed": {
-    "other": "Сіз бұл фильмді көрдіңіз бе?"
+    "other": "Сіз бұл фильмді бұрын көрдіңіз бе?"
   },
   "filmRequestUserRating": {
-    "other": "Фильмге өз бағаңызды енгізіңіз"
+    "other": "Фильмге бағаңызды енгізіңіз"
   },
   "filmRequestReview": {
-    "other": "Фильмге пікіріңізді енгізіңіз"
+    "other": "Фильмге шолуыңызды енгізіңіз"
   },
   "updateFilmFailure": {
-    "other": "Фильмді жаңарту мүмкін болмады"
+    "other": "Фильмді жаңарту сәтсіз аяқталды"
   },
   "updateFilmListFailure": {
-    "other": "Фильмдер тізімін жаңарту кезінде қате орын алды"
+    "other": "Фильмдер тізімін жаңарту қатесі"
   },
   "choiceWay": {
-    "other": "Бір әдісті таңдаңыз"
+    "other": "Опциялардың бірін таңдаңыз"
   },
   "filmRequestLink": {
-    "other": "Фильмнің сілтемесін жіберіңіз"
+    "other": "Фильмге сілтеме жіберіңіз"
   },
   "supportedServices": {
     "other": "Қолдау көрсетілетін қызметтер"
   },
   "getFilmFailure": {
-    "other": "Фильмді алу мүмкін болмады"
+    "other": "Фильмді алу қатесі"
   },
   "createFilmFailure": {
-    "other": "Фильмді жасау мүмкін болмады"
+    "other": "Фильмді жасау сәтсіз аяқталды"
   },
   "createFilmSuccess": {
     "other": "Фильм сәтті жасалды"
   },
   "createCollectionFilmSuccess": {
-    "other": "\"{{.Collection}}\" коллекциясына фильм сәтті қосылды"
+    "other": "<code>{{.Collection}}</code> коллекциясына фильм сәтті қосылды"
   },
   "lastPageAlert": {
     "other": "Сіз соңғы бетте тұрсыз"
@@ -652,13 +742,13 @@
     "other": "Сіз бірінші бетте тұрсыз"
   },
   "deleteFilmConfirm": {
-    "other": "\"{{.Film}}\" фильмін жою керек екеніне сенімдісіз бе?"
+    "other": "Сіз <code>{{.Film}}</code> фильмін жоюға сенімдісіз бе?"
   },
   "deleteFilmFailure": {
-    "other": "\"{{.Film}}\" фильмін жою мүмкін болмады"
+    "other": "<code>{{.Film}}</code> фильмін жою сәтсіз аяқталды"
   },
   "deleteFilmSuccess": {
-    "other": "\"{{.Film}}\" фильмі сәтті жойылды"
+    "other": "<code>{{.Film}}</code> фильмі сәтті жойылды"
   },
   "collectionRequestName": {
     "other": "Коллекцияның атауын енгізіңіз"
@@ -667,43 +757,43 @@
     "other": "Коллекцияның сипаттамасын енгізіңіз"
   },
   "updateCollectionFailure": {
-    "other": "Коллекцияны жаңарту мүмкін болмады"
+    "other": "Коллекцияны жаңарту сәтсіз аяқталды"
   },
   "updateCollectionSuccess": {
     "other": "Коллекция сәтті жаңартылды"
   },
   "createCollectionFailure": {
-    "other": "Коллекцияны жасау мүмкін болмады"
+    "other": "Коллекцияны жасау сәтсіз аяқталды"
   },
   "createCollectionSuccess": {
-    "other": "Жаңа коллекция сәтті жасалды!"
+    "other": "Коллекция сәтті жасалды"
   },
   "deleteCollectionConfirm": {
-    "other": "\"{{.Collection}}\" коллекциясын жою керек екеніне сенімдісіз бе?"
+    "other": "Сіз <code>{{.Collection}}</code> коллекциясын жоюға сенімдісіз бе?"
   },
   "deleteCollectionFailure": {
-    "other": "\"{{.Collection}}\" коллекциясын жою мүмкін болмады"
+    "other": "<code>{{.Collection}}</code> коллекциясын жою сәтсіз аяқталды"
   },
   "deleteCollectionSuccess": {
-    "other": "\"{{.Collection}}\" коллекциясы сәтті жойылды"
+    "other": "<code>{{.Collection}}</code> коллекциясы сәтті жойылды"
   },
   "getCollectionFailure": {
-    "other": "Коллекцияны алу кезінде қате орын алды"
+    "other": "Коллекцияны алу қатесі"
   },
   "filmToCollectionSuccess": {
-    "other": "\"{{.Film}}\" фильмі \"{{.Collection}}\" коллекциясына сәтті қосылды"
+    "other": "<code>{{.Film}}</code> фильмі <code>{{.Collection}}</code> коллекциясына сәтті қосылды"
   },
   "filmsNotFound": {
     "other": "Фильмдер табылмады"
   },
-  "choiceFilmToCollection": {
-    "other": "Коллекцияға қосу үшін фильмді таңдаңыз"
+  "choiceFilm": {
+    "other": "Фильмді таңдаңыз"
   },
   "collectionsNotFound": {
     "other": "Коллекциялар табылмады"
   },
-  "choiceCollectionToFilm": {
-    "other": "Фильм қосу үшін коллекцияны таңдаңыз"
+  "choiceCollection": {
+    "other": "Коллекцияны таңдаңыз"
   },
   "adminOptionUserCount": {
     "other": "Пайдаланушылар санын тексеру"
@@ -718,7 +808,7 @@
     "other": "Пайдаланушылар тізімі"
   },
   "requestFailure": {
-    "other": "Сұранысты орындау мүмкін болмады"
+    "other": "Сұранысты орындау сәтсіз аяқталды"
   },
   "uniqueUsersCount": {
     "other": "Боттың бірегей пайдаланушылары"
@@ -727,10 +817,10 @@
     "other": "Қабылдаушылар саны"
   },
   "requestBroadcastMessage": {
-    "other": "Хабарлама үшін мәтінді енгізіңіз"
+    "other": "Хабарламаны енгізіңіз"
   },
   "emptyFeedbackList": {
-    "other": "Қарауға жаңа пікірлер жоқ"
+    "other": "Көруге жаңа пікірлер жоқ"
   },
   "feedbackList": {
     "other": "Пікірлер тізімі"
@@ -743,9 +833,6 @@
   },
   "deleteFeedbackFailure": {
     "other": "Пікірді жою мүмкін болмады"
-  },
-  "deleteFeedbackSuccess": {
-    "other": "Пікір сәтті жойылды"
   },
   "emptyUserList": {
     "other": "Пайдаланушылар тізімі бос"
@@ -766,28 +853,28 @@
     "other": "Жасалған"
   },
   "badFormatID": {
-    "other": "ID форматы дұрыс емес"
+    "other": "Қате ID пішімі"
   },
   "banFailure": {
-    "other": "Пайдаланушыны бұғаттау кезінде қате орын алды"
+    "other": "Пайдаланушыны бұғаттау қатесі"
   },
   "banSuccess": {
-    "other": "\"{{.User}}\" пайдаланушысы сәтті бұғатталды"
+    "other": "Пайдаланушы \"{{.User}}\" сәтті бұғатталды"
   },
   "unbanFailure": {
-    "other": "Пайдаланушыны бұғаттан шығару кезінде қате орын алды"
+    "other": "Пайдаланушыны бұғаттан шығару қатесі"
   },
   "unbanSuccess": {
-    "other": "\"{{.User}}\" пайдаланушысы сәтті бұғаттан шығарылды"
+    "other": "Пайдаланушы \"{{.User}}\" сәтті бұғаттан шығарылды"
   },
   "helpMessage": {
-    "other": "Ботпен жұмыс істеу үшін /menu пәрменін қолданыңыз"
+    "other": "/menu командасын пайдаланып ботпен жұмыс істеу"
   },
   "unknownContext": {
     "other": "Белгісіз контекст"
   },
   "totalFilms": {
-    "other": "Фильмдердің жалпы саны"
+    "other": "Барлық фильмдер"
   },
   "pageCounter": {
     "other": "{{.CurrentPage}} беті {{.LastPage}} ішінен"
@@ -811,10 +898,10 @@
     "other": "Қаралмаған"
   },
   "totalCollections": {
-    "other": "Коллекциялардың жалпы саны"
+    "other": "Барлық коллекциялар"
   },
   "choiceCollectionForDetails": {
-    "other": "Толығырақ білу үшін коллекцияны таңдаңыз"
+    "other": "Толық ақпарат алу үшін коллекцияны таңдаңыз"
   },
   "backward": {
     "other": "Артқа"
@@ -835,16 +922,7 @@
     "other": "Жоқ"
   },
   "back": {
-    "other": "Артқа"
-  },
-  "offers": {
-    "other": "Ұсыныстар"
-  },
-  "mistakes": {
-    "other": "Қателер"
-  },
-  "otherIssues": {
-    "other": "Басқа сұрақтар"
+    "other": "Қайту"
   },
   "edit": {
     "other": "Өңдеу"
@@ -868,7 +946,7 @@
     "other": "Қолмен"
   },
   "fromURL": {
-    "other": "Сыртқы URL-дан"
+    "other": "Сыртқы URL арқылы"
   },
   "createCollection": {
     "other": "Коллекция жасау"
@@ -895,7 +973,7 @@
     "other": "Белгісіз команда. /menu енгізіңіз"
   },
   "sendImageFailure": {
-    "other": "Суретті жіберу кезінде қате орын алды"
+    "other": "Суретті жіберу қатесі"
   },
   "author": {
     "other": "Автор"
@@ -904,7 +982,7 @@
     "other": "Ұзақтығы"
   },
   "views": {
-    "other": "Көрілімдер"
+    "other": "Көрулер"
   },
   "grades": {
     "other": "Бағалар"
@@ -913,7 +991,7 @@
     "other": "Пікірлер"
   },
   "dateOfRelease": {
-    "other": "Шығарылған күні"
+    "other": "Жарияланған уақыты"
   },
   "year": {
     "other": "Жыл"

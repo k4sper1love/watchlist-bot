@@ -5,19 +5,23 @@ import (
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 )
 
-type CollectionsResponse struct {
-	Collections []apiModels.Collection `json:"collections"`
-	Metadata    filters.Metadata       `json:"metadata"`
-}
-
-type FilmsResponse struct {
-	Films    []apiModels.Film `json:"films"`
+type BaseResponse struct {
 	Metadata filters.Metadata `json:"metadata"`
 }
 
+type CollectionsResponse struct {
+	BaseResponse
+	Collections []apiModels.Collection `json:"collections"`
+}
+
+type FilmsResponse struct {
+	BaseResponse
+	Films []apiModels.Film `json:"films"`
+}
+
 type CollectionFilmsResponse struct {
+	BaseResponse
 	CollectionFilms apiModels.CollectionFilms `json:"collection_films"`
-	Metadata        filters.Metadata          `json:"metadata"`
 }
 
 type CollectionFilmResponse struct {

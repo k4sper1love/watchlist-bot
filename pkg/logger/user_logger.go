@@ -8,38 +8,46 @@ import (
 )
 
 type Wrapper struct {
-	mu     sync.Mutex
 	logger *log.Logger
+	mu     sync.Mutex
 }
 
 var (
 	loggers = make(map[int]*Wrapper)
-	mutex   sync.Mutex
+	mu      sync.RWMutex
 )
 
-type Logger log.Logger
-
 func GetLogger(userID int) *Wrapper {
-	mutex.Lock()
-	defer mutex.Unlock()
+	mu.RLock()
+	logger, exists := loggers[userID]
+	mu.RUnlock()
 
-	if logger, exists := loggers[userID]; exists {
+	if exists {
+		return logger
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	if logger, exists = loggers[userID]; exists {
 		return logger
 	}
 
 	logFile := fmt.Sprintf("logs/user_%d.log", userID)
-	logger := log.New(&lumberjack.Logger{
+	lumberjackLogger := &lumberjack.Logger{
 		Filename:   logFile,
 		MaxSize:    5,
 		MaxBackups: 3,
 		MaxAge:     7,
 		Compress:   true,
-	}, "", log.Ldate|log.Ltime|log.Lmsgprefix)
+	}
 
-	loggerWrapper := &Wrapper{logger: logger}
-	loggers[userID] = loggerWrapper
+	logger = &Wrapper{
+		logger: log.New(lumberjackLogger, "", log.Ldate|log.Ltime|log.Lmsgprefix),
+	}
 
-	return loggerWrapper
+	loggers[userID] = logger
+	return logger
 }
 
 func (w *Wrapper) SetPrefix(prefix string) {
@@ -52,4 +60,16 @@ func (w *Wrapper) Printf(format string, v ...interface{}) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	w.logger.Printf(format, v...)
+}
+
+func (w *Wrapper) Print(msg string) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	w.logger.Print(msg)
+}
+
+func (w *Wrapper) Println(msg string) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	w.logger.Println(msg)
 }

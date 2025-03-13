@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"net/http"
 	"strconv"
@@ -14,6 +15,7 @@ const (
 	HeaderVerification   = "Verification"
 	HeaderExternalAPIKey = "X-API-KEY"
 	HeaderContentType    = "Content-Type"
+	ContentTypeJSON      = "application/json"
 )
 
 type CustomRequest struct {
@@ -23,47 +25,41 @@ type CustomRequest struct {
 	URL                string
 	Body               any
 	ExpectedStatusCode int
+	WithoutLog         bool
 }
 
-func SendRequest(request *http.Request) (*http.Response, error) {
+func SendRequest(req *http.Request) (*http.Response, error) {
 	client := &http.Client{}
 
-	resp, err := client.Do(request)
+	resp, err := client.Do(req)
 	if err != nil {
-		utils.LogRequestError("failed to send request", err, request.Method, request.URL.String())
+		utils.LogRequestError("failed to send request", err, req.Method, req.URL.String())
 		return nil, err
 	}
 
 	return resp, nil
 }
 
-func SendRequestWithOptions(requestURL, method string, body any, headers map[string]string) (*http.Response, error) {
-	req, err := prepareRequest(requestURL, method, body)
+func SendRequestWithOptions(url, method string, body any, headers map[string]string) (*http.Response, error) {
+	req, err := prepareRequest(url, method, body)
 	if err != nil {
-		utils.LogRequestError("failed to prepare request", err, method, requestURL)
+		utils.LogRequestError("failed to prepare request", err, method, url)
 		return nil, err
 	}
 
-	AddRequestHeaders(req, headers)
-
-	resp, err := SendRequest(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+	setRequestHeaders(req, headers)
+	return SendRequest(req)
 }
 
-func AddRequestHeaders(req *http.Request, headers map[string]string) {
-	req.Header.Set("Content-Type", "application/json")
-
+func setRequestHeaders(req *http.Request, headers map[string]string) {
+	req.Header.Set(HeaderContentType, ContentTypeJSON)
 	for key, value := range headers {
 		req.Header.Set(key, value)
 	}
 }
 
-func prepareRequest(requestURL, method string, data any) (*http.Request, error) {
-	var requestBody *bytes.Buffer
+func prepareRequest(url, method string, data any) (*http.Request, error) {
+	requestBody := &bytes.Buffer{}
 
 	if data != nil {
 		body, err := json.Marshal(data)
@@ -71,47 +67,45 @@ func prepareRequest(requestURL, method string, data any) (*http.Request, error) 
 			return nil, err
 		}
 		requestBody = bytes.NewBuffer(body)
-	} else {
-		requestBody = bytes.NewBuffer([]byte{})
 	}
-
-	return http.NewRequest(method, requestURL, requestBody)
+	return http.NewRequest(method, url, requestBody)
 }
 
-func Do(request *CustomRequest) (*http.Response, error) {
-	var headers map[string]string
-
-	if request.HeaderType != "" {
-		headers = map[string]string{
-			request.HeaderType: request.HeaderValue,
-		}
+func Do(req *CustomRequest) (*http.Response, error) {
+	headers := make(map[string]string)
+	if req.HeaderType != "" {
+		headers[req.HeaderType] = req.HeaderValue
 	}
 
-	resp, err := SendRequestWithOptions(request.URL, request.Method, request.Body, headers)
+	resp, err := SendRequestWithOptions(req.URL, req.Method, req.Body, headers)
 	if err != nil {
 		return nil, err
 	}
 
-	if resp.StatusCode != request.ExpectedStatusCode {
+	if resp.StatusCode != req.ExpectedStatusCode {
 		defer utils.CloseBody(resp.Body)
-		return nil, utils.LogResponseError(request.URL, request.Method, resp.StatusCode, resp.Status)
+		if req.WithoutLog {
+			return nil, fmt.Errorf("failed response")
+		}
+		return nil, utils.LogResponseError(req.URL, req.Method, resp.StatusCode, resp.Status)
 	}
 
 	return resp, nil
 }
 
 func ParseErrorStatusCode(err error) int {
-	errStr := err.Error()
-
-	if strings.HasPrefix(errStr, "failed response") {
-		parts := strings.Split(errStr, "code")
-		codeStr := strings.TrimSpace(parts[len(parts)-1])
-		code, err := strconv.Atoi(codeStr)
-		if err != nil {
-			return -1
-		}
-		return code
+	if !strings.HasPrefix(err.Error(), "failed response") {
+		return -1
 	}
 
-	return -1
+	parts := strings.Split(err.Error(), "code")
+	if len(parts) < 2 {
+		return -1
+	}
+
+	code, err := strconv.Atoi(strings.TrimSpace(parts[len(parts)-1]))
+	if err != nil {
+		return -1
+	}
+	return code
 }

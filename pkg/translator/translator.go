@@ -12,25 +12,19 @@ import (
 )
 
 var (
-	bundle      *i18n.Bundle
-	localizers  sync.Map
-	initialized bool
+	bundle     *i18n.Bundle
+	localizers sync.Map
+	once       sync.Once
 )
 
-func InitTranslator(localeDir string) error {
-	if initialized {
-		return nil
-	}
-
-	bundle = i18n.NewBundle(language.English)
-	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
-
-	if err := loadLocales(bundle, localeDir); err != nil {
-		return err
-	}
-
-	initialized = true
-	return nil
+func Init(localeDir string) error {
+	var err error
+	once.Do(func() {
+		bundle = i18n.NewBundle(language.English)
+		bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
+		err = loadLocales(bundle, localeDir)
+	})
+	return err
 }
 
 func loadLocales(bundle *i18n.Bundle, dir string) error {
@@ -41,15 +35,15 @@ func loadLocales(bundle *i18n.Bundle, dir string) error {
 	}
 
 	for _, file := range files {
-		if filepath.Ext(file.Name()) == ".json" {
-			filePath := filepath.Join(dir, file.Name())
-			sl.Log.Info("loading translation file", slog.String("file", filePath))
+		if filepath.Ext(file.Name()) != ".json" {
+			continue
+		}
 
-			_, err = bundle.LoadMessageFile(filePath)
-			if err != nil {
-				sl.Log.Warn("failed to load translation file", slog.Any("error", err), slog.String("file", filePath))
-				continue
-			}
+		filePath := filepath.Join(dir, file.Name())
+		sl.Log.Info("loading translation file", slog.String("file", filePath))
+
+		if _, err = bundle.LoadMessageFile(filePath); err != nil {
+			sl.Log.Warn("failed to load translation file", slog.Any("error", err), slog.String("file", filePath))
 		}
 	}
 
@@ -61,7 +55,7 @@ func getLocalizer(languageCode string) *i18n.Localizer {
 		return localizer.(*i18n.Localizer)
 	}
 
-	localizer := i18n.NewLocalizer(bundle, languageCode) // default language
+	localizer := i18n.NewLocalizer(bundle, languageCode, "en") // default language
 	localizers.Store(languageCode, localizer)
 	return localizer
 }
@@ -77,8 +71,8 @@ func Translate(languageCode string, messageID string, templateData map[string]in
 
 	if err != nil || msg == "" {
 		sl.Log.Warn("translation missing, falling back to 'en'", slog.String("lang", languageCode), slog.String("message", messageID))
-
 		fallbackLocalizer := getLocalizer("en")
+
 		msg, err = fallbackLocalizer.Localize(&i18n.LocalizeConfig{
 			MessageID:    messageID,
 			TemplateData: templateData,

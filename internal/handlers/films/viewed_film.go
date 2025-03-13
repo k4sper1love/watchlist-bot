@@ -1,69 +1,44 @@
 package films
 
 import (
-	"fmt"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/parser"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleViewedFilmCommand(app models.App, session *models.Session) {
-	session.FilmDetailState.IsViewed = true
-
-	part1 := translator.Translate(session.Lang, "viewedFilmRequestRating", nil, nil)
-	part2 := translator.Translate(session.Lang, "viewedFilmCanCancel", nil, nil)
-
-	msg := fmt.Sprintf("✔️ <b>%s</b>\n\n<i>%s</i>", part1, part2)
-
-	keyboard := keyboards.BuildFilmViewedKeyboard(session)
-
-	app.SendMessage(msg, keyboard)
-	session.SetState(states.ProcessViewedFilmAwaitingRating)
+	session.FilmDetailState.SetViewed(true)
+	requestViewedFilmUserRating(app, session)
 }
 
 func HandleViewedFilmProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
+	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
-		HandleFilmsDetailCommand(app, session)
+		HandleFilmDetailCommand(app, session)
 		return
 	}
 
 	switch session.State {
-	case states.ProcessViewedFilmAwaitingRating:
-		parseViewedFilmRating(app, session)
-
-	case states.ProcessViewedFilmAwaitingReview:
-		parseViewedFilmReview(app, session)
+	case states.AwaitViewedFilmUserRating:
+		parser.ParseFilmUserRating(app, session, requestViewedFilmUserRating, requestViewedFilmReview)
+	case states.AwaitViewedFilmReview:
+		parser.ParseFilmReview(app, session, requestViewedFilmReview, finishViewedFilmProcess)
 	}
 }
 
-func parseViewedFilmRating(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
-		session.FilmDetailState.UserRating = 0
-	} else {
-		session.FilmDetailState.UserRating = utils.ParseMessageFloat(app.Upd)
-	}
-
-	part1 := translator.Translate(session.Lang, "viewedFilmRequestReview", nil, nil)
-	part2 := translator.Translate(session.Lang, "viewedFilmCanCancel", nil, nil)
-
-	msg := fmt.Sprintf("✔️ <b>%s</b>\n\n<i>%s</i>", part1, part2)
-
-	keyboard := keyboards.BuildFilmViewedKeyboard(session)
-
-	app.SendMessage(msg, keyboard)
-
-	session.SetState(states.ProcessViewedFilmAwaitingReview)
+func finishViewedFilmProcess(app models.App, session *models.Session) {
+	HandleUpdateFilm(app, session, HandleFilmDetailCommand)
 }
 
-func parseViewedFilmReview(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
-		session.FilmDetailState.Review = ""
-	} else {
-		session.FilmDetailState.Review = utils.ParseMessageString(app.Upd)
-	}
+func requestViewedFilmUserRating(app models.App, session *models.Session) {
+	app.SendMessage(messages.RequestViewedFilmUserRating(session), keyboards.SkipAndCancel(session))
+	session.SetState(states.AwaitViewedFilmUserRating)
+}
 
-	finishUpdateFilmProcess(app, session, HandleFilmsDetailCommand)
+func requestViewedFilmReview(app models.App, session *models.Session) {
+	app.SendMessage(messages.RequestViewedFilmReview(session), keyboards.SkipAndCancel(session))
+	session.SetState(states.AwaitViewedFilmReview)
 }

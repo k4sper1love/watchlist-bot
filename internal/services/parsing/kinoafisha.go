@@ -13,50 +13,44 @@ import (
 	"strings"
 )
 
+const (
+	categoryMovies = "movies"
+	categorySeries = "series"
+)
+
 func GetFilmFromKinoafisha(url string) (*apiModels.Film, error) {
-	url = fmt.Sprintf("https://www.kinoafisha.info/movies/%s", parseKinoafishaID(url))
-  
-	resp, err := getDataFromKinoafisha(url)
-	if err != nil {
-		return nil, err
-	}
-	defer utils.CloseBody(resp.Body)
-
-	var film apiModels.Film
-	if err = parseFilmFromKinoafisha(&film, resp.Body); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
-		return nil, err
-	}
-
-	return &film, nil
+	return getMediaFromKinoafisha(url, categoryMovies, parseFilmFromKinoafisha)
 }
 
 func GetSeriesFromKinoafisha(url string) (*apiModels.Film, error) {
-	url = fmt.Sprintf("https://www.kinoafisha.info/series/%s", parseKinoafishaID(url))
+	return getMediaFromKinoafisha(url, categorySeries, parseSeriesFromKinoafisha)
+}
 
-	resp, err := getDataFromKinoafisha(url)
+func getMediaFromKinoafisha(url, category string, parser func(*apiModels.Film, io.Reader) error) (*apiModels.Film, error) {
+	id := parseKinoafishaID(url)
+	if id == "" {
+		return nil, fmt.Errorf("invalid Kinoafisha URL: %s", url)
+	}
+
+	resp, err := client.Do(
+		&client.CustomRequest{
+			Method:             http.MethodGet,
+			URL:                fmt.Sprintf("https://www.kinoafisha.info/%s/%s", category, id),
+			ExpectedStatusCode: http.StatusOK,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
 	defer utils.CloseBody(resp.Body)
 
 	var film apiModels.Film
-	if err = parseSeriesFromKinoafisha(&film, resp.Body); err != nil {
+	if err = parser(&film, resp.Body); err != nil {
 		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
 	return &film, err
-}
-
-func getDataFromKinoafisha(url string) (*http.Response, error) {
-	return client.Do(
-		&client.CustomRequest{
-			Method:             http.MethodGet,
-			URL:                url,
-			ExpectedStatusCode: http.StatusOK,
-		},
-	)
 }
 
 func parseFilmFromKinoafisha(dest *apiModels.Film, data io.Reader) error {
@@ -65,23 +59,11 @@ func parseFilmFromKinoafisha(dest *apiModels.Film, data io.Reader) error {
 		return err
 	}
 
-	dest.Title = client.GetTextOrDefault(doc, ".newFilmInfo_title", "Unknown")
-	dest.Title = strings.Split(dest.Title, ",")[0]
-
+	dest.Title = strings.Split(getTextOrDefault(doc, ".newFilmInfo_title", "Unknown"), ",")[0]
 	dest.Year = getKinoafishaYear(doc)
-
-	dest.Genre = client.GetTextOrDefault(doc, ".newFilmInfo_genreItem", "")
-	dest.Description = client.GetTextOrDefault(doc, ".more_content p", "")
-
-	ratingStr := client.GetTextOrDefault(doc, ".rating_imdb ", "0")
-	parts := strings.Split(ratingStr, ":")
-	if len(parts) > 1 {
-		ratingStr = parts[1]
-	} else {
-		ratingStr = "0"
-	}
-	dest.Rating, _ = strconv.ParseFloat(strings.TrimSpace(ratingStr), 64)
-
+	dest.Genre = getTextOrDefault(doc, ".newFilmInfo_genreItem", "")
+	dest.Description = getTextOrDefault(doc, ".more_content p", "")
+	dest.Rating = parseKinoafishaRating(getTextOrDefault(doc, ".rating_imdb", "0"))
 	dest.ImageURL = getKinoafishaImageURL(doc)
 
 	return nil
@@ -98,15 +80,10 @@ func parseSeriesFromKinoafisha(dest *apiModels.Film, data io.Reader) error {
 			dest.Title = strings.TrimSpace(s.Text())
 		}
 	})
-
 	dest.Year = getKinoafishaYear(doc)
-
-	dest.Genre = client.GetTextOrDefault(doc, ".newFilmInfo_genreItem", "")
-	dest.Description = client.GetTextOrDefault(doc, ".more_content p", "")
-
-	ratingStr := client.GetTextOrDefault(doc, ".ratingBlockCard_externalVal", "0")
-	dest.Rating, _ = strconv.ParseFloat(strings.TrimSpace(ratingStr), 64)
-
+	dest.Genre = getTextOrDefault(doc, ".newFilmInfo_genreItem", "")
+	dest.Description = getTextOrDefault(doc, ".more_content p", "")
+	dest.Rating = parseKinoafishaRating(getTextOrDefault(doc, ".ratingBlockCard_externalVal", "0"))
 	dest.ImageURL = getKinoafishaImageURL(doc)
 
 	return nil
@@ -124,14 +101,20 @@ func getKinoafishaImageURL(doc *goquery.Document) string {
 	return ""
 }
 
+func parseKinoafishaRating(ratingStr string) float64 {
+	parts := strings.Split(ratingStr, ":")
+	if len(parts) > 1 {
+		ratingStr = parts[1]
+	}
+	rating, _ := strconv.ParseFloat(strings.TrimSpace(ratingStr), 64)
+	return rating
+}
+
 func getKinoafishaYear(doc *goquery.Document) int {
 	var year int
 	doc.Find(".newFilmInfo_infoItem").Each(func(i int, s *goquery.Selection) {
-		name := s.Find(".newFilmInfo_infoName").Text()
-		if strings.Contains(name, "Год выпуска") {
-			yearStr := s.Find(".newFilmInfo_infoData").Text()
-			yearStr = strings.TrimSpace(yearStr)
-			year, _ = strconv.Atoi(yearStr)
+		if strings.Contains(s.Find(".newFilmInfo_infoName").Text(), "Год выпуска") {
+			year, _ = strconv.Atoi(strings.TrimSpace(s.Find(".newFilmInfo_infoData").Text()))
 		}
 	})
 
@@ -139,12 +122,9 @@ func getKinoafishaYear(doc *goquery.Document) int {
 }
 
 func parseKinoafishaID(url string) string {
-	shortUrl := strings.TrimPrefix(url, "https://www.kinoafisha.info/")
-	parts := strings.Split(shortUrl, "/")
-
+	parts := strings.Split(strings.TrimPrefix(url, "https://www.kinoafisha.info/"), "/")
 	if len(parts) > 0 {
 		return parts[1]
 	}
-
 	return ""
 }

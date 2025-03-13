@@ -14,7 +14,7 @@ type Feedback struct {
 	Message          string `gorm:"not null"`
 }
 
-type FiltersFilm struct {
+type FilmFilters struct {
 	gorm.Model
 	FilterableID   uint   `json:"-"`
 	FilterableType string `json:"-"`
@@ -24,11 +24,6 @@ type FiltersFilm struct {
 	IsViewed       *bool  `json:"-"`
 	IsFavorite     *bool  `json:"-"`
 	HasURL         *bool  `json:"-"`
-}
-
-type FilterRangeConfig struct {
-	MinValue float64
-	MaxValue float64
 }
 
 type Sorting struct {
@@ -45,25 +40,7 @@ func (f *Sorting) Clear() {
 	f.Direction = ""
 }
 
-func (f *FiltersFilm) IsFiltersEnabled() bool {
-	if f.Rating != "" {
-		return true
-	} else if f.UserRating != "" {
-		return true
-	} else if f.Year != "" {
-		return true
-	} else if f.IsViewed != nil {
-		return true
-	} else if f.IsFavorite != nil {
-		return true
-	} else if f.HasURL != nil {
-		return true
-	}
-
-	return false
-}
-
-func (f *FiltersFilm) ResetFilters() {
+func (f *FilmFilters) ResetAll() {
 	f.Rating = ""
 	f.UserRating = ""
 	f.Year = ""
@@ -72,7 +49,7 @@ func (f *FiltersFilm) ResetFilters() {
 	f.HasURL = nil
 }
 
-func (f *FiltersFilm) ResetFilter(filterType string) {
+func (f *FilmFilters) Reset(filterType string) {
 	switch filterType {
 	case "rating":
 		f.Rating = ""
@@ -89,7 +66,11 @@ func (f *FiltersFilm) ResetFilter(filterType string) {
 	}
 }
 
-func (f *FiltersFilm) IsFilterEnabled(filterType string) bool {
+func (f *FilmFilters) IsEnabled() bool {
+	return f.Rating != "" || f.UserRating != "" || f.Year != "" || f.IsViewed != nil || f.IsFavorite != nil || f.HasURL != nil
+}
+
+func (f *FilmFilters) IsFieldEnabled(filterType string) bool {
 	switch filterType {
 	case "rating":
 		return f.Rating != ""
@@ -108,7 +89,7 @@ func (f *FiltersFilm) IsFilterEnabled(filterType string) bool {
 	}
 }
 
-func (f *FiltersFilm) ApplyRangeValue(filterType, value string) {
+func (f *FilmFilters) ApplyRange(filterType, value string) {
 	switch filterType {
 	case "rating":
 		f.Rating = value
@@ -119,7 +100,7 @@ func (f *FiltersFilm) ApplyRangeValue(filterType, value string) {
 	}
 }
 
-func (f *FiltersFilm) ApplySwitchValue(filterType string, value bool) {
+func (f *FilmFilters) ApplySwitch(filterType string, value bool) {
 	switch filterType {
 	case "isViewed":
 		f.IsViewed = &value
@@ -130,7 +111,7 @@ func (f *FiltersFilm) ApplySwitchValue(filterType string, value bool) {
 	}
 }
 
-func (f *FiltersFilm) ValueToString(filterType string) string {
+func (f *FilmFilters) ToString(filterType string) string {
 	switch filterType {
 	case "rating":
 		return f.Rating
@@ -149,14 +130,18 @@ func (f *FiltersFilm) ValueToString(filterType string) string {
 	}
 }
 
-func (f *Sorting) IsSortingEnabled() bool {
+func (f *Sorting) Reset() {
+	f.Sort = ""
+}
+
+func (f *Sorting) IsEnabled() bool {
 	return f.Sort != ""
 }
 
-func (f *Sorting) IsSortingFieldEnabled(field string) bool {
+func (f *Sorting) IsFieldEnabled(field string) bool {
 	return field == strings.TrimPrefix(f.Sort, "-")
 }
 
-func (f *Sorting) ResetSorting() {
-	f.Sort = ""
+func (f *Sorting) SetSort() {
+	f.Sort = f.Direction + f.Sort
 }

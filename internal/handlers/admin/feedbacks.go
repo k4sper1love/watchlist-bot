@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
@@ -10,114 +9,91 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
-	"log/slog"
 	"strconv"
 	"strings"
 )
 
 func HandleFeedbacksCommand(app models.App, session *models.Session) {
-	feedbacks, err := parseFeedbacks(session)
-	if err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
-		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackMenuSelectAdmin).Build(session.Lang)
-		app.SendMessage(msg, keyboard)
-		return
+	if feedbacks, err := getFeedbacks(session); err != nil {
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallMenuAdmin))
+	} else {
+		app.SendMessage(messages.FeedbackList(session, feedbacks), keyboards.FeedbackList(session, feedbacks))
 	}
-
-	msg := messages.BuildFeedbackListMessage(session, feedbacks)
-
-	keyboard := keyboards.BuildFeedbackListKeyboard(session, feedbacks)
-
-	app.SendMessage(msg, keyboard)
 }
 
 func HandleFeedbacksButtons(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
-	switch {
-	case callback == states.CallbackAdminFeedbackListBack:
+	callback := utils.ParseCallback(app.Update)
+
+	switch callback {
+	case states.CallFeedbacksBack:
 		general.RequireRole(app, session, HandleMenuCommand, roles.Helper)
 
-	case callback == states.CallbackAdminFeedbackListNextPage:
-		if session.AdminState.CurrentPage < session.AdminState.LastPage {
-			session.AdminState.CurrentPage++
-			HandleFeedbacksCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
+	default:
+		if strings.HasPrefix(callback, states.FeedbacksPage) {
+			handleFeedbackPagination(app, session, callback)
 		}
 
-	case callback == states.CallbackAdminFeedbackListPrevPage:
-		if session.AdminState.CurrentPage > 1 {
-			session.AdminState.CurrentPage--
-			HandleFeedbacksCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
+		if strings.HasPrefix(callback, states.SelectFeedback) {
+			handleFeedbackSelect(app, session, callback)
 		}
-
-	case callback == states.CallbackAdminFeedbackListLastPage:
-		if session.AdminState.CurrentPage != session.AdminState.LastPage {
-			session.AdminState.CurrentPage = session.AdminState.LastPage
-			HandleFeedbacksCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "lastPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
-		}
-
-	case callback == states.CallbackAdminFeedbackListFirstPage:
-		if session.AdminState.CurrentPage != 1 {
-			session.AdminState.CurrentPage = 1
-			HandleFeedbacksCommand(app, session)
-		} else {
-			msg := "❗️" + translator.Translate(session.Lang, "firstPageAlert", nil, nil)
-			app.SendMessage(msg, nil)
-		}
-
-	case strings.HasPrefix(callback, "select_admin_feedback_"):
-		handleFeedbackSelect(app, session)
 	}
-
 }
 
-func handleFeedbackSelect(app models.App, session *models.Session) {
-	callback := utils.ParseCallback(app.Upd)
-	idStr := strings.TrimPrefix(callback, "select_admin_feedback_")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "someError", nil, nil)
-		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackAdminSelectFeedback).Build(session.Lang)
-		app.SendMessage(msg, keyboard)
-		sl.Log.Error("failed to parse user ID", slog.Any("error", err), slog.String("callback", callback))
-		return
+func handleFeedbackPagination(app models.App, session *models.Session, callback string) {
+	switch callback {
+	case states.CallFeedbacksPageNext:
+		if session.AdminState.CurrentPage >= session.AdminState.LastPage {
+			app.SendMessage(messages.LastPageAlert(session), nil)
+			return
+		}
+		session.AdminState.CurrentPage++
+
+	case states.CallFeedbacksPagePrev:
+		if session.AdminState.CurrentPage <= 1 {
+			app.SendMessage(messages.FirstPageAlert(session), nil)
+			return
+		}
+		session.AdminState.CurrentPage--
+
+	case states.CallFeedbacksPageLast:
+		if session.AdminState.CurrentPage == session.AdminState.LastPage {
+			app.SendMessage(messages.LastPageAlert(session), nil)
+			return
+		}
+		session.AdminState.CurrentPage = session.AdminState.LastPage
+
+	case states.CallFeedbacksPageFirst:
+		if session.AdminState.CurrentPage == 1 {
+			app.SendMessage(messages.FirstPageAlert(session), nil)
+			return
+		}
+		session.AdminState.CurrentPage = 1
 	}
 
-	session.AdminState.FeedbackID = id
-
-	HandleFeedbackDetailCommand(app, session)
+	HandleFeedbacksCommand(app, session)
 }
 
-func parseFeedbacks(session *models.Session) ([]models.Feedback, error) {
-	currentPage := session.AdminState.CurrentPage
-	pageSize := session.AdminState.PageSize
+func handleFeedbackSelect(app models.App, session *models.Session, callback string) {
+	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectFeedback)); err != nil {
+		utils.LogParseSelectError(err, callback)
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallAdminFeedback))
+	} else {
+		session.AdminState.FeedbackID = id
+		HandleFeedbackDetailCommand(app, session)
+	}
+}
 
-	feedback, err := postgres.GetAllFeedbacksWithPagination(currentPage, pageSize)
+func getFeedbacks(session *models.Session) ([]models.Feedback, error) {
+	feedback, err := postgres.GetFeedbacksWithPagination(session.AdminState.CurrentPage, session.AdminState.PageSize)
 	if err != nil {
 		return nil, err
 	}
 
-	totalCount, err := postgres.GetFeedbackCounts()
+	totalCount, err := postgres.GetFeedbackCount()
 	if err != nil {
 		return nil, err
 	}
 
-	totalPages := int(totalCount / int64(pageSize))
-	if totalCount%int64(pageSize) > 0 {
-		totalPages++
-	}
-
-	session.AdminState.LastPage = totalPages
-	session.AdminState.TotalRecords = int(totalCount)
-
+	calculateAdminPages(session, totalCount)
 	return feedback, nil
 }

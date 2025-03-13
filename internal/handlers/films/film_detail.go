@@ -1,98 +1,78 @@
 package films
 
 import (
-	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
-	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"strings"
 )
 
-func HandleFilmsDetailCommand(app models.App, session *models.Session) {
-	state := session.FilmDetailState
-
-	if state.HasIndex() {
-		films := session.FilmsState.Films
-		session.FilmDetailState.Film = films[state.Index]
+func HandleFilmDetailCommand(app models.App, session *models.Session) {
+	if session.FilmDetailState.HasIndex() {
+		session.FilmDetailState.Film = session.FilmsState.Films[session.FilmDetailState.Index]
 	}
 
-	msg := messages.BuildFilmDetailMessage(session)
-
-	keyboard := keyboards.BuildFilmDetailKeyboard(session)
-
-	imageURL := state.Film.ImageURL
-
-	app.SendImage(imageURL, msg, keyboard)
+	app.SendImage(
+		session.FilmDetailState.Film.ImageURL,
+		messages.FilmDetail(session),
+		keyboards.FilmDetail(session),
+	)
 }
 
-func HandleFilmsDetailButtons(app models.App, session *models.Session) {
-	currentIndex := session.FilmDetailState.Index
-	lastIndex := getFilmsLastIndex(session)
+func HandleFilmDetailButtons(app models.App, session *models.Session) {
+	callback := utils.ParseCallback(app.Update)
 
-	switch utils.ParseCallback(app.Upd) {
-	case states.CallbackFilmDetailNextPage:
-		if currentIndex < lastIndex {
-			session.FilmDetailState.Index++
-			HandleFilmsDetailCommand(app, session)
-		} else {
-			if err := UpdateFilmsList(app, session, true); err != nil {
-				app.SendMessage(err.Error(), nil)
-				return
-			}
-			session.FilmDetailState.Index = 0
-			HandleFilmsDetailCommand(app, session)
-		}
-
-	case states.CallbackFilmDetailPrevPage:
-		if currentIndex > 0 {
-			session.FilmDetailState.Index--
-			HandleFilmsDetailCommand(app, session)
-		} else {
-			if err := UpdateFilmsList(app, session, false); err != nil {
-				app.SendMessage(err.Error(), nil)
-				return
-			}
-
-			session.FilmDetailState.Index = getFilmsLastIndex(session)
-			HandleFilmsDetailCommand(app, session)
-		}
-
-	case states.CallbackFilmDetailBack:
+	switch callback {
+	case states.CallFilmDetailBack:
 		session.FilmsState.CurrentPage = 1
 		HandleFilmsCommand(app, session)
 
-	case states.CallbackFilmDetailViewed:
+	case states.CallFilmDetailViewed:
 		HandleViewedFilmCommand(app, session)
 
-	case states.CallbackFilmDetailFavorite:
-		handleFavoriteFilm(app, session)
+	case states.CallFilmDetailFavorite:
+		makeFavoriteFilm(app, session)
+
+	default:
+		if strings.HasPrefix(callback, states.FilmDetailPage) {
+			handleFilmDetailPagination(app, session, callback)
+		}
 	}
 }
 
-func handleFavoriteFilm(app models.App, session *models.Session) {
-	session.FilmDetailState.Film.IsFavorite = !session.FilmDetailState.Film.IsFavorite
+func handleFilmDetailPagination(app models.App, session *models.Session, callback string) {
+	switch callback {
+	case states.CallFilmDetailPageNext:
+		if session.FilmDetailState.Index < getFilmsLastIndex(session) {
+			session.FilmDetailState.Index++
+		} else if err := updateFilmList(app, session, true); err == nil {
+			session.FilmDetailState.Index = 0
+		} else {
+			app.SendMessage(messages.LastPageAlert(session), nil)
+			return
+		}
 
-	finishUpdateFilmProcess(app, session, HandleFilmsDetailCommand)
+	case states.CallFilmDetailPagePrev:
+		if session.FilmDetailState.Index > 0 {
+			session.FilmDetailState.Index--
+		} else if err := updateFilmList(app, session, false); err == nil {
+			session.FilmDetailState.Index = getFilmsLastIndex(session)
+		} else {
+			app.SendMessage(messages.FirstPageAlert(session), nil)
+			return
+		}
+	}
+
+	HandleFilmDetailCommand(app, session)
+}
+
+func makeFavoriteFilm(app models.App, session *models.Session) {
+	session.FilmDetailState.SetFavorite(!session.FilmDetailState.Film.IsFavorite)
+	HandleUpdateFilm(app, session, HandleFilmDetailCommand)
 }
 
 func getFilmsLastIndex(session *models.Session) int {
 	return len(session.FilmsState.Films) - 1
-}
-
-func UpdateFilmInList(app models.App, session *models.Session) error {
-	film, err := watchlist.GetFilm(app, session)
-	if err != nil {
-		return err
-	}
-
-	UpdateSessionWithFilm(session, film)
-
-	return nil
-}
-
-func UpdateSessionWithFilm(session *models.Session, film *apiModels.Film) {
-	index := session.FilmDetailState.Index
-	session.FilmsState.Films[index] = *film
 }

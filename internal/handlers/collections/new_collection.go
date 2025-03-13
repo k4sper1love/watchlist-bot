@@ -2,96 +2,49 @@ package collections
 
 import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
-	"github.com/k4sper1love/watchlist-bot/internal/handlers/films"
+	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
+	"github.com/k4sper1love/watchlist-bot/internal/handlers/parser"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
-	"github.com/k4sper1love/watchlist-bot/internal/handlers/validator"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/watchlist"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
 func HandleNewCollectionCommand(app models.App, session *models.Session) {
-	keyboard := keyboards.NewKeyboard().AddCancel().Build(session.Lang)
-
-	msg := "❓" + translator.Translate(session.Lang, "collectionRequestName", nil, nil)
-
-	app.SendMessage(msg, keyboard)
-	session.SetState(states.ProcessNewCollectionAwaitingName)
+	app.SendMessage(messages.RequestCollectionName(session), keyboards.Cancel(session))
+	session.SetState(states.AwaitNewCollectionName)
 }
 
 func HandleNewCollectionProcess(app models.App, session *models.Session) {
-	if utils.IsCancel(app.Upd) {
-		session.ClearState()
-		session.CollectionDetailState.Clear()
+	if utils.IsCancel(app.Update) {
+		session.ClearAllStates()
 		HandleCollectionsCommand(app, session)
 		return
 	}
 
 	switch session.State {
-	case states.ProcessNewCollectionAwaitingName:
-		parseNewCollectionName(app, session)
+	case states.AwaitNewCollectionName:
+		parser.ParseCollectionName(app, session, HandleNewCollectionCommand, requestNewCollectionDescription)
 
-	case states.ProcessNewCollectionAwaitingDescription:
-		parseNewCollectionDescription(app, session)
+	case states.AwaitNewCollectionDescription:
+		parser.ParseCollectionDescription(app, session, requestNewCollectionDescription, finishNewCollectionProcess)
 	}
-}
-
-func parseNewCollectionName(app models.App, session *models.Session) {
-	name := utils.ParseMessageString(app.Upd)
-	if ok := utils.ValidStringLength(name, 3, 100); !ok {
-		validator.HandleInvalidInputLength(app, session, 3, 100)
-		HandleNewCollectionCommand(app, session)
-		return
-	}
-	session.CollectionDetailState.Name = name
-
-	requestNewCollectionDescription(app, session)
 }
 
 func requestNewCollectionDescription(app models.App, session *models.Session) {
-	keyboard := keyboards.NewKeyboard().AddSkip().AddCancel().Build(session.Lang)
-
-	msg := "❓" + translator.Translate(session.Lang, "collectionRequestDescription", nil, nil)
-
-	app.SendMessage(msg, keyboard)
-
-	session.SetState(states.ProcessNewCollectionAwaitingDescription)
+	app.SendMessage(messages.RequestCollectionDescription(session), keyboards.SkipAndCancel(session))
+	session.SetState(states.AwaitNewCollectionDescription)
 }
 
-func parseNewCollectionDescription(app models.App, session *models.Session) {
-	if utils.IsSkip(app.Upd) {
-		session.CollectionDetailState.Description = ""
-		createCollection(app, session)
-		return
-	}
-	description := utils.ParseMessageString(app.Upd)
-	if ok := utils.ValidStringLength(description, 0, 500); !ok {
-		validator.HandleInvalidInputLength(app, session, 0, 500)
-		requestNewCollectionDescription(app, session)
-		return
-	}
-	session.CollectionDetailState.Description = description
-
-	createCollection(app, session)
-}
-
-func createCollection(app models.App, session *models.Session) {
+func finishNewCollectionProcess(app models.App, session *models.Session) {
 	collection, err := watchlist.CreateCollection(app, session)
+	session.ClearAllStates()
 	if err != nil {
-		msg := "🚨 " + translator.Translate(session.Lang, "createCollectionFailure", nil, nil)
-		keyboard := keyboards.NewKeyboard().AddBack(states.CallbackCollectionsNew).Build(session.Lang)
-		app.SendMessage(msg, keyboard)
+		app.SendMessage(messages.CreateCollectionFailure(session), keyboards.Back(session, states.CallCollectionsNew))
 		return
 	}
-
-	msg := "📚 " + translator.Translate(session.Lang, "createCollectionSuccess", nil, nil)
-	app.SendMessage(msg, nil)
 
 	session.CollectionDetailState.ObjectID = collection.ID
-
-	session.SetContext(states.ContextCollection)
-	films.HandleFilmsCommand(app, session)
-
-	session.ClearAllStates()
+	app.SendMessage(messages.CreateCollectionSuccess(session), nil)
+	setContextAndHandleFilms(app, session)
 }
