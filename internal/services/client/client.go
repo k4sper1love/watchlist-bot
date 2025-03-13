@@ -59,7 +59,7 @@ func setRequestHeaders(req *http.Request, headers map[string]string) {
 }
 
 func prepareRequest(url, method string, data any) (*http.Request, error) {
-	var requestBody *bytes.Buffer
+	requestBody := &bytes.Buffer{}
 
 	if data != nil {
 		body, err := json.Marshal(data)
@@ -67,10 +67,7 @@ func prepareRequest(url, method string, data any) (*http.Request, error) {
 			return nil, err
 		}
 		requestBody = bytes.NewBuffer(body)
-	} else {
-		requestBody = &bytes.Buffer{}
 	}
-
 	return http.NewRequest(method, url, requestBody)
 }
 
@@ -97,20 +94,18 @@ func Do(req *CustomRequest) (*http.Response, error) {
 }
 
 func ParseErrorStatusCode(err error) int {
-	errStr := err.Error()
-
-	if strings.HasPrefix(errStr, "failed response") {
-		parts := strings.Split(errStr, "code")
-		if len(parts) < 2 {
-			return -1
-		}
-		codeStr := strings.TrimSpace(parts[len(parts)-1])
-		code, err := strconv.Atoi(codeStr)
-		if err != nil {
-			return -1
-		}
-		return code
+	if !strings.HasPrefix(err.Error(), "failed response") {
+		return -1
 	}
 
-	return -1
+	parts := strings.Split(err.Error(), "code")
+	if len(parts) < 2 {
+		return -1
+	}
+
+	code, err := strconv.Atoi(strings.TrimSpace(parts[len(parts)-1]))
+	if err != nil {
+		return -1
+	}
+	return code
 }

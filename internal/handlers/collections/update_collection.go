@@ -16,13 +16,13 @@ func HandleUpdateCollectionCommand(app models.App, session *models.Session) {
 
 func HandleUpdateCollectionButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Update) {
-	case states.CallbackUpdateCollectionSelectBack:
+	case states.CallUpdateCollectionBack:
 		HandleManageCollectionCommand(app, session)
 
-	case states.CallbackUpdateCollectionSelectName:
+	case states.CallUpdateCollectionName:
 		handleUpdateCollectionName(app, session)
 
-	case states.CallbackUpdateCollectionSelectDescription:
+	case states.CallUpdateCollectionDescription:
 		handleUpdateCollectionDescription(app, session)
 	}
 }
@@ -35,10 +35,10 @@ func HandleUpdateCollectionProcess(app models.App, session *models.Session) {
 	}
 
 	switch session.State {
-	case states.ProcessUpdateCollectionAwaitingName:
+	case states.AwaitUpdateCollectionName:
 		parser.ParseCollectionName(app, session, handleUpdateCollectionName, finishUpdateCollectionProcess)
 
-	case states.ProcessUpdateCollectionAwaitingDescription:
+	case states.AwaitUpdateCollectionDescription:
 		parser.ParseCollectionDescription(app, session, handleUpdateCollectionDescription, finishUpdateCollectionProcess)
 	}
 }
@@ -49,12 +49,12 @@ func finishUpdateCollectionProcess(app models.App, session *models.Session) {
 
 func handleUpdateCollectionName(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestCollectionName(session), keyboards.Cancel(session))
-	session.SetState(states.ProcessUpdateCollectionAwaitingName)
+	session.SetState(states.AwaitUpdateCollectionName)
 }
 
 func handleUpdateCollectionDescription(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestCollectionDescription(session), keyboards.Cancel(session))
-	session.SetState(states.ProcessUpdateCollectionAwaitingDescription)
+	session.SetState(states.AwaitUpdateCollectionDescription)
 }
 
 func HandleUpdateCollection(app models.App, session *models.Session, back func(models.App, *models.Session)) {

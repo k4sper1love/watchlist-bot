@@ -15,7 +15,6 @@ func Auth(app models.App, session *models.Session) bool {
 	if IsBanned(app, session) {
 		return false
 	}
-
 	if isAuthenticated(app, session) || attemptLoginOrRegister(app, session) == nil {
 		return true
 	}

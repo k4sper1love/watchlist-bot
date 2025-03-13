@@ -15,13 +15,13 @@ func HandleOptionsFilmToCollectionCommand(app models.App, session *models.Sessio
 
 func HandleOptionsFilmToCollectionButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Update) {
-	case states.CallbackOptionsFilmToCollectionBack:
+	case states.CallFilmToCollectionOptionBack:
 		films.HandleFilmsCommand(app, session)
 
-	case states.CallbackOptionsFilmToCollectionNew:
+	case states.CallFilmToCollectionOptionNew:
 		films.HandleNewFilmCommand(app, session)
 
-	case states.CallbackOptionsFilmToCollectionExisting:
+	case states.CallFilmToCollectionOptionExisting:
 		clearAndHandleFilmToCollection(app, session)
 	}
 }

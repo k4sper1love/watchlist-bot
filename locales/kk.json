@@ -32,6 +32,9 @@
   "invalidInputURL": {
     "other": "Қате URL немесе ұзындығы <b>[{{.Min}}, {{.Max}}]</b> таңбалары арасында емес"
   },
+  "invalidInputEmail": {
+    "other": "Қате email немесе ұзындығы <b>[{{.Min}}, {{.Max}}]</b> таңбалар диапазонында емес"
+  },
   "kinopoiskToken": {
     "other": "Kinopoisk токені"
   },
@@ -565,7 +568,7 @@
     "other": "Ағымдағы бет өлшемі"
   },
   "settingsPageSizeSuccess": {
-    "other": "Бет өлшемі орнатылды: <code>{{.Size}}</code>"
+    "other": "Жаңа бет өлшемі орнатылды"
   },
   "settingsCollectionsPageSizeSuccess": {
     "other": "Коллекциялар тізімі үшін жаңа бет өлшемі"

@@ -35,17 +35,17 @@ func (k *Keyboard) AddNavigation(currentPage, lastPage int, prefixCallback strin
 }
 
 func (k *Keyboard) AddCancel() *Keyboard {
-	return k.AddButton("", "cancel", states.CallbackProcessCancel, "", true)
+	return k.AddButton("", "cancel", states.CallProcessCancel, "", true)
 }
 
 func (k *Keyboard) AddSkip() *Keyboard {
-	return k.AddButton("", "skip", states.CallbackProcessSkip, "", true)
+	return k.AddButton("", "skip", states.CallProcessSkip, "", true)
 }
 
 func (k *Keyboard) AddSurvey() *Keyboard {
 	return k.AddButtonsWithRowSize(2,
-		Button{"", "yes", states.CallbackYes, "", true},
-		Button{"", "no", states.CallbackNo, "", true})
+		Button{"", "yes", states.CallYes, "", true},
+		Button{"", "no", states.CallNo, "", true})
 }
 
 func (k *Keyboard) AddBack(callbackData string) *Keyboard {
@@ -54,7 +54,7 @@ func (k *Keyboard) AddBack(callbackData string) *Keyboard {
 	if callbackData != "" {
 		buttons = append(buttons, Button{"←", "back", callbackData, "", true})
 	}
-	buttons = append(buttons, Button{"🏠 ", "mainMenu", states.CallbackMainMenu, "", true})
+	buttons = append(buttons, Button{"🏠 ", "mainMenu", states.CallMainMenu, "", true})
 
 	return k.AddButtonsWithRowSize(len(buttons), buttons...)
 }
@@ -82,19 +82,19 @@ func (k *Keyboard) AddLanguageSelect(languages []string, callback string) *Keybo
 }
 
 func (k *Keyboard) AddProfileUpdate() *Keyboard {
-	return k.AddButton("✏️", "edit", states.CallbackProfileSelectUpdate, "", true)
+	return k.AddButton("✏️", "edit", states.CallProfileUpdate, "", true)
 }
 
 func (k *Keyboard) AddProfileDelete() *Keyboard {
-	return k.AddButton("🗑️", "delete", states.CallbackProfileSelectDelete, "", true)
+	return k.AddButton("🗑️", "delete", states.CallProfileDelete, "", true)
 }
 
 func (k *Keyboard) AddAdminPanel() *Keyboard {
-	return k.AddButton("🛠️", "adminPanel", states.CallbackMenuSelectAdmin, "", true)
+	return k.AddButton("🛠️", "adminPanel", states.CallMenuAdmin, "", true)
 }
 
 func (k *Keyboard) AddUpdateFilmURL() *Keyboard {
-	return k.AddButton("", "filmURL", states.CallbackUpdateFilmSelectURL, "", true)
+	return k.AddButton("", "filmURL", states.CallUpdateFilmURL, "", true)
 }
 
 func (k *Keyboard) AddOpenInBrowser(url string) *Keyboard {
@@ -102,7 +102,7 @@ func (k *Keyboard) AddOpenInBrowser(url string) *Keyboard {
 }
 
 func (k *Keyboard) AddFilmViewed() *Keyboard {
-	return k.AddButton("✔️", "viewed", states.CallbackFilmDetailViewed, "", true)
+	return k.AddButton("✔️", "viewed", states.CallFilmDetailViewed, "", true)
 }
 
 func (k *Keyboard) AddFilmSelect(session *models.Session) *Keyboard {
@@ -110,7 +110,7 @@ func (k *Keyboard) AddFilmSelect(session *models.Session) *Keyboard {
 
 	for i, film := range session.FilmsState.Films {
 		itemID := utils.GetItemID(i, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
-		callback := states.PrefixSelectFilm + strconv.Itoa(i)
+		callback := states.SelectFilm + strconv.Itoa(i)
 
 		buttons = append(buttons, Button{utils.NumberToEmoji(itemID), film.Title, callback, "", false})
 	}
@@ -123,7 +123,7 @@ func (k *Keyboard) AddFindNewFilmSelect(session *models.Session) *Keyboard {
 
 	for i, film := range session.FilmsState.Films {
 		itemID := utils.GetItemID(i, session.FilmsState.CurrentPage, session.FilmsState.PageSize)
-		callback := states.PrefixSelectFindNewFilm + strconv.Itoa(i)
+		callback := states.SelectNewFilm + strconv.Itoa(i)
 
 		buttons = append(buttons, Button{utils.NumberToEmoji(itemID), film.Title, callback, "", false})
 	}
@@ -132,48 +132,48 @@ func (k *Keyboard) AddFindNewFilmSelect(session *models.Session) *Keyboard {
 }
 
 func (k *Keyboard) AddFilmFind() *Keyboard {
-	return k.AddButton("🔎", "findFilmByTitle", states.CallbackFilmsFind, "", true)
+	return k.AddButton("🔎", "findFilmByTitle", states.CallFilmsFind, "", true)
 }
 
 func (k *Keyboard) AddFilmNew() *Keyboard {
-	return k.AddButton("➕", "createFilm", states.CallbackFilmsNew, "", true)
+	return k.AddButton("➕", "createFilm", states.CallFilmsNew, "", true)
 }
 
 func (k *Keyboard) AddFilmFiltersAndSorting(session *models.Session) *Keyboard {
-	filtersEnable := session.GetFilmsFiltersByContext().IsFiltersEnabled()
-	sortingEnable := session.GetFilmsSortingByContext().IsSortingEnabled()
+	filtersEnable := session.GetFilmFiltersByCtx().IsEnabled()
+	sortingEnable := session.GetFilmSortingByCtx().IsEnabled()
 
 	return k.AddButtonsWithRowSize(2,
-		Button{utils.BoolToEmoji(sortingEnable), "sorting", states.CallbackFilmsSorting, "", true},
-		Button{utils.BoolToEmoji(filtersEnable), "filters", states.CallbackFilmsFilters, "", true})
+		Button{utils.BoolToEmoji(sortingEnable), "sorting", states.CallFilmsSorting, "", true},
+		Button{utils.BoolToEmoji(filtersEnable), "filters", states.CallFilmsFilters, "", true})
 }
 
 func (k *Keyboard) AddFilmDelete() *Keyboard {
-	return k.AddButton("🗑️", "deleteFilm", states.CallbackManageFilmSelectDelete, "", true)
+	return k.AddButton("🗑️", "deleteFilm", states.CallManageFilmDelete, "", true)
 }
 
 func (k *Keyboard) AddFilmUpdate() *Keyboard {
-	return k.AddButton("✏️", "updateFilm", states.CallbackManageFilmSelectUpdate, "", true)
+	return k.AddButton("✏️", "updateFilm", states.CallManageFilmUpdate, "", true)
 }
 
 func (k *Keyboard) AddFilmManage() *Keyboard {
-	return k.AddButton("⚙️", "manageFilm", states.CallbackFilmsManage, "", true)
+	return k.AddButton("⚙️", "manageFilm", states.CallFilmsManage, "", true)
 }
 
 func (k *Keyboard) AddFilmRemoveFromCollection() *Keyboard {
-	return k.AddButton("🧹󠁝", "removeFromCollection", states.CallbackManageFilmSelectRemoveFromCollection, "", true)
+	return k.AddButton("🧹󠁝", "removeFromCollection", states.CallManageFilmRemoveFromCollection, "", true)
 }
 
 func (k *Keyboard) AddNewFilmManually() *Keyboard {
-	return k.AddButton("", "manually", states.CallbackNewFilmSelectManually, "", true)
+	return k.AddButton("", "manually", states.CallNewFilmManually, "", true)
 }
 
 func (k *Keyboard) AddNewFilmFromURL() *Keyboard {
-	return k.AddButton("", "fromURL", states.CallbackNewFilmSelectFromURL, "", true)
+	return k.AddButton("", "fromURL", states.CallNewFilmFromURL, "", true)
 }
 
 func (k *Keyboard) AddNewFilmFind() *Keyboard {
-	return k.AddButton("", "findFilm", states.CallbackNewFilmSelectFind, "", true)
+	return k.AddButton("", "findFilm", states.CallNewFilmFind, "", true)
 }
 
 func (k *Keyboard) AddAgain(callback string) *Keyboard {
@@ -181,12 +181,12 @@ func (k *Keyboard) AddAgain(callback string) *Keyboard {
 }
 
 func (k *Keyboard) AddResetAllFilmsFilters() *Keyboard {
-	return k.AddButton("🔄", "resetFilters", states.CallbackFiltersFilmsAllReset, "", true)
+	return k.AddButton("🔄", "resetFilters", states.CallFilmFiltersAllReset, "", true)
 }
 
 func (k *Keyboard) AddResetFilmsFilter(session *models.Session, filterType string) *Keyboard {
-	if session.GetFilmsFiltersByContext().IsFilterEnabled(filterType) {
-		return k.AddButton("🔄", "reset", states.CallbackProcessReset, "", true)
+	if session.GetFilmFiltersByCtx().IsFieldEnabled(filterType) {
+		return k.AddButton("🔄", "reset", states.CallProcessReset, "", true)
 	}
 	return k
 }
@@ -201,7 +201,7 @@ func (k *Keyboard) AddFavorite(isFavorite bool, callback string) *Keyboard {
 }
 
 func (k *Keyboard) AddChangeToken() *Keyboard {
-	return k.AddButton("🔄", "changeToken", states.CallbackNewFilmSelectChangeKinopoiskToken, "", true)
+	return k.AddButton("🔄", "changeToken", states.CallNewFilmChangeKinopoiskToken, "", true)
 }
 
 func (k *Keyboard) AddCollectionsSelect(session *models.Session) *Keyboard {
@@ -209,7 +209,7 @@ func (k *Keyboard) AddCollectionsSelect(session *models.Session) *Keyboard {
 
 	for i, collection := range session.CollectionsState.Collections {
 		itemID := utils.GetItemID(i, session.CollectionsState.CurrentPage, session.CollectionsState.PageSize)
-		callback := states.PrefixSelectCollection + strconv.Itoa(collection.ID)
+		callback := states.SelectCollection + strconv.Itoa(collection.ID)
 
 		buttons = append(buttons, Button{utils.NumberToEmoji(itemID), collection.Name, callback, "", false})
 	}
@@ -218,12 +218,12 @@ func (k *Keyboard) AddCollectionsSelect(session *models.Session) *Keyboard {
 }
 
 func (k *Keyboard) AddCollectionsNew() *Keyboard {
-	return k.AddButton("➕", "createCollection", states.CallbackCollectionsNew, "", true)
+	return k.AddButton("➕", "createCollection", states.CallCollectionsNew, "", true)
 }
 
 func (k *Keyboard) AddCollectionFiltersAndSorting(session *models.Session) *Keyboard {
-	sortingEnable := session.CollectionsState.Sorting.IsSortingEnabled()
-	return k.AddButton(utils.BoolToEmoji(sortingEnable), "sorting", states.CallbackCollectionsSorting, "", true)
+	sortingEnable := session.CollectionsState.Sorting.IsEnabled()
+	return k.AddButton(utils.BoolToEmoji(sortingEnable), "sorting", states.CallCollectionsSorting, "", true)
 }
 
 func (k *Keyboard) AddSearch(callback string) *Keyboard {
@@ -239,32 +239,32 @@ func (k *Keyboard) AddResetAllSorting(callback string) *Keyboard {
 }
 
 func (k *Keyboard) AddResetSorting(sorting *models.Sorting) *Keyboard {
-	if sorting.IsSortingFieldEnabled(sorting.Field) {
-		return k.AddButton("🔄", "reset", states.CallbackProcessReset, "", true)
+	if sorting.IsFieldEnabled(sorting.Field) {
+		return k.AddButton("🔄", "reset", states.CallProcessReset, "", true)
 	}
 	return k
 }
 
 func (k *Keyboard) AddSortingDirection() *Keyboard {
 	return k.AddButtonsWithRowSize(2,
-		Button{"⬇️", "decreaseOrder", states.CallbackDecrease, "", true},
-		Button{"⬆️", "increaseOrder", states.CallbackIncrease, "", true})
+		Button{"⬇️", "decreaseOrder", states.CallDecrease, "", true},
+		Button{"⬆️", "increaseOrder", states.CallIncrease, "", true})
 }
 
 func (k *Keyboard) AddCollectionFilmFromFilm() *Keyboard {
-	return k.AddButton("➕", "addCollectionToFilm", states.CallbackCollectionFilmsFromFilm, "", true)
+	return k.AddButton("➕", "addCollectionToFilm", states.CallCollectionFilmsFromFilm, "", true)
 }
 
 func (k *Keyboard) AddCollectionFilmFromCollection() *Keyboard {
-	return k.AddButton("➕", "addFilmToCollection", states.CallbackCollectionFilmsFromCollection, "", true)
+	return k.AddButton("➕", "addFilmToCollection", states.CallCollectionFilmsFromCollection, "", true)
 }
 
 func (k *Keyboard) AddNewFilmToCollection() *Keyboard {
-	return k.AddButton("🆕", "createFilm", states.CallbackOptionsFilmToCollectionNew, "", true)
+	return k.AddButton("🆕", "createFilm", states.CallFilmToCollectionOptionNew, "", true)
 }
 
 func (k *Keyboard) AddExistingFilmToCollection() *Keyboard {
-	return k.AddButton("\U0001F7F0", "choiceFromFilms", states.CallbackOptionsFilmToCollectionExisting, "", true)
+	return k.AddButton("\U0001F7F0", "choiceFromFilms", states.CallFilmToCollectionOptionExisting, "", true)
 }
 
 func (k *Keyboard) AddCollectionFilmSelectFilm(films []apiModels.Film) *Keyboard {
@@ -272,7 +272,7 @@ func (k *Keyboard) AddCollectionFilmSelectFilm(films []apiModels.Film) *Keyboard
 		k.AddButton(
 			utils.BoolToStarOrEmpty(film.IsFavorite),
 			fmt.Sprintf("%s (%d)", film.Title, film.ID),
-			states.PrefixSelectCFFilm+strconv.Itoa(film.ID),
+			states.SelectCFFilm+strconv.Itoa(film.ID),
 			"",
 			false,
 		)
@@ -285,7 +285,7 @@ func (k *Keyboard) AddCollectionFilmSelectCollection(collections []apiModels.Col
 		k.AddButton(
 			utils.BoolToStarOrEmpty(collection.IsFavorite),
 			fmt.Sprintf("%s (%d)", collection.Name, collection.ID),
-			states.PrefixSelectCFCollection+strconv.Itoa(collection.ID),
+			states.SelectCFCollection+strconv.Itoa(collection.ID),
 			"",
 			false)
 	}
@@ -293,56 +293,56 @@ func (k *Keyboard) AddCollectionFilmSelectCollection(collections []apiModels.Col
 }
 
 func (k *Keyboard) AddSuperRole() *Keyboard {
-	return k.AddButton("🦸", "superAdmin", states.CallbackAdminUserRoleSelectSuper, "", true)
+	return k.AddButton("🦸", "superAdmin", states.CallUserDetailRoleSelectSuper, "", true)
 }
 
 func (k *Keyboard) AddLogs() *Keyboard {
-	return k.AddButton("💾", "logs", states.CallbackAdminUserDetailLogs, "", true)
+	return k.AddButton("💾", "logs", states.CallUserDetailLogs, "", true)
 }
 
 func (k *Keyboard) AddManageRole() *Keyboard {
-	return k.AddButton("🔄", "manageUserRole", states.CallbackAdminUserDetailRole, "", true)
+	return k.AddButton("🔄", "manageUserRole", states.CallUserDetailRole, "", true)
 }
 
 func (k *Keyboard) AddUnban() *Keyboard {
-	return k.AddButton("✅", "unban", states.CallbackAdminUserDetailUnban, "", true)
+	return k.AddButton("✅", "unban", states.CallUserDetailUnban, "", true)
 }
 
 func (k *Keyboard) AddBan() *Keyboard {
-	return k.AddButton("❌", "ban", states.CallbackAdminUserDetailBan, "", true)
+	return k.AddButton("❌", "ban", states.CallUserDetailBan, "", true)
 }
 
 func (k *Keyboard) AddViewFeedback() *Keyboard {
-	return k.AddButton("📩", "viewFeedback", states.CallbackAdminUserDetailFeedback, "", true)
+	return k.AddButton("📩", "viewFeedback", states.CallUserDetailFeedback, "", true)
 }
 
 func (k *Keyboard) AddRaiseRank() *Keyboard {
-	return k.AddButton("⬆️", "raiseRole", states.CallbackAdminDetailRaiseRole, "", true)
+	return k.AddButton("⬆️", "raiseRole", states.CallAdminDetailRaiseRole, "", true)
 }
 
 func (k *Keyboard) AddLowerRank() *Keyboard {
-	return k.AddButton("⬇️", "lowerRole", states.CallbackAdminDetailLowerRole, "", true)
+	return k.AddButton("⬇️", "lowerRole", states.CallAdminDetailLowerRole, "", true)
 }
 
 func (k *Keyboard) AddRemoveAdminRole() *Keyboard {
-	return k.AddButton("⚠️", "removeAdminRole", states.CallbackAdminDetailRemoveRole, "", true)
+	return k.AddButton("⚠️", "removeAdminRole", states.CallAdminDetailRemoveRole, "", true)
 }
 
 func (k *Keyboard) AddFeedbackDelete() *Keyboard {
-	return k.AddButton("🗑️", "delete", states.CallbackAdminFeedbackDetailDelete, "", true)
+	return k.AddButton("🗑️", "delete", states.CallFeedbackDetailDelete, "", true)
 }
 
 func (k *Keyboard) AddSendBroadcast() *Keyboard {
-	return k.AddButton("➤", "send", states.CallbackAdminBroadcastSend, "", true)
+	return k.AddButton("➤", "send", states.CallBroadcastSend, "", true)
 }
 
 func (k *Keyboard) AddUserSelect(session *models.Session, users []models.Session) *Keyboard {
-	buttons := entitySelectButtons(session, users, states.PrefixSelectAdminUser)
+	buttons := entitySelectButtons(session, users, states.SelectUser)
 	return k.AddButtonsWithRowSize(2, buttons...)
 }
 
 func (k *Keyboard) AddAdminSelect(session *models.Session, admins []models.Session) *Keyboard {
-	buttons := entitySelectButtons(session, admins, states.PrefixSelectAdmin)
+	buttons := entitySelectButtons(session, admins, states.SelectAdmin)
 	return k.AddButtonsWithRowSize(2, buttons...)
 }
 
@@ -351,7 +351,7 @@ func (k *Keyboard) AddFeedbackSelect(session *models.Session, feedbacks []models
 
 	for i, feedback := range feedbacks {
 		itemID := utils.GetItemID(i, session.AdminState.CurrentPage, session.AdminState.PageSize)
-		callback := states.PrefixSelectAdminFeedback + strconv.Itoa(int(feedback.ID))
+		callback := states.SelectFeedback + strconv.Itoa(int(feedback.ID))
 
 		buttons = append(buttons, Button{utils.NumberToEmoji(itemID), "", callback, "", false})
 	}
@@ -377,7 +377,7 @@ func entitySelectButtons(session *models.Session, users []models.Session, rawCal
 }
 
 func addSortingButton(buttons []Button, sorting *models.Sorting, lang, field, callback string) []Button {
-	sortingEnabled := sorting.IsSortingFieldEnabled(field)
+	sortingEnabled := sorting.IsFieldEnabled(field)
 
 	text := translator.Translate(lang, field, nil, nil)
 	if sortingEnabled {
@@ -387,12 +387,12 @@ func addSortingButton(buttons []Button, sorting *models.Sorting, lang, field, ca
 	return append(buttons, Button{utils.BoolToEmoji(sortingEnabled), text, callback, "", false})
 }
 
-func addFiltersFilmsButton(buttons []Button, filter *models.FiltersFilm, lang, filterType, callback string, needTranslate bool) []Button {
-	filterEnabled := filter.IsFilterEnabled(filterType)
+func addFiltersFilmsButton(buttons []Button, filter *models.FilmFilters, lang, filterType, callback string, needTranslate bool) []Button {
+	filterEnabled := filter.IsFieldEnabled(filterType)
 
 	text := translator.Translate(lang, filterType, nil, nil)
 	if filterEnabled {
-		value := filter.ValueToString(filterType)
+		value := filter.ToString(filterType)
 		if needTranslate {
 			value = translator.Translate(lang, value, nil, nil)
 		}
@@ -402,15 +402,15 @@ func addFiltersFilmsButton(buttons []Button, filter *models.FiltersFilm, lang, f
 	return append(buttons, Button{utils.BoolToEmoji(filterEnabled), text, callback, "", false})
 }
 
-func getFiltersFilmsButtons(filter *models.FiltersFilm, lang string) []Button {
+func getFiltersFilmsButtons(filter *models.FilmFilters, lang string) []Button {
 	var buttons []Button
 
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "is_favorite", states.CallbackFiltersFilmsSelectSwitchIsFavorite, true)
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "is_viewed", states.CallbackFiltersFilmsSelectSwitchIsViewed, true)
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "year", states.CallbackFiltersFilmsSelectRangeYear, false)
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "rating", states.CallbackFiltersFilmsSelectRangeRating, false)
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "user_rating", states.CallbackFiltersFilmsSelectRangeUserRating, false)
-	buttons = addFiltersFilmsButton(buttons, filter, lang, "has_url", states.CallbackFiltersFilmsSelectSwitchHasURL, true)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "is_favorite", states.CallFilmFiltersSelectSwitchIsFavorite, true)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "is_viewed", states.CallFilmFiltersSelectSwitchIsViewed, true)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "year", states.CallFilmFiltersSelectRangeYear, false)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "rating", states.CallFilmFiltersSelectRangeRating, false)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "user_rating", states.CallFilmFiltersSelectRangeUserRating, false)
+	buttons = addFiltersFilmsButton(buttons, filter, lang, "has_url", states.CallFilmFiltersSelectSwitchHasURL, true)
 
 	return buttons
 }
@@ -418,13 +418,13 @@ func getFiltersFilmsButtons(filter *models.FiltersFilm, lang string) []Button {
 func getSortingFilmsButtons(sorting *models.Sorting, lang string) []Button {
 	var buttons []Button
 
-	buttons = addSortingButton(buttons, sorting, lang, "is_favorite", states.CallbackSortingFilmsSelectIsFavorite)
-	buttons = addSortingButton(buttons, sorting, lang, "is_viewed", states.CallbackSortingFilmsSelectIsViewed)
-	buttons = addSortingButton(buttons, sorting, lang, "title", states.CallbackSortingFilmsSelectTitle)
-	buttons = addSortingButton(buttons, sorting, lang, "year", states.CallbackSortingFilmsSelectYear)
-	buttons = addSortingButton(buttons, sorting, lang, "rating", states.CallbackSortingFilmsSelectRating)
-	buttons = addSortingButton(buttons, sorting, lang, "user_rating", states.CallbackSortingFilmsSelectUserRating)
-	buttons = addSortingButton(buttons, sorting, lang, "created_at", states.CallbackSortingFilmsSelectCreatedAt)
+	buttons = addSortingButton(buttons, sorting, lang, "is_favorite", states.CallFilmSortingSelectIsFavorite)
+	buttons = addSortingButton(buttons, sorting, lang, "is_viewed", states.CallFilmSortingSelectIsViewed)
+	buttons = addSortingButton(buttons, sorting, lang, "title", states.CallFilmSortingSelectTitle)
+	buttons = addSortingButton(buttons, sorting, lang, "year", states.CallFilmSortingSelectYear)
+	buttons = addSortingButton(buttons, sorting, lang, "rating", states.CallFilmSortingSelectRating)
+	buttons = addSortingButton(buttons, sorting, lang, "user_rating", states.CallFilmSortingSelectUserRating)
+	buttons = addSortingButton(buttons, sorting, lang, "created_at", states.CallFilmSortingSelectCreatedAt)
 
 	return buttons
 }
@@ -432,10 +432,10 @@ func getSortingFilmsButtons(sorting *models.Sorting, lang string) []Button {
 func getSortingCollectionsButtons(sorting *models.Sorting, lang string) []Button {
 	var buttons []Button
 
-	buttons = addSortingButton(buttons, sorting, lang, "is_favorite", states.CallbackSortingCollectionsSelectIsFavorite)
-	buttons = addSortingButton(buttons, sorting, lang, "title", states.CallbackSortingCollectionsSelectName)
-	buttons = addSortingButton(buttons, sorting, lang, "total_films", states.CallbackSortingCollectionsSelectTotalFilms)
-	buttons = addSortingButton(buttons, sorting, lang, "created_at", states.CallbackSortingCollectionsSelectCreatedAt)
+	buttons = addSortingButton(buttons, sorting, lang, "is_favorite", states.CallCollectionSortingSelectIsFavorite)
+	buttons = addSortingButton(buttons, sorting, lang, "title", states.CallCollectionSortingSelectName)
+	buttons = addSortingButton(buttons, sorting, lang, "total_films", states.CallCollectionSortingSelectTotalFilms)
+	buttons = addSortingButton(buttons, sorting, lang, "created_at", states.CallCollectionSortingSelectCreatedAt)
 
 	return buttons
 }

@@ -8,22 +8,22 @@ import (
 )
 
 var superAdminButtons = []Button{
-	{"🛡️", "admins", states.CallbackAdminSelectAdmins, "", true},
+	{"🛡️", "admins", states.CallAdminAdmins, "", true},
 }
 
 var adminButtons = []Button{
-	{"👥", "users", states.CallbackAdminSelectUsers, "", true},
-	{"📢", "broadcast", states.CallbackAdminSelectBroadcast, "", true},
+	{"👥", "profile", states.CallAdminUsers, "", true},
+	{"📢", "broadcast", states.CallAdminBroadcast, "", true},
 }
 
 var helperButtons = []Button{
-	{"💬", "feedback", states.CallbackAdminSelectFeedback, "", true},
+	{"💬", "feedback", states.CallAdminFeedback, "", true},
 }
 
 var rolesButtons = []Button{
-	{"👤", "user", states.CallbackAdminUserRoleSelectUser, "", true},
-	{"👷🏼", "helper", states.CallbackAdminUserRoleSelectHelper, "", true},
-	{"👨🏻‍💼", "admin", states.CallbackAdminUserRoleSelectAdmin, "", true},
+	{"👤", "user", states.CallUserDetailRoleSelectUser, "", true},
+	{"👷🏼", "helper", states.CallUserDetailRoleSelectHelper, "", true},
+	{"👨🏻‍💼", "admin", states.CallUserDetailRoleSelectAdmin, "", true},
 }
 
 func AdminMenu(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
@@ -44,7 +44,7 @@ func AdminMenu(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 func AdminList(session *models.Session, admins []models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddIf(len(admins) > 0, func(k *Keyboard) {
-			k.AddSearch(states.CallbackEntitiesSelectFind)
+			k.AddSearch(states.CallEntitiesFind)
 		}).
 		AddIf(session.AdminState.IsAdmin, func(k *Keyboard) {
 			k.AddAdminSelect(session, admins)
@@ -52,16 +52,16 @@ func AdminList(session *models.Session, admins []models.Session) *tgbotapi.Inlin
 		AddIf(!session.AdminState.IsAdmin, func(k *Keyboard) {
 			k.AddUserSelect(session, admins)
 		}).
-		AddNavigation(session.AdminState.CurrentPage, session.AdminState.LastPage, states.PrefixEntitiesListPage, true).
-		AddBack(states.CallbackEntitiesListBack).
+		AddNavigation(session.AdminState.CurrentPage, session.AdminState.LastPage, states.EntitiesPage, true).
+		AddBack(states.CallEntitiesBack).
 		Build(session.Lang)
 }
 
 func FeedbackList(session *models.Session, feedbacks []models.Feedback) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddFeedbackSelect(session, feedbacks).
-		AddNavigation(session.AdminState.CurrentPage, session.AdminState.LastPage, states.PrefixAdminFeedbackListPage, true).
-		AddBack(states.CallbackAdminFeedbackListBack).
+		AddNavigation(session.AdminState.CurrentPage, session.AdminState.LastPage, states.FeedbacksPage, true).
+		AddBack(states.CallFeedbacksBack).
 		Build(session.Lang)
 }
 
@@ -79,7 +79,7 @@ func UserDetail(session *models.Session, user *models.Session) *tgbotapi.InlineK
 		AddIf(session.Role.HasAccess(roles.SuperAdmin) && !user.Role.HasAccess(session.Role), func(k *Keyboard) {
 			k.AddManageRole()
 		}).
-		AddBack(states.CallbackAdminUserDetailBack).
+		AddBack(states.CallUserDetailBack).
 		Build(session.Lang)
 }
 
@@ -95,14 +95,14 @@ func AdminDetail(session *models.Session, user *models.Session) *tgbotapi.Inline
 			session.Role.HasAccess(roles.SuperAdmin) && !user.Role.HasAccess(session.Role), func(k *Keyboard) {
 			k.AddRemoveAdminRole()
 		}).
-		AddBack(states.CallbackAdminDetailBack).
+		AddBack(states.CallAdminDetailBack).
 		Build(session.Lang)
 }
 
 func FeedbackDetail(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddFeedbackDelete().
-		AddBack(states.CallbackAdminFeedbackDetailBack).
+		AddBack(states.CallFeedbackDetailBack).
 		Build(session.Lang)
 }
 
@@ -112,7 +112,7 @@ func UserRoleSelect(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		AddIf(session.Role.HasAccess(roles.Root), func(k *Keyboard) {
 			k.AddSuperRole()
 		}).
-		AddBack(states.CallbackAdminUserDetailAgain).
+		AddBack(states.CallUserDetailAgain).
 		Build(session.Lang)
 }
 

@@ -16,18 +16,18 @@ func HandleMenuCommand(app models.App, session *models.Session) {
 
 func HandleMenuButton(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Update) {
-	case states.CallbackAdminSelectAdmins:
+	case states.CallAdminAdmins:
 		session.AdminState.IsAdmin = true
 		resetAdminPageAndHandle(app, session, HandleEntitiesCommand, roles.Admin)
 
-	case states.CallbackAdminSelectUsers:
+	case states.CallAdminUsers:
 		session.AdminState.IsAdmin = false
 		resetAdminPageAndHandle(app, session, HandleEntitiesCommand, roles.Admin)
 
-	case states.CallbackAdminSelectBroadcast:
+	case states.CallAdminBroadcast:
 		resetAdminPageAndHandle(app, session, HandleBroadcastCommand, roles.Admin)
 
-	case states.CallbackAdminSelectFeedback:
+	case states.CallAdminFeedback:
 		resetAdminPageAndHandle(app, session, HandleFeedbacksCommand, roles.Helper)
 	}
 }

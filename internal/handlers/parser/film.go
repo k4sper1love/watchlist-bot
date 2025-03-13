@@ -50,7 +50,7 @@ func ParseFilmImageFromMessage(app models.App, session *models.Session, next fun
 		return
 	}
 
-	imageURL, err := ParseAndUploadImageFromMessage(app)
+	imageURL, err := UploadImageFromMessage(app)
 	if err != nil {
 		app.SendMessage(messages.ImageFailure(session), nil)
 	}
@@ -65,7 +65,7 @@ func ParseFilmImageFromMessageWithError(app models.App, session *models.Session,
 		return
 	}
 
-	imageURL, err := ParseAndUploadImageFromMessage(app)
+	imageURL, err := UploadImageFromMessage(app)
 	if err != nil {
 		app.SendMessage(messages.ImageFailure(session), keyboards.Back(session, callback))
 		session.ClearState()
@@ -77,7 +77,7 @@ func ParseFilmImageFromMessageWithError(app models.App, session *models.Session,
 }
 
 func ParseFilmImageFromURL(app models.App, session *models.Session, imageURL string, next func(models.App, *models.Session)) {
-	imageURL, err := ParseAndUploadImageFromURL(app, imageURL)
+	imageURL, err := UploadImageFromURL(app, imageURL)
 	if err != nil {
 		app.SendMessage(messages.ImageFailure(session), nil)
 	}
@@ -101,7 +101,7 @@ func ParseFilmViewedWithFinish(app models.App, session *models.Session, finish, 
 	next(app, session)
 }
 
-func ParseFilmFindTitle(app models.App, session *models.Session, next func(models.App, *models.Session)) {
+func ParseFindFilmsTitle(app models.App, session *models.Session, next func(models.App, *models.Session)) {
 	session.FilmsState.Title = utils.ParseMessageString(app.Update)
 	session.FilmsState.CurrentPage = 1
 

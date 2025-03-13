@@ -12,7 +12,7 @@ import (
 
 func HandleBroadcastCommand(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestBroadcastImage(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessAdminBroadcastAwaitingImage)
+	session.SetState(states.AwaitBroadcastImage)
 }
 
 func HandleBroadcastProcess(app models.App, session *models.Session) {
@@ -23,28 +23,28 @@ func HandleBroadcastProcess(app models.App, session *models.Session) {
 	}
 
 	switch session.State {
-	case states.ProcessAdminBroadcastAwaitingImage:
+	case states.AwaitBroadcastImage:
 		parser.ParseBroadcastImage(app, session, requestBroadcastMessage)
 
-	case states.ProcessAdminBroadcastAwaitingText:
+	case states.AwaitBroadcastText:
 		parser.ParseBroadcastMessage(app, session, requestBroadcastMessage, requestBroadcastPin)
 
-	case states.ProcessAdminBroadcastAwaitingPin:
+	case states.AwaitBroadcastPin:
 		parser.ParseBroadcastPin(app, session, previewBroadcast)
 
-	case states.ProcessAdminBroadcastAwaitingConfirm:
+	case states.AwaitBroadcastConfirm:
 		parseBroadcastConfirm(app, session)
 	}
 }
 
 func requestBroadcastMessage(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestBroadcastMessage(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessAdminBroadcastAwaitingText)
+	session.SetState(states.AwaitBroadcastText)
 }
 
 func requestBroadcastPin(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestBroadcastPin(session), keyboards.SurveyAndCancel(session))
-	session.SetState(states.ProcessAdminBroadcastAwaitingPin)
+	session.SetState(states.AwaitBroadcastPin)
 }
 
 func previewBroadcast(app models.App, session *models.Session) {
@@ -72,11 +72,11 @@ func requestBroadcastConfirm(app models.App, session *models.Session) {
 	}
 
 	app.SendMessage(messages.BroadcastConfirm(session, count), keyboards.BroadcastConfirm(session))
-	session.SetState(states.ProcessAdminBroadcastAwaitingConfirm)
+	session.SetState(states.AwaitBroadcastConfirm)
 }
 
 func parseBroadcastConfirm(app models.App, session *models.Session) {
-	if utils.ParseCallback(app.Update) != states.CallbackAdminBroadcastSend {
+	if utils.ParseCallback(app.Update) != states.CallBroadcastSend {
 		clearStatesAndHandleMenu(app, session)
 		return
 	}

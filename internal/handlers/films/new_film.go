@@ -20,19 +20,19 @@ func HandleNewFilmCommand(app models.App, session *models.Session) {
 
 func HandleNewFilmButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Update) {
-	case states.CallbackNewFilmSelectBack:
+	case states.CallNewFilmBack:
 		HandleFilmsCommand(app, session)
 
-	case states.CallbackNewFilmSelectManually:
+	case states.CallNewFilmManually:
 		handleNewFilmManually(app, session)
 
-	case states.CallbackNewFilmSelectFromURL:
+	case states.CallNewFilmFromURL:
 		handleNewFilmFromURL(app, session)
 
-	case states.CallbackNewFilmSelectFind:
+	case states.CallNewFilmFind:
 		handleNewFilmFind(app, session)
 
-	case states.CallbackNewFilmSelectChangeKinopoiskToken:
+	case states.CallNewFilmChangeKinopoiskToken:
 		handleKinopoiskToken(app, session)
 	}
 }
@@ -45,53 +45,53 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 	}
 
 	switch session.State {
-	case states.ProcessFindNewFilmAwaitingTitle:
-		parser.ParseFilmFindTitle(app, session, HandleFindNewFilmCommand)
+	case states.AwaitNewFilmFind:
+		parser.ParseFindFilmsTitle(app, session, HandleFindNewFilmCommand)
 
-	case states.ProcessNewFilmAwaitingURL:
+	case states.AwaitNewFilmFromURL:
 		parseNewFilmFromURL(app, session)
 
-	case states.ProcessNewFilmAwaitingKinopoiskToken:
+	case states.AwaitNewFilmKinopoiskToken:
 		parseKinopoiskToken(app, session)
 
-	case states.ProcessNewFilmAwaitingTitle:
+	case states.AwaitNewFilmTitle:
 		parser.ParseFilmTitle(app, session, handleNewFilmManually, requestNewFilmYear)
 
-	case states.ProcessNewFilmAwaitingYear:
+	case states.AwaitNewFilmYear:
 		parser.ParseFilmYear(app, session, requestNewFilmYear, requestNewFilmGenre)
 
-	case states.ProcessNewFilmAwaitingGenre:
+	case states.AwaitNewFilmGenre:
 		parser.ParseFilmGenre(app, session, requestNewFilmGenre, requestNewFilmDescription)
 
-	case states.ProcessNewFilmAwaitingDescription:
+	case states.AwaitNewFilmDescription:
 		parser.ParseFilmDescription(app, session, requestNewFilmDescription, requestNewFilmRating)
 
-	case states.ProcessNewFilmAwaitingRating:
+	case states.AwaitNewFilmRating:
 		parser.ParseFilmRating(app, session, requestNewFilmRating, requestNewFilmImage)
 
-	case states.ProcessNewFilmAwaitingImage:
+	case states.AwaitNewFilmImage:
 		parser.ParseFilmImageFromMessage(app, session, requestNewFilmURL)
 
-	case states.ProcessNewFilmAwaitingFilmURL:
+	case states.AwaitNewFilmFilmURL:
 		parser.ParseFilmURL(app, session, requestNewFilmURL, requestNewFilmComment)
 
-	case states.ProcessNewFilmAwaitingComment:
+	case states.AwaitNewFilmComment:
 		parser.ParseFilmComment(app, session, requestNewFilmComment, requestNewFilmViewed)
 
-	case states.ProcessNewFilmAwaitingViewed:
+	case states.AwaitNewFilmViewed:
 		parser.ParseFilmViewedWithFinish(app, session, finishNewFilmProcess, requestNewFilmUserRating)
 
-	case states.ProcessNewFilmAwaitingUserRating:
+	case states.AwaitNewFilmUserRating:
 		parser.ParseFilmUserRating(app, session, requestNewFilmUserRating, requestNewFilmReview)
 
-	case states.ProcessNewFilmAwaitingReview:
+	case states.AwaitNewFilmReview:
 		parser.ParseFilmReview(app, session, requestNewFilmReview, finishNewFilmProcess)
 	}
 }
 
 func handleKinopoiskToken(app models.App, session *models.Session) {
-	app.SendMessage(messages.KinopoiskToken(session), keyboards.Cancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingKinopoiskToken)
+	app.SendMessage(messages.RequestKinopoiskToken(session), keyboards.Cancel(session))
+	session.SetState(states.AwaitNewFilmKinopoiskToken)
 }
 
 func parseKinopoiskToken(app models.App, session *models.Session) {
@@ -105,7 +105,7 @@ func handleKinopoiskError(app models.App, session *models.Session, err error) {
 	if code == 401 || code == 403 {
 		app.SendMessage(messages.KinopoiskFailureCode(session, code), keyboards.NewFilmChangeToken(session))
 	} else {
-		app.SendMessage(messages.FilmsFailure(session), keyboards.Back(session, states.CallbackFilmsNew))
+		app.SendMessage(messages.FilmsFailure(session), keyboards.Back(session, states.CallFilmsNew))
 	}
 }
 
@@ -116,12 +116,12 @@ func handleNewFilmFind(app models.App, session *models.Session) {
 	}
 
 	app.SendMessage(messages.RequestFilmTitle(session), keyboards.Cancel(session))
-	session.SetState(states.ProcessFindNewFilmAwaitingTitle)
+	session.SetState(states.AwaitNewFilmFind)
 }
 
 func handleNewFilmFromURL(app models.App, session *models.Session) {
 	app.SendMessage(messages.NewFilmFromURL(session), keyboards.Cancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingURL)
+	session.SetState(states.AwaitNewFilmFromURL)
 }
 
 func parseNewFilmFromURL(app models.App, session *models.Session) {
@@ -158,76 +158,76 @@ func handleNewFilmFromURLError(app models.App, session *models.Session, err erro
 
 func handleNewFilmManually(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmTitle(session), keyboards.Cancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingTitle)
+	session.SetState(states.AwaitNewFilmTitle)
 }
 
 func requestNewFilmYear(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmYear(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingYear)
+	session.SetState(states.AwaitNewFilmYear)
 }
 
 func requestNewFilmGenre(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmGenre(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingGenre)
+	session.SetState(states.AwaitNewFilmGenre)
 }
 
 func requestNewFilmDescription(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmDescription(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingDescription)
+	session.SetState(states.AwaitNewFilmDescription)
 }
 
 func requestNewFilmRating(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmRating(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingRating)
+	session.SetState(states.AwaitNewFilmRating)
 }
 
 func requestNewFilmImage(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmImage(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingImage)
+	session.SetState(states.AwaitNewFilmImage)
 }
 
 func requestNewFilmURL(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmURL(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingFilmURL)
+	session.SetState(states.AwaitNewFilmFilmURL)
 }
 
 func requestNewFilmComment(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmComment(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingComment)
+	session.SetState(states.AwaitNewFilmComment)
 }
 
 func requestNewFilmViewed(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmViewed(session), keyboards.SurveyAndCancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingViewed)
+	session.SetState(states.AwaitNewFilmViewed)
 }
 
 func requestNewFilmUserRating(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmUserRating(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingUserRating)
+	session.SetState(states.AwaitNewFilmUserRating)
 }
 
 func requestNewFilmReview(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmReview(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessNewFilmAwaitingReview)
+	session.SetState(states.AwaitNewFilmReview)
 }
 
 func finishNewFilmProcess(app models.App, session *models.Session) {
 	film, err := createNewFilm(app, session)
 	session.ClearAllStates()
 	if err != nil {
-		app.SendMessage(messages.CreateFilmFailure(session), keyboards.Back(session, states.CallbackFilmsNew))
+		app.SendMessage(messages.CreateFilmFailure(session), keyboards.Back(session, states.CallFilmsNew))
 		return
 	}
 
 	session.FilmDetailState.UpdateFilmState(*film)
-	HandleFilmsDetailCommand(app, session)
+	HandleFilmDetailCommand(app, session)
 }
 
 func createNewFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
 	switch session.Context {
-	case states.ContextFilm:
+	case states.CtxFilm:
 		return createNewUserFilm(app, session)
-	case states.ContextCollection:
+	case states.CtxCollection:
 		return createNewCollectionFilm(app, session)
 	default:
 		return nil, fmt.Errorf("unsupported session context: %v", session.Context)

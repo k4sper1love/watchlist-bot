@@ -11,12 +11,12 @@ import (
 
 func HandleDeleteCollectionCommand(app models.App, session *models.Session) {
 	app.SendMessage(messages.DeleteCollection(session), keyboards.Survey(session))
-	session.SetState(states.ProcessDeleteCollectionAwaitingConfirm)
+	session.SetState(states.AwaitDeleteCollectionConfirm)
 }
 
 func HandleDeleteCollectionProcess(app models.App, session *models.Session) {
 	switch session.State {
-	case states.ProcessDeleteCollectionAwaitingConfirm:
+	case states.AwaitDeleteCollectionConfirm:
 		parseDeleteCollectionConfirm(app, session)
 		session.ClearState()
 	}
@@ -30,7 +30,7 @@ func parseDeleteCollectionConfirm(app models.App, session *models.Session) {
 	}
 
 	if err := watchlist.DeleteCollection(app, session); err != nil {
-		app.SendMessage(messages.DeleteCollectionFailure(session), keyboards.Back(session, states.CallbackCollectionsManage))
+		app.SendMessage(messages.DeleteCollectionFailure(session), keyboards.Back(session, states.CallCollectionsManage))
 		return
 	}
 

@@ -82,14 +82,14 @@ func initializeSessionDefaults(app models.App, session *models.Session) {
 	}
 
 	if session.FilmsState.FilmFilters == nil {
-		session.FilmsState.FilmFilters = &models.FiltersFilm{
+		session.FilmsState.FilmFilters = &models.FilmFilters{
 			FilterableID:   session.FilmsState.ID,
 			FilterableType: "FilmsState",
 		}
 	}
 
 	if session.FilmsState.CollectionFilters == nil {
-		session.FilmsState.CollectionFilters = &models.FiltersFilm{
+		session.FilmsState.CollectionFilters = &models.FilmFilters{
 			FilterableID:   session.FilmsState.ID,
 			FilterableType: "CollectionsState",
 		}

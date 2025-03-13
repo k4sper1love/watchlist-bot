@@ -7,14 +7,14 @@ import (
 )
 
 var updateProfileButtons = []Button{
-	{"", "name", states.CallbackUpdateProfileSelectUsername, "", true},
-	{"", "email", states.CallbackUpdateProfileSelectEmail, "", true},
+	{"", "name", states.CallUpdateProfileUsername, "", true},
+	{"", "email", states.CallUpdateProfileEmail, "", true},
 }
 
 func Profile(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddProfileUpdate().
-		AddDelete(states.CallbackProfileSelectDelete).
+		AddDelete(states.CallProfileDelete).
 		AddBack("").
 		Build(session.Lang)
 }
@@ -22,6 +22,6 @@ func Profile(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 func UpdateProfile(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddButtons(updateProfileButtons...).
-		AddBack(states.CallbackUpdateProfileSelectBack).
+		AddBack(states.CallUpdateProfileBack).
 		Build(session.Lang)
 }

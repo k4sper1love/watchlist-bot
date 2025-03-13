@@ -29,33 +29,33 @@ func HandleFilmsButtons(app models.App, session *models.Session, back func(model
 	callback := utils.ParseCallback(app.Update)
 
 	switch callback {
-	case states.CallbackFilmsBack:
-		if session.Context == states.ContextCollection {
+	case states.CallFilmsBack:
+		if session.Context == states.CtxCollection {
 			session.CollectionsState.CurrentPage = 1
 		}
 		back(app, session)
 
-	case states.CallbackFilmsPageNext, states.CallbackFilmsPagePrev,
-		states.CallbackFilmsPageLast, states.CallbackFilmsPageFirst:
-		handleFilmsPagination(app, session, callback)
-
-	case states.CallbackFilmsNew:
+	case states.CallFilmsNew:
 		HandleNewFilmCommand(app, session)
 
-	case states.CallbackFilmsManage:
+	case states.CallFilmsManage:
 		HandleManageFilmCommand(app, session)
 
-	case states.CallbackFilmsFind:
-		handleFilmsFindByTitle(app, session)
+	case states.CallFilmsFind:
+		requestFindFilmsTitle(app, session)
 
-	case states.CallbackFilmsFilters:
-		HandleFiltersFilmsCommand(app, session)
+	case states.CallFilmsFilters:
+		HandleFilmFiltersCommand(app, session)
 
-	case states.CallbackFilmsSorting:
+	case states.CallFilmsSorting:
 		HandleSortingFilmsCommand(app, session)
 
 	default:
-		if strings.HasPrefix(callback, states.PrefixSelectFilm) {
+		if strings.HasPrefix(callback, states.FilmsPage) {
+			handleFilmsPagination(app, session, callback)
+		}
+
+		if strings.HasPrefix(callback, states.SelectFilm) {
 			handleFilmSelect(app, session, callback)
 		}
 	}
@@ -69,35 +69,35 @@ func HandleFilmsProcess(app models.App, session *models.Session) {
 	}
 
 	switch session.State {
-	case states.ProcessFindFilmsAwaitingTitle:
-		parser.ParseFilmFindTitle(app, session, HandleFindFilmsCommand)
+	case states.AwaitFilmsTitle:
+		parser.ParseFindFilmsTitle(app, session, HandleFindFilmsCommand)
 	}
 }
 
 func handleFilmsPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
-	case states.CallbackFilmsPageNext:
+	case states.CallFilmsPageNext:
 		if session.FilmsState.CurrentPage >= session.FilmsState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.FilmsState.CurrentPage++
 
-	case states.CallbackFilmsPagePrev:
+	case states.CallFilmsPagePrev:
 		if session.FilmsState.CurrentPage <= 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.FilmsState.CurrentPage--
 
-	case states.CallbackFilmsPageLast:
+	case states.CallFilmsPageLast:
 		if session.FilmsState.CurrentPage == session.FilmsState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.FilmsState.CurrentPage = session.FilmsState.LastPage
 
-	case states.CallbackFilmsPageFirst:
+	case states.CallFilmsPageFirst:
 		if session.FilmsState.CurrentPage == 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
@@ -109,26 +109,27 @@ func handleFilmsPagination(app models.App, session *models.Session, callback str
 }
 
 func handleFilmSelect(app models.App, session *models.Session, callback string) {
-	if index, err := strconv.Atoi(strings.TrimPrefix(callback, states.PrefixSelectFilm)); err != nil {
+	if index, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectFilm)); err != nil {
 		utils.LogParseSelectError(err, callback)
-		app.SendMessage(messages.FilmsFailure(session), keyboards.Back(session, states.CallbackFilmsBack))
+		app.SendMessage(messages.FilmsFailure(session), keyboards.Back(session, states.CallFilmsBack))
 	} else {
 		session.FilmDetailState.Index = index
-		HandleFilmsDetailCommand(app, session)
+		HandleFilmDetailCommand(app, session)
 	}
 }
 
-func handleFilmsFindByTitle(app models.App, session *models.Session) {
+func requestFindFilmsTitle(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmTitle(session), keyboards.Cancel(session))
-	session.SetState(states.ProcessFindFilmsAwaitingTitle)
+	session.SetState(states.AwaitFilmsTitle)
 }
 
-func updateFilmsList(app models.App, session *models.Session, next bool) error {
+func updateFilmList(app models.App, session *models.Session, next bool) error {
 	if next {
 		if session.FilmsState.CurrentPage >= session.FilmsState.LastPage {
 			return fmt.Errorf(messages.LastPageAlert(session))
 		}
 		session.FilmsState.CurrentPage++
+
 	} else {
 		if session.FilmsState.CurrentPage <= 1 {
 			return fmt.Errorf(messages.FirstPageAlert(session))
@@ -148,9 +149,9 @@ func getFilms(app models.App, session *models.Session) (*filters.Metadata, error
 	)
 
 	switch session.Context {
-	case states.ContextFilm:
+	case states.CtxFilm:
 		films, metadata, err = fetchFilmsFromUser(app, session)
-	case states.ContextCollection:
+	case states.CtxCollection:
 		films, metadata, err = fetchFilmsFromCollection(app, session)
 	default:
 		return nil, fmt.Errorf("unsupported session context: %v", session.Context)

@@ -14,7 +14,7 @@ type Feedback struct {
 	Message          string `gorm:"not null"`
 }
 
-type FiltersFilm struct {
+type FilmFilters struct {
 	gorm.Model
 	FilterableID   uint   `json:"-"`
 	FilterableType string `json:"-"`
@@ -40,7 +40,7 @@ func (f *Sorting) Clear() {
 	f.Direction = ""
 }
 
-func (f *FiltersFilm) ResetFilters() {
+func (f *FilmFilters) ResetAll() {
 	f.Rating = ""
 	f.UserRating = ""
 	f.Year = ""
@@ -49,7 +49,7 @@ func (f *FiltersFilm) ResetFilters() {
 	f.HasURL = nil
 }
 
-func (f *FiltersFilm) ResetFilter(filterType string) {
+func (f *FilmFilters) Reset(filterType string) {
 	switch filterType {
 	case "rating":
 		f.Rating = ""
@@ -66,11 +66,11 @@ func (f *FiltersFilm) ResetFilter(filterType string) {
 	}
 }
 
-func (f *FiltersFilm) IsFiltersEnabled() bool {
+func (f *FilmFilters) IsEnabled() bool {
 	return f.Rating != "" || f.UserRating != "" || f.Year != "" || f.IsViewed != nil || f.IsFavorite != nil || f.HasURL != nil
 }
 
-func (f *FiltersFilm) IsFilterEnabled(filterType string) bool {
+func (f *FilmFilters) IsFieldEnabled(filterType string) bool {
 	switch filterType {
 	case "rating":
 		return f.Rating != ""
@@ -89,7 +89,7 @@ func (f *FiltersFilm) IsFilterEnabled(filterType string) bool {
 	}
 }
 
-func (f *FiltersFilm) ApplyRangeValue(filterType, value string) {
+func (f *FilmFilters) ApplyRange(filterType, value string) {
 	switch filterType {
 	case "rating":
 		f.Rating = value
@@ -100,7 +100,7 @@ func (f *FiltersFilm) ApplyRangeValue(filterType, value string) {
 	}
 }
 
-func (f *FiltersFilm) ApplySwitchValue(filterType string, value bool) {
+func (f *FilmFilters) ApplySwitch(filterType string, value bool) {
 	switch filterType {
 	case "isViewed":
 		f.IsViewed = &value
@@ -111,7 +111,7 @@ func (f *FiltersFilm) ApplySwitchValue(filterType string, value bool) {
 	}
 }
 
-func (f *FiltersFilm) ValueToString(filterType string) string {
+func (f *FilmFilters) ToString(filterType string) string {
 	switch filterType {
 	case "rating":
 		return f.Rating
@@ -130,15 +130,15 @@ func (f *FiltersFilm) ValueToString(filterType string) string {
 	}
 }
 
-func (f *Sorting) ResetSorting() {
+func (f *Sorting) Reset() {
 	f.Sort = ""
 }
 
-func (f *Sorting) IsSortingEnabled() bool {
+func (f *Sorting) IsEnabled() bool {
 	return f.Sort != ""
 }
 
-func (f *Sorting) IsSortingFieldEnabled(field string) bool {
+func (f *Sorting) IsFieldEnabled(field string) bool {
 	return field == strings.TrimPrefix(f.Sort, "-")
 }
 

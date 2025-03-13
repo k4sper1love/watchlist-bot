@@ -147,23 +147,23 @@ func ParseMessageFloat(update *tgbotapi.Update) float64 {
 }
 
 func IsSkip(update *tgbotapi.Update) bool {
-	return ParseCallback(update) == states.CallbackProcessSkip
+	return ParseCallback(update) == states.CallProcessSkip
 }
 
 func IsCancel(update *tgbotapi.Update) bool {
-	return ParseCallback(update) == states.CallbackProcessCancel
+	return ParseCallback(update) == states.CallProcessCancel
 }
 
 func IsReset(update *tgbotapi.Update) bool {
-	return ParseCallback(update) == states.CallbackProcessReset
+	return ParseCallback(update) == states.CallProcessReset
 }
 
 func IsAgree(update *tgbotapi.Update) bool {
-	return ParseCallback(update) == states.CallbackYes
+	return ParseCallback(update) == states.CallYes
 }
 
 func IsDecrease(update *tgbotapi.Update) bool {
-	return ParseCallback(update) == states.CallbackDecrease
+	return ParseCallback(update) == states.CallDecrease
 }
 
 func ExtractKinopoiskQuery(rawUrl string) (string, string, error) {

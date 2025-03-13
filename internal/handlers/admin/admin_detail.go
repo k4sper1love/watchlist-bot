@@ -21,31 +21,31 @@ func HandleAdminDetailCommand(app models.App, session *models.Session) {
 
 func HandleAdminDetailButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Update) {
-	case states.CallbackAdminDetailBack:
+	case states.CallAdminDetailBack:
 		general.RequireRole(app, session, HandleEntitiesCommand, roles.Admin)
 
-	case states.CallbackAdminDetailAgain:
+	case states.CallAdminDetailAgain:
 		general.RequireRole(app, session, HandleAdminDetailCommand, roles.Admin)
 
-	case states.CallbackAdminDetailRaiseRole:
+	case states.CallAdminDetailRaiseRole:
 		handleRoleChange(app, session, true)
 
-	case states.CallbackAdminDetailLowerRole:
+	case states.CallAdminDetailLowerRole:
 		handleRoleChange(app, session, false)
 
-	case states.CallbackAdminDetailRemoveRole:
+	case states.CallAdminDetailRemoveRole:
 		general.RequireRole(app, session, handleRemoveRole, roles.SuperAdmin)
 	}
 }
 
 func handleRoleChange(app models.App, session *models.Session, raise bool) {
 	if !canChangeRole(session, raise) {
-		app.SendMessage(messages.NoAccess(session), keyboards.Back(session, states.CallbackAdminDetailAgain))
+		app.SendMessage(messages.NoAccess(session), keyboards.Back(session, states.CallAdminDetailAgain))
 		return
 	}
 
 	if err := postgres.SetUserRole(session.AdminState.UserID, getNewRole(session.AdminState.UserRole, raise)); err != nil {
-		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallbackAdminDetailAgain))
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallAdminDetailAgain))
 		return
 	}
 
@@ -76,12 +76,12 @@ func getNewRole(current roles.Role, raise bool) roles.Role {
 
 func handleRemoveRole(app models.App, session *models.Session) {
 	if session.AdminState.UserRole.HasAccess(session.Role) && session.Role.HasAccess(roles.SuperAdmin) {
-		app.SendMessage(messages.NoAccess(session), keyboards.Back(session, states.CallbackAdminDetailAgain))
+		app.SendMessage(messages.NoAccess(session), keyboards.Back(session, states.CallAdminDetailAgain))
 		return
 	}
 
 	if err := postgres.SetUserRole(session.AdminState.UserID, roles.User); err != nil {
-		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallbackAdminDetailAgain))
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallAdminDetailAgain))
 		return
 	}
 

@@ -184,7 +184,7 @@ func (app App) SendImage(imageURL, text string, keyboard *tgbotapi.InlineKeyboar
 
 func (app App) SendBroadcastMessage(ids []int, needPin bool, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
 	for _, id := range ids {
-		app.createTempApp(id).sendMessageInternal(MessageConfig{Text: text, NeedPin: needPin}, keyboard)
+		app.createTemp(id).sendMessageInternal(MessageConfig{Text: text, NeedPin: needPin}, keyboard)
 	}
 }
 
@@ -197,12 +197,12 @@ func (app App) SendBroadcastImage(ids []int, needPin bool, imageURL, text string
 	defer utils.RemoveFile(imagePath)
 
 	for _, id := range ids {
-		app.createTempApp(id).sendImageInternal(MessageConfig{NeedPin: needPin, Text: text, ImageURL: imageURL}, imagePath, keyboard)
+		app.createTemp(id).sendImageInternal(MessageConfig{NeedPin: needPin, Text: text, ImageURL: imageURL}, imagePath, keyboard)
 	}
 }
 
 func (app App) SendMessageByID(id int, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
-	app.createTempApp(id).SendMessage(text, keyboard)
+	app.createTemp(id).SendMessage(text, keyboard)
 }
 
 func (app App) SendImageByID(id int, imageURL, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
@@ -213,7 +213,7 @@ func (app App) SendImageByID(id int, imageURL, text string, keyboard *tgbotapi.I
 	}
 	defer utils.RemoveFile(imagePath)
 
-	app.createTempApp(id).SendImage(imagePath, text, keyboard)
+	app.createTemp(id).SendImage(imagePath, text, keyboard)
 }
 
 func (app App) SendFile(filepath string, text string, keyboard *tgbotapi.InlineKeyboardMarkup) {
@@ -227,7 +227,7 @@ func (app App) SendFile(filepath string, text string, keyboard *tgbotapi.InlineK
 	app.send(msg, MessageConfig{File: filepath, Text: text})
 }
 
-func (app App) createTempApp(id int) *App {
+func (app App) createTemp(id int) *App {
 	return &App{
 		Bot:    app.Bot,
 		Config: app.Config,

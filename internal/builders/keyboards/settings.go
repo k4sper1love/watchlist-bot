@@ -7,11 +7,11 @@ import (
 )
 
 var settingsButtons = []Button{
-	{"🈳", "language", states.CallbackSettingsLanguage, "", true},
-	{"🌐", "kinopoiskToken", states.CallbackSettingsKinopoiskToken, "", true},
-	{"🔢", "collectionsPageSize", states.CallbackSettingsCollectionsPageSize, "", true},
-	{"🔢", "filmsPageSize", states.CallbackSettingsFilmsPageSize, "", true},
-	{"🔢", "objectsPageSize", states.CallbackSettingsObjectsPageSize, "", true},
+	{"🈳", "language", states.CallSettingsLanguage, "", true},
+	{"🌐", "kinopoiskToken", states.CallSettingsKinopoiskToken, "", true},
+	{"🔢", "collectionsPageSize", states.CallSettingsCollectionsPageSize, "", true},
+	{"🔢", "filmsPageSize", states.CallSettingsFilmsPageSize, "", true},
+	{"🔢", "objectsPageSize", states.CallSettingsObjectsPageSize, "", true},
 }
 
 func Settings(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
@@ -23,7 +23,7 @@ func Settings(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 
 func SettingsLanguageSelect(session *models.Session, languages []string) *tgbotapi.InlineKeyboardMarkup {
 	return New().
-		AddLanguageSelect(languages, states.PrefixSelectLang).
-		AddBack(states.CallbackSettingsBack).
+		AddLanguageSelect(languages, states.SelectLang).
+		AddBack(states.CallSettingsBack).
 		Build(session.Lang)
 }

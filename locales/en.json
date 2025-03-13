@@ -32,6 +32,9 @@
   "invalidInputURL": {
     "other": "Invalid URL or length is out of the range <b>[{{.Min}}, {{.Max}}]</b> characters"
   },
+  "invalidInputEmail": {
+    "other": "Invalid email or length is not within the range <b>[{{.Min}}, {{.Max}}]</b> characters"
+  },
   "kinopoiskToken": {
     "other": "Kinopoisk token"
   },
@@ -565,7 +568,7 @@
     "other": "Current page size"
   },
   "settingsPageSizeSuccess": {
-    "other": "Page size set to: <code>{{.Size}}</code>"
+    "other": "The new page size has been set"
   },
   "settingsCollectionsPageSizeSuccess": {
     "other": "New page size for collections list"

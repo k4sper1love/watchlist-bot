@@ -9,14 +9,13 @@ import (
 )
 
 func Start(app models.App, session *models.Session) string {
-	return fmt.Sprintf("👋%s\n\n%s🚀\n\n%s",
+	return fmt.Sprintf("👋 %s\n\n%s 🚀",
 		toBold(translator.Translate(session.Lang, "welcomeMessageGreeting", map[string]interface{}{
 			"Name": utils.ParseTelegramName(app.Update),
 		}, nil)),
 		translator.Translate(session.Lang, "welcomeMessageBody", map[string]interface{}{
 			"Version": app.Config.Version,
-		}, nil),
-		translator.Translate(session.Lang, "welcomeMessageCallToAction", nil, nil))
+		}, nil))
 }
 
 func Help(session *models.Session) string {
@@ -45,7 +44,7 @@ func LanguagesFailure(session *models.Session) string {
 		translator.Translate(session.Lang, "setDefaultLanguage", nil, nil))
 }
 
-func KinopoiskToken(session *models.Session) string {
+func RequestKinopoiskToken(session *models.Session) string {
 	return fmt.Sprintf("⚠️ %s\n\n%s%s",
 		translator.Translate(session.Lang, "tokenRequestInfo", nil, nil),
 		formatOptionalString(translator.Translate(session.Lang, "currentToken", nil, nil),
@@ -55,6 +54,18 @@ func KinopoiskToken(session *models.Session) string {
 
 func KinopoiskTokenSuccess(session *models.Session) string {
 	return "✅ " + translator.Translate(session.Lang, "tokenSuccess", nil, nil)
+}
+
+func UnknownCommand(session *models.Session) string {
+	return "❗" + translator.Translate(session.Lang, "unknownCommand", nil, nil)
+}
+
+func UnknownState(session *models.Session) string {
+	return "❗" + translator.Translate(session.Lang, "unknownState", nil, nil)
+}
+
+func SessionError(lang string) string {
+	return translator.Translate(lang, "sessionError", nil, nil)
 }
 
 func CancelAction(session *models.Session) string {

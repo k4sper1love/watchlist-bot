@@ -12,7 +12,7 @@ import (
 
 func HandleNewCollectionCommand(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestCollectionName(session), keyboards.Cancel(session))
-	session.SetState(states.ProcessNewCollectionAwaitingName)
+	session.SetState(states.AwaitNewCollectionName)
 }
 
 func HandleNewCollectionProcess(app models.App, session *models.Session) {
@@ -23,24 +23,24 @@ func HandleNewCollectionProcess(app models.App, session *models.Session) {
 	}
 
 	switch session.State {
-	case states.ProcessNewCollectionAwaitingName:
+	case states.AwaitNewCollectionName:
 		parser.ParseCollectionName(app, session, HandleNewCollectionCommand, requestNewCollectionDescription)
 
-	case states.ProcessNewCollectionAwaitingDescription:
+	case states.AwaitNewCollectionDescription:
 		parser.ParseCollectionDescription(app, session, requestNewCollectionDescription, finishNewCollectionProcess)
 	}
 }
 
 func requestNewCollectionDescription(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestCollectionDescription(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessNewCollectionAwaitingDescription)
+	session.SetState(states.AwaitNewCollectionDescription)
 }
 
 func finishNewCollectionProcess(app models.App, session *models.Session) {
 	collection, err := watchlist.CreateCollection(app, session)
 	session.ClearAllStates()
 	if err != nil {
-		app.SendMessage(messages.CreateCollectionFailure(session), keyboards.Back(session, states.CallbackCollectionsNew))
+		app.SendMessage(messages.CreateCollectionFailure(session), keyboards.Back(session, states.CallCollectionsNew))
 		return
 	}
 

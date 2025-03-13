@@ -30,7 +30,7 @@ func Run() error {
 	}
 	sl.Log.Info("database connection established successfully")
 
-	err = translator.InitTranslator(app.Config.LocalesDir)
+	err = translator.Init(app.Config.LocalesDir)
 	if err != nil {
 		return err
 	}

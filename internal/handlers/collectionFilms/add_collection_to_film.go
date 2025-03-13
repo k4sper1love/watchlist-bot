@@ -27,26 +27,26 @@ func HandleAddCollectionToFilmButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
 	switch callback {
-	case states.CallbackAddCollectionToFilmBack:
-		films.HandleFilmsDetailCommand(app, session)
+	case states.CallAddCollectionToFilmBack:
+		films.HandleFilmDetailCommand(app, session)
 
-	case states.CallbackAddCollectionToFilmFind:
+	case states.CallAddCollectionToFilmFind:
 		handleAddCollectionToFilmFind(app, session)
 
-	case states.CallbackAddCollectionToFilmAgain:
+	case states.CallAddCollectionToFilmAgain:
 		session.CollectionsState.Name = ""
 		handleAddCollectionToFilmFind(app, session)
 
-	case states.CallbackAddCollectionToFilmReset:
+	case states.CallAddCollectionToFilmReset:
 		session.CollectionsState.Name = ""
 		HandleAddCollectionToFilmCommand(app, session)
 
-	case states.CallbackAddCollectionToFilmPageNext, states.CallbackAddCollectionToFilmPagePrev,
-		states.CallbackAddCollectionToFilmPageLast, states.CallbackAddCollectionToFilmPageFirst:
-		handleAddCollectionToFilmPagination(app, session, callback)
-
 	default:
-		if strings.HasPrefix(callback, states.PrefixSelectCFCollection) {
+		if strings.HasPrefix(callback, states.AddCollectionToFilmPage) {
+			handleAddCollectionToFilmPagination(app, session, callback)
+		}
+
+		if strings.HasPrefix(callback, states.SelectCFCollection) {
 			handleAddCollectionToFilmSelect(app, session, callback)
 		}
 	}
@@ -60,35 +60,35 @@ func HandleAddCollectionToFilmProcess(app models.App, session *models.Session) {
 	}
 
 	switch session.State {
-	case states.ProcessAddCollectionToFilmAwaitingName:
+	case states.AwaitAddCollectionToFilmName:
 		parseAddCollectionToFilmName(app, session)
 	}
 }
 
 func handleAddCollectionToFilmPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
-	case states.CallbackAddCollectionToFilmPageNext:
+	case states.CallAddCollectionToFilmPageNext:
 		if session.CollectionFilmsState.CurrentPage >= session.CollectionFilmsState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.CollectionFilmsState.CurrentPage++
 
-	case states.CallbackAddCollectionToFilmPagePrev:
+	case states.CallAddCollectionToFilmPagePrev:
 		if session.CollectionFilmsState.CurrentPage <= 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.CollectionFilmsState.CurrentPage--
 
-	case states.CallbackAddCollectionToFilmPageLast:
+	case states.CallAddCollectionToFilmPageLast:
 		if session.CollectionFilmsState.CurrentPage == session.CollectionFilmsState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.CollectionFilmsState.CurrentPage = session.CollectionFilmsState.LastPage
 
-	case states.CallbackAddCollectionToFilmPageFirst:
+	case states.CallAddCollectionToFilmPageFirst:
 		if session.CollectionFilmsState.CurrentPage == 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
@@ -100,9 +100,9 @@ func handleAddCollectionToFilmPagination(app models.App, session *models.Session
 }
 
 func handleAddCollectionToFilmSelect(app models.App, session *models.Session, callback string) {
-	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.PrefixSelectCFCollection)); err != nil {
+	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectCFCollection)); err != nil {
 		utils.LogParseSelectError(err, callback)
-		app.SendMessage(messages.CollectionsFailure(session), keyboards.Back(session, states.CallbackCollectionFilmsFromFilm))
+		app.SendMessage(messages.CollectionsFailure(session), keyboards.Back(session, states.CallCollectionFilmsFromFilm))
 	} else {
 		session.CollectionDetailState.Collection.ID = id
 		addFilmToCollection(app, session)
@@ -111,7 +111,7 @@ func handleAddCollectionToFilmSelect(app models.App, session *models.Session, ca
 
 func handleAddCollectionToFilmFind(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestCollectionName(session), keyboards.Cancel(session))
-	session.SetState(states.ProcessAddCollectionToFilmAwaitingName)
+	session.SetState(states.AwaitAddCollectionToFilmName)
 }
 
 func parseAddCollectionToFilmName(app models.App, session *models.Session) {

@@ -8,18 +8,18 @@ import (
 )
 
 var menuButtons = []Button{
-	{"👤", "profile", states.CallbackMenuSelectProfile, "", true},
-	{"🎥", "films", states.CallbackMenuSelectFilms, "", true},
-	{"📚", "collections", states.CallbackMenuSelectCollections, "", true},
-	{"⚙️", "settings", states.CallbackMenuSelectSettings, "", true},
-	{"💬", "feedback", states.CallbackMenuSelectFeedback, "", true},
-	{"🚪", "logout", states.CallbackMenuSelectLogout, "", true},
+	{"👤", "profile", states.CallMenuProfile, "", true},
+	{"🎥", "films", states.CallMenuFilms, "", true},
+	{"📚", "collections", states.CallMenuCollections, "", true},
+	{"⚙️", "settings", states.CallMenuSettings, "", true},
+	{"💬", "feedback", states.CallMenuFeedback, "", true},
+	{"🚪", "logout", states.CallMenuLogout, "", true},
 }
 
 var feedbackCategoryButtons = []Button{
-	{"💡", "suggestions", states.CallbackFeedbackCategorySuggestions, "", true},
-	{"🐞", "bugs", states.CallbackFeedbackCategoryBugs, "", true},
-	{"❓", "issues", states.CallbackFeedbackCategoryIssues, "", true},
+	{"💡", "suggestions", states.CallFeedbackCategorySuggestions, "", true},
+	{"🐞", "bugs", states.CallFeedbackCategoryBugs, "", true},
+	{"❓", "issues", states.CallFeedbackCategoryIssues, "", true},
 }
 
 func Cancel(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
@@ -49,7 +49,7 @@ func SurveyAndCancel(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 }
 
 func LanguageSelect(languages []string) *tgbotapi.InlineKeyboardMarkup {
-	return New().AddLanguageSelect(languages, states.PrefixSelectStartLang).Build("")
+	return New().AddLanguageSelect(languages, states.SelectStartLang).Build("")
 }
 
 func Menu(session *models.Session) *tgbotapi.InlineKeyboardMarkup {

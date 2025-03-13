@@ -19,23 +19,23 @@ func HandleManageFilmCommand(app models.App, session *models.Session) {
 
 func HandleManageFilmButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Update) {
-	case states.CallbackManageFilmSelectBack:
-		HandleFilmsDetailCommand(app, session)
+	case states.CallManageFilmBack:
+		HandleFilmDetailCommand(app, session)
 
-	case states.CallbackManageFilmSelectUpdate:
+	case states.CallManageFilmUpdate:
 		HandleUpdateFilmCommand(app, session)
 
-	case states.CallbackManageFilmSelectDelete:
+	case states.CallManageFilmDelete:
 		HandleDeleteFilmCommand(app, session)
 
-	case states.CallbackManageFilmSelectRemoveFromCollection:
+	case states.CallManageFilmRemoveFromCollection:
 		handleRemoveFilmFromCollection(app, session)
 	}
 }
 
 func handleRemoveFilmFromCollection(app models.App, session *models.Session) {
 	if err := watchlist.DeleteCollectionFilm(app, session); err != nil {
-		app.SendMessage(messages.RemoveFilmFailure(session), keyboards.Back(session, states.CallbackFilmsManage))
+		app.SendMessage(messages.RemoveFilmFailure(session), keyboards.Back(session, states.CallFilmsManage))
 		return
 	}
 

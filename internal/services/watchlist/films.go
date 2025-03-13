@@ -164,7 +164,7 @@ func addFilmsBasicParams(queryParams url.Values, title string, currentPage, page
 	return queryParams
 }
 
-func addFilmsFilterAndSortingParams(queryParams url.Values, filter *models.FiltersFilm, sorting *models.Sorting) url.Values {
+func addFilmsFilterAndSortingParams(queryParams url.Values, filter *models.FilmFilters, sorting *models.Sorting) url.Values {
 	if filter.Rating != "" {
 		queryParams.Add("rating", filter.Rating)
 	}

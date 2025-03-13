@@ -11,17 +11,17 @@ import (
 
 func HandleLogoutCommand(app models.App, session *models.Session) {
 	app.SendMessage(messages.Logout(session), keyboards.Survey(session))
-	session.SetState(states.ProcessLogoutAwaitingConfirm)
+	session.SetState(states.AwaitLogoutConfirm)
 }
 
 func HandleLogoutProcess(app models.App, session *models.Session) {
 	switch session.State {
-	case states.ProcessLogoutAwaitingConfirm:
-		parseLogoutConfirm(app, session)
+	case states.AwaitLogoutConfirm:
+		handleLogoutConfirm(app, session)
 	}
 }
 
-func parseLogoutConfirm(app models.App, session *models.Session) {
+func handleLogoutConfirm(app models.App, session *models.Session) {
 	if !utils.IsAgree(app.Update) {
 		app.SendMessage(messages.CancelAction(session), nil)
 		session.ClearState()

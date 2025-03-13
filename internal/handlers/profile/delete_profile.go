@@ -1,4 +1,4 @@
-package users
+package profile
 
 import (
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
@@ -11,19 +11,18 @@ import (
 
 func HandleDeleteProfileCommand(app models.App, session *models.Session) {
 	app.SendMessage(messages.DeleteProfile(session), keyboards.Survey(session))
-	session.SetState(states.ProcessDeleteProfileAwaitingConfirm)
+	session.SetState(states.AwaitDeleteProfileConfirm)
 }
 
 func HandleDeleteProfileProcess(app models.App, session *models.Session) {
 	switch session.State {
-	case states.ProcessDeleteProfileAwaitingConfirm:
-		parseDeleteProfileConfirm(app, session)
+	case states.AwaitDeleteProfileConfirm:
+		handleDeleteProfileConfirm(app, session)
+		session.ClearState()
 	}
-
-	session.ClearState()
 }
 
-func parseDeleteProfileConfirm(app models.App, session *models.Session) {
+func handleDeleteProfileConfirm(app models.App, session *models.Session) {
 	if !utils.IsAgree(app.Update) {
 		app.SendMessage(messages.CancelAction(session), nil)
 		HandleProfileCommand(app, session)
@@ -31,7 +30,7 @@ func parseDeleteProfileConfirm(app models.App, session *models.Session) {
 	}
 
 	if err := watchlist.DeleteUser(app, session); err != nil {
-		app.SendMessage(messages.DeleteProfileFailure(session), keyboards.Back(session, states.CallbackMenuSelectProfile))
+		app.SendMessage(messages.DeleteProfileFailure(session), keyboards.Back(session, states.CallMenuProfile))
 		return
 	}
 

@@ -32,6 +32,9 @@
   "invalidInputURL": {
     "other": "Неверный URL или длина не находится в диапазоне <b>[{{.Min}}, {{.Max}}]</b> символов"
   },
+  "invalidInputEmail": {
+    "other": "Неверный email или длина не находится в диапазоне <b>[{{.Min}}, {{.Max}}]</b> символов"
+  },
   "kinopoiskToken": {
     "other": "Kinopoisk токен"
   },
@@ -565,7 +568,7 @@
     "other": "Текущий размер страницы"
   },
   "settingsPageSizeSuccess": {
-    "other": "Установлен размер страницы: <code>{{.Size}}</code>"
+    "other": "Новый размер страницы установлен"
   },
   "settingsCollectionsPageSizeSuccess": {
     "other": "Новый размер страницы для списка коллекций"

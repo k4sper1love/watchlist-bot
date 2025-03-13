@@ -13,8 +13,8 @@ type BaseState struct {
 
 type ProfileState struct {
 	BaseState
-	Username string
-	Email    string
+	Username string `json:"username,omitempty"`
+	Email    string `json:"email,omitempty"`
 }
 
 type FeedbackState struct {
@@ -31,8 +31,8 @@ type FilmsState struct {
 	CurrentPage       int              `json:"-"`
 	TotalRecords      int
 	Title             string       `json:"-"`
-	FilmFilters       *FiltersFilm `gorm:"polymorphic:Filterable;polymorphicValue:FilmFilters"`
-	CollectionFilters *FiltersFilm `gorm:"polymorphic:Filterable;polymorphicValue:CollectionFilters"`
+	FilmFilters       *FilmFilters `gorm:"polymorphic:Filterable;polymorphicValue:FilmFilters"`
+	CollectionFilters *FilmFilters `gorm:"polymorphic:Filterable;polymorphicValue:CollectionFilters"`
 	FilmSorting       *Sorting     `gorm:"polymorphic:Sortable;polymorphicValue:FilmSorting"`
 	CollectionSorting *Sorting     `gorm:"polymorphic:Sortable;polymorphicValue:CollectionSorting"`
 }

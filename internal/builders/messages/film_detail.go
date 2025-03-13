@@ -24,7 +24,7 @@ func FilmDetail(session *models.Session) string {
 			toItalic(film.Comment), "%s:\n%s\n\n"),
 		formatOptionalString(toBold(translator.Translate(session.Lang, "review", nil, nil)),
 			formatOptionalBool(toItalic(film.Review), film.IsViewed, "%s"), "%s:\n%s\n\n"),
-		formatOptionalBool(toItalic(session.CollectionDetailState.Collection.Name), session.Context == states.ContextCollection, "📚 %s\n\n"))
+		formatOptionalBool(toItalic(session.CollectionDetailState.Collection.Name), session.Context == states.CtxCollection, "📚 %s\n\n"))
 }
 
 func FilmGeneral(session *models.Session, film *apiModels.Film, needViewed bool) string {

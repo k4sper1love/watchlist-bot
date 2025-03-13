@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"net/mail"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -25,7 +26,12 @@ func IsValidStringLength(value string, minLength int, maxLength int) bool {
 
 func IsValidURL(u string, minLength int, maxLength int) bool {
 	_, err := url.ParseRequestURI(u)
-	return err == nil && IsValidNumberRange(utf8.RuneCountInString(u), minLength, maxLength)
+	return err == nil && IsValidStringLength(u, minLength, maxLength)
+}
+
+func IsValidEmail(email string, minLength int, maxLength int) bool {
+	_, err := mail.ParseAddress(email)
+	return err == nil && IsValidStringLength(email, minLength, maxLength)
 }
 
 func ValidateFiltersRange(input string, config FilterRangeConfig) (string, error) {

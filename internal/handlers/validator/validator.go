@@ -25,3 +25,10 @@ func HandleInvalidInputURL(app models.App, session *models.Session, minLength, m
 		"Max": maxLength,
 	}), nil)
 }
+
+func HandleInvalidInputEmail(app models.App, session *models.Session, minLength, maxLength int) {
+	app.SendMessage(messages.ValidationWarning(session, "invalidInputEmail", map[string]interface{}{
+		"Min": minLength,
+		"Max": maxLength,
+	}), nil)
+}

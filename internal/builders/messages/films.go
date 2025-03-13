@@ -14,9 +14,9 @@ import (
 
 func Films(session *models.Session, metadata *filters.Metadata) string {
 	switch session.Context {
-	case states.ContextFilm:
+	case states.CtxFilm:
 		return FilmList(session, metadata, false, true)
-	case states.ContextCollection:
+	case states.CtxCollection:
 		return CollectionHeader(session) + FilmList(session, metadata, false, true)
 	default:
 		return translator.Translate(session.Lang, "unknownContext", nil, nil)
@@ -62,25 +62,25 @@ func CollectionHeader(session *models.Session) string {
 }
 
 func FilterRange(session *models.Session, filterType string) string {
-	filterEnabled := session.GetFilmsFiltersByContext().IsFilterEnabled(filterType)
+	filterEnabled := session.GetFilmFiltersByCtx().IsFieldEnabled(filterType)
 	return fmt.Sprintf("↕️ %s\n\n%s%s%s",
 		translator.Translate(session.Lang, "filterInstructionRange", nil, nil),
 		translator.Translate(session.Lang, "filterInstructionPartialRange", nil, nil),
 		formatOptionalBool(toBold(translator.Translate(session.Lang, "currentValue", nil, nil)),
 			filterEnabled, "\n\n%s:"),
-		formatOptionalBool(session.GetFilmsFiltersByContext().ValueToString(filterType),
+		formatOptionalBool(session.GetFilmFiltersByCtx().ToString(filterType),
 			filterEnabled, " %s"))
 }
 
 func FilterSwitch(session *models.Session, filterType string) string {
-	filterEnabled := session.GetFilmsFiltersByContext().IsFilterEnabled(filterType)
+	filterEnabled := session.GetFilmFiltersByCtx().IsFieldEnabled(filterType)
 	return fmt.Sprintf("🔀 %s%s%s",
 		translator.Translate(session.Lang, "filterInstructionSwitch", map[string]interface{}{
 			"Filter": translator.Translate(session.Lang, filterType, nil, nil),
 		}, nil),
 		formatOptionalBool(toBold(translator.Translate(session.Lang, "currentValue", nil, nil)),
 			filterEnabled, "\n\n%s:"),
-		formatOptionalBool(translator.Translate(session.Lang, session.GetFilmsFiltersByContext().ValueToString(filterType), nil, nil),
+		formatOptionalBool(translator.Translate(session.Lang, session.GetFilmFiltersByCtx().ToString(filterType), nil, nil),
 			filterEnabled, " %s"))
 }
 

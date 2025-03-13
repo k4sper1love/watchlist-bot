@@ -7,17 +7,17 @@ import (
 )
 
 var updateCollectionButtons = []Button{
-	{"", "title", states.CallbackUpdateCollectionSelectName, "", true},
-	{"", "description", states.CallbackUpdateCollectionSelectDescription, "", true},
+	{"", "title", states.CallUpdateCollectionName, "", true},
+	{"", "description", states.CallUpdateCollectionDescription, "", true},
 }
 
 func Collections(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddIf(len(session.CollectionsState.Collections) > 0, func(k *Keyboard) {
-			k.AddSearch(states.CallbackCollectionsFind)
+			k.AddSearch(states.CallCollectionsFind)
 		}).
 		AddCollectionsSelect(session).
-		AddNavigation(currentPage, lastPage, states.PrefixCollectionsPage, true).
+		AddNavigation(currentPage, lastPage, states.CollectionsPage, true).
 		AddCollectionFiltersAndSorting(session).
 		AddCollectionsNew().
 		AddBack("").
@@ -26,24 +26,24 @@ func Collections(session *models.Session, currentPage, lastPage int) *tgbotapi.I
 
 func CollectionManage(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
-		AddUpdate(states.CallbackManageCollectionSelectUpdate).
-		AddDelete(states.CallbackManageCollectionSelectDelete).
-		AddBack(states.CallbackManageCollectionSelectBack).
+		AddUpdate(states.CallManageCollectionUpdate).
+		AddDelete(states.CallManageCollectionDelete).
+		AddBack(states.CallManageCollectionBack).
 		Build(session.Lang)
 }
 
 func CollectionUpdate(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddButtons(updateCollectionButtons...).
-		AddBack(states.CallbackUpdateCollectionSelectBack).
+		AddBack(states.CallUpdateCollectionBack).
 		Build(session.Lang)
 }
 
 func FindCollections(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddCollectionsSelect(session).
-		AddNavigation(currentPage, lastPage, states.PrefixFindCollectionsPage, true).
-		AddBack(states.CallbackFindCollectionsBack).
+		AddNavigation(currentPage, lastPage, states.FindCollectionsPage, true).
+		AddBack(states.CallFindCollectionsBack).
 		Build(session.Lang)
 }
 
@@ -51,9 +51,9 @@ func CollectionsSorting(session *models.Session) *tgbotapi.InlineKeyboardMarkup 
 	sorting := session.CollectionsState.Sorting
 	return New().
 		AddButtons(getSortingCollectionsButtons(sorting, session.Lang)...).
-		AddIf(sorting.IsSortingEnabled(), func(k *Keyboard) {
-			k.AddResetAllSorting(states.CallbackSortingCollectionsAllReset)
+		AddIf(sorting.IsEnabled(), func(k *Keyboard) {
+			k.AddResetAllSorting(states.CallCollectionSortingAllReset)
 		}).
-		AddBack(states.CallbackSortingCollectionsBack).
+		AddBack(states.CallCollectionSortingBack).
 		Build(session.Lang)
 }

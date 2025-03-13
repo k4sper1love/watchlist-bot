@@ -12,18 +12,18 @@ import (
 
 func HandleCollectionFilmsButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Update) {
-	case states.CallbackCollectionFilmsFromFilm:
+	case states.CallCollectionFilmsFromFilm:
 		clearAndHandleCollectionToFilm(app, session)
 
-	case states.CallbackCollectionFilmsFromCollection:
+	case states.CallCollectionFilmsFromCollection:
 		HandleOptionsFilmToCollectionCommand(app, session)
 	}
 }
 
 func handleFilmsWithContext(app models.App, session *models.Session) {
-	if session.Context == states.ContextFilm {
-		films.HandleFilmsDetailCommand(app, session)
-	} else if session.Context == states.ContextCollection {
+	if session.Context == states.CtxFilm {
+		films.HandleFilmDetailCommand(app, session)
+	} else if session.Context == states.CtxCollection {
 		films.HandleFilmsCommand(app, session)
 	}
 }
@@ -31,7 +31,7 @@ func handleFilmsWithContext(app models.App, session *models.Session) {
 func addFilmToCollection(app models.App, session *models.Session) {
 	collectionFilm, err := watchlist.AddCollectionFilm(app, session)
 	if err != nil {
-		app.SendMessage(messages.CreateFilmFailure(session), keyboards.Back(session, states.CallbackMenuSelectFilms))
+		app.SendMessage(messages.CreateFilmFailure(session), keyboards.Back(session, states.CallMenuFilms))
 		return
 	}
 

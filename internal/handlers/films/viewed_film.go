@@ -17,28 +17,28 @@ func HandleViewedFilmCommand(app models.App, session *models.Session) {
 func HandleViewedFilmProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
-		HandleFilmsDetailCommand(app, session)
+		HandleFilmDetailCommand(app, session)
 		return
 	}
 
 	switch session.State {
-	case states.ProcessViewedFilmAwaitingUserRating:
+	case states.AwaitViewedFilmUserRating:
 		parser.ParseFilmUserRating(app, session, requestViewedFilmUserRating, requestViewedFilmReview)
-	case states.ProcessViewedFilmAwaitingReview:
+	case states.AwaitViewedFilmReview:
 		parser.ParseFilmReview(app, session, requestViewedFilmReview, finishViewedFilmProcess)
 	}
 }
 
 func finishViewedFilmProcess(app models.App, session *models.Session) {
-	HandleUpdateFilm(app, session, HandleFilmsDetailCommand)
+	HandleUpdateFilm(app, session, HandleFilmDetailCommand)
 }
 
 func requestViewedFilmUserRating(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestViewedFilmUserRating(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessViewedFilmAwaitingUserRating)
+	session.SetState(states.AwaitViewedFilmUserRating)
 }
 
 func requestViewedFilmReview(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestViewedFilmReview(session), keyboards.SkipAndCancel(session))
-	session.SetState(states.ProcessViewedFilmAwaitingReview)
+	session.SetState(states.AwaitViewedFilmReview)
 }

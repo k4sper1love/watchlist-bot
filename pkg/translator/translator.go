@@ -17,7 +17,7 @@ var (
 	once       sync.Once
 )
 
-func InitTranslator(localeDir string) error {
+func Init(localeDir string) error {
 	var err error
 	once.Do(func() {
 		bundle = i18n.NewBundle(language.English)

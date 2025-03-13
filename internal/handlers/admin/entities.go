@@ -15,7 +15,7 @@ import (
 
 func HandleEntitiesCommand(app models.App, session *models.Session) {
 	if entities, err := getEntities(session); err != nil {
-		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallbackMenuSelectAdmin))
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallMenuAdmin))
 	} else {
 		app.SendMessage(messages.UserList(session, entities), keyboards.AdminList(session, entities))
 	}
@@ -25,18 +25,18 @@ func HandleEntitiesButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
 	switch callback {
-	case states.CallbackEntitiesListBack:
+	case states.CallEntitiesBack:
 		general.RequireRole(app, session, HandleMenuCommand, roles.Helper)
 
-	case states.CallbackEntitiesSelectFind:
+	case states.CallEntitiesFind:
 		general.RequireRole(app, session, handleEntitiesFindCommand, roles.Admin)
 
-	case states.CallbackEntitiesListPageNext, states.CallbackEntitiesListPagePrev,
-		states.CallbackEntitiesListPageLast, states.CallbackEntitiesPageFirst:
-		handleEntitiesPagination(app, session, callback)
-
 	default:
-		if strings.HasPrefix(callback, getSelectEntityPrefix(session)) {
+		if strings.HasPrefix(callback, states.EntitiesPage) {
+			handleEntitiesPagination(app, session, callback)
+		}
+
+		if strings.HasPrefix(callback, states.SelectEntity) {
 			handleEntitiesSelect(app, session, callback)
 		}
 	}
@@ -44,35 +44,35 @@ func HandleEntitiesButtons(app models.App, session *models.Session) {
 
 func HandleEntitiesProcess(app models.App, session *models.Session) {
 	switch session.State {
-	case states.ProcessEntitiesAwaitingFind:
+	case states.AwaitEntitiesFind:
 		general.RequireRole(app, session, parseEntitiesFind, roles.Admin)
 	}
 }
 
 func handleEntitiesPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
-	case states.CallbackEntitiesListPageNext:
+	case states.CallEntitiesPageNext:
 		if session.AdminState.CurrentPage >= session.AdminState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage++
 
-	case states.CallbackEntitiesListPagePrev:
+	case states.CallEntitiesPagePrev:
 		if session.AdminState.CurrentPage <= 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage--
 
-	case states.CallbackEntitiesListPageLast:
+	case states.CallEntitiesPageLast:
 		if session.AdminState.CurrentPage == session.AdminState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.AdminState.CurrentPage = session.AdminState.LastPage
 
-	case states.CallbackEntitiesPageFirst:
+	case states.CallEntitiesFirst:
 		if session.AdminState.CurrentPage == 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
@@ -86,7 +86,7 @@ func handleEntitiesPagination(app models.App, session *models.Session, callback 
 func handleEntitiesSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, getSelectEntityPrefix(session))); err != nil {
 		utils.LogParseSelectError(err, callback)
-		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallbackMenuSelectAdmin))
+		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallMenuAdmin))
 	} else {
 		session.AdminState.UserID = id
 		HandleEntityDetailCommand(app, session)
@@ -103,7 +103,7 @@ func HandleEntityDetailCommand(app models.App, session *models.Session) {
 
 func handleEntitiesFindCommand(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestEntityField(session), keyboards.Cancel(session))
-	session.SetState(states.ProcessEntitiesAwaitingFind)
+	session.SetState(states.AwaitEntitiesFind)
 }
 
 func parseEntitiesFind(app models.App, session *models.Session) {
@@ -148,9 +148,9 @@ func parseEntityByField(session *models.Session, input string) (*models.Session,
 
 func getSelectEntityPrefix(session *models.Session) string {
 	if session.AdminState.IsAdmin {
-		return states.PrefixSelectAdmin
+		return states.SelectAdmin
 	}
-	return states.PrefixSelectAdminUser
+	return states.SelectUser
 }
 
 func getEntities(session *models.Session) ([]models.Session, error) {

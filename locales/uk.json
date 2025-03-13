@@ -32,6 +32,9 @@
   "invalidInputURL": {
     "other": "Невірний URL або довжина не входить в діапазон <b>[{{.Min}}, {{.Max}}]</b> символів"
   },
+  "invalidInputEmail": {
+    "other": "Неправильний email або довжина не знаходиться в діапазоні <b>[{{.Min}}, {{.Max}}]</b> символів"
+  },
   "kinopoiskToken": {
     "other": "Токен Kinopoisk"
   },
@@ -565,7 +568,7 @@
     "other": "Поточний розмір сторінки"
   },
   "settingsPageSizeSuccess": {
-    "other": "Розмір сторінки встановлено: <code>{{.Size}}</code>"
+    "other": "Новий розмір сторінки встановлено"
   },
   "settingsCollectionsPageSizeSuccess": {
     "other": "Новий розмір сторінки для списку колекцій"

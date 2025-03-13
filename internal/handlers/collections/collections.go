@@ -30,30 +30,30 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
 	switch callback {
-	case states.CallbackCollectionsBack:
+	case states.CallCollectionsBack:
 		general.HandleMenuCommand(app, session)
 
-	case states.CallbackCollectionsPageNext, states.CallbackCollectionsPagePrev,
-		states.CallbackCollectionsPageLast, states.CallbackCollectionsPageFirst:
-		handleCollectionsPagination(app, session, callback)
-
-	case states.CallbackCollectionsNew:
+	case states.CallCollectionsNew:
 		HandleNewCollectionCommand(app, session)
 
-	case states.CallbackCollectionsManage:
+	case states.CallCollectionsManage:
 		HandleManageCollectionCommand(app, session)
 
-	case states.CallbackCollectionsFind:
+	case states.CallCollectionsFind:
 		handleCollectionsFindByName(app, session)
 
-	case states.CallbackCollectionsSorting:
+	case states.CallCollectionsSorting:
 		HandleSortingCollectionsCommand(app, session)
 
-	case states.CallbackCollectionsFavorite:
+	case states.CallCollectionsFavorite:
 		handleFavoriteCollection(app, session)
 
 	default:
-		if strings.HasPrefix(callback, states.PrefixSelectCollection) {
+		if strings.HasPrefix(callback, states.CollectionsPage) {
+			handleCollectionsPagination(app, session, callback)
+		}
+
+		if strings.HasPrefix(callback, states.SelectCollection) {
 			handleCollectionSelect(app, session, callback)
 		}
 	}
@@ -67,35 +67,35 @@ func HandleCollectionProcess(app models.App, session *models.Session) {
 	}
 
 	switch session.State {
-	case states.ProcessFindCollectionsAwaitingName:
+	case states.AwaitCollectionsName:
 		parser.ParseCollectionFindName(app, session, HandleFindCollectionsCommand)
 	}
 }
 
 func handleCollectionsPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
-	case states.CallbackCollectionsPageNext:
+	case states.CallCollectionsPageNext:
 		if session.CollectionsState.CurrentPage >= session.CollectionsState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.CollectionsState.CurrentPage++
 
-	case states.CallbackCollectionsPagePrev:
+	case states.CallCollectionsPagePrev:
 		if session.CollectionsState.CurrentPage <= 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
 		}
 		session.CollectionsState.CurrentPage--
 
-	case states.CallbackCollectionsPageLast:
+	case states.CallCollectionsPageLast:
 		if session.CollectionsState.CurrentPage == session.CollectionsState.LastPage {
 			app.SendMessage(messages.LastPageAlert(session), nil)
 			return
 		}
 		session.CollectionsState.CurrentPage = session.CollectionsState.LastPage
 
-	case states.CallbackCollectionsPageFirst:
+	case states.CallCollectionsPageFirst:
 		if session.CollectionsState.CurrentPage == 1 {
 			app.SendMessage(messages.FirstPageAlert(session), nil)
 			return
@@ -107,9 +107,9 @@ func handleCollectionsPagination(app models.App, session *models.Session, callba
 }
 
 func handleCollectionSelect(app models.App, session *models.Session, callback string) {
-	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.PrefixSelectCollection)); err != nil {
+	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectCollection)); err != nil {
 		utils.LogParseSelectError(err, callback)
-		app.SendMessage(messages.CollectionsFailure(session), keyboards.Back(session, states.CallbackCollectionsBack))
+		app.SendMessage(messages.CollectionsFailure(session), keyboards.Back(session, states.CallCollectionsBack))
 	} else {
 		session.CollectionDetailState.ObjectID = id
 		setContextAndHandleFilms(app, session)
@@ -118,7 +118,7 @@ func handleCollectionSelect(app models.App, session *models.Session, callback st
 
 func handleCollectionsFindByName(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestCollectionName(session), keyboards.Cancel(session))
-	session.SetState(states.ProcessFindCollectionsAwaitingName)
+	session.SetState(states.AwaitCollectionsName)
 }
 
 func handleFavoriteCollection(app models.App, session *models.Session) {
@@ -142,7 +142,7 @@ func updateSessionWithCollections(session *models.Session, collections []apiMode
 }
 
 func setContextAndHandleFilms(app models.App, session *models.Session) {
-	session.SetContext(states.ContextCollection)
+	session.SetContext(states.CtxCollection)
 	session.FilmsState.CurrentPage = 1
 	films.HandleFilmsCommand(app, session)
 }

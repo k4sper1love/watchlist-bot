@@ -26,7 +26,7 @@ func autoMigrate() error {
 		&models.Feedback{},
 		&models.Session{},
 		&models.FilmsState{},
-		&models.FiltersFilm{},
+		&models.FilmFilters{},
 		&models.Sorting{},
 		&models.ProfileState{},
 		&models.FeedbackState{},

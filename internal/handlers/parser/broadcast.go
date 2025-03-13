@@ -17,7 +17,7 @@ func ParseBroadcastImage(app models.App, session *models.Session, next func(mode
 		return
 	}
 
-	imageURL, err := ParseAndUploadImageFromMessage(app)
+	imageURL, err := UploadImageFromMessage(app)
 	if err != nil {
 		app.SendMessage(messages.ImageFailure(session), nil)
 	}

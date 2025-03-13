@@ -15,14 +15,14 @@ func HandleManageCollectionCommand(app models.App, session *models.Session) {
 
 func HandleManageCollectionButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Update) {
-	case states.CallbackManageCollectionSelectBack:
-		session.SetContext(states.ContextCollection)
+	case states.CallManageCollectionBack:
+		session.SetContext(states.CtxCollection)
 		films.HandleFilmsCommand(app, session)
 
-	case states.CallbackManageCollectionSelectUpdate:
+	case states.CallManageCollectionUpdate:
 		HandleUpdateCollectionCommand(app, session)
 
-	case states.CallbackManageCollectionSelectDelete:
+	case states.CallManageCollectionDelete:
 		HandleDeleteCollectionCommand(app, session)
 	}
 }

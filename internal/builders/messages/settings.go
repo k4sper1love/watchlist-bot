@@ -34,8 +34,6 @@ func SettingsPageSize(session *models.Session, pageSize int) string {
 		translator.Translate(session.Lang, "settingsPageSizeChoice", nil, nil))
 }
 
-func SettingsPageSizeSuccess(session *models.Session, pageSize int) string {
-	return "🔄 " + translator.Translate(session.Lang, "settingsPageSizeSuccess", map[string]interface{}{
-		"Size": pageSize,
-	}, nil)
+func SettingsPageSizeSuccess(session *models.Session) string {
+	return "🔄 " + translator.Translate(session.Lang, "settingsPageSizeSuccess", nil, nil)
 }

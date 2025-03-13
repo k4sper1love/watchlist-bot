@@ -32,7 +32,7 @@ func ProcessInput[T any, N int | float64](
 	next(app, session)
 }
 
-func ParseAndUploadImageFromMessage(app models.App) (string, error) {
+func UploadImageFromMessage(app models.App) (string, error) {
 	image, err := utils.ParseImageFromMessage(app.Bot, app.Update)
 	if err != nil {
 		return "", err
@@ -40,7 +40,7 @@ func ParseAndUploadImageFromMessage(app models.App) (string, error) {
 	return watchlist.UploadImage(app, image)
 }
 
-func ParseAndUploadImageFromURL(app models.App, imageURL string) (string, error) {
+func UploadImageFromURL(app models.App, imageURL string) (string, error) {
 	image, err := utils.ParseImageFromURL(imageURL)
 	if err != nil {
 		return "", err
