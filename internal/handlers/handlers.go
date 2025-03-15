@@ -45,8 +45,10 @@ func routeUpdate(app models.App, session *models.Session) {
 	switch {
 	case app.Update.CallbackQuery != nil:
 		handleCallbackQuery(app, session)
+
 	case session.State == "":
 		handleCommands(app, session)
+
 	default:
 		handleInput(app, session)
 	}
@@ -236,7 +238,7 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 	case strings.HasPrefix(callbackData, states.FindNewFilm) || strings.HasPrefix(callbackData, states.SelectNewFilm):
 		films.HandleFindNewFilmButtons(app, session)
 
-	case strings.HasPrefix(callbackData, states.SelectNewFilm):
+	case strings.HasPrefix(callbackData, states.NewFilm):
 		films.HandleNewFilmButtons(app, session)
 
 	case strings.HasPrefix(callbackData, states.ManageFilm):

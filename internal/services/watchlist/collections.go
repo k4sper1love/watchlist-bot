@@ -7,6 +7,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/security"
 	"net/http"
 	"net/url"
 )
@@ -20,10 +21,16 @@ func GetCollectionsExcludeFilm(app models.App, session *models.Session) (*models
 }
 
 func getCollectionsRequest(app models.App, session *models.Session, filmID, excludeFilmID, currentPage, pageSize int) (*models.CollectionsResponse, error) {
+	token, err := security.Decrypt(session.AccessToken)
+	if err != nil {
+		utils.LogDecryptError(err)
+		return nil, err
+	}
+
 	resp, err := client.Do(
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
-			HeaderValue:        session.AccessToken,
+			HeaderValue:        token,
 			Method:             http.MethodGet,
 			URL:                buildGetCollectionsURL(app, session, filmID, excludeFilmID, currentPage, pageSize),
 			ExpectedStatusCode: http.StatusOK,
@@ -44,10 +51,16 @@ func getCollectionsRequest(app models.App, session *models.Session, filmID, excl
 }
 
 func CreateCollection(app models.App, session *models.Session) (*apiModels.Collection, error) {
+	token, err := security.Decrypt(session.AccessToken)
+	if err != nil {
+		utils.LogDecryptError(err)
+		return nil, err
+	}
+
 	resp, err := client.Do(
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
-			HeaderValue:        session.AccessToken,
+			HeaderValue:        token,
 			Method:             http.MethodPost,
 			URL:                app.Config.APIHost + "/api/v1/collections",
 			Body:               session.CollectionDetailState,
@@ -69,10 +82,16 @@ func CreateCollection(app models.App, session *models.Session) (*apiModels.Colle
 }
 
 func UpdateCollection(app models.App, session *models.Session) (*apiModels.Collection, error) {
+	token, err := security.Decrypt(session.AccessToken)
+	if err != nil {
+		utils.LogDecryptError(err)
+		return nil, err
+	}
+
 	resp, err := client.Do(
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
-			HeaderValue:        session.AccessToken,
+			HeaderValue:        token,
 			Method:             http.MethodPut,
 			URL:                fmt.Sprintf("%s/api/v1/collections/%d", app.Config.APIHost, session.CollectionDetailState.Collection.ID),
 			Body:               session.CollectionDetailState,
@@ -94,10 +113,16 @@ func UpdateCollection(app models.App, session *models.Session) (*apiModels.Colle
 }
 
 func DeleteCollection(app models.App, session *models.Session) error {
+	token, err := security.Decrypt(session.AccessToken)
+	if err != nil {
+		utils.LogDecryptError(err)
+		return err
+	}
+
 	resp, err := client.Do(
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
-			HeaderValue:        session.AccessToken,
+			HeaderValue:        token,
 			Method:             http.MethodDelete,
 			URL:                fmt.Sprintf("%s/api/v1/collections/%d", app.Config.APIHost, session.CollectionDetailState.Collection.ID),
 			ExpectedStatusCode: http.StatusOK,

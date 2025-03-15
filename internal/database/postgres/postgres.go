@@ -48,8 +48,7 @@ func SaveRecords(records ...interface{}) {
 			sl.Log.Warn(
 				"failed to save record",
 				slog.Any("error", err),
-				slog.Any("record", record),
-			)
+				slog.Any("record", record))
 		}
 	}
 }

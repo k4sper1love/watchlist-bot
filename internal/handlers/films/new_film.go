@@ -52,7 +52,7 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 		parseNewFilmFromURL(app, session)
 
 	case states.AwaitNewFilmKinopoiskToken:
-		parseKinopoiskToken(app, session)
+		parser.ParseKinopoiskToken(app, session, HandleNewFilmCommand)
 
 	case states.AwaitNewFilmTitle:
 		parser.ParseFilmTitle(app, session, handleNewFilmManually, requestNewFilmYear)
@@ -92,12 +92,6 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 func handleKinopoiskToken(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestKinopoiskToken(session), keyboards.Cancel(session))
 	session.SetState(states.AwaitNewFilmKinopoiskToken)
-}
-
-func parseKinopoiskToken(app models.App, session *models.Session) {
-	session.KinopoiskAPIToken = utils.ParseMessageString(app.Update)
-	app.SendMessage(messages.KinopoiskTokenSuccess(session), nil)
-	HandleNewFilmCommand(app, session)
 }
 
 func handleKinopoiskError(app models.App, session *models.Session, err error) {

@@ -9,6 +9,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/security"
 	"io"
 	"log/slog"
 	"net/http"
@@ -60,10 +61,16 @@ func GetFilmsFromKinopoisk(session *models.Session) ([]apiModels.Film, *filters.
 }
 
 func getDataFromKinopoisk(session *models.Session, url string) (*http.Response, error) {
+	token, err := security.Decrypt(session.KinopoiskAPIToken)
+	if err != nil {
+		utils.LogDecryptError(err)
+		return nil, err
+	}
+
 	return client.Do(
 		&client.CustomRequest{
 			HeaderType:         client.HeaderExternalAPIKey,
-			HeaderValue:        session.KinopoiskAPIToken,
+			HeaderValue:        token,
 			Method:             http.MethodGet,
 			URL:                url,
 			ExpectedStatusCode: http.StatusOK,

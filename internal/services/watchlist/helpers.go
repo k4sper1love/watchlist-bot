@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
+	"github.com/k4sper1love/watchlist-bot/pkg/security"
 	"io"
 )
 
@@ -20,9 +21,19 @@ func parseAuth(dest *models.Session, data io.Reader) error {
 	}
 
 	dest.User = *auth.User
-	dest.AccessToken = auth.AccessToken
-	dest.RefreshToken = auth.RefreshToken
 
+	encryptedAccessToken, err := security.Encrypt(auth.AccessToken)
+	if err != nil {
+		return err
+	}
+
+	encryptedRefreshToken, err := security.Encrypt(auth.RefreshToken)
+	if err != nil {
+		return err
+	}
+
+	dest.AccessToken = encryptedAccessToken
+	dest.RefreshToken = encryptedRefreshToken
 	return nil
 }
 
@@ -63,10 +74,8 @@ func parseImageURL(data io.Reader) (string, error) {
 		ImageURL string `json:"image_url"`
 	}
 
-	err := json.NewDecoder(data).Decode(&result)
-	if err != nil {
+	if err := json.NewDecoder(data).Decode(&result); err != nil {
 		return "", err
 	}
-
 	return result.ImageURL, nil
 }

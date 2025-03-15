@@ -11,8 +11,7 @@ func LogRequestError(message string, err error, method, requestURL string) {
 		message,
 		slog.Any("error", err),
 		slog.String("method", method),
-		slog.String("url", requestURL),
-	)
+		slog.String("url", requestURL))
 }
 
 func LogResponseError(url, method string, code int, status string) error {
@@ -23,6 +22,7 @@ func LogResponseError(url, method string, code int, status string) error {
 		slog.Int("code", code),
 		slog.String("status", status),
 	)
+
 	return fmt.Errorf("failed response from %s with code %d", url, code)
 }
 
@@ -31,8 +31,7 @@ func LogParseJSONError(err error, method, requestURL string) {
 		"failed parsing",
 		slog.Any("error", err),
 		slog.String("method", method),
-		slog.String("url", requestURL),
-	)
+		slog.String("url", requestURL))
 }
 
 func LogUpdateInfo(telegramID, messageID int, updateType string) {
@@ -40,8 +39,7 @@ func LogUpdateInfo(telegramID, messageID int, updateType string) {
 		"received update",
 		slog.Int("from", telegramID),
 		slog.Int("message_id", messageID),
-		slog.String("type", updateType),
-	)
+		slog.String("type", updateType))
 }
 
 func LogMessageInfo(chatID int64, messageID int, hasText, hasImage, isPinned bool) {
@@ -51,8 +49,7 @@ func LogMessageInfo(chatID int64, messageID int, hasText, hasImage, isPinned boo
 		slog.Int("message_id", messageID),
 		slog.Bool("has_text", hasText),
 		slog.Bool("has_image", hasImage),
-		slog.Bool("is_pinned", isPinned),
-	)
+		slog.Bool("is_pinned", isPinned))
 }
 
 func LogMessageError(err error, chatID int64, messageID int) {
@@ -74,28 +71,36 @@ func LogRemoveFileWarn(err error, path string) {
 	sl.Log.Warn(
 		"failed to remove file",
 		slog.Any("error", err),
-		slog.String("path", path),
-	)
+		slog.String("path", path))
 }
 
 func LogBodyCloseWarn(err error) {
 	sl.Log.Warn(
 		"failed to close body",
-		slog.Any("error", err),
-	)
+		slog.Any("error", err))
 }
 
 func LogFileCloseWarn(err error) {
 	sl.Log.Warn(
 		"failed to close file",
-		slog.Any("error", err),
-	)
+		slog.Any("error", err))
 }
 
 func LogParseSelectError(err error, callback string) {
 	sl.Log.Error(
 		"failed to parse select value",
 		slog.Any("error", err),
-		slog.String("callback", callback),
-	)
+		slog.String("callback", callback))
+}
+
+func LogEncryptError(err error) {
+	sl.Log.Error(
+		"failed to encrypt data",
+		slog.Any("error", err))
+}
+
+func LogDecryptError(err error) {
+	sl.Log.Error(
+		"failed to decrypt data",
+		slog.Any("error", err))
 }

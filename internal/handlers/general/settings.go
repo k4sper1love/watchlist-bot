@@ -51,7 +51,7 @@ func HandleSettingsProcess(app models.App, session *models.Session) {
 
 	switch session.State {
 	case states.AwaitSettingsKinopoiskToken:
-		parseKinopoiskToken(app, session)
+		parser.ParseKinopoiskToken(app, session, HandleSettingsCommand)
 
 	case states.AwaitSettingsFilmsPageSize:
 		parser.ParseSettingsFilmsPageSize(app, session, requestSettingsFilmsPageSize, finishUpdatePageSize)
@@ -82,12 +82,6 @@ func parseLanguageSelect(app models.App, session *models.Session) {
 func requestKinopoiskToken(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestKinopoiskToken(session), keyboards.Cancel(session))
 	session.SetState(states.AwaitSettingsKinopoiskToken)
-}
-
-func parseKinopoiskToken(app models.App, session *models.Session) {
-	session.KinopoiskAPIToken = utils.ParseMessageString(app.Update)
-	app.SendMessage(messages.KinopoiskTokenSuccess(session), nil)
-	returnToSettingsMenu(app, session)
 }
 
 func requestSettingsFilmsPageSize(app models.App, session *models.Session) {

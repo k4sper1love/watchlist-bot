@@ -7,6 +7,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/security"
 	"net/http"
 	"net/url"
 )
@@ -20,10 +21,16 @@ func GetFilmsExcludeCollection(app models.App, session *models.Session) (*models
 }
 
 func getFilmsRequest(app models.App, session *models.Session, collectionID, currentPage, pageSize int) (*models.FilmsResponse, error) {
+	token, err := security.Decrypt(session.AccessToken)
+	if err != nil {
+		utils.LogDecryptError(err)
+		return nil, err
+	}
+
 	resp, err := client.Do(
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
-			HeaderValue:        session.AccessToken,
+			HeaderValue:        token,
 			Method:             http.MethodGet,
 			URL:                buildGetFilmsURL(app, session, collectionID, currentPage, pageSize),
 			ExpectedStatusCode: http.StatusOK,
@@ -44,10 +51,16 @@ func getFilmsRequest(app models.App, session *models.Session, collectionID, curr
 }
 
 func GetFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
+	token, err := security.Decrypt(session.AccessToken)
+	if err != nil {
+		utils.LogDecryptError(err)
+		return nil, err
+	}
+
 	resp, err := client.Do(
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
-			HeaderValue:        session.AccessToken,
+			HeaderValue:        token,
 			Method:             http.MethodGet,
 			URL:                fmt.Sprintf("%s/api/v1/films/%d", app.Config.APIHost, session.FilmDetailState.Film.ID),
 			ExpectedStatusCode: http.StatusOK,
@@ -68,10 +81,16 @@ func GetFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
 }
 
 func UpdateFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
+	token, err := security.Decrypt(session.AccessToken)
+	if err != nil {
+		utils.LogDecryptError(err)
+		return nil, err
+	}
+
 	resp, err := client.Do(
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
-			HeaderValue:        session.AccessToken,
+			HeaderValue:        token,
 			Method:             http.MethodPut,
 			URL:                fmt.Sprintf("%s/api/v1/films/%d", app.Config.APIHost, session.FilmDetailState.Film.ID),
 			Body:               session.FilmDetailState,
@@ -93,10 +112,16 @@ func UpdateFilm(app models.App, session *models.Session) (*apiModels.Film, error
 }
 
 func CreateFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
+	token, err := security.Decrypt(session.AccessToken)
+	if err != nil {
+		utils.LogDecryptError(err)
+		return nil, err
+	}
+
 	resp, err := client.Do(
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
-			HeaderValue:        session.AccessToken,
+			HeaderValue:        token,
 			Method:             http.MethodPost,
 			URL:                app.Config.APIHost + "/api/v1/films",
 			Body:               session.FilmDetailState,
@@ -118,10 +143,16 @@ func CreateFilm(app models.App, session *models.Session) (*apiModels.Film, error
 }
 
 func DeleteFilm(app models.App, session *models.Session) error {
+	token, err := security.Decrypt(session.AccessToken)
+	if err != nil {
+		utils.LogDecryptError(err)
+		return err
+	}
+
 	resp, err := client.Do(
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
-			HeaderValue:        session.AccessToken,
+			HeaderValue:        token,
 			Method:             http.MethodDelete,
 			URL:                fmt.Sprintf("%s/api/v1/films/%d", app.Config.APIHost, session.FilmDetailState.Film.ID),
 			ExpectedStatusCode: http.StatusOK,

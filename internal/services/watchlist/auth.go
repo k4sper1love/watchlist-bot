@@ -7,6 +7,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/security"
 	"log/slog"
 	"net/http"
 	"time"
@@ -53,7 +54,13 @@ func sendAuthRequest(app models.App, session *models.Session, endpoint string, e
 	return nil
 }
 
-func IsTokenValid(app models.App, token string) bool {
+func IsTokenValid(app models.App, encryptedToken string) bool {
+	token, err := security.Decrypt(encryptedToken)
+	if err != nil {
+		utils.LogDecryptError(err)
+		return false
+	}
+
 	resp, err := client.Do(
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
@@ -73,10 +80,16 @@ func IsTokenValid(app models.App, token string) bool {
 }
 
 func RefreshAccessToken(app models.App, session *models.Session) error {
+	token, err := security.Decrypt(session.RefreshToken)
+	if err != nil {
+		utils.LogDecryptError(err)
+		return err
+	}
+
 	resp, err := client.Do(
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
-			HeaderValue:        session.RefreshToken,
+			HeaderValue:        token,
 			Method:             http.MethodPost,
 			URL:                app.Config.APIHost + "/api/v1/auth/refresh",
 			ExpectedStatusCode: http.StatusOK,
@@ -93,15 +106,27 @@ func RefreshAccessToken(app models.App, session *models.Session) error {
 		return err
 	}
 
-	session.AccessToken = responseMap["access_token"].(string)
+	encryptedAccessToken, err := security.Encrypt(responseMap["access_token"].(string))
+	if err != nil {
+		utils.LogDecryptError(err)
+		return err
+	}
+
+	session.AccessToken = encryptedAccessToken
 	return nil
 }
 
 func Logout(app models.App, session *models.Session) error {
+	token, err := security.Decrypt(session.RefreshToken)
+	if err != nil {
+		utils.LogDecryptError(err)
+		return err
+	}
+
 	resp, err := client.Do(
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
-			HeaderValue:        session.RefreshToken,
+			HeaderValue:        token,
 			Method:             http.MethodPost,
 			URL:                app.Config.APIHost + "/api/v1/auth/logout",
 			ExpectedStatusCode: http.StatusOK,
