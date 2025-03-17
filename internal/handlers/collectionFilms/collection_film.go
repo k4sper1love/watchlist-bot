@@ -32,9 +32,9 @@ func handleFilmsWithContext(app models.App, session *models.Session) {
 	}
 }
 
-// addFilmToCollection adds a film to a collection using the Watchlist service.
+// AddFilmToCollection adds a film to a collection using the Watchlist service.
 // Sends a success message upon completion and clears the session states.
-func addFilmToCollection(app models.App, session *models.Session) {
+func AddFilmToCollection(app models.App, session *models.Session) {
 	collectionFilm, err := watchlist.AddCollectionFilm(app, session)
 	if err != nil {
 		app.SendMessage(messages.CreateFilmFailure(session), keyboards.Back(session, states.CallMenuFilms))

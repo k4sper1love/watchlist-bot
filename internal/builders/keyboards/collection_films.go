@@ -54,6 +54,7 @@ func AddCollectionToFilm(session *models.Session) *tgbotapi.InlineKeyboardMarkup
 			k.AddReset(states.CallAddCollectionToFilmReset)
 		}).
 		AddCollectionFilmSelectCollection(session.CollectionsState.Collections).
+		AddCollectionsNew().
 		AddNavigation(state.CurrentPage, state.LastPage, states.AddCollectionToFilmPage, true).
 		AddBack(states.CallAddCollectionToFilmBack).
 		Build(session.Lang)
@@ -66,6 +67,7 @@ func CollectionToFilmNotFound(session *models.Session) *tgbotapi.InlineKeyboardM
 		AddIf(session.CollectionsState.Name != "", func(k *Keyboard) {
 			k.AddAgain(states.CallAddCollectionToFilmAgain)
 		}).
+		AddCollectionsNew().
 		AddIf(session.CollectionsState.Name == "", func(k *Keyboard) {
 			k.AddBack(states.CallAddCollectionToFilmBack)
 		}).

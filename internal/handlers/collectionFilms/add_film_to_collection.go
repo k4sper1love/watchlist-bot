@@ -114,7 +114,7 @@ func handleAddFilmToCollectionSelect(app models.App, session *models.Session, ca
 		app.SendMessage(messages.FilmsFailure(session), keyboards.Back(session, states.CallFilmToCollectionOptionExisting))
 	} else {
 		session.FilmDetailState.Film.ID = id
-		addFilmToCollection(app, session)
+		AddFilmToCollection(app, session)
 	}
 }
 
