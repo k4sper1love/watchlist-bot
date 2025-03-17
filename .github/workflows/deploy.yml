@@ -13,14 +13,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout Project Files
       - name: Checkout Project Files
         uses: actions/checkout@v3
 
+      # 2. Configure SSH Access
       - name: Configure SSH Access
         uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      # 3. Set VERSION and Create Tag
       - name: Set VERSION and Create Tag
         run: |
           VERSION=$(date +'%Y%m%d%H%M%S')
@@ -32,6 +35,7 @@ jobs:
           git tag -a "v${VERSION}" -m "Release version ${VERSION}"
           git push origin "v${VERSION}"
 
+      # 4. Upload Project to Server
       - name: Upload Project to Server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
@@ -40,6 +44,7 @@ jobs:
           
           scp -o StrictHostKeyChecking=no -r ./* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/watchlist-bot
           
+      # 5. Deploy Application with Docker Compose
       - name: Deploy Application with Docker Compose
         run: |
           ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=5 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
@@ -50,15 +55,19 @@ jobs:
           
             export VERSION=${{ env.VERSION }}
             export ENVIRONMENT=${{ secrets.ENVIRONMENT }}
+            export POSTGRES_DB=${{ secrets.POSTGRES_DB }}  
+            export POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
+            export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
+            export POSTGRES_USER=${{ secrets.POSTGRES_USER }}  
+            export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            export LOCALES_DIR=${{ secrets.LOCALES_DIR }}
+            export BOT_TOKEN=${{ secrets.BOT_TOKEN }}
+            export ROOT_TELEGRAM_ID = ${{ secrets.ROOT_TELEGRAM_ID }}
+            export MASTER_KEY = ${{ secrets.MASTER_KEY }}
             export API_HOST=${{ secrets.API_HOST }}  
             export API_SECRET=${{ secrets.API_SECRET }}
-            export BOT_TOKEN=${{ secrets.BOT_TOKEN }}
-            export POSTGRES_USER=${{ secrets.POSTGRES_USER }}  
-            export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}  
-            export POSTGRES_DB=${{ secrets.POSTGRES_DB }}  
-            export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
-            export POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
-            export KINOPOISK_API_TOKEN=${{ secrets.KINOPOISK_API_TOKEN }}
+            export YOUTUBE_API_TOKEN = ${{ secrets.YOUTUBE_API_TOKEN }}
+            export IMDB_API_TOKEN = ${{ secrets.IMDB_API_TOKEN }}
           
             if [[ "${{ secrets.FULL_REBUILD }}" == "true" ]]; then
               docker-compose down --rmi all

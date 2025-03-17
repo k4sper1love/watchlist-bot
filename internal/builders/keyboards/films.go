@@ -7,6 +7,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
+// Predefined buttons for updating film details.
 var updateFilmButtons = []Button{
 	{"", "image", states.CallUpdateFilmImage, "", true},
 	{"", "title", states.CallUpdateFilmTitle, "", true},
@@ -18,11 +19,13 @@ var updateFilmButtons = []Button{
 	{"", "viewed", states.CallUpdateFilmViewed, "", true},
 }
 
+// Predefined buttons for updating film details after marking it as viewed.
 var updateFilmAfterViewedButtons = []Button{
 	{"", "userRating", states.CallUpdateFilmUserRating, "", true},
 	{"", "review", states.CallUpdateFilmReview, "", true},
 }
 
+// Films creates an inline keyboard for managing films.
 func Films(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddIf(len(session.FilmsState.Films) > 0, func(k *Keyboard) {
@@ -44,6 +47,7 @@ func Films(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineK
 		Build(session.Lang)
 }
 
+// FindFilms creates an inline keyboard for selecting films with navigation and back options.
 func FindFilms(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddFilmSelect(session).
@@ -52,6 +56,7 @@ func FindFilms(session *models.Session, currentPage, lastPage int) *tgbotapi.Inl
 		Build(session.Lang)
 }
 
+// FindNewFilm creates an inline keyboard for selecting new films with navigation and back options.
 func FindNewFilm(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddFindNewFilmSelect(session).
@@ -60,6 +65,7 @@ func FindNewFilm(session *models.Session, currentPage, lastPage int) *tgbotapi.I
 		Build(session.Lang)
 }
 
+// FilmDetail creates an inline keyboard for managing a specific film's details.
 func FilmDetail(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	film := session.FilmDetailState.Film
 	return New().
@@ -82,6 +88,7 @@ func FilmDetail(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		Build(session.Lang)
 }
 
+// FilmManage creates an inline keyboard for managing a specific film.
 func FilmManage(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddIf(session.Context == states.CtxCollection, func(k *Keyboard) {
@@ -93,6 +100,7 @@ func FilmManage(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		Build(session.Lang)
 }
 
+// FilmNew creates an inline keyboard for creating a new film.
 func FilmNew(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddNewFilmManually().
@@ -102,6 +110,7 @@ func FilmNew(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		Build(session.Lang)
 }
 
+// FilmUpdate creates an inline keyboard for updating a film's details.
 func FilmUpdate(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddUpdateFilmURL().
@@ -113,6 +122,7 @@ func FilmUpdate(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		Build(session.Lang)
 }
 
+// FilmFilters creates an inline keyboard for managing film filters.
 func FilmFilters(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	filter := session.GetFilmFiltersByCtx()
 	return New().
@@ -124,6 +134,7 @@ func FilmFilters(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		Build(session.Lang)
 }
 
+// FilmsSorting creates an inline keyboard for managing film sorting options.
 func FilmsSorting(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	sorting := session.GetFilmSortingByCtx()
 	return New().
@@ -135,6 +146,7 @@ func FilmsSorting(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		Build(session.Lang)
 }
 
+// FilmsNotFound creates an inline keyboard for handling cases where no films are found.
 func FilmsNotFound(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddAgain(states.CallFindFilmsAgain).
@@ -142,6 +154,7 @@ func FilmsNotFound(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		Build(session.Lang)
 }
 
+// NewFilmChangeToken creates an inline keyboard for changing a Kinopoisk token during film creation.
 func NewFilmChangeToken(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddChangeToken().
@@ -149,6 +162,7 @@ func NewFilmChangeToken(session *models.Session) *tgbotapi.InlineKeyboardMarkup 
 		Build(session.Lang)
 }
 
+// FilmFilterSwitch creates an inline keyboard for switching a specific film filter.
 func FilmFilterSwitch(session *models.Session, filterType string) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddSurvey().
@@ -157,6 +171,7 @@ func FilmFilterSwitch(session *models.Session, filterType string) *tgbotapi.Inli
 		Build(session.Lang)
 }
 
+// FilmFilterRange creates an inline keyboard for setting a range for a specific film filter.
 func FilmFilterRange(session *models.Session, filterType string) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddResetFilmsFilter(session, filterType).

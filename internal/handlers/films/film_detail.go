@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+// HandleFilmDetailCommand handles the command for viewing detailed information about a specific film.
+// Sends a message with the film's details, including an image and navigation buttons.
 func HandleFilmDetailCommand(app models.App, session *models.Session) {
 	if session.FilmDetailState.HasIndex() {
 		session.FilmDetailState.Film = session.FilmsState.Films[session.FilmDetailState.Index]
@@ -21,6 +23,8 @@ func HandleFilmDetailCommand(app models.App, session *models.Session) {
 	)
 }
 
+// HandleFilmDetailButtons handles button interactions related to the detailed view of a film.
+// Supports actions like going back, marking as viewed, adding to favorites, and pagination.
 func HandleFilmDetailButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
@@ -42,6 +46,8 @@ func HandleFilmDetailButtons(app models.App, session *models.Session) {
 	}
 }
 
+// handleFilmDetailPagination processes pagination actions for navigating between films in the detailed view.
+// Updates the current film index or reloads the film list when reaching the boundaries of the current page.
 func handleFilmDetailPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
 	case states.CallFilmDetailPageNext:
@@ -68,11 +74,13 @@ func handleFilmDetailPagination(app models.App, session *models.Session, callbac
 	HandleFilmDetailCommand(app, session)
 }
 
+// makeFavoriteFilm toggles the favorite status of the current film and updates it.
 func makeFavoriteFilm(app models.App, session *models.Session) {
 	session.FilmDetailState.SetFavorite(!session.FilmDetailState.Film.IsFavorite)
 	HandleUpdateFilm(app, session, HandleFilmDetailCommand)
 }
 
+// getFilmsLastIndex calculates the last index of the films list in the current session state.
 func getFilmsLastIndex(session *models.Session) int {
 	return len(session.FilmsState.Films) - 1
 }

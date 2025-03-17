@@ -13,10 +13,14 @@ import (
 	"time"
 )
 
+// GetItemID calculates the global item ID based on the index, current page, and page size.
+// It is used for pagination in lists of items (e.g., films or collections).
 func GetItemID(index, currentPage, pageSize int) int {
 	return (index + 1) + (currentPage-1)*pageSize
 }
 
+// IsBotMessage checks if the update originates from a bot.
+// It returns true if the message or callback query is sent by a bot.
 func IsBotMessage(update *tgbotapi.Update) bool {
 	if update == nil {
 		return false
@@ -25,6 +29,8 @@ func IsBotMessage(update *tgbotapi.Update) bool {
 		(update.CallbackQuery != nil && update.CallbackQuery.From.IsBot)
 }
 
+// ParseMessageID extracts the message ID from the update.
+// It handles both direct messages and callback queries with associated messages.
 func ParseMessageID(update *tgbotapi.Update) int {
 	if update == nil {
 		return -1
@@ -39,6 +45,8 @@ func ParseMessageID(update *tgbotapi.Update) int {
 	}
 }
 
+// ParseTelegramID extracts the Telegram user ID from the update.
+// It handles both direct messages and callback queries.
 func ParseTelegramID(update *tgbotapi.Update) int {
 	if update == nil {
 		return -1
@@ -53,6 +61,8 @@ func ParseTelegramID(update *tgbotapi.Update) int {
 	}
 }
 
+// ParseTelegramName extracts the first name of the Telegram user from the update.
+// If no name is available, it defaults to "Guest".
 func ParseTelegramName(update *tgbotapi.Update) string {
 	if update == nil {
 		return "Guest"
@@ -67,6 +77,8 @@ func ParseTelegramName(update *tgbotapi.Update) string {
 	}
 }
 
+// ParseTelegramUsername extracts the username of the Telegram user from the update.
+// If no username is available, it returns an empty string.
 func ParseTelegramUsername(update *tgbotapi.Update) string {
 	if update == nil {
 		return ""
@@ -81,6 +93,8 @@ func ParseTelegramUsername(update *tgbotapi.Update) string {
 	}
 }
 
+// ParseLanguageCode extracts the language code of the Telegram user from the update.
+// If no language code is available, it defaults to "en" (English).
 func ParseLanguageCode(update *tgbotapi.Update) string {
 	if update == nil {
 		return "en"
@@ -95,6 +109,8 @@ func ParseLanguageCode(update *tgbotapi.Update) string {
 	}
 }
 
+// ParseCallback extracts the callback data from the update.
+// It returns an empty string if no callback query is present.
 func ParseCallback(update *tgbotapi.Update) string {
 	if update != nil && update.CallbackQuery != nil {
 		return update.CallbackQuery.Data
@@ -102,6 +118,8 @@ func ParseCallback(update *tgbotapi.Update) string {
 	return ""
 }
 
+// ParseMessageCommand extracts the command from the message in the update.
+// It handles both direct messages and callback queries with associated messages.
 func ParseMessageCommand(update *tgbotapi.Update) string {
 	if update == nil {
 		return ""
@@ -116,6 +134,8 @@ func ParseMessageCommand(update *tgbotapi.Update) string {
 	}
 }
 
+// ParseMessageString extracts the text content of the message from the update.
+// It handles both direct messages and callback queries with associated messages.
 func ParseMessageString(update *tgbotapi.Update) string {
 	if update == nil {
 		return ""
@@ -130,6 +150,8 @@ func ParseMessageString(update *tgbotapi.Update) string {
 	}
 }
 
+// ParseMessageInt parses the message text as an integer.
+// If parsing fails, it returns -1.
 func ParseMessageInt(update *tgbotapi.Update) int {
 	num, err := strconv.Atoi(ParseMessageString(update))
 	if err != nil {
@@ -138,6 +160,8 @@ func ParseMessageInt(update *tgbotapi.Update) int {
 	return num
 }
 
+// ParseMessageFloat parses the message text as a float64.
+// If parsing fails, it returns -1.
 func ParseMessageFloat(update *tgbotapi.Update) float64 {
 	num, err := strconv.ParseFloat(ParseMessageString(update), 64)
 	if err != nil {
@@ -146,26 +170,33 @@ func ParseMessageFloat(update *tgbotapi.Update) float64 {
 	return num
 }
 
+// IsSkip checks if the callback query corresponds to a "skip" action.
 func IsSkip(update *tgbotapi.Update) bool {
 	return ParseCallback(update) == states.CallProcessSkip
 }
 
+// IsCancel checks if the callback query corresponds to a "cancel" action.
 func IsCancel(update *tgbotapi.Update) bool {
 	return ParseCallback(update) == states.CallProcessCancel
 }
 
+// IsReset checks if the callback query corresponds to a "reset" action.
 func IsReset(update *tgbotapi.Update) bool {
 	return ParseCallback(update) == states.CallProcessReset
 }
 
+// IsAgree checks if the callback query corresponds to an "agree" action.
 func IsAgree(update *tgbotapi.Update) bool {
 	return ParseCallback(update) == states.CallYes
 }
 
+// IsDecrease checks if the callback query corresponds to a "decrease" action.
 func IsDecrease(update *tgbotapi.Update) bool {
 	return ParseCallback(update) == states.CallDecrease
 }
 
+// ExtractKinopoiskQuery extracts the query key and ID from a Kinopoisk URL.
+// It supports both path-based and query-parameter-based IDs.
 func ExtractKinopoiskQuery(rawUrl string) (string, string, error) {
 	parsedUrl, err := url.Parse(rawUrl)
 	if err != nil {
@@ -189,6 +220,8 @@ func ExtractKinopoiskQuery(rawUrl string) (string, string, error) {
 	return "", "", fmt.Errorf("ID not found")
 }
 
+// SplitTextByLength splits a string into two parts based on a maximum length.
+// It attempts to split at spaces or newlines for better readability.
 func SplitTextByLength(text string, maxLength int) (string, string) {
 	runes := []rune(text)
 
@@ -213,6 +246,8 @@ func SplitTextByLength(text string, maxLength int) (string, string) {
 	return firstPart, secondPart
 }
 
+// LastIndexRune finds the last occurrence of a target rune in a slice of runes within a given range.
+// It returns the index of the rune or -1 if the rune is not found.
 func LastIndexRune(runes []rune, maxLength int, target rune) int {
 	for i := maxLength - 1; i >= 0; i-- {
 		if runes[i] == target {
@@ -222,16 +257,20 @@ func LastIndexRune(runes []rune, maxLength int, target rune) int {
 	return -1
 }
 
+// ExtractYoutubeVideoID extracts the video ID from a YouTube URL.
+// It supports both "youtu.be" short URLs and standard URLs with a "v" query parameter.
 func ExtractYoutubeVideoID(rawUrl string) (string, error) {
 	parsedURL, err := url.Parse(rawUrl)
 	if err != nil {
 		return "", err
 	}
 
+	// Handle short URLs like "https://youtu.be/<videoID>".
 	if parsedURL.Host == "youtu.be" {
 		return parsedURL.Path[1:], nil
 	}
 
+	// Handle standard URLs with a "v" query parameter.
 	query := parsedURL.Query()
 	videoID := query.Get("v")
 	if videoID == "" {
@@ -241,11 +280,13 @@ func ExtractYoutubeVideoID(rawUrl string) (string, error) {
 	return videoID, nil
 }
 
+// Round rounds a floating-point number to two decimal places.
 func Round(v float64) float64 {
 	rounded, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", v), 64)
 	return rounded
 }
 
+// FormatTextDate converts an ISO 8601 date string into a human-readable format ("DD.MM.YYYY HH:MM").
 func FormatTextDate(date string) string {
 	parsedDate, err := time.Parse(time.RFC3339, date)
 	if err != nil {
@@ -254,6 +295,7 @@ func FormatTextDate(date string) string {
 	return parsedDate.Format("02.01.2006 15:04")
 }
 
+// ParseISO8601Duration parses an ISO 8601 duration string (e.g., "PT1H30M") into a formatted duration string (e.g., "01:30:00").
 func ParseISO8601Duration(isoDuration string) string {
 	duration, err := time.ParseDuration(strings.ReplaceAll(strings.ToLower(isoDuration), "pt", ""))
 	if err != nil {
@@ -270,6 +312,8 @@ func ParseISO8601Duration(isoDuration string) string {
 	return fmt.Sprintf("%02d:%02d", minutes, seconds)
 }
 
+// ParseSupportedLanguages lists all supported languages by reading JSON files from a directory.
+// Each file name (without the ".json" extension) represents a supported language code.
 func ParseSupportedLanguages(dir string) ([]string, error) {
 	files, err := os.ReadDir(dir)
 	if err != nil {
@@ -286,6 +330,7 @@ func ParseSupportedLanguages(dir string) ([]string, error) {
 	return languages, nil
 }
 
+// BoolToEmoji converts a boolean value to a corresponding emoji ("✔️" for true, "✖️" for false).
 func BoolToEmoji(value bool) string {
 	if value {
 		return "✔️"
@@ -293,6 +338,7 @@ func BoolToEmoji(value bool) string {
 	return "✖️"
 }
 
+// ViewedToEmojiColored converts a boolean value to a colored emoji ("✅" for true, "👀" for false).
 func ViewedToEmojiColored(value bool) string {
 	if value {
 		return "✅"
@@ -300,6 +346,7 @@ func ViewedToEmojiColored(value bool) string {
 	return "👀"
 }
 
+// BoolToEmojiColored converts a boolean value to a colored emoji ("✅" for true, "❌" for false).
 func BoolToEmojiColored(value bool) string {
 	if value {
 		return "✅"
@@ -307,6 +354,7 @@ func BoolToEmojiColored(value bool) string {
 	return "❌"
 }
 
+// BoolToStar converts a boolean value to a star emoji ("⭐" for true, "☆" for false).
 func BoolToStar(value bool) string {
 	if value {
 		return "⭐"
@@ -314,6 +362,7 @@ func BoolToStar(value bool) string {
 	return "☆"
 }
 
+// BoolToStarOrEmpty converts a boolean value to a star emoji or an empty string ("⭐" for true, "" for false).
 func BoolToStarOrEmpty(value bool) string {
 	if value {
 		return "⭐"
@@ -321,14 +370,15 @@ func BoolToStarOrEmpty(value bool) string {
 	return ""
 }
 
+// SortDirectionToEmoji converts a sort direction string to a corresponding emoji ("⬇️" for descending, "⬆️" for ascending).
 func SortDirectionToEmoji(value string) string {
 	if strings.HasPrefix(value, "-") {
 		return "⬇️"
 	}
-
 	return "⬆️"
 }
 
+// NumberToEmoji converts a number into a sequence of emoji digits (e.g., "123" -> "1️⃣2️⃣3️⃣").
 func NumberToEmoji(number int) string {
 	emojis := []string{"0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"}
 	if number < 10 {
@@ -344,6 +394,8 @@ func NumberToEmoji(number int) string {
 	return result
 }
 
+// GetLogFilePath constructs the log file path for a user based on their ID.
+// It checks if the log file exists and returns an error if it does not.
 func GetLogFilePath(userID int) (string, error) {
 	logFile := filepath.Join("logs", fmt.Sprintf("user_%d.log", userID))
 	if _, err := os.Stat(logFile); os.IsNotExist(err) {
@@ -352,6 +404,8 @@ func GetLogFilePath(userID int) (string, error) {
 	return logFile, nil
 }
 
+// CloseBody ensures that an HTTP response body is closed safely.
+// It logs a warning if an error occurs during closing.
 func CloseBody(Body io.ReadCloser) {
 	if Body == nil {
 		return
@@ -360,6 +414,8 @@ func CloseBody(Body io.ReadCloser) {
 	}
 }
 
+// CloseFile ensures that a file is closed safely.
+// It logs a warning if an error occurs during closing.
 func CloseFile(file *os.File) {
 	if file == nil {
 		return
@@ -368,6 +424,8 @@ func CloseFile(file *os.File) {
 	}
 }
 
+// RemoveFile removes a file at the specified path.
+// It logs a warning if an error occurs during removal.
 func RemoveFile(path string) {
 	if path == "" {
 		return
@@ -376,6 +434,7 @@ func RemoveFile(path string) {
 	}
 }
 
+// CalculateOffset calculates the offset for pagination based on the current page and page size.
 func CalculateOffset(page, pageSize int) int {
 	return (page - 1) * pageSize
 }

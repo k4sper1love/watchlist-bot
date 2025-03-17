@@ -1,3 +1,6 @@
+// Package main initializes and runs the Watchlist bot application.
+//
+// It serves as the entry point for the bot, handling initialization and error logging.
 package main
 
 import (
@@ -6,6 +9,8 @@ import (
 	"os"
 )
 
+// main is the entry point of the application.
+// It initializes and runs the bot, logging any critical errors that cause termination.
 func main() {
 	if err := bot.Run(); err != nil {
 		sl.Log.Error("application terminated due to an error")

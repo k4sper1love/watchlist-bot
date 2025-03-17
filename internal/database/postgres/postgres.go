@@ -8,8 +8,10 @@ import (
 	"log/slog"
 )
 
-var db *gorm.DB
+var db *gorm.DB // Global database connection instance
 
+// ConnectDatabase establishes a connection to the PostgreSQL database using the provided configuration.
+// It also performs automatic migration to ensure the database schema is up-to-date.
 func ConnectDatabase(config *models.Config) error {
 	var err error
 	db, err = gorm.Open(postgres.Open(config.DatabaseURL), &gorm.Config{})
@@ -18,9 +20,12 @@ func ConnectDatabase(config *models.Config) error {
 		return err
 	}
 
+	// Perform automatic migration to update the database schema
 	return autoMigrate()
 }
 
+// autoMigrate performs automatic migration for all defined models.
+// Ensures that the database schema matches the structure of the models.
 func autoMigrate() error {
 	return db.AutoMigrate(
 		&models.Feedback{},
@@ -38,10 +43,13 @@ func autoMigrate() error {
 	)
 }
 
+// GetDatabase returns the global database connection instance.
+// This function is used to access the database throughout the application.
 func GetDatabase() *gorm.DB {
 	return db
 }
 
+// SaveRecords saves multiple records to the database.
 func SaveRecords(records ...interface{}) {
 	for _, record := range records {
 		if err := db.Save(record).Error; err != nil {

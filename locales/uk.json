@@ -44,11 +44,9 @@
   "changeToken": {
     "other": "Змінити токен"
   },
-  "token403": {
-    "other": "Ви досягли денного ліміту використання Kinopoisk"
-  },
-  "token401": {
-    "other": "Невірний токен Kinopoisk"
+  "tokenCodeError": {
+    "403": "Ви досягли денного ліміту використання Kinopoisk",
+    "401": "Невірний токен Kinopoisk"
   },
   "tokenRequestInfo": {
     "other": "Отримайте токен у @kinopoiskdev_bot для роботи з Kinopoisk"

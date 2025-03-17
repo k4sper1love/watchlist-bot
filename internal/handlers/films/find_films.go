@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+// HandleFindFilmsCommand handles the command for searching and listing films by title.
+// Retrieves paginated films matching the search criteria and sends a message with their details and navigation buttons.
 func HandleFindFilmsCommand(app models.App, session *models.Session) {
 	if metadata, err := getFilms(app, session); err != nil {
 		app.SendMessage(messages.FilmsFailure(session), keyboards.FilmsNotFound(session))
@@ -17,6 +19,8 @@ func HandleFindFilmsCommand(app models.App, session *models.Session) {
 	}
 }
 
+// HandleFindFilmsButtons handles button interactions related to the search results of films.
+// Supports actions like going back, refreshing the search, and pagination.
 func HandleFindFilmsButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
@@ -36,6 +40,8 @@ func HandleFindFilmsButtons(app models.App, session *models.Session) {
 	}
 }
 
+// handleFindFilmsPagination processes pagination actions for the search results of films.
+// Updates the current page in the session and reloads the films list.
 func handleFindFilmsPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
 	case states.CallFindFilmsPageNext:

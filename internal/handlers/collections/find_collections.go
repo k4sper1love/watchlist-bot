@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+// HandleFindCollectionsCommand handles the command for searching and listing collections by name.
+// Retrieves paginated collections matching the search criteria and sends a message with their details and navigation buttons.
 func HandleFindCollectionsCommand(app models.App, session *models.Session) {
 	if metadata, err := getCollections(app, session); err != nil {
 		app.SendMessage(messages.CollectionsFailure(session), keyboards.Back(session, states.CallFindCollectionsBack))
@@ -17,6 +19,8 @@ func HandleFindCollectionsCommand(app models.App, session *models.Session) {
 	}
 }
 
+// HandleFindCollectionsButtons handles button interactions related to the collection search results.
+// Supports actions like going back, refreshing the search, and pagination.
 func HandleFindCollectionsButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
@@ -36,6 +40,8 @@ func HandleFindCollectionsButtons(app models.App, session *models.Session) {
 	}
 }
 
+// handleFindCollectionPagination processes pagination actions for the search results of collections.
+// Updates the current page in the session and reloads the collections list.
 func handleFindCollectionPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
 	case states.CallFindCollectionsPageNext:

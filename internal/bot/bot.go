@@ -1,3 +1,6 @@
+// Package bot provides functionality for running and managing the Telegram bot.
+//
+// It handles initialization, updates processing, and interaction with other components like the database and translator.
 package bot
 
 import (
@@ -13,11 +16,13 @@ import (
 	"log/slog"
 )
 
+// Run initializes and starts the bot application.
+// It sets up the logger, loads configuration, connects to the database, initializes the translator, and starts the bot.
 func Run() error {
 	sl.SetupLogger("dev")
 	sl.Log.Info("starting application...")
 
-	app, err := config.InitAppConfig()
+	app, err := config.Init()
 	if err != nil {
 		return err
 	}
@@ -30,8 +35,7 @@ func Run() error {
 	}
 	sl.Log.Info("database connection established successfully")
 
-	err = translator.Init(app.Config.LocalesDir)
-	if err != nil {
+	if err = translator.Init(app.Config.LocalesDir); err != nil {
 		return err
 	}
 	sl.Log.Info("translator initialized successfully")
@@ -39,6 +43,8 @@ func Run() error {
 	return startBot(app)
 }
 
+// startBot initializes the Telegram bot API and starts processing updates.
+// It authorizes the bot, fetches updates, and processes them in a loop.
 func startBot(app *models.App) error {
 	bot, err := tgbotapi.NewBotAPI(app.Config.BotToken)
 	if err != nil {
@@ -59,6 +65,8 @@ func startBot(app *models.App) error {
 	return nil
 }
 
+// fetchUpdates retrieves updates from the Telegram bot API.
+// It configures the update channel with a timeout and returns the channel for processing.
 func fetchUpdates(bot *tgbotapi.BotAPI) (tgbotapi.UpdatesChannel, error) {
 	updateConfig := tgbotapi.NewUpdate(0)
 	updateConfig.Timeout = 60
@@ -71,6 +79,8 @@ func fetchUpdates(bot *tgbotapi.BotAPI) (tgbotapi.UpdatesChannel, error) {
 	return updates, nil
 }
 
+// processUpdates processes incoming updates from the Telegram bot API.
+// It filters out bot messages and delegates handling to the appropriate handlers.
 func processUpdates(app *models.App, updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
 		if utils.IsBotMessage(&update) {
@@ -82,6 +92,8 @@ func processUpdates(app *models.App, updates tgbotapi.UpdatesChannel) {
 	}
 }
 
+// updateAppContext updates the application context based on the current Telegram update.
+// It sets the logger and updates the app's state with the latest update.
 func updateAppContext(app *models.App, update *tgbotapi.Update) {
 	userID := utils.ParseTelegramID(update)
 

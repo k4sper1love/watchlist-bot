@@ -11,6 +11,8 @@ import (
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 )
 
+// HandleFeedbackDetailCommand handles the command for viewing detailed information about a specific feedback.
+// Retrieves the feedback details and sends a message with its information and an appropriate keyboard.
 func HandleFeedbackDetailCommand(app models.App, session *models.Session) {
 	if feedback, err := postgres.GetFeedbackByID(session.AdminState.FeedbackID); err != nil {
 		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallAdminFeedback))
@@ -19,6 +21,8 @@ func HandleFeedbackDetailCommand(app models.App, session *models.Session) {
 	}
 }
 
+// HandleFeedbackDetailButtons handles button interactions related to the feedback detail view.
+// Supports actions like going back or deleting the feedback.
 func HandleFeedbackDetailButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
@@ -31,6 +35,8 @@ func HandleFeedbackDetailButtons(app models.App, session *models.Session) {
 	}
 }
 
+// handleFeedbackDetailDelete processes the deletion of a specific feedback.
+// Deletes the feedback from the database and navigates back to the feedback list.
 func handleFeedbackDetailDelete(app models.App, session *models.Session) {
 	if err := postgres.DeleteFeedbackByID(session.AdminState.FeedbackID); err != nil {
 		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallAdminFeedback))

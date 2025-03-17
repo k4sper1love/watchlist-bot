@@ -9,11 +9,15 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
+// HandleDeleteCollectionCommand handles the command for deleting a collection.
+// Sends a confirmation message and sets the session state to await user confirmation.
 func HandleDeleteCollectionCommand(app models.App, session *models.Session) {
 	app.SendMessage(messages.DeleteCollection(session), keyboards.Survey(session))
 	session.SetState(states.AwaitDeleteCollectionConfirm)
 }
 
+// HandleDeleteCollectionProcess processes the workflow for deleting a collection.
+// Handles states like awaiting confirmation from the user.
 func HandleDeleteCollectionProcess(app models.App, session *models.Session) {
 	switch session.State {
 	case states.AwaitDeleteCollectionConfirm:
@@ -22,6 +26,7 @@ func HandleDeleteCollectionProcess(app models.App, session *models.Session) {
 	}
 }
 
+// parseDeleteCollectionConfirm processes the user's response to the deletion confirmation.
 func parseDeleteCollectionConfirm(app models.App, session *models.Session) {
 	if !utils.IsAgree(app.Update) {
 		app.SendMessage(messages.CancelAction(session), nil)

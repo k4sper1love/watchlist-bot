@@ -5,6 +5,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 )
 
+// SortingDirection creates an inline keyboard for managing sorting direction.
 func SortingDirection(session *models.Session, sorting *models.Sorting) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddSortingDirection().

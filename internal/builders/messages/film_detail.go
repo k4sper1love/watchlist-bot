@@ -11,6 +11,7 @@ import (
 	"unicode/utf8"
 )
 
+// FilmDetail generates a detailed message about a specific film.
 func FilmDetail(session *models.Session) string {
 	film := session.FilmDetailState.Film
 	return fmt.Sprintf("%s%s%s\n\n%s%s%s%s%s",
@@ -27,6 +28,7 @@ func FilmDetail(session *models.Session) string {
 		formatOptionalBool(toItalic(session.CollectionDetailState.Collection.Name), session.Context == states.CtxCollection, "📚 %s\n\n"))
 }
 
+// FilmGeneral generates a general message about a film, including its title, year, viewed status, and details.
 func FilmGeneral(session *models.Session, film *apiModels.Film, needViewed bool) string {
 	return fmt.Sprintf("%s%s | %s\n%s%s\n",
 		toBold(film.Title),
@@ -36,6 +38,7 @@ func FilmGeneral(session *models.Session, film *apiModels.Film, needViewed bool)
 		formatFilmGeneralDescription(session, film))
 }
 
+// formatFilmDetails formats detailed information about a film, such as ID, genre, rating, and user rating.
 func formatFilmDetails(film *apiModels.Film) string {
 	var details []string
 
@@ -58,6 +61,7 @@ func formatFilmDetails(film *apiModels.Film) string {
 	return ""
 }
 
+// formatFilmGeneralDetails formats general details about a film, such as genre, rating, and user rating.
 func formatFilmGeneralDetails(film *apiModels.Film, needViewed bool) string {
 	var details []string
 
@@ -77,6 +81,8 @@ func formatFilmGeneralDetails(film *apiModels.Film, needViewed bool) string {
 	return ""
 }
 
+// formatFilmGeneralDescription formats the description of a film, truncating it if necessary.
+// Handles special cases for YouTube videos by extracting the creator's name from the description.
 func formatFilmGeneralDescription(session *models.Session, film *apiModels.Film) string {
 	if film.Description == "" {
 		return ""

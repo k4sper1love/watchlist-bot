@@ -6,6 +6,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 )
 
+// Predefined buttons for managing user settings.
 var settingsButtons = []Button{
 	{"🈳", "language", states.CallSettingsLanguage, "", true},
 	{"🌐", "kinopoiskToken", states.CallSettingsKinopoiskToken, "", true},
@@ -14,6 +15,7 @@ var settingsButtons = []Button{
 	{"🔢", "objectsPageSize", states.CallSettingsObjectsPageSize, "", true},
 }
 
+// Settings creates an inline keyboard for managing user settings.
 func Settings(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddButtons(settingsButtons...).
@@ -21,6 +23,7 @@ func Settings(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		Build(session.Lang)
 }
 
+// SettingsLanguageSelect creates an inline keyboard for selecting a language in the settings.
 func SettingsLanguageSelect(session *models.Session, languages []string) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddLanguageSelect(languages, states.SelectLang).

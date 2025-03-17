@@ -13,6 +13,8 @@ import (
 	"strings"
 )
 
+// HandleFindNewFilmCommand handles the command for searching new films from Kinopoisk.
+// Retrieves paginated films and sends a message with their details and navigation buttons.
 func HandleFindNewFilmCommand(app models.App, session *models.Session) {
 	if metadata, err := getFilmsFromKinopoisk(session); err != nil {
 		handleKinopoiskError(app, session, err)
@@ -22,6 +24,8 @@ func HandleFindNewFilmCommand(app models.App, session *models.Session) {
 	}
 }
 
+// HandleFindNewFilmButtons handles button interactions related to the search results of new films.
+// Supports actions like going back, refreshing the search, pagination, and selecting specific films.
 func HandleFindNewFilmButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
@@ -45,6 +49,8 @@ func HandleFindNewFilmButtons(app models.App, session *models.Session) {
 	}
 }
 
+// handleFindNewFilmPagination processes pagination actions for the search results of new films.
+// Updates the current page in the session and reloads the films list.
 func handleFindNewFilmPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
 	case states.CallFindNewFilmPageNext:
@@ -79,6 +85,8 @@ func handleFindNewFilmPagination(app models.App, session *models.Session, callba
 	HandleFindNewFilmCommand(app, session)
 }
 
+// handleFindNewFilmSelect processes the selection of a film from the search results.
+// Parses the film index and navigates to the detailed view of the selected film.
 func handleFindNewFilmSelect(app models.App, session *models.Session, callback string) {
 	if index, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectNewFilm)); err != nil {
 		utils.LogParseSelectError(err, callback)
@@ -89,6 +97,8 @@ func handleFindNewFilmSelect(app models.App, session *models.Session, callback s
 	}
 }
 
+// getFilmsFromKinopoisk retrieves a paginated list of films from Kinopoisk using the Parsing service.
+// Updates the session with the retrieved films and their metadata.
 func getFilmsFromKinopoisk(session *models.Session) (*filters.Metadata, error) {
 	films, metadata, err := parsing.GetFilmsFromKinopoisk(session)
 	if err != nil {
@@ -99,6 +109,7 @@ func getFilmsFromKinopoisk(session *models.Session) (*filters.Metadata, error) {
 	return metadata, nil
 }
 
+// clearStatesAndResetFilmsPage clears all session states and resets the current page of the films list.
 func clearStatesAndResetFilmsPage(session *models.Session) {
 	session.ClearAllStates()
 	session.FilmsState.CurrentPage = 1

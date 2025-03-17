@@ -1,3 +1,9 @@
+// Package client provides utilities for making HTTP requests to external services.
+//
+// It includes functions for preparing, sending, and handling HTTP requests with customizable headers,
+// body, and expected status codes.
+//
+// The package also supports error handling and logging for failed requests.
 package client
 
 import (
@@ -11,23 +17,25 @@ import (
 )
 
 const (
-	HeaderAuthorization  = "Authorization"
-	HeaderVerification   = "Verification"
-	HeaderExternalAPIKey = "X-API-KEY"
-	HeaderContentType    = "Content-Type"
-	ContentTypeJSON      = "application/json"
+	HeaderAuthorization  = "Authorization"    // Header for authentication tokens.
+	HeaderVerification   = "Verification"     // Header for verification tokens.
+	HeaderExternalAPIKey = "X-API-KEY"        // Header for external API keys.
+	HeaderContentType    = "Content-Type"     // Header for specifying content type.
+	ContentTypeJSON      = "application/json" // Default content type for JSON requests.
 )
 
+// CustomRequest represents a custom HTTP request with additional options.
 type CustomRequest struct {
-	HeaderType         string
-	HeaderValue        string
-	Method             string
-	URL                string
-	Body               any
-	ExpectedStatusCode int
-	WithoutLog         bool
+	HeaderType         string // Type of header to set (e.g., Authorization, X-API-KEY).
+	HeaderValue        string // Value for the specified header.
+	Method             string // HTTP method (e.g., GET, POST, PUT, DELETE).
+	URL                string // Target URL for the request.
+	Body               any    // Request body (optional).
+	ExpectedStatusCode int    // Expected HTTP status code for successful responses.
+	WithoutLog         bool   // Whether to suppress logging for failed responses.
 }
 
+// SendRequest sends an HTTP request and returns the response.
 func SendRequest(req *http.Request) (*http.Response, error) {
 	client := &http.Client{}
 
@@ -40,6 +48,7 @@ func SendRequest(req *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
+// SendRequestWithOptions sends an HTTP request with custom headers and body.
 func SendRequestWithOptions(url, method string, body any, headers map[string]string) (*http.Response, error) {
 	req, err := prepareRequest(url, method, body)
 	if err != nil {
@@ -51,6 +60,7 @@ func SendRequestWithOptions(url, method string, body any, headers map[string]str
 	return SendRequest(req)
 }
 
+// setRequestHeaders sets the headers for an HTTP request.
 func setRequestHeaders(req *http.Request, headers map[string]string) {
 	req.Header.Set(HeaderContentType, ContentTypeJSON)
 	for key, value := range headers {
@@ -58,6 +68,7 @@ func setRequestHeaders(req *http.Request, headers map[string]string) {
 	}
 }
 
+// prepareRequest prepares an HTTP request with the given URL, method, and data.
 func prepareRequest(url, method string, data any) (*http.Request, error) {
 	requestBody := &bytes.Buffer{}
 
@@ -71,6 +82,7 @@ func prepareRequest(url, method string, data any) (*http.Request, error) {
 	return http.NewRequest(method, url, requestBody)
 }
 
+// Do sends a custom HTTP request and validates the response status code.
 func Do(req *CustomRequest) (*http.Response, error) {
 	headers := make(map[string]string)
 	if req.HeaderType != "" {
@@ -93,6 +105,7 @@ func Do(req *CustomRequest) (*http.Response, error) {
 	return resp, nil
 }
 
+// ParseErrorStatusCode extracts the HTTP status code from an error message.
 func ParseErrorStatusCode(err error) int {
 	if !strings.HasPrefix(err.Error(), "failed response") {
 		return -1

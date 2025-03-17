@@ -10,11 +10,15 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
+// HandleDeleteFilmCommand handles the command for deleting a film.
+// Sends a confirmation message and sets the session state to await user confirmation.
 func HandleDeleteFilmCommand(app models.App, session *models.Session) {
 	app.SendMessage(messages.DeleteFilm(session), keyboards.Survey(session))
 	session.SetState(states.AwaitDeleteFilmConfirm)
 }
 
+// HandleDeleteFilmProcess processes the workflow for deleting a film.
+// Handles states like awaiting confirmation from the user.
 func HandleDeleteFilmProcess(app models.App, session *models.Session) {
 	switch session.State {
 	case states.AwaitDeleteFilmConfirm:
@@ -23,6 +27,7 @@ func HandleDeleteFilmProcess(app models.App, session *models.Session) {
 	}
 }
 
+// handleDeleteFilmConfirm processes the user's response to the deletion confirmation.
 func handleDeleteFilmConfirm(app models.App, session *models.Session) {
 	if !utils.IsAgree(app.Update) {
 		app.SendMessage(messages.CancelAction(session), nil)
@@ -39,6 +44,7 @@ func handleDeleteFilmConfirm(app models.App, session *models.Session) {
 	HandleFilmsCommand(app, session)
 }
 
+// DeleteFilm deletes a film based on the current session context (user or collection).
 func DeleteFilm(app models.App, session *models.Session) error {
 	switch session.Context {
 	case states.CtxFilm:

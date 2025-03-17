@@ -12,6 +12,8 @@ import (
 	"strings"
 )
 
+// HandleAddFilmToCollectionCommand handles the command for adding a film to a collection.
+// Retrieves films excluding the current collection and sends a paginated list with navigation buttons.
 func HandleAddFilmToCollectionCommand(app models.App, session *models.Session) {
 	if metadata, err := getFilmsExcludeCollection(app, session); err != nil {
 		app.SendMessage(messages.FilmsFailure(session), nil)
@@ -22,6 +24,8 @@ func HandleAddFilmToCollectionCommand(app models.App, session *models.Session) {
 	}
 }
 
+// HandleAddFilmToCollectionButtons handles button interactions related to adding a film to a collection.
+// Supports actions like going back, searching, pagination, and selecting specific films.
 func HandleAddFilmToCollectionButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
@@ -51,6 +55,8 @@ func HandleAddFilmToCollectionButtons(app models.App, session *models.Session) {
 	}
 }
 
+// HandleAddFilmToCollectionProcess processes the workflow for adding a film to a collection.
+// Handles states like awaiting a film title input.
 func HandleAddFilmToCollectionProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
@@ -64,6 +70,8 @@ func HandleAddFilmToCollectionProcess(app models.App, session *models.Session) {
 	}
 }
 
+// handleAddFilmToCollectionPagination processes pagination actions for the film list.
+// Updates the current page in the session and reloads the film list.
 func handleAddFilmToCollectionPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
 	case states.CallAddFilmToCollectionPageNext:
@@ -98,6 +106,8 @@ func handleAddFilmToCollectionPagination(app models.App, session *models.Session
 	HandleAddFilmToCollectionCommand(app, session)
 }
 
+// handleAddFilmToCollectionSelect processes the selection of a film from the list.
+// Parses the film ID and adds the selected film to the collection.
 func handleAddFilmToCollectionSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectCFFilm)); err != nil {
 		utils.LogParseSelectError(err, callback)
@@ -108,11 +118,13 @@ func handleAddFilmToCollectionSelect(app models.App, session *models.Session, ca
 	}
 }
 
+// handleAddFilmToCollectionFind prompts the user to enter the title of a film to search for.
 func handleAddFilmToCollectionFind(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmTitle(session), keyboards.Cancel(session))
 	session.SetState(states.AwaitAddFilmToCollectionTitle)
 }
 
+// parseAddFilmToCollectionTitle processes the film title provided by the user.
 func parseAddFilmToCollectionTitle(app models.App, session *models.Session) {
 	session.FilmsState.Title = utils.ParseMessageString(app.Update)
 	session.CollectionFilmsState.CurrentPage = 1
@@ -121,6 +133,7 @@ func parseAddFilmToCollectionTitle(app models.App, session *models.Session) {
 	HandleAddFilmToCollectionCommand(app, session)
 }
 
+// getFilmsExcludeCollection retrieves a paginated list of films excluding the current collection.
 func getFilmsExcludeCollection(app models.App, session *models.Session) (*filters.Metadata, error) {
 	filmsResponse, err := watchlist.GetFilmsExcludeCollection(app, session)
 	if err != nil {
@@ -131,6 +144,7 @@ func getFilmsExcludeCollection(app models.App, session *models.Session) (*filter
 	return &filmsResponse.Metadata, nil
 }
 
+// updateSessionWithFilmsExcludeCollection updates the session with the retrieved films and their metadata.
 func updateSessionWithFilmsExcludeCollection(session *models.Session, filmsResponse *models.FilmsResponse) {
 	session.FilmsState.Films = filmsResponse.Films
 	session.CollectionFilmsState.CurrentPage = filmsResponse.Metadata.CurrentPage

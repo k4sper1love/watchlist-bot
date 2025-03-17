@@ -14,10 +14,14 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
+// HandleNewFilmCommand handles the command for creating a new film.
+// Sends a message with options to create a film manually, from a URL, or by searching.
 func HandleNewFilmCommand(app models.App, session *models.Session) {
 	app.SendMessage(messages.ChoiceWay(session), keyboards.FilmNew(session))
 }
 
+// HandleNewFilmButtons handles button interactions related to creating a new film.
+// Supports actions like going back, creating manually, from a URL, or by searching.
 func HandleNewFilmButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Update) {
 	case states.CallNewFilmBack:
@@ -37,6 +41,8 @@ func HandleNewFilmButtons(app models.App, session *models.Session) {
 	}
 }
 
+// HandleNewFilmProcess processes the workflow for creating a new film.
+// Handles states like awaiting input for title, year, genre, and other film details.
 func HandleNewFilmProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
@@ -89,11 +95,14 @@ func HandleNewFilmProcess(app models.App, session *models.Session) {
 	}
 }
 
+// handleKinopoiskToken prompts the user to enter a Kinopoisk API token.
 func handleKinopoiskToken(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestKinopoiskToken(session), keyboards.Cancel(session))
 	session.SetState(states.AwaitNewFilmKinopoiskToken)
 }
 
+// handleKinopoiskError handles errors related to Kinopoisk API requests.
+// Displays appropriate error messages based on the status code.
 func handleKinopoiskError(app models.App, session *models.Session, err error) {
 	code := client.ParseErrorStatusCode(err)
 	if code == 401 || code == 403 {
@@ -103,6 +112,7 @@ func handleKinopoiskError(app models.App, session *models.Session, err error) {
 	}
 }
 
+// handleNewFilmFind prompts the user to search for a new film by title using Kinopoisk.
 func handleNewFilmFind(app models.App, session *models.Session) {
 	if session.KinopoiskAPIToken == "" {
 		handleKinopoiskToken(app, session)
@@ -113,11 +123,13 @@ func handleNewFilmFind(app models.App, session *models.Session) {
 	session.SetState(states.AwaitNewFilmFind)
 }
 
+// handleNewFilmFromURL prompts the user to create a new film by providing a URL.
 func handleNewFilmFromURL(app models.App, session *models.Session) {
 	app.SendMessage(messages.NewFilmFromURL(session), keyboards.Cancel(session))
 	session.SetState(states.AwaitNewFilmFromURL)
 }
 
+// parseNewFilmFromURL processes the URL provided by the user to create a new film.
 func parseNewFilmFromURL(app models.App, session *models.Session) {
 	url := utils.ParseMessageString(app.Update)
 	isKinopoisk := parsing.IsKinopoisk(url)
@@ -138,6 +150,7 @@ func parseNewFilmFromURL(app models.App, session *models.Session) {
 	parser.ParseFilmImageFromMessage(app, session, requestNewFilmComment)
 }
 
+// handleNewFilmFromURLError handles errors encountered while processing a film from a URL.
 func handleNewFilmFromURLError(app models.App, session *models.Session, err error, isKinopoisk bool) {
 	session.ClearState()
 
@@ -150,61 +163,74 @@ func handleNewFilmFromURLError(app models.App, session *models.Session, err erro
 	HandleNewFilmCommand(app, session)
 }
 
+// handleNewFilmManually prompts the user to create a new film by entering details manually.
 func handleNewFilmManually(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmTitle(session), keyboards.Cancel(session))
 	session.SetState(states.AwaitNewFilmTitle)
 }
 
+// requestNewFilmYear prompts the user to enter the release year of the film.
 func requestNewFilmYear(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmYear(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.AwaitNewFilmYear)
 }
 
+// requestNewFilmGenre prompts the user to enter the genre of the film.
 func requestNewFilmGenre(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmGenre(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.AwaitNewFilmGenre)
 }
 
+// requestNewFilmDescription prompts the user to enter a description for the film.
 func requestNewFilmDescription(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmDescription(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.AwaitNewFilmDescription)
 }
 
+// requestNewFilmRating prompts the user to enter the rating of the film.
 func requestNewFilmRating(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmRating(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.AwaitNewFilmRating)
 }
 
+// requestNewFilmImage prompts the user to provide an image for the film.
 func requestNewFilmImage(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmImage(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.AwaitNewFilmImage)
 }
 
+// requestNewFilmURL prompts the user to provide a URL for the film.
 func requestNewFilmURL(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmURL(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.AwaitNewFilmFilmURL)
 }
 
+// requestNewFilmComment prompts the user to add a comment for the film.
 func requestNewFilmComment(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmComment(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.AwaitNewFilmComment)
 }
 
+// requestNewFilmViewed prompts the user to indicate if the film has been viewed.
 func requestNewFilmViewed(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmViewed(session), keyboards.SurveyAndCancel(session))
 	session.SetState(states.AwaitNewFilmViewed)
 }
 
+// requestNewFilmUserRating prompts the user to enter their personal rating for the film.
 func requestNewFilmUserRating(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmUserRating(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.AwaitNewFilmUserRating)
 }
 
+// requestNewFilmReview prompts the user to write a review for the film.
 func requestNewFilmReview(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmReview(session), keyboards.SkipAndCancel(session))
 	session.SetState(states.AwaitNewFilmReview)
 }
 
+// finishNewFilmProcess finalizes the creation of a new film.
+// Calls the Watchlist service to save the film and navigates to the detailed view.
 func finishNewFilmProcess(app models.App, session *models.Session) {
 	film, err := createNewFilm(app, session)
 	session.ClearAllStates()
@@ -213,10 +239,11 @@ func finishNewFilmProcess(app models.App, session *models.Session) {
 		return
 	}
 
-	session.FilmDetailState.UpdateFilmState(*film)
+	session.FilmDetailState.UpdateFilm(*film)
 	HandleFilmDetailCommand(app, session)
 }
 
+// createNewFilm creates a new film based on the current session context (user or collection).
 func createNewFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
 	switch session.Context {
 	case states.CtxFilm:
@@ -228,6 +255,7 @@ func createNewFilm(app models.App, session *models.Session) (*apiModels.Film, er
 	}
 }
 
+// createNewUserFilm creates a new film associated with the current user using the Watchlist service.
 func createNewUserFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
 	film, err := watchlist.CreateFilm(app, session)
 	if err != nil {
@@ -238,6 +266,7 @@ func createNewUserFilm(app models.App, session *models.Session) (*apiModels.Film
 	return film, nil
 }
 
+// createNewCollectionFilm creates a new film and associates it with a collection using the Watchlist service.
 func createNewCollectionFilm(app models.App, session *models.Session) (*apiModels.Film, error) {
 	collectionFilm, err := watchlist.CreateCollectionFilm(app, session)
 	if err != nil {

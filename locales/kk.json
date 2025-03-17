@@ -44,11 +44,9 @@
   "changeToken": {
     "other": "Токенді өзгерту"
   },
-  "token403": {
-    "other": "Сіз Kinopoisk пайдалану үшін күндік лимитке жеттіңіз"
-  },
-  "token401": {
-    "other": "Қате Kinopoisk токені"
+  "tokenCodeError": {
+    "403": "Сіз Kinopoisk пайдалану үшін күндік лимитке жеттіңіз",
+    "401": "Қате Kinopoisk токені"
   },
   "tokenRequestInfo": {
     "other": "Kinopoisk-ті пайдалану үшін @kinopoiskdev_bot-тан токен алыңыз"

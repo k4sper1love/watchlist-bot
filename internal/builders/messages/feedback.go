@@ -6,6 +6,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
 )
 
+// Feedback generates a message prompting the user to provide feedback.
 func Feedback(session *models.Session) string {
 	return fmt.Sprintf("💬 %s\n\n%s 😊\n\n%s",
 		toBold(translator.Translate(session.Lang, "feedbackMessageHeader", nil, nil)),
@@ -13,6 +14,8 @@ func Feedback(session *models.Session) string {
 		translator.Translate(session.Lang, "feedbackCategoryChoice", nil, nil))
 }
 
+// RequestFeedbackMessage generates a message prompting the user to enter feedback text.
+// Includes the selected feedback category.
 func RequestFeedbackMessage(session *models.Session) string {
 	return fmt.Sprintf("📄 %s: %s\n\n%s",
 		toBold(translator.Translate(session.Lang, "category", nil, nil)),
@@ -20,18 +23,14 @@ func RequestFeedbackMessage(session *models.Session) string {
 		translator.Translate(session.Lang, "feedbackTextRequest", nil, nil))
 }
 
-func WarningMaxLength(session *models.Session, maxLength int) string {
-	return "⚠️ " + translator.Translate(session.Lang, "maxLengthInSymbols", map[string]interface{}{
-		"Length": maxLength,
-	}, nil)
-}
-
+// FeedbackFailure generates an error message when submitting feedback fails.
 func FeedbackFailure(session *models.Session) string {
 	return fmt.Sprintf("🚨 %s\n%s",
 		translator.Translate(session.Lang, "feedbackFailure", nil, nil),
 		translator.Translate(session.Lang, "tryLater", nil, nil))
 }
 
+// FeedbackSuccess generates a success message after feedback is successfully submitted.
 func FeedbackSuccess(session *models.Session) string {
 	return "✅ " + translator.Translate(session.Lang, "feedbackSuccess", nil, nil)
 }

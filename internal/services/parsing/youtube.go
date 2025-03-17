@@ -17,18 +17,22 @@ import (
 	"strconv"
 )
 
+// externalVideoData represents additional video data fetched from an external API.
 type externalVideoData struct {
-	ID          string  `json:"id"`
-	DateCreated string  `json:"dateCreated"`
-	Likes       int64   `json:"likes"`
-	RawDislikes int64   `json:"rawDislikes"`
-	RawLikes    int64   `json:"rawLikes"`
-	Dislikes    int64   `json:"dislikes"`
-	Rating      float64 `json:"rating"`
-	ViewCount   int64   `json:"viewCount"`
-	Deleted     bool    `json:"deleted"`
+	ID          string  `json:"id"`          // Video ID.
+	DateCreated string  `json:"dateCreated"` // Date the video was created.
+	Likes       int64   `json:"likes"`       // Number of likes.
+	RawDislikes int64   `json:"rawDislikes"` // Raw number of dislikes.
+	RawLikes    int64   `json:"rawLikes"`    // Raw number of likes.
+	Dislikes    int64   `json:"dislikes"`    // Number of dislikes.
+	Rating      float64 `json:"rating"`      // Video rating.
+	ViewCount   int64   `json:"viewCount"`   // Number of views.
+	Deleted     bool    `json:"deleted"`     // Indicates if the video has been deleted.
 }
 
+// GetFilmFromYoutube fetches a YouTube video and parses it into an `models.Film` object.
+// It extracts the video ID from the URL, fetches video details from the YouTube API,
+// and retrieves additional data from an external API.
 func GetFilmFromYoutube(app models.App, session *models.Session, url string) (*apiModels.Film, error) {
 	videoID, err := utils.ExtractYoutubeVideoID(url)
 	if err != nil {
@@ -57,6 +61,7 @@ func GetFilmFromYoutube(app models.App, session *models.Session, url string) (*a
 	return parseVideoFromYoutube(session, video, externalData), nil
 }
 
+// fetchYoutubeVideo fetches video details from the YouTube API using the provided video ID.
 func fetchYoutubeVideo(service *youtube.Service, videoID string) (*youtube.Video, error) {
 	resp, err := service.Videos.List([]string{"snippet", "statistics", "contentDetails"}).Id(videoID).Do()
 	if err != nil || len(resp.Items) == 0 {
@@ -65,18 +70,19 @@ func fetchYoutubeVideo(service *youtube.Service, videoID string) (*youtube.Video
 	return resp.Items[0], nil
 }
 
+// getExternalVideoData fetches additional video data (e.g., likes, dislikes) from an external API.
 func getExternalVideoData(videoID string) (*externalVideoData, error) {
 	resp, err := client.Do(
 		&client.CustomRequest{
-			Method:             http.MethodGet,
+			Method:             http.MethodGet, // HTTP GET method for fetching data.
 			URL:                fmt.Sprintf("https://returnyoutubedislikeapi.com/votes?videoId=%s", videoID),
-			ExpectedStatusCode: http.StatusOK,
+			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
-	defer utils.CloseBody(resp.Body)
+	defer utils.CloseBody(resp.Body) // Ensure the response body is closed after use.
 
 	var data externalVideoData
 	if err = json.NewDecoder(resp.Body).Decode(&data); err != nil {
@@ -87,17 +93,19 @@ func getExternalVideoData(videoID string) (*externalVideoData, error) {
 	return &data, err
 }
 
+// parseVideoFromYoutube parses a YouTube video into an `models.Film` object.
 func parseVideoFromYoutube(session *models.Session, video *youtube.Video, externalData *externalVideoData) *apiModels.Film {
 	return &apiModels.Film{
 		Title:       video.Snippet.Title,
-		Genre:       "YouTube Video",
+		Genre:       "YouTube Video", // Default genre for YouTube videos.
 		ImageURL:    parseThumbnailFromYoutube(video),
 		Year:        parseYearFromYoutube(video.Snippet.PublishedAt),
-		Rating:      utils.Round(externalData.Rating * 2),
+		Rating:      utils.Round(externalData.Rating * 2), // Scale the rating to match the application's format.
 		Description: formatDescription(session, video, externalData),
 	}
 }
 
+// parseThumbnailFromYoutube extracts the highest-resolution thumbnail URL from the YouTube video.
 func parseThumbnailFromYoutube(video *youtube.Video) string {
 	if video.Snippet.Thumbnails.Maxres != nil {
 		return video.Snippet.Thumbnails.Maxres.Url
@@ -107,14 +115,16 @@ func parseThumbnailFromYoutube(video *youtube.Video) string {
 	return ""
 }
 
+// parseYearFromYoutube extracts the year from the video's publication date.
 func parseYearFromYoutube(date string) int {
 	if len(date) >= 4 {
-		year, _ := strconv.Atoi(date[:4])
+		year, _ := strconv.Atoi(date[:4]) // Extract the first 4 characters as the year.
 		return year
 	}
 	return 0
 }
 
+// formatDescription formats the video description with localized labels and statistics.
 func formatDescription(session *models.Session, video *youtube.Video, externalData *externalVideoData) string {
 	return fmt.Sprintf(
 		"👨‍💼 %s: %s\n⏳ %s: %s\n👁️‍🗨️ %s: %d\n❤️ %s: %d / %d\n💬 %s: %d\n📆 %s: %s",

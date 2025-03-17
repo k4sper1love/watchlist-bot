@@ -7,12 +7,13 @@ import (
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 )
 
+// Predefined button sets for different roles.
 var superAdminButtons = []Button{
 	{"🛡️", "admins", states.CallAdminAdmins, "", true},
 }
 
 var adminButtons = []Button{
-	{"👥", "profile", states.CallAdminUsers, "", true},
+	{"👥", "users", states.CallAdminUsers, "", true},
 	{"📢", "broadcast", states.CallAdminBroadcast, "", true},
 }
 
@@ -26,6 +27,7 @@ var rolesButtons = []Button{
 	{"👨🏻‍💼", "admin", states.CallUserDetailRoleSelectAdmin, "", true},
 }
 
+// AdminMenu creates an inline keyboard for the admin menu based on the user's role.
 func AdminMenu(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddIf(session.Role.HasAccess(roles.SuperAdmin), func(k *Keyboard) {
@@ -41,6 +43,7 @@ func AdminMenu(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		Build(session.Lang)
 }
 
+// AdminList creates an inline keyboard for listing admins with navigation and search options.
 func AdminList(session *models.Session, admins []models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddIf(len(admins) > 0, func(k *Keyboard) {
@@ -57,6 +60,7 @@ func AdminList(session *models.Session, admins []models.Session) *tgbotapi.Inlin
 		Build(session.Lang)
 }
 
+// FeedbackList creates an inline keyboard for listing feedback entries with navigation.
 func FeedbackList(session *models.Session, feedbacks []models.Feedback) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddFeedbackSelect(session, feedbacks).
@@ -65,6 +69,7 @@ func FeedbackList(session *models.Session, feedbacks []models.Feedback) *tgbotap
 		Build(session.Lang)
 }
 
+// UserDetail creates an inline keyboard for managing a user's details (e.g., ban, unban, role management).
 func UserDetail(session *models.Session, user *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddIf(session.Role.HasAccess(roles.SuperAdmin) && !user.Role.HasAccess(session.Role), func(k *Keyboard) {
@@ -83,6 +88,7 @@ func UserDetail(session *models.Session, user *models.Session) *tgbotapi.InlineK
 		Build(session.Lang)
 }
 
+// AdminDetail creates an inline keyboard for managing an admin's details (e.g., raise/lower rank, remove role).
 func AdminDetail(session *models.Session, user *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddIf(!user.Role.HasAccess(session.Role.PrevRole()), func(k *Keyboard) {
@@ -99,6 +105,7 @@ func AdminDetail(session *models.Session, user *models.Session) *tgbotapi.Inline
 		Build(session.Lang)
 }
 
+// FeedbackDetail creates an inline keyboard for managing a feedback entry (e.g., delete feedback).
 func FeedbackDetail(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddFeedbackDelete().
@@ -106,6 +113,7 @@ func FeedbackDetail(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		Build(session.Lang)
 }
 
+// UserRoleSelect creates an inline keyboard for selecting a user's role (e.g., user, helper, admin).
 func UserRoleSelect(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddButtons(rolesButtons...).
@@ -116,6 +124,7 @@ func UserRoleSelect(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		Build(session.Lang)
 }
 
+// BroadcastConfirm creates an inline keyboard for confirming or canceling a broadcast message.
 func BroadcastConfirm(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddSendBroadcast().

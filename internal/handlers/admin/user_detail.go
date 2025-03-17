@@ -12,6 +12,8 @@ import (
 	"strings"
 )
 
+// HandleUserDetailCommand handles the command for viewing detailed information about a specific user.
+// Retrieves the user's details and sends a message with their information and an appropriate keyboard.
 func HandleUserDetailCommand(app models.App, session *models.Session) {
 	if user, err := getEntity(session); err != nil {
 		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallAdminUsers))
@@ -20,6 +22,8 @@ func HandleUserDetailCommand(app models.App, session *models.Session) {
 	}
 }
 
+// HandleUserDetailButton handles button interactions related to the user detail view.
+// Supports actions like going back, refreshing details, viewing logs, banning/unbanning, and changing roles.
 func HandleUserDetailButton(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
@@ -49,6 +53,8 @@ func HandleUserDetailButton(app models.App, session *models.Session) {
 	}
 }
 
+// HandleUserDetailProcess processes the user detail workflow based on the current session state.
+// Handles states like awaiting a ban reason.
 func HandleUserDetailProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
@@ -62,6 +68,7 @@ func HandleUserDetailProcess(app models.App, session *models.Session) {
 	}
 }
 
+// handleUserDetailSelect processes the selection of a new role for the user.
 func handleUserDetailSelect(app models.App, session *models.Session) {
 	var role roles.Role
 
@@ -82,6 +89,7 @@ func handleUserDetailSelect(app models.App, session *models.Session) {
 	processUserRole(app, session, role)
 }
 
+// handleUserLogs retrieves and sends the log file for the specified user.
 func handleUserLogs(app models.App, session *models.Session) {
 	if path, err := utils.GetLogFilePath(session.AdminState.UserID); err != nil {
 		app.SendMessage(messages.LogsNotFound(session), keyboards.Back(session, states.CallUserDetailAgain))
@@ -90,6 +98,7 @@ func handleUserLogs(app models.App, session *models.Session) {
 	}
 }
 
+// handleUserUnban unblocks the user by updating their ban status in the database.
 func handleUserUnban(app models.App, session *models.Session) {
 	if err := postgres.SetUserBanStatus(session.AdminState.UserID, false); err != nil {
 		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallUserDetailAgain))
@@ -101,6 +110,7 @@ func handleUserUnban(app models.App, session *models.Session) {
 	general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 }
 
+// handleUserBan prompts the admin to provide a reason for banning the user.
 func handleUserBan(app models.App, session *models.Session) {
 	if session.AdminState.UserRole.HasAccess(roles.Helper) {
 		app.SendMessage(messages.NeedRemoveRole(session), keyboards.Back(session, states.CallUserDetailAgain))
@@ -111,6 +121,8 @@ func handleUserBan(app models.App, session *models.Session) {
 	session.SetState(states.AwaitUserDetailReason)
 }
 
+// parseUserBanReason processes the ban reason provided by the admin.
+// If skipped, bans the user without a reason; otherwise, uses the provided reason.
 func parseUserBanReason(app models.App, session *models.Session) {
 	if utils.IsSkip(app.Update) {
 		processUserBan(app, session, "")
@@ -119,6 +131,7 @@ func parseUserBanReason(app models.App, session *models.Session) {
 	}
 }
 
+// processUserBan updates the user's ban status in the database and sends notifications.
 func processUserBan(app models.App, session *models.Session, reason string) {
 	if err := postgres.SetUserBanStatus(session.AdminState.UserID, true); err != nil {
 		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallUserDetailAgain))
@@ -130,10 +143,12 @@ func processUserBan(app models.App, session *models.Session, reason string) {
 	general.RequireRole(app, session, HandleUserDetailCommand, roles.Admin)
 }
 
+// handleUserRole displays the role selection menu for updating the user's role.
 func handleUserRole(app models.App, session *models.Session) {
 	app.SendMessage(messages.ChoiceRole(session), keyboards.UserRoleSelect(session))
 }
 
+// processUserRole updates the user's role in the database and sends notifications.
 func processUserRole(app models.App, session *models.Session, role roles.Role) {
 	if !canChangeRole(session, role > session.AdminState.UserRole) {
 		app.SendMessage(messages.NoAccess(session), keyboards.Back(session, states.CallUserDetailAgain))

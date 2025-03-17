@@ -44,11 +44,9 @@
   "changeToken": {
     "other": "Change token"
   },
-  "token403": {
-    "other": "You have reached the daily limit for working with Kinopoisk"
-  },
-  "token401": {
-    "other": "Incorrect Kinopoisk token"
+  "tokenCodeError": {
+    "403": "You have reached the daily limit for working with Kinopoisk",
+    "401": "Incorrect Kinopoisk token"
   },
   "tokenRequestInfo": {
     "other": "Get a token from @kinopoiskdev_bot to work with Kinopoisk"

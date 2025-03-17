@@ -6,11 +6,13 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 )
 
+// Predefined buttons for updating collection details.
 var updateCollectionButtons = []Button{
 	{"", "title", states.CallUpdateCollectionName, "", true},
 	{"", "description", states.CallUpdateCollectionDescription, "", true},
 }
 
+// Collections creates an inline keyboard for managing collections.
 func Collections(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddIf(len(session.CollectionsState.Collections) > 0, func(k *Keyboard) {
@@ -24,6 +26,7 @@ func Collections(session *models.Session, currentPage, lastPage int) *tgbotapi.I
 		Build(session.Lang)
 }
 
+// CollectionManage creates an inline keyboard for managing a specific collection.
 func CollectionManage(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddUpdate(states.CallManageCollectionUpdate).
@@ -32,6 +35,7 @@ func CollectionManage(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		Build(session.Lang)
 }
 
+// CollectionUpdate creates an inline keyboard for updating collection details (e.g., title, description).
 func CollectionUpdate(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddButtons(updateCollectionButtons...).
@@ -39,6 +43,7 @@ func CollectionUpdate(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 		Build(session.Lang)
 }
 
+// FindCollections creates an inline keyboard for selecting collections with navigation and back options.
 func FindCollections(session *models.Session, currentPage, lastPage int) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddCollectionsSelect(session).
@@ -47,6 +52,7 @@ func FindCollections(session *models.Session, currentPage, lastPage int) *tgbota
 		Build(session.Lang)
 }
 
+// CollectionsSorting creates an inline keyboard for managing collection sorting options.
 func CollectionsSorting(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	sorting := session.CollectionsState.Sorting
 	return New().

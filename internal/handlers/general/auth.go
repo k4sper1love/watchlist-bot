@@ -9,11 +9,15 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
+// HandleLogoutCommand handles the command for logging out the user.
+// Sends a confirmation message and sets the session state to await user confirmation.
 func HandleLogoutCommand(app models.App, session *models.Session) {
 	app.SendMessage(messages.Logout(session), keyboards.Survey(session))
 	session.SetState(states.AwaitLogoutConfirm)
 }
 
+// HandleLogoutProcess processes the workflow for logging out the user.
+// Handles states like awaiting confirmation from the user.
 func HandleLogoutProcess(app models.App, session *models.Session) {
 	switch session.State {
 	case states.AwaitLogoutConfirm:
@@ -21,6 +25,7 @@ func HandleLogoutProcess(app models.App, session *models.Session) {
 	}
 }
 
+// handleLogoutConfirm processes the user's response to the logout confirmation.
 func handleLogoutConfirm(app models.App, session *models.Session) {
 	if !utils.IsAgree(app.Update) {
 		app.SendMessage(messages.CancelAction(session), nil)

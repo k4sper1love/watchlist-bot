@@ -9,6 +9,8 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
+// HandleProfileCommand handles the command for displaying the user's profile.
+// Fetches the user's data from the Watchlist service and sends a message with their profile details.
 func HandleProfileCommand(app models.App, session *models.Session) {
 	if user, err := watchlist.GetUser(app, session); err != nil {
 		app.SendMessage(err.Error(), nil)
@@ -18,6 +20,8 @@ func HandleProfileCommand(app models.App, session *models.Session) {
 	}
 }
 
+// HandleProfileButtons handles button interactions related to the user's profile.
+// Supports actions like updating the profile or deleting it.
 func HandleProfileButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Update) {
 	case states.CallProfileUpdate:

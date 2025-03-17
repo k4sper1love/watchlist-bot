@@ -1,3 +1,7 @@
+// Package handlers defines the core logic for processing user interactions in the Watchlist Telegram bot.
+//
+// It acts as the central hub for routing and handling updates, managing commands, and processing user input.
+// This package ensures a seamless and structured user experience by centralizing all interaction logic.
 package handlers
 
 import (
@@ -20,49 +24,58 @@ import (
 	"strings"
 )
 
+// HandleUpdates processes incoming updates from the Telegram bot API.
+// It logs the update, retrieves the user's session, and routes the update to the appropriate handler.
 func HandleUpdates(app models.App) {
-	logUpdate(app)
+	logUpdate(app) // Log the incoming update for debugging purposes.
 
 	session, err := postgres.GetSessionByTelegramID(app)
 	if err != nil {
+		// If there's an error retrieving the session, send an error message to the user.
 		app.SendMessage(messages.SessionError(utils.ParseLanguageCode(app.Update)), nil)
 		return
 	}
 
+	// Check if the user sent a "reset" command to reset their session state.
 	if utils.ParseMessageCommand(app.Update) == "reset" {
 		handleReset(app, session)
 		return
 	}
 
-	if general.Auth(app, session) {
-		routeUpdate(app, session)
-	}
+	// Ensure the user is authenticated before proceeding.
+	general.RequireAuth(app, session, routeUpdate)
 
+	// Save the session and its dependencies to the database.
 	postgres.SaveSessionWithDependencies(session)
 }
 
 func routeUpdate(app models.App, session *models.Session) {
 	switch {
 	case app.Update.CallbackQuery != nil:
+		// Handle callback queries (button interactions).
 		handleCallbackQuery(app, session)
 
 	case session.State == "":
+		// Handle commands when no specific state is active.
 		handleCommands(app, session)
 
 	default:
+		// Handle user input when a specific state is active.
 		handleInput(app, session)
 	}
 }
 
+// handleReset resets the user's session by logging them out and requiring re-authentication.
 func handleReset(app models.App, session *models.Session) {
-	session.Logout()
+	session.Logout() // Clear the session data.
 	postgres.SaveSessionWithDependencies(session)
-	general.RequireAuth(app, session, general.HandleStartCommand)
+	general.RequireAuth(app, session, general.HandleStartCommand) // Redirect the user to the start command.
 }
 
+// handleCommands processes user commands such as /start, /help, /menu, etc.
 func handleCommands(app models.App, session *models.Session) {
-	command := utils.ParseMessageCommand(app.Update)
-	callbackData := utils.ParseCallback(app.Update)
+	command := utils.ParseMessageCommand(app.Update) // Extract the command from the message.
+	callbackData := utils.ParseCallback(app.Update)  // Extract the callback data if it's a button interaction.
 
 	switch {
 	case command == "start":
@@ -99,10 +112,12 @@ func handleCommands(app models.App, session *models.Session) {
 		general.RequireRole(app, session, admin.HandleMenuCommand, roles.Helper)
 
 	default:
+		// Handle unknown commands by notifying the user.
 		app.SendMessage(messages.UnknownCommand(session), nil)
 	}
 }
 
+// handleInput processes user input based on the current session state.
 func handleInput(app models.App, session *models.Session) {
 	switch {
 	case strings.HasPrefix(session.State, states.LogoutAwait):
@@ -172,12 +187,14 @@ func handleInput(app models.App, session *models.Session) {
 		general.HandleSettingsProcess(app, session)
 
 	default:
+		// Handle unknown states by notifying the user.
 		app.SendMessage(messages.UnknownState(session), nil)
 	}
 }
 
+// handleCallbackQuery processes callback queries (button interactions) from the Telegram bot.
 func handleCallbackQuery(app models.App, session *models.Session) {
-	callbackData := utils.ParseCallback(app.Update)
+	callbackData := utils.ParseCallback(app.Update) // Extract the callback data from the update.
 
 	switch {
 	case callbackData == states.CallMainMenu:
@@ -220,6 +237,7 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 		profile.HandleUpdateProfileButtons(app, session)
 
 	case strings.HasPrefix(callbackData, states.Films) || strings.HasPrefix(callbackData, states.SelectFilm):
+		// Handle film-related buttons based on the current session context (films or collections).
 		if session.Context == states.CtxFilm {
 			films.HandleFilmsButtons(app, session, general.HandleMenuCommand)
 		} else if session.Context == states.CtxCollection {
@@ -280,39 +298,49 @@ func handleCallbackQuery(app models.App, session *models.Session) {
 		collectionFilms.HandleAddFilmToCollectionButtons(app, session)
 
 	default:
+		// Handle unknown callback data as user input.
 		handleInput(app, session)
 	}
 
+	// Acknowledge the callback query to prevent the "loading" indicator in Telegram.
 	answerCallbackQuery(app)
 }
 
+// answerCallbackQuery sends an acknowledgment to Telegram for the callback query.
+// This prevents the "loading" indicator from persisting in the Telegram interface.
 func answerCallbackQuery(app models.App) {
 	_, err := app.Bot.AnswerCallbackQuery(tgbotapi.CallbackConfig{
 		CallbackQueryID: app.Update.CallbackQuery.ID,
 	})
 	if err != nil {
+		// Log any errors that occur while answering the callback query.
 		sl.Log.Error("failed to answer callback", slog.Any("error", err), slog.String("callback_id", app.Update.CallbackQuery.ID))
 	}
 }
 
+// logUpdate logs incoming updates (messages or callback queries) for debugging and monitoring purposes.
 func logUpdate(app models.App) {
-	telegramID := utils.ParseTelegramID(app.Update)
-	messageID := utils.ParseMessageID(app.Update)
-	input := fmt.Sprintf(" #%d: ", messageID)
+	telegramID := utils.ParseTelegramID(app.Update) // Extract the Telegram user ID.
+	messageID := utils.ParseMessageID(app.Update)   // Extract the message ID.
+	input := fmt.Sprintf(" #%d: ", messageID)       // Format the log entry with the message ID.
 
 	switch {
 	case app.Update.Message != nil:
+		// Log incoming messages.
 		utils.LogUpdateInfo(telegramID, messageID, "message")
 		input += fmt.Sprintf("(message) %s", utils.ParseMessageString(app.Update))
 
 	case app.Update.CallbackQuery != nil:
+		// Log incoming callback queries.
 		utils.LogUpdateInfo(telegramID, messageID, "callback")
 		input += fmt.Sprintf("(callback) %s", utils.ParseCallback(app.Update))
 
 	default:
+		// Log unknown update types.
 		utils.LogUpdateInfo(telegramID, messageID, "unknown")
 		input += "(unknown)"
 	}
 
+	// Log the update with the user's Telegram ID as the context.
 	app.LogAsUser(telegramID).Print(input)
 }

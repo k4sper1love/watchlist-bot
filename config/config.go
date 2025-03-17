@@ -1,3 +1,6 @@
+// Package config provides functionality for loading and managing application configuration.
+//
+// It reads environment variables, parses required values, and initializes the application's configuration.
 package config
 
 import (
@@ -10,7 +13,9 @@ import (
 	"strconv"
 )
 
-func InitAppConfig() (*models.App, error) {
+// Init initializes the application configuration by reading environment variables.
+// It loads the .env file, parses required values (e.g., ROOT_TELEGRAM_ID), and sets defaults for missing values.
+func Init() (*models.App, error) {
 	if err := godotenv.Load(); err != nil {
 		sl.Log.Warn(".env file not found")
 	}
@@ -36,6 +41,8 @@ func InitAppConfig() (*models.App, error) {
 	return &models.App{Config: config}, nil
 }
 
+// buildDatabaseURL constructs the PostgreSQL database connection URL from environment variables.
+// It uses default values if any required environment variable is missing.
 func buildDatabaseURL() string {
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
@@ -47,6 +54,7 @@ func buildDatabaseURL() string {
 	)
 }
 
+// parseRootTelegramID parses the ROOT_TELEGRAM_ID environment variable as an integer.
 func parseRootTelegramID() (int, error) {
 	idStr := os.Getenv("ROOT_TELEGRAM_ID")
 	if idStr == "" {
@@ -62,6 +70,7 @@ func parseRootTelegramID() (int, error) {
 	return id, nil
 }
 
+// getEnvOrDefault retrieves the value of an environment variable or returns a default value if it is not set.
 func getEnvOrDefault(key, defaultValue string) string {
 	value := os.Getenv(key)
 	if value == "" {

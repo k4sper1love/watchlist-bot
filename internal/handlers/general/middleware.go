@@ -11,6 +11,9 @@ import (
 	"log/slog"
 )
 
+// Auth checks if the user is authenticated.
+// Verifies if the user is banned, already authenticated, or attempts to log in/register.
+// Returns false if authentication fails or the user is banned.
 func Auth(app models.App, session *models.Session) bool {
 	if IsBanned(app, session) {
 		return false
@@ -24,12 +27,14 @@ func Auth(app models.App, session *models.Session) bool {
 	return false
 }
 
+// RequireAuth ensures that the user is authenticated before proceeding.
 func RequireAuth(app models.App, session *models.Session, next func(app models.App, session *models.Session)) {
 	if Auth(app, session) {
 		next(app, session)
 	}
 }
 
+// RequireRole ensures that the user has the required role to access a specific feature.
 func RequireRole(app models.App, session *models.Session, next func(models.App, *models.Session), role roles.Role) {
 	if session.Role.HasAccess(role) {
 		next(app, session)
@@ -40,6 +45,7 @@ func RequireRole(app models.App, session *models.Session, next func(models.App, 
 	session.ClearState()
 }
 
+// IsBanned checks if the user is banned.
 func IsBanned(app models.App, session *models.Session) bool {
 	if !postgres.IsUserBanned(session.TelegramID) {
 		return false
@@ -49,12 +55,15 @@ func IsBanned(app models.App, session *models.Session) bool {
 	return true
 }
 
+// isAuthenticated checks if the user is already authenticated.
+// Validates the access token or refreshes it using the refresh token if necessary.
 func isAuthenticated(app models.App, session *models.Session) bool {
 	return session.AccessToken != "" &&
 		(watchlist.IsTokenValid(app, session.AccessToken) ||
 			(session.RefreshToken != "" && watchlist.RefreshAccessToken(app, session) == nil))
 }
 
+// attemptLoginOrRegister attempts to log in or register the user.
 func attemptLoginOrRegister(app models.App, session *models.Session) error {
 	if err := watchlist.Login(app, session); err == nil {
 		return nil

@@ -8,10 +8,11 @@ import (
 )
 
 const (
-	TelegramIDField       = "telegram_id"
-	TelegramUsernameField = "telegram_username"
+	TelegramIDField       = "telegram_id"       // Field name for Telegram ID in the database.
+	TelegramUsernameField = "telegram_username" // Field name for Telegram username in the database.
 )
 
+// GetUserCount returns the total number of users, optionally filtered by admin status.
 func GetUserCount(isAdmin bool) (int64, error) {
 	var count int64
 
@@ -24,12 +25,14 @@ func GetUserCount(isAdmin bool) (int64, error) {
 	return count, err
 }
 
+// GetTelegramIDs retrieves all Telegram IDs from the sessions table.
 func GetTelegramIDs() ([]int, error) {
 	var telegramIDs []int
 	err := GetDatabase().Model(&models.Session{}).Pluck("telegram_id", &telegramIDs).Error
 	return telegramIDs, err
 }
 
+// GetUsers retrieves all users, optionally filtered by admin status, ordered by creation time.
 func GetUsers(isAdmin bool) ([]models.Session, error) {
 	var sessions []models.Session
 
@@ -42,6 +45,7 @@ func GetUsers(isAdmin bool) ([]models.Session, error) {
 	return sessions, err
 }
 
+// GetUsersWithPagination retrieves users with pagination support, optionally filtered by admin status.
 func GetUsersWithPagination(page, pageSize int, isAdmin bool) ([]models.Session, error) {
 	var sessions []models.Session
 	offset := utils.CalculateOffset(page, pageSize)
@@ -55,10 +59,12 @@ func GetUsersWithPagination(page, pageSize int, isAdmin bool) ([]models.Session,
 	return sessions, err
 }
 
+// SetUserBanStatus updates the ban status of a user by Telegram ID.
 func SetUserBanStatus(telegramID int, isBanned bool) error {
 	return GetDatabase().Model(&models.Session{}).Where("telegram_id = ?", telegramID).Update("is_banned", isBanned).Error
 }
 
+// IsUserBanned checks if a user is banned by Telegram ID.
 func IsUserBanned(telegramID int) bool {
 	var session models.Session
 	if err := GetDatabase().Model(&models.Session{}).Where("telegram_id = ?", telegramID).First(&session).Error; err != nil {
@@ -67,10 +73,12 @@ func IsUserBanned(telegramID int) bool {
 	return session.IsBanned
 }
 
+// SetUserRole updates the role of a user by Telegram ID.
 func SetUserRole(telegramID int, role roles.Role) error {
 	return GetDatabase().Model(&models.Session{}).Where("telegram_id = ?", telegramID).Update("role", role).Error
 }
 
+// GetUserByField retrieves a user by a specific field value, optionally filtered by admin status.
 func GetUserByField(field string, value any, isAdmin bool) (*models.Session, error) {
 	var session models.Session
 
@@ -83,6 +91,7 @@ func GetUserByField(field string, value any, isAdmin bool) (*models.Session, err
 	return &session, err
 }
 
+// GetUserByAPIUserID retrieves a user session by API user ID, optionally filtered by admin status.
 func GetUserByAPIUserID(id int, isAdmin bool) (*models.Session, error) {
 	sessions, err := GetUsers(isAdmin)
 	if err != nil {

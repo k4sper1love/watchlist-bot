@@ -15,7 +15,11 @@ import (
 	"strings"
 )
 
+// HandleFilmsCommand handles the command for listing films.
+// Retrieves paginated films based on the current session context (user or collection)
+// and sends a message with their details and navigation buttons.
 func HandleFilmsCommand(app models.App, session *models.Session) {
+	// Clears the title used for finding films in other contexts to ensure a fresh state.
 	session.FilmsState.Clear()
 
 	if metadata, err := getFilms(app, session); err != nil {
@@ -25,6 +29,8 @@ func HandleFilmsCommand(app models.App, session *models.Session) {
 	}
 }
 
+// HandleFilmsButtons handles button interactions related to the films list.
+// Supports actions like going back, creating new films, managing existing ones, searching, filtering, sorting, and pagination.
 func HandleFilmsButtons(app models.App, session *models.Session, back func(models.App, *models.Session)) {
 	callback := utils.ParseCallback(app.Update)
 
@@ -61,6 +67,8 @@ func HandleFilmsButtons(app models.App, session *models.Session, back func(model
 	}
 }
 
+// HandleFilmsProcess processes workflows related to the films list.
+// Handles states like awaiting a film title input for search.
 func HandleFilmsProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
@@ -74,6 +82,8 @@ func HandleFilmsProcess(app models.App, session *models.Session) {
 	}
 }
 
+// handleFilmsPagination processes pagination actions for the films list.
+// Updates the current page in the session and reloads the films list.
 func handleFilmsPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
 	case states.CallFilmsPageNext:
@@ -108,6 +118,8 @@ func handleFilmsPagination(app models.App, session *models.Session, callback str
 	HandleFilmsCommand(app, session)
 }
 
+// handleFilmSelect processes the selection of a film from the list.
+// Parses the film index and navigates to the detailed view of the selected film.
 func handleFilmSelect(app models.App, session *models.Session, callback string) {
 	if index, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectFilm)); err != nil {
 		utils.LogParseSelectError(err, callback)
@@ -118,11 +130,13 @@ func handleFilmSelect(app models.App, session *models.Session, callback string) 
 	}
 }
 
+// requestFindFilmsTitle prompts the user to enter the title of a film to search for.
 func requestFindFilmsTitle(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestFilmTitle(session), keyboards.Cancel(session))
 	session.SetState(states.AwaitFilmsTitle)
 }
 
+// updateFilmList updates the film list by navigating to the next or previous page.
 func updateFilmList(app models.App, session *models.Session, next bool) error {
 	if next {
 		if session.FilmsState.CurrentPage >= session.FilmsState.LastPage {
@@ -141,6 +155,8 @@ func updateFilmList(app models.App, session *models.Session, next bool) error {
 	return err
 }
 
+// getFilms retrieves a paginated list of films based on the session context (user or collection).
+// Updates the session with the retrieved films and their metadata.
 func getFilms(app models.App, session *models.Session) (*filters.Metadata, error) {
 	var (
 		films    []apiModels.Film
@@ -165,6 +181,7 @@ func getFilms(app models.App, session *models.Session) (*filters.Metadata, error
 	return metadata, nil
 }
 
+// fetchFilmsFromUser retrieves films associated with the current user using the Watchlist service.
 func fetchFilmsFromUser(app models.App, session *models.Session) ([]apiModels.Film, *filters.Metadata, error) {
 	filmsResponse, err := watchlist.GetFilms(app, session)
 	if err != nil {
@@ -174,6 +191,7 @@ func fetchFilmsFromUser(app models.App, session *models.Session) ([]apiModels.Fi
 	return filmsResponse.Films, &filmsResponse.Metadata, nil
 }
 
+// fetchFilmsFromCollection retrieves films associated with the current collection using the Watchlist service.
 func fetchFilmsFromCollection(app models.App, session *models.Session) ([]apiModels.Film, *filters.Metadata, error) {
 	collectionResponse, err := watchlist.GetCollectionFilms(app, session)
 	if err != nil {
@@ -184,6 +202,7 @@ func fetchFilmsFromCollection(app models.App, session *models.Session) ([]apiMod
 	return collectionResponse.CollectionFilms.Films, &collectionResponse.Metadata, nil
 }
 
+// updateSessionWithFilms updates the session with the retrieved films and their metadata.
 func updateSessionWithFilms(session *models.Session, films []apiModels.Film, metadata *filters.Metadata) {
 	session.FilmsState.Films = films
 	session.FilmsState.LastPage = metadata.LastPage

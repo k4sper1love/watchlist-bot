@@ -13,6 +13,8 @@ import (
 	"strings"
 )
 
+// HandleEntitiesCommand handles the command for listing entities (users or admins).
+// Retrieves paginated entities and sends a message with their details and navigation keyboard.
 func HandleEntitiesCommand(app models.App, session *models.Session) {
 	if entities, err := getEntities(session); err != nil {
 		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallMenuAdmin))
@@ -21,6 +23,8 @@ func HandleEntitiesCommand(app models.App, session *models.Session) {
 	}
 }
 
+// HandleEntitiesButtons handles button interactions related to entity management.
+// Supports actions like going back, searching, pagination, and selecting specific entities.
 func HandleEntitiesButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
@@ -42,6 +46,8 @@ func HandleEntitiesButtons(app models.App, session *models.Session) {
 	}
 }
 
+// HandleEntitiesProcess processes the entity-related workflow based on the current session state.
+// Handles states like awaiting a search query for entities.
 func HandleEntitiesProcess(app models.App, session *models.Session) {
 	switch session.State {
 	case states.AwaitEntitiesFind:
@@ -49,6 +55,8 @@ func HandleEntitiesProcess(app models.App, session *models.Session) {
 	}
 }
 
+// handleEntitiesPagination processes pagination actions for entity lists.
+// Updates the current page in the session and reloads the entity list.
 func handleEntitiesPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
 	case states.CallEntitiesPageNext:
@@ -83,6 +91,8 @@ func handleEntitiesPagination(app models.App, session *models.Session, callback 
 	HandleEntitiesCommand(app, session)
 }
 
+// handleEntitiesSelect processes the selection of an entity from the list.
+// Parses the entity ID and navigates to the entity detail view.
 func handleEntitiesSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, getSelectEntityPrefix(session))); err != nil {
 		utils.LogParseSelectError(err, callback)
@@ -93,6 +103,8 @@ func handleEntitiesSelect(app models.App, session *models.Session, callback stri
 	}
 }
 
+// HandleEntityDetailCommand handles the command for viewing detailed information about a selected entity.
+// Delegates to either admin or user detail commands based on the entity type.
 func HandleEntityDetailCommand(app models.App, session *models.Session) {
 	if session.AdminState.IsAdmin {
 		HandleAdminDetailCommand(app, session)
@@ -101,11 +113,14 @@ func HandleEntityDetailCommand(app models.App, session *models.Session) {
 	}
 }
 
+// handleEntitiesFindCommand prompts the user to enter a search query for finding entities.
 func handleEntitiesFindCommand(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestEntityField(session), keyboards.Cancel(session))
 	session.SetState(states.AwaitEntitiesFind)
 }
 
+// parseEntitiesFind processes the search query for entities.
+// Retrieves the entity by Telegram ID, username, or API user ID and navigates to its detail view.
 func parseEntitiesFind(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
@@ -125,6 +140,7 @@ func parseEntitiesFind(app models.App, session *models.Session) {
 	HandleEntityDetailCommand(app, session)
 }
 
+// parseEntityByField retrieves an entity based on the provided field (username, Telegram ID, or API user ID).
 func parseEntityByField(session *models.Session, input string) (*models.Session, error) {
 	switch {
 	case strings.HasPrefix(input, "@"):
@@ -146,6 +162,7 @@ func parseEntityByField(session *models.Session, input string) (*models.Session,
 	}
 }
 
+// getSelectEntityPrefix determines the prefix for selecting entities based on the entity type (admin or user).
 func getSelectEntityPrefix(session *models.Session) string {
 	if session.AdminState.IsAdmin {
 		return states.SelectAdmin
@@ -153,6 +170,8 @@ func getSelectEntityPrefix(session *models.Session) string {
 	return states.SelectUser
 }
 
+// getEntities retrieves paginated entities (users or admins) from the database.
+// Calculates pagination metadata and returns the entities.
 func getEntities(session *models.Session) ([]models.Session, error) {
 	users, err := postgres.GetUsersWithPagination(session.AdminState.CurrentPage, session.AdminState.PageSize, session.AdminState.IsAdmin)
 	if err != nil {
@@ -168,6 +187,8 @@ func getEntities(session *models.Session) ([]models.Session, error) {
 	return users, nil
 }
 
+// getEntity retrieves a specific entity by its Telegram ID.
+// Updates the session with the entity's details.
 func getEntity(session *models.Session) (*models.Session, error) {
 	entity, err := postgres.GetUserByField(postgres.TelegramIDField, session.AdminState.UserID, session.AdminState.IsAdmin)
 	if err != nil {
@@ -178,11 +199,13 @@ func getEntity(session *models.Session) (*models.Session, error) {
 	return entity, nil
 }
 
+// updateSessionWithEntity updates the session with the selected entity's details (language and role).
 func updateSessionWithEntity(session *models.Session, entity *models.Session) {
 	session.AdminState.UserLang = entity.Lang
 	session.AdminState.UserRole = entity.Role
 }
 
+// calculateAdminPages calculates pagination metadata (last page and total records) for entity lists.
 func calculateAdminPages(session *models.Session, total int64) {
 	session.AdminState.LastPage = (int(total) + session.AdminState.PageSize - 1) / session.AdminState.PageSize
 	session.AdminState.TotalRecords = int(total)

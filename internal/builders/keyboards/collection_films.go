@@ -6,6 +6,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 )
 
+// FilmToCollectionOptions creates an inline keyboard for selecting options when adding a film to a collection.
 func FilmToCollectionOptions(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddNewFilmToCollection().
@@ -14,6 +15,7 @@ func FilmToCollectionOptions(session *models.Session) *tgbotapi.InlineKeyboardMa
 		Build(session.Lang)
 }
 
+// AddFilmToCollection creates an inline keyboard for adding a film to a collection.
 func AddFilmToCollection(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	state := session.CollectionFilmsState
 	return New().
@@ -29,6 +31,7 @@ func AddFilmToCollection(session *models.Session) *tgbotapi.InlineKeyboardMarkup
 		Build(session.Lang)
 }
 
+// FilmToCollectionNotFound creates an inline keyboard for handling cases where no films are found.
 func FilmToCollectionNotFound(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddIf(session.FilmsState.Title != "", func(k *Keyboard) {
@@ -40,6 +43,7 @@ func FilmToCollectionNotFound(session *models.Session) *tgbotapi.InlineKeyboardM
 		Build(session.Lang)
 }
 
+// AddCollectionToFilm creates an inline keyboard for adding a collection to a film.
 func AddCollectionToFilm(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	state := session.CollectionFilmsState
 	return New().
@@ -56,6 +60,7 @@ func AddCollectionToFilm(session *models.Session) *tgbotapi.InlineKeyboardMarkup
 
 }
 
+// CollectionToFilmNotFound creates an inline keyboard for handling cases where no collections are found.
 func CollectionToFilmNotFound(session *models.Session) *tgbotapi.InlineKeyboardMarkup {
 	return New().
 		AddIf(session.CollectionsState.Name != "", func(k *Keyboard) {

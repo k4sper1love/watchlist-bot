@@ -7,10 +7,15 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
+// ParseBroadcastMessage processes the input for a broadcast message.
+// Validates the message length and retries if the input is invalid.
+// Stores the validated message in the session's AdminState.
 func ParseBroadcastMessage(app models.App, session *models.Session, retry, next func(models.App, *models.Session)) {
 	ProcessInput(app, session, retry, next, 0, 3000, utils.ParseMessageString, utils.IsValidStringLength, validator.HandleInvalidInputLength, func(s *models.Session, v string) { s.AdminState.Message = v })
 }
 
+// ParseBroadcastImage processes the input for a broadcast image.
+// If the user skips the image, proceeds to the next step; otherwise, uploads the image and stores its URL.
 func ParseBroadcastImage(app models.App, session *models.Session, next func(models.App, *models.Session)) {
 	if utils.IsSkip(app.Update) {
 		next(app, session)
@@ -26,7 +31,9 @@ func ParseBroadcastImage(app models.App, session *models.Session, next func(mode
 	next(app, session)
 }
 
+// ParseBroadcastPin processes the input for pinning a broadcast message.
+// Sets the NeedPin flag in the session's AdminState based on the user's choice.
 func ParseBroadcastPin(app models.App, session *models.Session, next func(models.App, *models.Session)) {
-	session.AdminState.NeedFeedbackPin = utils.IsAgree(app.Update)
+	session.AdminState.NeedPin = utils.IsAgree(app.Update)
 	next(app, session)
 }

@@ -9,6 +9,8 @@ import (
 	"net/http"
 )
 
+// GetUser fetches the current user's details from the API.
+// It decrypts the access token, sends a GET request to the API, and parses the response into an `models.User` object.
 func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
@@ -20,15 +22,15 @@ func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        token,
-			Method:             http.MethodGet,
+			Method:             http.MethodGet, // HTTP GET method for fetching data.
 			URL:                app.Config.APIHost + "/api/v1/user",
-			ExpectedStatusCode: http.StatusOK,
+			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
-	defer utils.CloseBody(resp.Body)
+	defer utils.CloseBody(resp.Body) // Ensure the response body is closed after use.
 
 	user := &apiModels.User{}
 	if err = parseUser(user, resp.Body); err != nil {
@@ -39,6 +41,9 @@ func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 	return user, nil
 }
 
+// UpdateUser updates the current user's details by sending a PUT request to the API.
+// It decrypts the access token, sends the request with updated user details in the body,
+// and parses the response into an `models.User` object.
 func UpdateUser(app models.App, session *models.Session) (*apiModels.User, error) {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
@@ -50,16 +55,16 @@ func UpdateUser(app models.App, session *models.Session) (*apiModels.User, error
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        token,
-			Method:             http.MethodPut,
+			Method:             http.MethodPut, // HTTP PUT method for updating data.
 			URL:                app.Config.APIHost + "/api/v1/user",
 			Body:               session.ProfileState,
-			ExpectedStatusCode: http.StatusOK,
+			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
-	defer utils.CloseBody(resp.Body)
+	defer utils.CloseBody(resp.Body) // Ensure the response body is closed after use.
 
 	user := &apiModels.User{}
 	if err = parseUser(user, resp.Body); err != nil {
@@ -70,6 +75,8 @@ func UpdateUser(app models.App, session *models.Session) (*apiModels.User, error
 	return user, nil
 }
 
+// DeleteUser deletes the current user's account by sending a DELETE request to the API.
+// It decrypts the access token, sends the request, and handles the response.
 func DeleteUser(app models.App, session *models.Session) error {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
@@ -81,15 +88,15 @@ func DeleteUser(app models.App, session *models.Session) error {
 		&client.CustomRequest{
 			HeaderType:         client.HeaderAuthorization,
 			HeaderValue:        token,
-			Method:             http.MethodDelete,
+			Method:             http.MethodDelete, // HTTP DELETE method for removing data.
 			URL:                app.Config.APIHost + "/api/v1/user",
-			ExpectedStatusCode: http.StatusOK,
+			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
 		},
 	)
 	if err != nil {
 		return err
 	}
-	defer utils.CloseBody(resp.Body)
+	defer utils.CloseBody(resp.Body) // Ensure the response body is closed after use.
 
 	return nil
 }

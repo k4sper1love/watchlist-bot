@@ -13,6 +13,8 @@ import (
 	"strings"
 )
 
+// HandleFeedbacksCommand handles the command for listing feedbacks.
+// Retrieves paginated feedbacks and sends a message with their details and navigation keyboard.
 func HandleFeedbacksCommand(app models.App, session *models.Session) {
 	if feedbacks, err := getFeedbacks(session); err != nil {
 		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallMenuAdmin))
@@ -21,6 +23,8 @@ func HandleFeedbacksCommand(app models.App, session *models.Session) {
 	}
 }
 
+// HandleFeedbacksButtons handles button interactions related to feedback management.
+// Supports actions like going back, pagination, and selecting specific feedbacks.
 func HandleFeedbacksButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
@@ -39,6 +43,8 @@ func HandleFeedbacksButtons(app models.App, session *models.Session) {
 	}
 }
 
+// handleFeedbackPagination processes pagination actions for feedback lists.
+// Updates the current page in the session and reloads the feedback list.
 func handleFeedbackPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
 	case states.CallFeedbacksPageNext:
@@ -73,6 +79,8 @@ func handleFeedbackPagination(app models.App, session *models.Session, callback 
 	HandleFeedbacksCommand(app, session)
 }
 
+// handleFeedbackSelect processes the selection of a feedback from the list.
+// Parses the feedback ID and navigates to the feedback detail view.
 func handleFeedbackSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectFeedback)); err != nil {
 		utils.LogParseSelectError(err, callback)
@@ -83,6 +91,8 @@ func handleFeedbackSelect(app models.App, session *models.Session, callback stri
 	}
 }
 
+// getFeedbacks retrieves paginated feedbacks from the database.
+// Calculates pagination metadata and returns the feedbacks.
 func getFeedbacks(session *models.Session) ([]models.Feedback, error) {
 	feedback, err := postgres.GetFeedbacksWithPagination(session.AdminState.CurrentPage, session.AdminState.PageSize)
 	if err != nil {

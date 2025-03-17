@@ -9,10 +9,13 @@ import (
 	"log/slog"
 )
 
+// GetSessionByTelegramID retrieves a session from the database by Telegram ID.
+// It preloads all related states and initializes default values if necessary.
 func GetSessionByTelegramID(app models.App) (*models.Session, error) {
 	var session models.Session
 	telegramID := utils.ParseTelegramID(app.Update)
 
+	// Query the database with preloading of all related states
 	if err := GetDatabase().
 		Preload("ProfileState").
 		Preload("FeedbackState").
@@ -36,23 +39,30 @@ func GetSessionByTelegramID(app models.App) (*models.Session, error) {
 		return nil, err
 	}
 
+	// Initialize default values for the session
 	initializeSessionDefaults(app, &session)
 	return &session, nil
 }
 
+// initializeSessionDefaults sets default values for a session if they are not already set.
+// This ensures that all necessary fields and related states are properly initialized.
 func initializeSessionDefaults(app models.App, session *models.Session) {
+	// Set role to Root if Telegram ID matches the root ID
 	if session.TelegramID == app.Config.RootID {
 		session.Role = roles.Root
 	}
 
+	// Initialize Telegram username if not set
 	if session.TelegramUsername == "" {
 		session.TelegramUsername = utils.ParseTelegramUsername(app.Update)
 	}
 
+	// Initialize language code if not set
 	if session.Lang == "" {
 		session.Lang = utils.ParseLanguageCode(app.Update)
 	}
 
+	// Ensure all state objects are initialized
 	if session.AdminState == nil {
 		session.AdminState = &models.AdminState{}
 	}
@@ -125,6 +135,8 @@ func initializeSessionDefaults(app models.App, session *models.Session) {
 	}
 }
 
+// SaveSessionWithDependencies saves a session and all its associated dependencies to the database.
+// Uses FullSaveAssociations to ensure all related states are saved.
 func SaveSessionWithDependencies(session *models.Session) {
 	GetDatabase().Session(&gorm.Session{FullSaveAssociations: true}).Save(session)
 }

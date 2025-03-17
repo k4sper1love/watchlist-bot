@@ -9,6 +9,8 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 )
 
+// HandleManageFilmCommand handles the command for managing a specific film.
+// Sends a message with options to update, delete, or remove the film from a collection.
 func HandleManageFilmCommand(app models.App, session *models.Session) {
 	app.SendImage(
 		session.FilmDetailState.Film.ImageURL,
@@ -17,6 +19,8 @@ func HandleManageFilmCommand(app models.App, session *models.Session) {
 	)
 }
 
+// HandleManageFilmButtons handles button interactions related to managing a film.
+// Supports actions like going back, updating, deleting, or removing the film from a collection.
 func HandleManageFilmButtons(app models.App, session *models.Session) {
 	switch utils.ParseCallback(app.Update) {
 	case states.CallManageFilmBack:
@@ -33,6 +37,7 @@ func HandleManageFilmButtons(app models.App, session *models.Session) {
 	}
 }
 
+// handleRemoveFilmFromCollection removes the current film from its associated collection.
 func handleRemoveFilmFromCollection(app models.App, session *models.Session) {
 	if err := watchlist.DeleteCollectionFilm(app, session); err != nil {
 		app.SendMessage(messages.RemoveFilmFailure(session), keyboards.Back(session, states.CallFilmsManage))

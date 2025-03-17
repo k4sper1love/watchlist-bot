@@ -16,7 +16,10 @@ import (
 	"strings"
 )
 
+// HandleCollectionsCommand handles the command for listing collections.
+// Retrieves paginated collections and sends a message with their details and navigation buttons.
 func HandleCollectionsCommand(app models.App, session *models.Session) {
+	// Clears the name used for finding collections in other contexts to ensure a fresh state.
 	session.CollectionsState.Clear()
 
 	if metadata, err := getCollections(app, session); err != nil {
@@ -26,6 +29,8 @@ func HandleCollectionsCommand(app models.App, session *models.Session) {
 	}
 }
 
+// HandleCollectionsButtons handles button interactions related to collections.
+// Supports actions like going back, creating new collections, managing existing ones, searching, sorting, and pagination.
 func HandleCollectionsButtons(app models.App, session *models.Session) {
 	callback := utils.ParseCallback(app.Update)
 
@@ -59,6 +64,8 @@ func HandleCollectionsButtons(app models.App, session *models.Session) {
 	}
 }
 
+// HandleCollectionProcess processes workflows related to collections.
+// Handles states like awaiting a collection name input for search.
 func HandleCollectionProcess(app models.App, session *models.Session) {
 	if utils.IsCancel(app.Update) {
 		session.ClearAllStates()
@@ -72,6 +79,8 @@ func HandleCollectionProcess(app models.App, session *models.Session) {
 	}
 }
 
+// handleCollectionsPagination processes pagination actions for the collections list.
+// Updates the current page in the session and reloads the collections list.
 func handleCollectionsPagination(app models.App, session *models.Session, callback string) {
 	switch callback {
 	case states.CallCollectionsPageNext:
@@ -106,6 +115,8 @@ func handleCollectionsPagination(app models.App, session *models.Session, callba
 	HandleCollectionsCommand(app, session)
 }
 
+// handleCollectionSelect processes the selection of a collection from the list.
+// Parses the collection ID and navigates to the films associated with the selected collection.
 func handleCollectionSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectCollection)); err != nil {
 		utils.LogParseSelectError(err, callback)
@@ -116,16 +127,19 @@ func handleCollectionSelect(app models.App, session *models.Session, callback st
 	}
 }
 
+// handleCollectionsFindByName prompts the user to enter the name of a collection to search for.
 func handleCollectionsFindByName(app models.App, session *models.Session) {
 	app.SendMessage(messages.RequestCollectionName(session), keyboards.Cancel(session))
 	session.SetState(states.AwaitCollectionsName)
 }
 
+// handleFavoriteCollection toggles the favorite status of the current collection and updates it.
 func handleFavoriteCollection(app models.App, session *models.Session) {
 	session.CollectionDetailState.SetFavorite(!session.CollectionDetailState.Collection.IsFavorite)
 	HandleUpdateCollection(app, session, films.HandleFilmsCommand)
 }
 
+// getCollections retrieves a paginated list of collections using the Watchlist service.
 func getCollections(app models.App, session *models.Session) (*filters.Metadata, error) {
 	collectionsResponse, err := watchlist.GetCollections(app, session)
 	if err != nil {
@@ -136,11 +150,13 @@ func getCollections(app models.App, session *models.Session) (*filters.Metadata,
 	return &collectionsResponse.Metadata, nil
 }
 
+// updateSessionWithCollections updates the session with the retrieved collections and their metadata.
 func updateSessionWithCollections(session *models.Session, collections []apiModels.Collection, metadata *filters.Metadata) {
 	session.CollectionsState.Collections = collections
 	session.CollectionsState.LastPage = metadata.LastPage
 }
 
+// setContextAndHandleFilms sets the context to "collection" and navigates to the films associated with the collection.
 func setContextAndHandleFilms(app models.App, session *models.Session) {
 	session.SetContext(states.CtxCollection)
 	session.FilmsState.CurrentPage = 1
