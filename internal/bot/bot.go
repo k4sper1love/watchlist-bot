@@ -6,14 +6,16 @@ package bot
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
-	"github.com/k4sper1love/watchlist-bot/config"
+	"github.com/k4sper1love/watchlist-bot/internal/config"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/logger"
 	"github.com/k4sper1love/watchlist-bot/pkg/translator"
+	"log"
 	"log/slog"
+	"os"
 )
 
 // Run initializes and starts the bot application.
@@ -27,6 +29,22 @@ func Run() error {
 		return err
 	}
 	sl.Log.Info("application config loaded successfully")
+
+	// Создаем директорию, если её нет
+	if err = os.MkdirAll(os.Getenv("LOGS_DIR"), os.ModePerm); err != nil {
+		log.Fatalf("Ошибка создания директории: %v", err)
+	}
+
+	// Открываем файл для записи логов
+	logFile, err := os.OpenFile(os.Getenv("LOGS_DIR")+"/bot.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("Ошибка открытия файла: %v", err)
+	}
+	defer logFile.Close()
+
+	// Перенаправляем stdout и stderr в файл
+	os.Stdout = logFile
+	os.Stderr = logFile
 
 	sl.SetupLogger(app.Config.Environment)
 

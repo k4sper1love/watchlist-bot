@@ -397,7 +397,7 @@ func NumberToEmoji(number int) string {
 // GetLogFilePath constructs the log file path for a user based on their ID.
 // It checks if the log file exists and returns an error if it does not.
 func GetLogFilePath(userID int) (string, error) {
-	logFile := filepath.Join("logs", fmt.Sprintf("user_%d.log", userID))
+	logFile := filepath.Join("logs/users", fmt.Sprintf("user_%d.log", userID))
 	if _, err := os.Stat(logFile); os.IsNotExist(err) {
 		return "", err
 	}
