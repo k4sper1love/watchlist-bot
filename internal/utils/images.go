@@ -3,7 +3,6 @@ package utils
 import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"io"
 	"log/slog"
 	"net/http"
@@ -32,7 +31,7 @@ func ParseImageFromMessage(bot *tgbotapi.BotAPI, update *tgbotapi.Update) ([]byt
 	// Fetch the file metadata from Telegram's API.
 	file, err := bot.GetFile(tgbotapi.FileConfig{FileID: photo.FileID})
 	if err != nil {
-		sl.Log.Error("failed to get file", slog.Any("error", err))
+		slog.Error("failed to get file", slog.Any("error", err))
 		return nil, err
 	}
 
@@ -46,14 +45,14 @@ func ParseImageFromMessage(bot *tgbotapi.BotAPI, update *tgbotapi.Update) ([]byt
 func ParseImageFromURL(imageURL string) ([]byte, error) {
 	resp, err := http.Get(imageURL)
 	if err != nil {
-		sl.Log.Error("failed to get image by URL", slog.Any("error", err), slog.String("url", imageURL))
+		slog.Error("failed to get image by URL", slog.Any("error", err), slog.String("url", imageURL))
 		return nil, err
 	}
 	defer CloseBody(resp.Body) // Ensure the response body is closed after use.
 
 	// Validate the content type of the response.
 	if !isSupportedImageType(resp.Header.Get("Content-Type")) {
-		sl.Log.Warn(
+		slog.Warn(
 			"image has unsupported content type",
 			slog.String("content-type", resp.Header.Get("Content-Type")),
 			slog.String("url", imageURL),
@@ -64,7 +63,7 @@ func ParseImageFromURL(imageURL string) ([]byte, error) {
 	// Read the image data from the response body.
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		sl.Log.Error("failed to read response body", slog.Any("error", err), slog.String("url", imageURL))
+		slog.Error("failed to read response body", slog.Any("error", err), slog.String("url", imageURL))
 		return nil, err
 	}
 
@@ -76,7 +75,7 @@ func ParseImageFromURL(imageURL string) ([]byte, error) {
 func DownloadImage(imageURL string) (string, error) {
 	resp, err := http.Get(imageURL)
 	if err != nil {
-		sl.Log.Error("failed to get image by URL", slog.Any("error", err), slog.String("url", imageURL))
+		slog.Error("failed to get image by URL", slog.Any("error", err), slog.String("url", imageURL))
 		return "", err
 	}
 	defer CloseBody(resp.Body) // Ensure the response body is closed after use.
@@ -84,7 +83,7 @@ func DownloadImage(imageURL string) (string, error) {
 	// Create a temporary file to store the image.
 	file, err := os.CreateTemp("", "image_*.jpg")
 	if err != nil {
-		sl.Log.Error("failed to create temporary file", slog.Any("error", err), slog.String("url", imageURL))
+		slog.Error("failed to create temporary file", slog.Any("error", err), slog.String("url", imageURL))
 		return "", err
 	}
 	defer CloseFile(file) // Ensure the file is closed after use.
@@ -92,7 +91,7 @@ func DownloadImage(imageURL string) (string, error) {
 	// Copy the image data into the temporary file.
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
-		sl.Log.Error("failed to copy image data to file", slog.Any("error", err), slog.String("url", imageURL))
+		slog.Error("failed to copy image data to file", slog.Any("error", err), slog.String("url", imageURL))
 		return "", err
 	}
 

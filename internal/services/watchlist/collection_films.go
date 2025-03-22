@@ -18,7 +18,7 @@ import (
 func GetCollectionFilms(app models.App, session *models.Session) (*models.CollectionFilmsResponse, error) {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return nil, err
 	}
 
@@ -30,6 +30,7 @@ func GetCollectionFilms(app models.App, session *models.Session) (*models.Collec
 			Method:             http.MethodGet, // HTTP GET method for fetching data.
 			URL:                buildGetCollectionFilmsURL(app, session),
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -40,7 +41,7 @@ func GetCollectionFilms(app models.App, session *models.Session) (*models.Collec
 	// Parse the response into a structured format.
 	var collectionFilmsResponse models.CollectionFilmsResponse
 	if err = json.NewDecoder(resp.Body).Decode(&collectionFilmsResponse); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -53,7 +54,7 @@ func GetCollectionFilms(app models.App, session *models.Session) (*models.Collec
 func CreateCollectionFilm(app models.App, session *models.Session) (*apiModels.CollectionFilm, error) {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return nil, err
 	}
 
@@ -66,6 +67,7 @@ func CreateCollectionFilm(app models.App, session *models.Session) (*apiModels.C
 			URL:                fmt.Sprintf("%s/api/v1/collections/%d/films", app.Config.APIHost, session.CollectionDetailState.Collection.ID),
 			Body:               session.FilmDetailState,
 			ExpectedStatusCode: http.StatusCreated, // Expecting a 201 Created response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -76,7 +78,7 @@ func CreateCollectionFilm(app models.App, session *models.Session) (*apiModels.C
 	// Parse the response into a structured format.
 	collectionFilm := &apiModels.CollectionFilm{}
 	if err = parseCollectionFilm(collectionFilm, resp.Body); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -89,7 +91,7 @@ func CreateCollectionFilm(app models.App, session *models.Session) (*apiModels.C
 func AddCollectionFilm(app models.App, session *models.Session) (*apiModels.CollectionFilm, error) {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return nil, err
 	}
 
@@ -101,6 +103,7 @@ func AddCollectionFilm(app models.App, session *models.Session) (*apiModels.Coll
 			Method:             http.MethodPost, // HTTP POST method for adding data.
 			URL:                fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Config.APIHost, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID),
 			ExpectedStatusCode: http.StatusCreated, // Expecting a 201 Created response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -111,7 +114,7 @@ func AddCollectionFilm(app models.App, session *models.Session) (*apiModels.Coll
 	// Parse the response into a structured format.
 	collectionFilm := &apiModels.CollectionFilm{}
 	if err = parseCollectionFilm(collectionFilm, resp.Body); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -124,7 +127,7 @@ func AddCollectionFilm(app models.App, session *models.Session) (*apiModels.Coll
 func DeleteCollectionFilm(app models.App, session *models.Session) error {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return err
 	}
 
@@ -136,6 +139,7 @@ func DeleteCollectionFilm(app models.App, session *models.Session) error {
 			Method:             http.MethodDelete, // HTTP DELETE method for removing data.
 			URL:                fmt.Sprintf("%s/api/v1/collections/%d/films/%d", app.Config.APIHost, session.CollectionDetailState.Collection.ID, session.FilmDetailState.Film.ID),
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {

@@ -30,7 +30,7 @@ func GetCollectionsExcludeFilm(app models.App, session *models.Session) (*models
 func getCollectionsRequest(app models.App, session *models.Session, filmID, excludeFilmID, currentPage, pageSize int) (*models.CollectionsResponse, error) {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return nil, err
 	}
 
@@ -41,6 +41,7 @@ func getCollectionsRequest(app models.App, session *models.Session, filmID, excl
 			Method:             http.MethodGet, // HTTP GET method for fetching data.
 			URL:                buildGetCollectionsURL(app, session, filmID, excludeFilmID, currentPage, pageSize),
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -50,7 +51,7 @@ func getCollectionsRequest(app models.App, session *models.Session, filmID, excl
 
 	var collectionsResponse models.CollectionsResponse
 	if err = json.NewDecoder(resp.Body).Decode(&collectionsResponse); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -63,7 +64,7 @@ func getCollectionsRequest(app models.App, session *models.Session, filmID, excl
 func CreateCollection(app models.App, session *models.Session) (*apiModels.Collection, error) {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return nil, err
 	}
 
@@ -75,6 +76,7 @@ func CreateCollection(app models.App, session *models.Session) (*apiModels.Colle
 			URL:                app.Config.APIHost + "/api/v1/collections",
 			Body:               session.CollectionDetailState,
 			ExpectedStatusCode: http.StatusCreated, // Expecting a 201 Created response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -84,7 +86,7 @@ func CreateCollection(app models.App, session *models.Session) (*apiModels.Colle
 
 	collection := &apiModels.Collection{}
 	if err = parseCollection(collection, resp.Body); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -97,7 +99,7 @@ func CreateCollection(app models.App, session *models.Session) (*apiModels.Colle
 func UpdateCollection(app models.App, session *models.Session) (*apiModels.Collection, error) {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return nil, err
 	}
 
@@ -109,6 +111,7 @@ func UpdateCollection(app models.App, session *models.Session) (*apiModels.Colle
 			URL:                fmt.Sprintf("%s/api/v1/collections/%d", app.Config.APIHost, session.CollectionDetailState.Collection.ID),
 			Body:               session.CollectionDetailState,
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -118,7 +121,7 @@ func UpdateCollection(app models.App, session *models.Session) (*apiModels.Colle
 
 	collection := &apiModels.Collection{}
 	if err = parseCollection(collection, resp.Body); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -131,7 +134,7 @@ func UpdateCollection(app models.App, session *models.Session) (*apiModels.Colle
 func DeleteCollection(app models.App, session *models.Session) error {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return err
 	}
 
@@ -142,6 +145,7 @@ func DeleteCollection(app models.App, session *models.Session) error {
 			Method:             http.MethodDelete, // HTTP DELETE method for removing data.
 			URL:                fmt.Sprintf("%s/api/v1/collections/%d", app.Config.APIHost, session.CollectionDetailState.Collection.ID),
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {

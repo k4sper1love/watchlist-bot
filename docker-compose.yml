@@ -16,6 +16,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       LOCALES_DIR: ${LOCALES_DIR}
       LOGS_DIR: ${LOGS_DIR}
+      LOGS_OUTPUT: ${LOGS_OUTPUT}
       BOT_TOKEN: ${BOT_TOKEN}
       ROOT_TELEGRAM_ID: ${ROOT_TELEGRAM_ID}
       MASTER_KEY: ${MASTER_KEY}
@@ -54,8 +55,8 @@ services:
       - es-data:/usr/share/elasticsearch/data
     environment:
       ES_JAVA_OPTS: "-Xmx512m -Xms512m"
-      ELASTIC_USERNAME: "elastic"
-      ELASTIC_PASSWORD: "MyPw123"
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME:-elastic}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       discovery.type: single-node
     networks:
       - elk
@@ -71,6 +72,8 @@ services:
       - ./configs/logstash/pipelines:/usr/share/logstash/config/pipelines:ro
     environment:
       LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME:-elastic}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
     ports:
       - "5044:5044"
       - "5000:5000"
@@ -86,6 +89,9 @@ services:
       - elasticsearch
     volumes:
       - ./configs/kibana/config.yml:/usr/share/kibana/config/kibana.yml:ro
+    environment:
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME:-elastic}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
     networks:
       - elk
     ports:
@@ -96,6 +102,8 @@ services:
     volumes:
       - ./configs/filebeat/config.yml:/usr/share/filebeat/filebeat.yml:ro
       - logs-data:/logs
+    environment:
+      LOGS_DIR: ${LOGS_DIR}
     networks:
       - elk
     depends_on:

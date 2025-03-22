@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
@@ -36,25 +35,39 @@ type externalVideoData struct {
 func GetFilmFromYoutube(app models.App, session *models.Session, url string) (*apiModels.Film, error) {
 	videoID, err := utils.ExtractYoutubeVideoID(url)
 	if err != nil {
-		sl.Log.Error("failed to extract video ID", slog.Any("error", err), slog.String("url", url))
+		utils.LogParseFromURLError(session.TelegramID, "failed to extract video ID", err, url)
 		return nil, err
 	}
 
 	service, err := youtube.NewService(context.Background(), option.WithAPIKey(app.Config.YoutubeAPIToken))
 	if err != nil {
-		sl.Log.Error("failed to create youtube service", slog.Any("error", err))
+		slog.Error(
+			"failed to create youtube service",
+			slog.Any("error", err),
+			slog.Int("telegram_id", session.TelegramID),
+		)
 		return nil, err
 	}
 
 	video, err := fetchYoutubeVideo(service, videoID)
 	if err != nil {
-		sl.Log.Error("failed to fetch youtube video", slog.Any("error", err), slog.String("url", url))
+		slog.Error(
+			"failed to fetch youtube video",
+			slog.Any("error", err),
+			slog.String("url", url),
+			slog.Int("telegram_id", session.TelegramID),
+		)
 		return nil, err
 	}
 
-	externalData, err := getExternalVideoData(videoID)
+	externalData, err := getExternalVideoData(session, videoID)
 	if err != nil {
-		sl.Log.Warn("failed to get external video data", slog.Any("error", err), slog.String("videoID", videoID))
+		slog.Warn(
+			"failed to get external video data",
+			slog.Any("error", err),
+			slog.String("videoID", videoID),
+			slog.Int("telegram_id", session.TelegramID),
+		)
 		externalData = &externalVideoData{}
 	}
 
@@ -71,12 +84,13 @@ func fetchYoutubeVideo(service *youtube.Service, videoID string) (*youtube.Video
 }
 
 // getExternalVideoData fetches additional video data (e.g., likes, dislikes) from an external API.
-func getExternalVideoData(videoID string) (*externalVideoData, error) {
+func getExternalVideoData(session *models.Session, videoID string) (*externalVideoData, error) {
 	resp, err := client.Do(
 		&client.CustomRequest{
 			Method:             http.MethodGet, // HTTP GET method for fetching data.
 			URL:                fmt.Sprintf("https://returnyoutubedislikeapi.com/votes?videoId=%s", videoID),
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -86,7 +100,7 @@ func getExternalVideoData(videoID string) (*externalVideoData, error) {
 
 	var data externalVideoData
 	if err = json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 

@@ -2,7 +2,6 @@ package translator
 
 import (
 	"encoding/json"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
 	"log/slog"
@@ -20,7 +19,7 @@ var (
 // Init initializes the translator by loading translation files from the specified directory.
 // It sets up the `i18n.Bundle` with English as the default language and registers the JSON unmarshal function.
 // Returns an error if reading the directory or loading a translation file fails.
-func Init(localeDir string) error {
+func Init(localesDir string) error {
 	var err error
 	once.Do(func() {
 		// Initialize the i18n bundle with English as the default language.
@@ -28,7 +27,7 @@ func Init(localeDir string) error {
 		bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
 
 		// Load all translation files from the specified directory.
-		err = loadLocales(bundle, localeDir)
+		err = loadLocales(bundle, localesDir)
 	})
 	return err
 }
@@ -39,7 +38,7 @@ func loadLocales(bundle *i18n.Bundle, dir string) error {
 	// Read the directory containing translation files.
 	files, err := os.ReadDir(dir)
 	if err != nil {
-		sl.Log.Error("failed to read directory", slog.Any("error", err), slog.String("dir", dir))
+		slog.Error("failed to read directory", slog.Any("error", err), slog.String("dir", dir))
 		return err
 	}
 
@@ -50,11 +49,11 @@ func loadLocales(bundle *i18n.Bundle, dir string) error {
 		}
 
 		filePath := filepath.Join(dir, file.Name())
-		sl.Log.Info("loading translation file", slog.String("file", filePath))
+		slog.Debug("loading translation file", slog.String("file", filePath))
 
 		// Attempt to load the translation file into the bundle.
 		if _, err = bundle.LoadMessageFile(filePath); err != nil {
-			sl.Log.Warn("failed to load translation file", slog.Any("error", err), slog.String("file", filePath))
+			slog.Warn("failed to load translation file", slog.Any("error", err), slog.String("file", filePath))
 		}
 	}
 
@@ -92,7 +91,7 @@ func Translate(languageCode string, messageID string, templateData map[string]in
 
 	// If localization fails or the message is empty, fall back to English.
 	if err != nil || msg == "" {
-		sl.Log.Warn("translation missing, falling back to 'en'", slog.String("lang", languageCode), slog.String("message", messageID))
+		slog.Warn("translation missing, falling back to 'en'", slog.String("lang", languageCode), slog.String("message", messageID))
 		fallbackLocalizer := getLocalizer("en")
 
 		msg, err = fallbackLocalizer.Localize(&i18n.LocalizeConfig{
@@ -103,7 +102,7 @@ func Translate(languageCode string, messageID string, templateData map[string]in
 
 		// If fallback localization also fails, return the message ID as the fallback value.
 		if err != nil || msg == "" {
-			sl.Log.Warn("translation missing in fallback language", slog.String("lang", "en"), slog.String("message", messageID))
+			slog.Warn("translation missing in fallback language", slog.String("lang", "en"), slog.String("message", messageID))
 			return messageID
 		}
 	}

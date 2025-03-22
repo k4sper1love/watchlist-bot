@@ -95,7 +95,7 @@ func handleEntitiesPagination(app models.App, session *models.Session, callback 
 // Parses the entity ID and navigates to the entity detail view.
 func handleEntitiesSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, getSelectEntityPrefix(session))); err != nil {
-		utils.LogParseSelectError(err, callback)
+		utils.LogParseSelectError(session.TelegramID, err, callback)
 		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallMenuAdmin))
 	} else {
 		session.AdminState.UserID = id

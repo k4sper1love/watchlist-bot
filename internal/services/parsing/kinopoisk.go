@@ -4,14 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/k4sper1love/watchlist-api/pkg/filters"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"github.com/k4sper1love/watchlist-bot/pkg/security"
 	"io"
-	"log/slog"
 	"net/http"
 	"net/url"
 )
@@ -22,7 +20,7 @@ import (
 func GetFilmFromKinopoisk(session *models.Session, url string) (*apiModels.Film, error) {
 	queryKey, id, err := utils.ExtractKinopoiskQuery(url)
 	if err != nil {
-		sl.Log.Error("failed to extract query", slog.Any("error", err), slog.String("url", url))
+		utils.LogParseFromURLError(session.TelegramID, "failed to extract query", err, url)
 		return nil, err
 	}
 
@@ -37,7 +35,7 @@ func GetFilmFromKinopoisk(session *models.Session, url string) (*apiModels.Film,
 
 	film, err := parseFilmFromKinopoisk(resp.Body)
 	if err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -62,7 +60,7 @@ func GetFilmsFromKinopoisk(session *models.Session) ([]apiModels.Film, *filters.
 
 	films, metadata, err := parseFilmsFromKinopoisk(resp.Body)
 	if err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, nil, err
 	}
 
@@ -74,7 +72,7 @@ func GetFilmsFromKinopoisk(session *models.Session) ([]apiModels.Film, *filters.
 func getDataFromKinopoisk(session *models.Session, url string) (*http.Response, error) {
 	token, err := security.Decrypt(session.KinopoiskAPIToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return nil, err
 	}
 
@@ -85,6 +83,7 @@ func getDataFromKinopoisk(session *models.Session, url string) (*http.Response, 
 			Method:             http.MethodGet, // HTTP GET method for fetching data.
 			URL:                url,
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 }

@@ -24,7 +24,7 @@
 //	{
 //	  "welcome_message": {
 //	    "one": "Welcome, {{.Name}}!",
-//	    "other": "Welcome, everyone!"
+//	    "other": "Welcome, everyone!",
 //	  }
 //	}
 //

@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -10,13 +9,13 @@ import (
 
 var db *gorm.DB // Global database connection instance
 
-// ConnectDatabase establishes a connection to the PostgreSQL database using the provided configuration.
+// ConnectDatabase establishes a connection to the PostgreSQL database using the provided database URL.
 // It also performs automatic migration to ensure the database schema is up-to-date.
-func ConnectDatabase(config *models.Config) error {
+func ConnectDatabase(databaseURL string) error {
 	var err error
-	db, err = gorm.Open(postgres.Open(config.DatabaseURL), &gorm.Config{})
+	db, err = gorm.Open(postgres.Open(databaseURL), &gorm.Config{})
 	if err != nil {
-		sl.Log.Error("failed to open database connection", slog.Any("error", err))
+		slog.Error("failed to open database connection", slog.Any("error", err))
 		return err
 	}
 
@@ -53,7 +52,7 @@ func GetDatabase() *gorm.DB {
 func SaveRecords(records ...interface{}) {
 	for _, record := range records {
 		if err := db.Save(record).Error; err != nil {
-			sl.Log.Warn(
+			slog.Warn(
 				"failed to save record",
 				slog.Any("error", err),
 				slog.Any("record", record))

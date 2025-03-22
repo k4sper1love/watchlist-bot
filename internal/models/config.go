@@ -257,7 +257,7 @@ func (app App) createTemp(id int) *App {
 					ID: int64(id)},
 			},
 		},
-		Logger: logger.GetLogger(id),
+		Logger: logger.Get(id),
 	}
 }
 

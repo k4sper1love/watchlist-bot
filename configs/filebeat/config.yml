@@ -2,11 +2,11 @@ filebeat.inputs:
   - type: log
     enabled: true
     paths:
-      - /logs/bot.log
-    json.keys_under_root: true  # Разворачивает JSON в корневые поля
-    json.add_error_key: true     # Добавляет поле ошибки, если что-то не так
+      - ${LOGS_DIR}/app.log
+    json.keys_under_root: true
+    json.add_error_key: true
     fields:
-      service: bot
+      service: app
 
 output.logstash:
   hosts: ["logstash:5044"]

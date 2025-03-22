@@ -14,7 +14,7 @@ import (
 func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return nil, err
 	}
 
@@ -25,6 +25,7 @@ func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 			Method:             http.MethodGet, // HTTP GET method for fetching data.
 			URL:                app.Config.APIHost + "/api/v1/user",
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -34,7 +35,7 @@ func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 
 	user := &apiModels.User{}
 	if err = parseUser(user, resp.Body); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -47,7 +48,7 @@ func GetUser(app models.App, session *models.Session) (*apiModels.User, error) {
 func UpdateUser(app models.App, session *models.Session) (*apiModels.User, error) {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return nil, err
 	}
 
@@ -59,6 +60,7 @@ func UpdateUser(app models.App, session *models.Session) (*apiModels.User, error
 			URL:                app.Config.APIHost + "/api/v1/user",
 			Body:               session.ProfileState,
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -68,7 +70,7 @@ func UpdateUser(app models.App, session *models.Session) (*apiModels.User, error
 
 	user := &apiModels.User{}
 	if err = parseUser(user, resp.Body); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -80,7 +82,7 @@ func UpdateUser(app models.App, session *models.Session) (*apiModels.User, error
 func DeleteUser(app models.App, session *models.Session) error {
 	token, err := security.Decrypt(session.AccessToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return err
 	}
 
@@ -91,6 +93,7 @@ func DeleteUser(app models.App, session *models.Session) error {
 			Method:             http.MethodDelete, // HTTP DELETE method for removing data.
 			URL:                app.Config.APIHost + "/api/v1/user",
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {

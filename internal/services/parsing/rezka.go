@@ -3,6 +3,7 @@ package parsing
 import (
 	"github.com/PuerkitoBio/goquery"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
+	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"io"
@@ -13,12 +14,13 @@ import (
 
 // GetFilmFromRezka fetches film details from the Rezka website using the provided URL.
 // It sends an HTTP GET request to the URL and parses the HTML response into an `models.Film` object.
-func GetFilmFromRezka(url string) (*apiModels.Film, error) {
+func GetFilmFromRezka(session *models.Session, url string) (*apiModels.Film, error) {
 	resp, err := client.Do(
 		&client.CustomRequest{
 			Method:             http.MethodGet, // HTTP GET method for fetching data.
 			URL:                url,
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -28,7 +30,7 @@ func GetFilmFromRezka(url string) (*apiModels.Film, error) {
 
 	var film apiModels.Film
 	if err = parseFilmFromRezka(&film, resp.Body); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 

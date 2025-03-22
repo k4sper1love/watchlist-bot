@@ -83,7 +83,7 @@ func handleFeedbackPagination(app models.App, session *models.Session, callback 
 // Parses the feedback ID and navigates to the feedback detail view.
 func handleFeedbackSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectFeedback)); err != nil {
-		utils.LogParseSelectError(err, callback)
+		utils.LogParseSelectError(session.TelegramID, err, callback)
 		app.SendMessage(messages.SomeError(session), keyboards.Back(session, states.CallAdminFeedback))
 	} else {
 		session.AdminState.FeedbackID = id

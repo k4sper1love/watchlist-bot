@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/natefinch/lumberjack"
 	"log"
+	"os"
 	"sync"
 )
 
@@ -20,10 +21,10 @@ var (
 	mu      sync.RWMutex             // Read-write mutex for safe concurrent access to the loggers map.
 )
 
-// GetLogger retrieves or creates a logger for the specified user ID.
+// Get retrieves or creates a logger for the specified user ID.
 // If a logger already exists for the user, it is returned. Otherwise, a new logger is created,
 // configured with log rotation using the `lumberjack.Logger`, and stored in the global map.
-func GetLogger(userID int) *Wrapper {
+func Get(userID int) *Wrapper {
 	// Attempt to retrieve the logger from the map using a read lock.
 	mu.RLock()
 	logger, exists := loggers[userID]
@@ -43,7 +44,7 @@ func GetLogger(userID int) *Wrapper {
 	}
 
 	// Configure the log file path and log rotation settings.
-	logFile := fmt.Sprintf("logs/user_%d.log", userID)
+	logFile := fmt.Sprintf("%s/users/user_%d.log", getLogDirectory(), userID)
 	lumberjackLogger := &lumberjack.Logger{
 		Filename:   logFile, // Path to the log file.
 		MaxSize:    5,       // Maximum size of the log file in MB before rotation.
@@ -92,4 +93,24 @@ func (w *Wrapper) Println(msg string) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	w.logger.Println(msg)
+}
+
+// GetFilePath constructs the log file path for a user based on their ID.
+// It checks if the log file exists and returns an error if it does not.
+func GetFilePath(userID int) (string, error) {
+	logFile := fmt.Sprintf("%s/users/user_%d.log", getLogDirectory(), userID)
+	if _, err := os.Stat(logFile); os.IsNotExist(err) {
+		return "", err
+	}
+	return logFile, nil
+}
+
+// getLogDirectory returns the log directory path.
+// If the LOGS_DIR environment variable is set, it uses that value.
+// Otherwise, it defaults to "./logs".
+func getLogDirectory() string {
+	if logsDir := os.Getenv("LOGS_DIR"); logsDir != "" {
+		return logsDir
+	}
+	return "./logs" // Default log directory.
 }

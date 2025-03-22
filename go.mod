@@ -6,7 +6,8 @@ require (
 	github.com/PuerkitoBio/goquery v1.10.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/joho/godotenv v1.5.1
-	github.com/k4sper1love/watchlist-api v0.0.0-20250113232134-c0ba1dd01cb7
+	github.com/k4sper1love/watchlist-api v0.0.0-20250321110402-5cea796cf947
+	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/nicksnyder/go-i18n/v2 v2.4.1
 	golang.org/x/text v0.21.0
 	google.golang.org/api v0.211.0
@@ -38,7 +39,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/natefinch/lumberjack v2.0.0+incompatible // indirect
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.58.0 // indirect
@@ -53,4 +53,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241209162323-e6fa225c2576 // indirect
 	google.golang.org/grpc v1.69.0 // indirect
 	google.golang.org/protobuf v1.35.2 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

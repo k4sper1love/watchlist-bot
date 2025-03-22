@@ -1,14 +1,12 @@
 package general
 
 import (
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/parser"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
-	"log/slog"
 	"strings"
 )
 
@@ -73,7 +71,7 @@ func HandleSettingsProcess(app models.App, session *models.Session) {
 // requestLanguageSelect prompts the user to select a new language for the bot interface.
 func requestLanguageSelect(app models.App, session *models.Session) {
 	if languages, err := utils.ParseSupportedLanguages(app.Config.LocalesDir); err != nil {
-		sl.Log.Error("failed to parse supported languages", slog.Any("error", err), slog.String("dir", app.Config.LocalesDir))
+		utils.LogParseLanguagesError(err, app.Config.LocalesDir)
 		app.SendMessage(messages.LanguagesFailure(session), keyboards.Back(session, states.CallMenuSettings))
 	} else {
 		app.SendMessage(messages.SettingsLanguage(session), keyboards.SettingsLanguageSelect(session, languages))
