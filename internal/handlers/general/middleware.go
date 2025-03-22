@@ -1,7 +1,6 @@
 package general
 
 import (
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/keyboards"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
@@ -59,7 +58,7 @@ func IsBanned(app models.App, session *models.Session) bool {
 // Validates the access token or refreshes it using the refresh token if necessary.
 func isAuthenticated(app models.App, session *models.Session) bool {
 	return session.AccessToken != "" &&
-		(watchlist.IsTokenValid(app, session.AccessToken) ||
+		(watchlist.IsTokenValid(app, session, session.AccessToken) ||
 			(session.RefreshToken != "" && watchlist.RefreshAccessToken(app, session) == nil))
 }
 
@@ -70,7 +69,7 @@ func attemptLoginOrRegister(app models.App, session *models.Session) error {
 	}
 
 	if err := watchlist.Register(app, session); err != nil {
-		sl.Log.Error("failed to login/register", slog.Any("error", err), slog.Int("telegram_id", session.TelegramID))
+		slog.Error("failed to login/register", slog.Any("error", err), slog.Int("telegram_id", session.TelegramID))
 		return err
 	}
 

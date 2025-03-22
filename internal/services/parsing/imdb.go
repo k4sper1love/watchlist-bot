@@ -3,13 +3,11 @@ package parsing
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"io"
-	"log/slog"
 	"net/http"
 	"strings"
 )
@@ -17,10 +15,10 @@ import (
 // GetFilmFromIMDB fetches film details from the IMDB API using the provided URL.
 // It extracts the film ID from the URL, makes an HTTP request to the OMDB API,
 // and parses the response into an `models.Film` object.
-func GetFilmFromIMDB(app models.App, url string) (*apiModels.Film, error) {
+func GetFilmFromIMDB(app models.App, session *models.Session, url string) (*apiModels.Film, error) {
 	id, err := parseIDFromIMDB(url)
 	if err != nil {
-		sl.Log.Error("failed to parse IMDB id", slog.Any("error", err), slog.String("url", url))
+		utils.LogParseFromURLError(session.TelegramID, "failed to parse ID", err, url)
 		return nil, err
 	}
 
@@ -29,6 +27,7 @@ func GetFilmFromIMDB(app models.App, url string) (*apiModels.Film, error) {
 			Method:             http.MethodGet, // HTTP GET method for fetching data.
 			URL:                fmt.Sprintf("http://www.omdbapi.com/?apikey=%s&i=%s&plot=full", app.Config.IMDBAPIToken, id),
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -38,7 +37,7 @@ func GetFilmFromIMDB(app models.App, url string) (*apiModels.Film, error) {
 
 	var film apiModels.Film
 	if err = parseFilmFromIMDB(&film, resp.Body); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 

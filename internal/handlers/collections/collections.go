@@ -119,7 +119,7 @@ func handleCollectionsPagination(app models.App, session *models.Session, callba
 // Parses the collection ID and navigates to the films associated with the selected collection.
 func handleCollectionSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectCollection)); err != nil {
-		utils.LogParseSelectError(err, callback)
+		utils.LogParseSelectError(session.TelegramID, err, callback)
 		app.SendMessage(messages.CollectionsFailure(session), keyboards.Back(session, states.CallCollectionsBack))
 	} else {
 		session.CollectionDetailState.ObjectID = id

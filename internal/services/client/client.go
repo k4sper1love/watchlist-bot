@@ -33,15 +33,17 @@ type CustomRequest struct {
 	Body               any    // Request body (optional).
 	ExpectedStatusCode int    // Expected HTTP status code for successful responses.
 	WithoutLog         bool   // Whether to suppress logging for failed responses.
+	TelegramID         int    // Unique identifier of the Telegram user or chat.
 }
 
 // SendRequest sends an HTTP request and returns the response.
-func SendRequest(req *http.Request) (*http.Response, error) {
-	client := &http.Client{}
+func SendRequest(telegramID int, req *http.Request) (*http.Response, error) {
+	utils.LogRequestDebug(telegramID, req.Method, req.URL.String())
 
+	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		utils.LogRequestError("failed to send request", err, req.Method, req.URL.String())
+		utils.LogRequestError(telegramID, "failed to send request", err, req.Method, req.URL.String())
 		return nil, err
 	}
 
@@ -49,15 +51,15 @@ func SendRequest(req *http.Request) (*http.Response, error) {
 }
 
 // SendRequestWithOptions sends an HTTP request with custom headers and body.
-func SendRequestWithOptions(url, method string, body any, headers map[string]string) (*http.Response, error) {
+func SendRequestWithOptions(telegramID int, url, method string, body any, headers map[string]string) (*http.Response, error) {
 	req, err := prepareRequest(url, method, body)
 	if err != nil {
-		utils.LogRequestError("failed to prepare request", err, method, url)
+		utils.LogRequestError(telegramID, "failed to prepare request", err, method, url)
 		return nil, err
 	}
 
 	setRequestHeaders(req, headers)
-	return SendRequest(req)
+	return SendRequest(telegramID, req)
 }
 
 // setRequestHeaders sets the headers for an HTTP request.
@@ -89,7 +91,7 @@ func Do(req *CustomRequest) (*http.Response, error) {
 		headers[req.HeaderType] = req.HeaderValue
 	}
 
-	resp, err := SendRequestWithOptions(req.URL, req.Method, req.Body, headers)
+	resp, err := SendRequestWithOptions(req.TelegramID, req.URL, req.Method, req.Body, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +101,7 @@ func Do(req *CustomRequest) (*http.Response, error) {
 		if req.WithoutLog {
 			return nil, fmt.Errorf("failed response")
 		}
-		return nil, utils.LogResponseError(req.URL, req.Method, resp.StatusCode, resp.Status)
+		return nil, utils.LogResponseError(req.TelegramID, req.URL, req.Method, req.ExpectedStatusCode, resp.StatusCode, resp.Status)
 	}
 
 	return resp, nil

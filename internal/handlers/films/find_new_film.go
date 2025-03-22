@@ -89,7 +89,7 @@ func handleFindNewFilmPagination(app models.App, session *models.Session, callba
 // Parses the film index and navigates to the detailed view of the selected film.
 func handleFindNewFilmSelect(app models.App, session *models.Session, callback string) {
 	if index, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectNewFilm)); err != nil {
-		utils.LogParseSelectError(err, callback)
+		utils.LogParseSelectError(session.TelegramID, err, callback)
 		app.SendMessage(messages.FilmsFailure(session), keyboards.Back(session, states.CallFindNewFilmBack))
 	} else {
 		session.FilmDetailState.SetFromFilm(&session.FilmsState.Films[index])

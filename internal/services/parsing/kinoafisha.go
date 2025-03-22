@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	apiModels "github.com/k4sper1love/watchlist-api/pkg/models"
+	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
 	"io"
@@ -19,21 +20,22 @@ const (
 )
 
 // GetFilmFromKinoafisha fetches film details from the Kinoafisha website using the provided URL.
-func GetFilmFromKinoafisha(url string) (*apiModels.Film, error) {
-	return getMediaFromKinoafisha(url, categoryMovies, parseFilmFromKinoafisha)
+func GetFilmFromKinoafisha(session *models.Session, url string) (*apiModels.Film, error) {
+	return getMediaFromKinoafisha(session, url, categoryMovies, parseFilmFromKinoafisha)
 }
 
 // GetSeriesFromKinoafisha fetches series details from the Kinoafisha website using the provided URL.
-func GetSeriesFromKinoafisha(url string) (*apiModels.Film, error) {
-	return getMediaFromKinoafisha(url, categorySeries, parseSeriesFromKinoafisha)
+func GetSeriesFromKinoafisha(session *models.Session, url string) (*apiModels.Film, error) {
+	return getMediaFromKinoafisha(session, url, categorySeries, parseSeriesFromKinoafisha)
 }
 
 // getMediaFromKinoafisha is a helper function to fetch media (film or series) details from Kinoafisha.
 // It uses the provided URL, category, and parser function to extract and parse the data.
-func getMediaFromKinoafisha(url, category string, parser func(*apiModels.Film, io.Reader) error) (*apiModels.Film, error) {
-	id := parseKinoafishaID(url)
-	if id == "" {
-		return nil, fmt.Errorf("invalid Kinoafisha URL: %s", url)
+func getMediaFromKinoafisha(session *models.Session, url, category string, parser func(*apiModels.Film, io.Reader) error) (*apiModels.Film, error) {
+	id, err := parseKinoafishaID(url)
+	if err != nil {
+		utils.LogParseFromURLError(session.TelegramID, "failed to parse ID", err, url)
+		return nil, err
 	}
 
 	resp, err := client.Do(
@@ -41,6 +43,7 @@ func getMediaFromKinoafisha(url, category string, parser func(*apiModels.Film, i
 			Method:             http.MethodGet, // HTTP GET method for fetching data.
 			URL:                fmt.Sprintf("https://www.kinoafisha.info/%s/%s", category, id),
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -50,7 +53,7 @@ func getMediaFromKinoafisha(url, category string, parser func(*apiModels.Film, i
 
 	var film apiModels.Film
 	if err = parser(&film, resp.Body); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return nil, err
 	}
 
@@ -135,10 +138,10 @@ func getKinoafishaYear(doc *goquery.Document) int {
 }
 
 // parseKinoafishaID extracts the media ID from the Kinoafisha URL.
-func parseKinoafishaID(url string) string {
+func parseKinoafishaID(url string) (string, error) {
 	parts := strings.Split(strings.TrimPrefix(url, "https://www.kinoafisha.info/"), "/")
 	if len(parts) > 0 {
-		return parts[1] // The second part of the path is the media ID.
+		return parts[1], nil // The second part of the path is the media ID.
 	}
-	return ""
+	return "", fmt.Errorf("invalid Kinoafisha URL: %s", url)
 }

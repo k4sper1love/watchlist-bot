@@ -4,8 +4,8 @@
 package main
 
 import (
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/bot"
+	"log/slog"
 	"os"
 )
 
@@ -13,7 +13,7 @@ import (
 // It initializes and runs the bot, logging any critical errors that cause termination.
 func main() {
 	if err := bot.Run(); err != nil {
-		sl.Log.Error("application terminated due to an error")
+		slog.Error("application terminated due to an error")
 		os.Exit(1)
 	}
 }

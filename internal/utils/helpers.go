@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -394,22 +393,12 @@ func NumberToEmoji(number int) string {
 	return result
 }
 
-// GetLogFilePath constructs the log file path for a user based on their ID.
-// It checks if the log file exists and returns an error if it does not.
-func GetLogFilePath(userID int) (string, error) {
-	logFile := filepath.Join("logs", fmt.Sprintf("user_%d.log", userID))
-	if _, err := os.Stat(logFile); os.IsNotExist(err) {
-		return "", err
-	}
-	return logFile, nil
-}
-
 // CloseBody ensures that an HTTP response body is closed safely.
 // It logs a warning if an error occurs during closing.
-func CloseBody(Body io.ReadCloser) {
-	if Body == nil {
+func CloseBody(body io.ReadCloser) {
+	if body == nil {
 		return
-	} else if err := Body.Close(); err != nil {
+	} else if err := body.Close(); err != nil {
 		LogBodyCloseWarn(err)
 	}
 }
@@ -420,7 +409,7 @@ func CloseFile(file *os.File) {
 	if file == nil {
 		return
 	} else if err := file.Close(); err != nil {
-		LogFileCloseWarn(err)
+		LogFileCloseWarn(err, file.Name())
 	}
 }
 

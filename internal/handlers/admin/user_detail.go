@@ -8,6 +8,7 @@ import (
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/states"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
+	"github.com/k4sper1love/watchlist-bot/pkg/logger"
 	"github.com/k4sper1love/watchlist-bot/pkg/roles"
 	"strings"
 )
@@ -91,7 +92,7 @@ func handleUserDetailSelect(app models.App, session *models.Session) {
 
 // handleUserLogs retrieves and sends the log file for the specified user.
 func handleUserLogs(app models.App, session *models.Session) {
-	if path, err := utils.GetLogFilePath(session.AdminState.UserID); err != nil {
+	if path, err := logger.GetFilePath(session.AdminState.UserID); err != nil {
 		app.SendMessage(messages.LogsNotFound(session), keyboards.Back(session, states.CallUserDetailAgain))
 	} else {
 		app.SendFile(path, messages.LogsFound(session), keyboards.Back(session, states.CallUserDetailAgain))

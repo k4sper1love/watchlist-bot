@@ -3,7 +3,6 @@ package watchlist
 import (
 	"bytes"
 	"fmt"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
 	"github.com/k4sper1love/watchlist-bot/internal/utils"
@@ -19,12 +18,12 @@ func UploadImage(app models.App, data []byte) (string, error) {
 	// Prepare the multipart/form-data request for uploading the image.
 	req, err := prepareImageRequest(app, data)
 	if err != nil {
-		sl.Log.Error("failed to prepare request", slog.Any("error", err))
+		slog.Error("failed to prepare request", slog.Any("error", err))
 		return "", err
 	}
 
 	// Send the request to the API.
-	resp, err := client.SendRequest(req)
+	resp, err := client.SendRequest(int(app.GetChatID()), req)
 	if err != nil {
 		return "", err
 	}
@@ -32,13 +31,13 @@ func UploadImage(app models.App, data []byte) (string, error) {
 
 	// Check if the response status code indicates success.
 	if resp.StatusCode != 201 {
-		return "", utils.LogResponseError(req.URL.String(), req.Method, resp.StatusCode, resp.Status)
+		return "", utils.LogResponseError(int(app.GetChatID()), req.URL.String(), req.Method, 201, resp.StatusCode, resp.Status)
 	}
 
 	// Parse the response to extract the image URL.
 	imageURL, err := parseImageURL(resp.Body)
 	if err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(int(app.GetChatID()), err, resp.Request.Method, resp.Request.URL.String())
 		return "", err
 	}
 

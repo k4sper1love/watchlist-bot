@@ -29,6 +29,7 @@ WORKDIR /root/
 
 # Copy the compiled binary from the builder stage to the runtime container
 COPY --from=builder /app/watchlist-bot .
+COPY --from=builder /app/locales ./locales
 
 # Define the default command to run the application when the container starts
 CMD ["./watchlist-bot"]

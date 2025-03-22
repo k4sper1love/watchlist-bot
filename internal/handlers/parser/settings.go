@@ -33,7 +33,7 @@ func ParseSettingsObjectsPageSize(app models.App, session *models.Session, retry
 // Encrypts the token using the security package and stores it in the session.
 func ParseKinopoiskToken(app models.App, session *models.Session, next func(models.App, *models.Session)) {
 	if encryptedToken, err := security.Encrypt(utils.ParseMessageString(app.Update)); err != nil {
-		utils.LogEncryptError(err)
+		utils.LogEncryptError(session.TelegramID, err)
 		app.SendMessage(messages.SomeError(session), nil)
 	} else {
 		session.KinopoiskAPIToken = encryptedToken

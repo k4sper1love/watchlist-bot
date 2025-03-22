@@ -2,7 +2,6 @@ package watchlist
 
 import (
 	"encoding/json"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-api/pkg/tokens"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"github.com/k4sper1love/watchlist-bot/internal/services/client"
@@ -33,7 +32,7 @@ func sendAuthRequest(app models.App, session *models.Session, endpoint string, e
 	// Generate a short-lived verification token for the user.
 	token, err := tokens.GenerateToken(app.Config.APISecret, session.TelegramID, verificationTokenExpiration)
 	if err != nil {
-		sl.Log.Error("failed to generate verification token", slog.Any("error", err), slog.Int("telegram_id", session.TelegramID))
+		slog.Error("failed to generate verification token", slog.Any("error", err), slog.Int("telegram_id", session.TelegramID))
 		return err
 	}
 
@@ -45,6 +44,7 @@ func sendAuthRequest(app models.App, session *models.Session, endpoint string, e
 			Method:             http.MethodPost, // HTTP POST method for creating data.
 			URL:                app.Config.APIHost + endpoint,
 			ExpectedStatusCode: expectedStatusCode,
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -54,7 +54,7 @@ func sendAuthRequest(app models.App, session *models.Session, endpoint string, e
 
 	// Parse the authentication response and populate the session.
 	if err = parseAuth(session, resp.Body); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return err
 	}
 
@@ -62,11 +62,11 @@ func sendAuthRequest(app models.App, session *models.Session, endpoint string, e
 }
 
 // IsTokenValid checks if the provided access token is valid by sending a verification request to the API.
-func IsTokenValid(app models.App, encryptedToken string) bool {
+func IsTokenValid(app models.App, session *models.Session, encryptedToken string) bool {
 	// Decrypt the encrypted token for use in the request.
 	token, err := security.Decrypt(encryptedToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return false
 	}
 
@@ -79,6 +79,7 @@ func IsTokenValid(app models.App, encryptedToken string) bool {
 			URL:                app.Config.APIHost + "/api/v1/auth/check",
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
 			WithoutLog:         true,          // Suppress logging for this request.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -94,7 +95,7 @@ func RefreshAccessToken(app models.App, session *models.Session) error {
 	// Decrypt the refresh token for use in the request.
 	token, err := security.Decrypt(session.RefreshToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return err
 	}
 
@@ -106,6 +107,7 @@ func RefreshAccessToken(app models.App, session *models.Session) error {
 			Method:             http.MethodPost, // HTTP POST method for creating data.
 			URL:                app.Config.APIHost + "/api/v1/auth/refresh",
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {
@@ -116,14 +118,14 @@ func RefreshAccessToken(app models.App, session *models.Session) error {
 	// Parse the response to extract the new access token.
 	var responseMap map[string]interface{}
 	if err = json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
-		utils.LogParseJSONError(err, resp.Request.Method, resp.Request.URL.String())
+		utils.LogParseJSONError(session.TelegramID, err, resp.Request.Method, resp.Request.URL.String())
 		return err
 	}
 
 	// Encrypt the new access token and update the session.
 	encryptedAccessToken, err := security.Encrypt(responseMap["access_token"].(string))
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return err
 	}
 
@@ -136,7 +138,7 @@ func Logout(app models.App, session *models.Session) error {
 	// Decrypt the refresh token for use in the request.
 	token, err := security.Decrypt(session.RefreshToken)
 	if err != nil {
-		utils.LogDecryptError(err)
+		utils.LogDecryptError(session.TelegramID, err)
 		return err
 	}
 
@@ -148,6 +150,7 @@ func Logout(app models.App, session *models.Session) error {
 			Method:             http.MethodPost, // HTTP POST method for creating data.
 			URL:                app.Config.APIHost + "/api/v1/auth/logout",
 			ExpectedStatusCode: http.StatusOK, // Expecting a 200 OK response.
+			TelegramID:         session.TelegramID,
 		},
 	)
 	if err != nil {

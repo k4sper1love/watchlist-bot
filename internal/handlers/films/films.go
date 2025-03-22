@@ -122,7 +122,7 @@ func handleFilmsPagination(app models.App, session *models.Session, callback str
 // Parses the film index and navigates to the detailed view of the selected film.
 func handleFilmSelect(app models.App, session *models.Session, callback string) {
 	if index, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectFilm)); err != nil {
-		utils.LogParseSelectError(err, callback)
+		utils.LogParseSelectError(session.TelegramID, err, callback)
 		app.SendMessage(messages.FilmsFailure(session), keyboards.Back(session, states.CallFilmsBack))
 	} else {
 		session.FilmDetailState.Index = index

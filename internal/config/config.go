@@ -6,7 +6,6 @@ package config
 import (
 	"fmt"
 	"github.com/joho/godotenv"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/models"
 	"log/slog"
 	"os"
@@ -17,7 +16,7 @@ import (
 // It loads the .env file, parses required values (e.g., ROOT_TELEGRAM_ID), and sets defaults for missing values.
 func Init() (*models.App, error) {
 	if err := godotenv.Load(); err != nil {
-		sl.Log.Warn(".env file not found")
+		slog.Warn(".env file not found")
 	}
 
 	rootID, err := parseRootTelegramID()
@@ -58,13 +57,13 @@ func buildDatabaseURL() string {
 func parseRootTelegramID() (int, error) {
 	idStr := os.Getenv("ROOT_TELEGRAM_ID")
 	if idStr == "" {
-		sl.Log.Error("ROOT_TELEGRAM_ID is not set")
+		slog.Error("ROOT_TELEGRAM_ID is not set")
 		return 0, fmt.Errorf("ROOT_TELEGRAM_ID is not set")
 	}
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		sl.Log.Error("failed to parse ROOT_TELEGRAM_ID", slog.Any("error", err))
+		slog.Error("failed to parse ROOT_TELEGRAM_ID", slog.Any("error", err))
 		return 0, fmt.Errorf("invalid ROOT_TELEGRAM_ID: %w", err)
 	}
 	return id, nil
@@ -74,7 +73,7 @@ func parseRootTelegramID() (int, error) {
 func getEnvOrDefault(key, defaultValue string) string {
 	value := os.Getenv(key)
 	if value == "" {
-		sl.Log.Warn("environment variable is not set, using default", slog.String("key", key), slog.String("default", defaultValue))
+		slog.Warn("environment variable is not set, using default", slog.String("key", key), slog.String("default", defaultValue))
 		return defaultValue
 	}
 	return value

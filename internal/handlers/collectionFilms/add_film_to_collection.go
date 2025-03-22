@@ -110,7 +110,7 @@ func handleAddFilmToCollectionPagination(app models.App, session *models.Session
 // Parses the film ID and adds the selected film to the collection.
 func handleAddFilmToCollectionSelect(app models.App, session *models.Session, callback string) {
 	if id, err := strconv.Atoi(strings.TrimPrefix(callback, states.SelectCFFilm)); err != nil {
-		utils.LogParseSelectError(err, callback)
+		utils.LogParseSelectError(session.TelegramID, err, callback)
 		app.SendMessage(messages.FilmsFailure(session), keyboards.Back(session, states.CallFilmToCollectionOptionExisting))
 	} else {
 		session.FilmDetailState.Film.ID = id

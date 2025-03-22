@@ -22,7 +22,7 @@ func GetFilmByURL(app models.App, session *models.Session, url string) (*apiMode
 	switch {
 	case strings.Contains(url, supportedServices[0]):
 		// Parse film from IMDB.
-		return GetFilmFromIMDB(app, url)
+		return GetFilmFromIMDB(app, session, url)
 
 	case strings.Contains(url, supportedServices[1]):
 		// Parse film from Kinopoisk.
@@ -30,15 +30,15 @@ func GetFilmByURL(app models.App, session *models.Session, url string) (*apiMode
 
 	case strings.Contains(url, supportedServices[2]):
 		// Parse film from Rezka.
-		return GetFilmFromRezka(url)
+		return GetFilmFromRezka(session, url)
 
 	case strings.Contains(url, supportedServices[3]) && strings.Contains(url, "movies"):
 		// Parse film from Kinoafisha (movies section).
-		return GetFilmFromKinoafisha(url)
+		return GetFilmFromKinoafisha(session, url)
 
 	case strings.Contains(url, supportedServices[3]) && strings.Contains(url, "series"):
 		// Parse series from Kinoafisha (series section).
-		return GetSeriesFromKinoafisha(url)
+		return GetSeriesFromKinoafisha(session, url)
 
 	case strings.Contains(url, supportedServices[4]) || strings.Contains(url, "youtu.be"):
 		// Parse film from YouTube or youtu.be links.

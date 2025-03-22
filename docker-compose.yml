@@ -1,8 +1,11 @@
+version: "3.8"
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: on-failure
     environment:
       VERSION: ${VERSION}
       ENVIRONMENT: ${ENVIRONMENT}
@@ -12,6 +15,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       LOCALES_DIR: ${LOCALES_DIR}
+      LOGS_DIR: ${LOGS_DIR}
+      LOGS_OUTPUT: ${LOGS_OUTPUT}
       BOT_TOKEN: ${BOT_TOKEN}
       ROOT_TELEGRAM_ID: ${ROOT_TELEGRAM_ID}
       MASTER_KEY: ${MASTER_KEY}
@@ -19,6 +24,8 @@ services:
       API_SECRET: ${API_SECRET}
       YOUTUBE_API_TOKEN: ${YOUTUBE_API_TOKEN}
       IMDB_API_TOKEN: ${IMDB_API_TOKEN}
+    volumes:
+      - logs-data:${LOGS_DIR}
     depends_on:
       db:
         condition: service_healthy
@@ -33,7 +40,7 @@ services:
     ports:
       - "${POSTGRES_PORT}:5432"
     volumes:
-      - pg-data-bot:/var/lib/postgresql/data
+      - pg-data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
       interval: 10s
@@ -41,5 +48,73 @@ services:
       start_period: 30s
       timeout: 5s
 
+  elasticsearch:
+    image: elasticsearch:7.16.1
+    volumes:
+      - ./configs/elasticsearch/config.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - es-data:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME:-elastic}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      discovery.type: single-node
+    networks:
+      - elk
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  logstash:
+    image: logstash:7.16.2
+    volumes:
+      - ./configs/logstash/config.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./configs/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
+      - ./configs/logstash/pipelines:/usr/share/logstash/config/pipelines:ro
+    environment:
+      LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME:-elastic}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    ports:
+      - "5044:5044"
+      - "5000:5000"
+      - "9600:9600"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: kibana:7.16.1
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./configs/kibana/config.yml:/usr/share/kibana/config/kibana.yml:ro
+    environment:
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME:-elastic}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    networks:
+      - elk
+    ports:
+      - "5601:5601"
+
+  beats:
+    image: elastic/filebeat:7.16.2
+    volumes:
+      - ./configs/filebeat/config.yml:/usr/share/filebeat/filebeat.yml:ro
+      - logs-data:/logs
+    environment:
+      LOGS_DIR: ${LOGS_DIR}
+    networks:
+      - elk
+    depends_on:
+      - app
+      - elasticsearch
+
+networks:
+  elk:
+    driver: bridge
+
 volumes:
-  pg-data-bot:
+  logs-data:
+  pg-data:
+  es-data:

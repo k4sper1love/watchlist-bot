@@ -7,7 +7,6 @@ package handlers
 import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/k4sper1love/watchlist-api/pkg/logger/sl"
 	"github.com/k4sper1love/watchlist-bot/internal/builders/messages"
 	"github.com/k4sper1love/watchlist-bot/internal/database/postgres"
 	"github.com/k4sper1love/watchlist-bot/internal/handlers/admin"
@@ -314,7 +313,7 @@ func answerCallbackQuery(app models.App) {
 	})
 	if err != nil {
 		// Log any errors that occur while answering the callback query.
-		sl.Log.Error("failed to answer callback", slog.Any("error", err), slog.String("callback_id", app.Update.CallbackQuery.ID))
+		slog.Error("failed to answer callback", slog.Any("error", err), slog.String("callback_id", app.Update.CallbackQuery.ID))
 	}
 }
 
