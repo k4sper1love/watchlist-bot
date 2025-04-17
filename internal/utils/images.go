@@ -11,10 +11,13 @@ import (
 
 // supportedTypes defines the list of supported image MIME types.
 var supportedTypes = map[string]bool{
-	"image/jpeg":               true,
-	"image/png":                true,
-	"image/gif":                true,
-	"application/octet-stream": true,
+	"image/jpeg":                true,
+	"image/png":                 true,
+	"image/gif":                 true,
+	"application/octet-stream":  true,
+	"image/png; charset=UTF-8":  true,
+	"image/jpeg; charset=UTF-8": true,
+	"image/gif; charset=UTF-8":  true,
 }
 
 // ParseImageFromMessage extracts an image from a Telegram message.

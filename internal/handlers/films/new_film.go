@@ -147,7 +147,7 @@ func parseNewFilmFromURL(app models.App, session *models.Session) {
 
 	film.URL = url
 	session.FilmDetailState.SetFromFilm(film)
-	parser.ParseFilmImageFromMessage(app, session, requestNewFilmComment)
+	parser.ParseFilmImageFromURL(app, session, film.ImageURL, requestNewFilmComment)
 }
 
 // handleNewFilmFromURLError handles errors encountered while processing a film from a URL.
